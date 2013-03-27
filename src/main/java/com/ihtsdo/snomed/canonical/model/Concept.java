@@ -3,6 +3,8 @@ package com.ihtsdo.snomed.canonical.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 @Entity
 public class Concept {
 	@Id private long id;
@@ -13,6 +15,14 @@ public class Concept {
 	private boolean isPrimitive;
 	
 	
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+    
+    /*
+     * Generated Getters and Setters
+     */
 	
 	public long getId() {
 		return id;
