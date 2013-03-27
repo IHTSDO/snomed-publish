@@ -3,3 +3,4 @@ src/main/resources/*.ont.txt
 .settings
 .metadata
 .classpath
+.project
