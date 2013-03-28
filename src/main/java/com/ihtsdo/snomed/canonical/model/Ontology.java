@@ -1,13 +1,13 @@
 package com.ihtsdo.snomed.canonical.model;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 @Entity
 public class Ontology {
@@ -15,14 +15,24 @@ public class Ontology {
 	private String name;
 	private String description;
 	
-	@OneToMany(cascade=CascadeType.ALL)
-	private List<Relationship> triples;
+	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
+	private Set<Relationship> relationships = new HashSet<Relationship>();
 	
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return "id: " + id + ", name: " + name + ", description: " + description + ", number of relationships: " + relationships.size();
+    }
+    
+    public void addRelationship(Relationship r){
+    	relationships.add(r);
     }
 
+    
+    
+    /*
+     * Generated Getters and Setters
+     */
+    
 	public long getId() {
 		return id;
 	}
@@ -47,16 +57,13 @@ public class Ontology {
 		this.description = description;
 	}
 
-	public List<Relationship> getTriples() {
-		return triples;
+	public Set<Relationship> getRelationships() {
+		return relationships;
 	}
 
-	public void setTriples(List<Relationship> triples) {
-		this.triples = triples;
+	public void setRelationships(Set<Relationship> relationships) {
+		this.relationships = relationships;
 	}
-    
-    /*
-     * Generated Getters and Setters
-     */
+
 
 }

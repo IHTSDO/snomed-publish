@@ -2,10 +2,11 @@ package com.ihtsdo.snomed.canonical.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.google.common.primitives.Longs;
 
 @Entity
 public class Relationship {
@@ -22,6 +23,24 @@ public class Relationship {
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
+    
+    @Override
+    public int hashCode(){
+    	return Longs.hashCode(id);
+    }
+    
+    @Override
+    public boolean equals(Object o){
+    	if (o instanceof Relationship){
+    		Relationship r = (Relationship) o;
+    		if (r.id == this.id){
+    			return true;
+    		}
+    	}
+    	return false; 
+    }
+    
+    
     
     /*
      * Generated Getters and Setters

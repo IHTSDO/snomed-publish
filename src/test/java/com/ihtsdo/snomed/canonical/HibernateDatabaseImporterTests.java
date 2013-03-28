@@ -1,8 +1,9 @@
 package com.ihtsdo.snomed.canonical;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -15,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
+import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Relationship;
 
 public class HibernateDatabaseImporterTests {
@@ -49,22 +51,22 @@ public class HibernateDatabaseImporterTests {
 
 	@SuppressWarnings("static-access")
 	@Test
-	public void shouldPopulateConcepts() throws FileNotFoundException, IOException {
+	public void shouldPopulateConcepts() throws IOException {
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
 	}
 	
 	@SuppressWarnings("static-access")
 	@Test
-	public void shouldPopulateRelationships() throws FileNotFoundException, IOException {
+	public void shouldPopulateRelationships() throws IOException {
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-		importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+		importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 	}	
 
 	@SuppressWarnings("static-access")
 	@Test
-	public void dbShouldHave10TestRelationshipsAfterPopulation() throws FileNotFoundException, IOException{
+	public void dbShouldHave10TestRelationshipsAfterPopulation() throws IOException{
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-		importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+		importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 		
 		CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -76,7 +78,7 @@ public class HibernateDatabaseImporterTests {
 	
 	@SuppressWarnings("static-access")
 	@Test
-	public void dbShouldHave10TestConceptsAfterPopulation() throws FileNotFoundException, IOException{
+	public void dbShouldHave10TestConceptsAfterPopulation() throws IOException{
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
 		
 		CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
@@ -89,9 +91,9 @@ public class HibernateDatabaseImporterTests {
 	
 	@SuppressWarnings("static-access")
 	@Test
-	public void dbShouldStoreAllDataPointsForRelationship() throws FileNotFoundException, IOException{
+	public void dbShouldStoreAllDataPointsForRelationship() throws IOException{
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-		importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+		importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 		
 		Relationship r = main.em.find(Relationship.class, (long)100000028); 
 	    
@@ -106,7 +108,7 @@ public class HibernateDatabaseImporterTests {
 	
 	@SuppressWarnings("static-access")
 	@Test
-	public void dbShouldStoreAllDataPointsForConcept() throws FileNotFoundException, IOException{
+	public void dbShouldStoreAllDataPointsForConcept() throws IOException{
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
 
 		Concept c = main.em.find(Concept.class, (long)100000000); 
@@ -118,15 +120,38 @@ public class HibernateDatabaseImporterTests {
 		assertEquals ("C-D1619", c.getSnomedId());
 		assertEquals (true, c.isPrimitive());
 	}
+	
+	@Test
+	public void shouldReturnOntologyAfterPopulatingDatabase() throws IOException{
+		@SuppressWarnings("static-access")
+		Ontology ontology = importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), 
+				ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+		assertNotNull(ontology);
+		assertEquals(10, ontology.getRelationships().size());
+	}
+	
+	@SuppressWarnings("static-access")
+	@Test
+	public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
+		importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), 
+				ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+		
+		Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+		assertNotNull(ontology);
+		assertEquals(10, ontology.getRelationships().size());
+		assertEquals(HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID, ontology.getId());
+		Relationship r = new Relationship();
+		r.setId(100000028);
+		assertTrue(ontology.getRelationships().contains(r));
+	}
 
 	@SuppressWarnings("static-access")
 	@Test
-	public void shouldSkipRowAndContinueDbPopulationAfterParseError() throws FileNotFoundException, IOException{
+	public void shouldSkipRowAndContinueDbPopulationAfterParseError() throws IOException{
 		importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS_WITH_PARSE_ERROR), main.em);
-		importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_WITH_PARSE_ERROR), main.em);
+		importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_WITH_PARSE_ERROR), main.em);
 		
-		CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
-		
+		CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();		
 		CriteriaQuery<Long> conceptCriteriaQuery = criteriaBuilder.createQuery(Long.class);
 		conceptCriteriaQuery.select(criteriaBuilder.count(conceptCriteriaQuery.from(Concept.class)));
 		long conceptResult = main.em.createQuery(conceptCriteriaQuery).getSingleResult();
