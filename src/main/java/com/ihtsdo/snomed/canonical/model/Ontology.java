@@ -11,59 +11,59 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class Ontology {
-	@Id private long id;
-	private String name;
-	private String description;
-	
-	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
-	private Set<RelationshipStatement> relationshipStatements = new HashSet<RelationshipStatement>();
-	
+    @Id private long id;
+    private String name;
+    private String description;
+
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
+    private Set<RelationshipStatement> relationshipStatements = new HashSet<RelationshipStatement>();
+
     @Override
     public String toString() {
         return "id: " + id + ", name: " + name + ", description: " + description + ", number of relationshipStatements: " + relationshipStatements.size();
     }
-    
+
     public void addRelationshipStatement(RelationshipStatement r){
-    	relationshipStatements.add(r);
+        relationshipStatements.add(r);
     }
 
-    
-    
+
+
     /*
      * Generated Getters and Setters
      */
-    
-	public long getId() {
-		return id;
-	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public Set<RelationshipStatement> getRelationshipStatements() {
-		return relationshipStatements;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setRelationshipStatements(Set<RelationshipStatement> relationshipStatements) {
-		this.relationshipStatements = relationshipStatements;
-	}
+    public Set<RelationshipStatement> getRelationshipStatements() {
+        return relationshipStatements;
+    }
+
+    public void setRelationshipStatements(Set<RelationshipStatement> relationshipStatements) {
+        this.relationshipStatements = relationshipStatements;
+    }
 
 
 }
