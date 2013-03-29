@@ -1,11 +1,8 @@
 CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
-100000000	10	BITTER-3 (product)	XU000	C-D1619	1
-10000006	0	Radiating chest pain (finding)	XU001	F-37060	1
-1000004	4	Sprain (morphologic abnormality)	XC0C0	M-13400	1
-100001001	10	BIZOLIN 200 (product)	XU002	C-D1621	1
-100002008	10	BIZOLIN GEL (product)	XU003	C-D1623	1
-100003003	10	BLACKLEGOL 4 WITH SPUR (product)	XU004	C-D1625	1
-100004009	10	BLACKLEGOL 7 SOMNUS WITH SPUR (product)	XU005	C-D1627	1
-100005	1	SNOMED RT Concept (special concept)	XU006	G-3000	1
-100005005	10	BLACKLEGOL 7 WITH SPUR (product)	XU007	C-D1629	1
-100006006	10	BLACKLEGOL 8 WITH SPUR (product)	XU008	C-D1631	1
+280844000	0	Entire body of seventh thoracic vertebra (body structure)	Xa1Y9	T-11875	1
+280845004	0	Entire body of eighth thoracic vertebra (body structure)	Xa1YA	T-11876	1
+280846003	0	Entire body of ninth thoracic vertebra (body structure)	Xa1YB	T-11877	1
+71737002	0	Structure of body of seventh thoracic vertebra (body structure)	XUJbr	T-11779	1
+280737002	0	Entire body of thoracic vertebra (body structure)	Xa1WN	T-1183E	1
+77435000	0	Structure of body of eighth thoracic vertebra (body structure)	XUKjT	T-11789	1
+33766003	0	Structure of body of ninth thoracic vertebra (body structure)	XUC28	T-11799	1

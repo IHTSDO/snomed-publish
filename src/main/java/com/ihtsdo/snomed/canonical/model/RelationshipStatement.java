@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.google.common.primitives.Longs;
 
-@Entity
+@Entity(name="RelationshipStatement")
 public class RelationshipStatement {
 
     @Id private long id;
@@ -21,7 +21,7 @@ public class RelationshipStatement {
     private long relationshipType;
     @OneToOne private Concept object;
     private int characteristicType;
-    private boolean refinability;
+    private int refinability;
     private int relationShipGroup;
 
     @Override
@@ -78,12 +78,15 @@ public class RelationshipStatement {
     public void setCharacteristicType(int characteristicType) {
         this.characteristicType = characteristicType;
     }
-    public boolean isRefinability() {
+
+    public int getRefinability() {
         return refinability;
     }
-    public void setRefinability(boolean refinability) {
+
+    public void setRefinability(int refinability) {
         this.refinability = refinability;
     }
+
     public int getRelationShipGroup() {
         return relationShipGroup;
     }

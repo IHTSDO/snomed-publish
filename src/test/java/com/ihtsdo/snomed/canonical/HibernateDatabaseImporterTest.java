@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
@@ -17,13 +19,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
-import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
-public class HibernateDatabaseImporterTests {
+public class HibernateDatabaseImporterTest {
 
     private static HibernateDatabaseImporter importer;
     private static Main main;
+
+    private static final String COMPLETE_CONCEPTS = "sct1_Concepts_Core_INT_20130131.ont.txt";
+    private static final String COMPLETE_RELATIONSHIPS = "sct1_Relationships_Core_INT_20130131.ont.txt";
     private static final String TEST_CONCEPTS = "test_concepts.txt";
     private static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
     private static final String TEST_RELATIONSHIPS = "test_relationships.txt";
@@ -51,36 +55,38 @@ public class HibernateDatabaseImporterTests {
         main.closeDb();
     }
 
-    @SuppressWarnings("static-access")
+//    @Test
+//    public void shouldPopulateALLItems() throws IOException {
+//        importer.populateDb(ClassLoader.getSystemResourceAsStream(COMPLETE_CONCEPTS),
+//                ClassLoader.getSystemResourceAsStream(COMPLETE_RELATIONSHIPS), main.em);
+//    }
+
     @Test
     public void shouldPopulateConcepts() throws IOException {
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
     }
 
-    @SuppressWarnings("static-access")
     @Test
     public void shouldPopulateRelationships() throws IOException {
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-        importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+        importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
     }
 
-    @SuppressWarnings("static-access")
     @Test
-    public void dbShouldHave10RelationshipsAfterPopulation() throws IOException{
+    public void dbShouldHave5RelationshipsAfterPopulation() throws IOException{
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-        importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+        importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 
         CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(RelationshipStatement.class)));
 
         long result = main.em.createQuery(criteriaQuery).getSingleResult();
-        assertEquals(10, result);
+        assertEquals(5, result);
     }
 
-    @SuppressWarnings("static-access")
     @Test
-    public void dbShouldHave10TestConceptsAfterPopulation() throws IOException{
+    public void dbShouldHave7ConceptsAfterPopulation() throws IOException{
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
 
         CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
@@ -88,74 +94,73 @@ public class HibernateDatabaseImporterTests {
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
 
         long result = main.em.createQuery(criteriaQuery).getSingleResult();
-        assertEquals(10, result);
+        assertEquals(7, result);
     }
 
-    @SuppressWarnings("static-access")
     @Test
     public void dbShouldStoreAllDataPointsForRelationship() throws IOException{
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
-        importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+        importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 
         RelationshipStatement r = main.em.find(RelationshipStatement.class, (long)100000028);
 
+        assertNotNull(r);
+        assertNotNull(r.getSubject());
+        assertNotNull(r.getObject());
         assertEquals (100000028, r.getId());
-        assertEquals (100006006, r.getSubject().getId());
+        assertEquals (280844000, r.getSubject().getId());
         assertEquals (116680003, r.getRelationshipType(), 116680003);
-        assertEquals (10000006, r.getObject().getId());
+        assertEquals (71737002, r.getObject().getId());
         assertEquals (0, r.getCharacteristicType());
-        assertEquals (false, r.isRefinability());
+        assertEquals (0, r.getRefinability());
         assertEquals (0, r.getRelationShipGroup());
     }
 
-    @SuppressWarnings("static-access")
     @Test
     public void dbShouldStoreAllDataPointsForConcept() throws IOException{
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
 
-        Concept c = main.em.find(Concept.class, (long)100000000);
+        Concept c = main.em.find(Concept.class, (long)280844000);
 
-        assertEquals (100000000, c.getId());
-        assertEquals (10, c.getStatus());
-        assertEquals ("BITTER-3 (product)", c.getFullySpecifiedName());
-        assertEquals ("XU000", c.getCtv3id());
-        assertEquals ("C-D1619", c.getSnomedId());
+        assertNotNull(c);
+        assertEquals (280844000, c.getId());
+        assertEquals (0, c.getStatus());
+        assertEquals ("Entire body of seventh thoracic vertebra (body structure)", c.getFullySpecifiedName());
+        assertEquals ("Xa1Y9", c.getCtv3id());
+        assertEquals ("T-11875", c.getSnomedId());
         assertEquals (true, c.isPrimitive());
     }
 
-    @Test
-    public void shouldReturnOntologyAfterPopulatingDatabase() throws IOException{
-        @SuppressWarnings("static-access")
-        Ontology ontology = importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
-        assertNotNull(ontology);
-        assertEquals(10, ontology.getRelationshipStatements().size());
-    }
-
-    @SuppressWarnings("static-access")
     @Test
     public void shouldPopulateSubjectOfRelationshipStatementBidirectionalField() throws IOException{
         importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 
-        Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
-        RelationshipStatement r = ontology.getRelationshipStatements().iterator().next();
-        assertTrue(r.getSubject().getSubjectOfRelationShipStatements().contains(r));
+        Query query = main.em.createQuery("SELECT r FROM RelationshipStatement r");
+        
+        @SuppressWarnings("unchecked")
+        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
 
+        Iterator<RelationshipStatement> stIt = statements.iterator();
+        while (stIt.hasNext()){
+            RelationshipStatement statement = stIt.next();
+            assertTrue(statement.getSubject().getSubjectOfRelationShipStatements().contains(statement));
+        }
     }
 
-    @SuppressWarnings("static-access")
     @Test
     public void shouldPopulateKindOfAndParentOfBidirectionalFieldsForIsARelationships() throws IOException{
         importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_RELATIONSHIPS), main.em);
 
-        Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+        Query query = main.em.createQuery("SELECT r FROM RelationshipStatement r");
+        @SuppressWarnings("unchecked")
+        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
 
         RelationshipStatement r1000 = null;
         RelationshipStatement r2000 = null;
         RelationshipStatement r3000 = null;
-        Iterator<RelationshipStatement> rIt = ontology.getRelationshipStatements().iterator();
+        Iterator<RelationshipStatement> rIt = statements.iterator();
         while (rIt.hasNext()){
             RelationshipStatement r = rIt.next();
             if (r.getId() == 1000){
@@ -168,35 +173,17 @@ public class HibernateDatabaseImporterTests {
                 r3000 = r;
             }
         }
-
         assertEquals(1, r1000.getSubject().getId());
         assertEquals(2, r2000.getSubject().getId());
         assertEquals(3, r3000.getSubject().getId());
         assertTrue(r1000.getSubject().getKindOf().contains(r2000.getSubject()));
         assertTrue(r2000.getSubject().getParentOf().contains(r1000.getSubject()));
-
     }
 
-    @SuppressWarnings("static-access")
-    @Test
-    public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
-        importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
-
-        Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
-        assertNotNull(ontology);
-        assertEquals(10, ontology.getRelationshipStatements().size());
-        assertEquals(HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID, ontology.getId());
-        RelationshipStatement r = new RelationshipStatement();
-        r.setId(100000028);
-        assertTrue(ontology.getRelationshipStatements().contains(r));
-    }
-
-    @SuppressWarnings("static-access")
     @Test
     public void shouldSkipRowAndContinueDbPopulationAfterParseError() throws IOException{
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS_WITH_PARSE_ERROR), main.em);
-        importer.populateRelationshipsAndCreateOntology(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_WITH_PARSE_ERROR), main.em);
+        importer.populateRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_WITH_PARSE_ERROR), main.em);
 
         CriteriaBuilder criteriaBuilder = main.em.getCriteriaBuilder();
         CriteriaQuery<Long> conceptCriteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -210,4 +197,21 @@ public class HibernateDatabaseImporterTests {
         assertEquals(9, conceptResult);
         assertEquals(9, relationshipResult);
     }
+
+
+
+////  @SuppressWarnings("static-access")
+////  @Test
+////  public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
+////      importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+////              ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
+////
+////      Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+////      assertNotNull(ontology);
+////      assertEquals(10, ontology.getRelationshipStatements().size());
+////      assertEquals(HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID, ontology.getId());
+////      RelationshipStatement r = new RelationshipStatement();
+////      r.setId(100000028);
+////      assertTrue(ontology.getRelationshipStatements().contains(r));
+////  }
 }

@@ -4,21 +4,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.ejb.HibernateEntityManager;
+import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
+import com.ihtsdo.snomed.canonical.exception.InvalidInputException;
 import com.ihtsdo.snomed.canonical.model.Concept;
-import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class HibernateDatabaseImporter {
@@ -28,29 +33,26 @@ public class HibernateDatabaseImporter {
 
     protected static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
 
-    public static Ontology populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
+    public void populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
         LOG.info("Populating database");
         populateConcepts(conceptsStream, em);
-        return populateRelationshipsAndCreateOntology(relationshipsStream, em);
+        populateRelationships(relationshipsStream, em);
+        createIsKindOfHierarchy(em);
     }
 
-    protected static void populateConcepts(InputStream stream, EntityManager em) throws IOException {
+    protected void populateConcepts(InputStream stream, EntityManager em) throws IOException {
         LOG.info("Populating Concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
-
         try {
             Transaction tx = session.beginTransaction();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             int currentLine = 1;
             String line = null;
-
                 try {
                     line = br.readLine();
-
                     //skip the headers
                     line = br.readLine();
-
                     while (line != null) {
                         currentLine++;
                         if (line.isEmpty()){
@@ -59,7 +61,6 @@ public class HibernateDatabaseImporter {
                         }
                         Iterable<String> split = Splitter.on('\t').split(line);
                         Iterator<String> splitIt = split.iterator();
-
                         Concept concept = new Concept();
                         try {
                             concept.setId(Long.parseLong(splitIt.next()));
@@ -67,7 +68,7 @@ public class HibernateDatabaseImporter {
                             concept.setFullySpecifiedName(splitIt.next());
                             concept.setCtv3id(splitIt.next());
                             concept.setSnomedId(splitIt.next());
-                            concept.setPrimitive(HibernateDatabaseImporter.stringToBoolean(splitIt.next()));
+                            concept.setPrimitive(stringToBoolean(splitIt.next()));
                             session.insert(concept);
 
                         } catch (NumberFormatException e) {
@@ -75,14 +76,11 @@ public class HibernateDatabaseImporter {
                         } catch (IllegalArgumentException e){
                             LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
                         }
-
                         line = br.readLine();
-
                     }
                 } finally {
                     br.close();
                 }
-
             tx.commit();
             LOG.info("Populated [" + (currentLine - 1) + "] concepts");
         } finally {
@@ -90,30 +88,19 @@ public class HibernateDatabaseImporter {
         }
     }
 
-    protected static Ontology populateRelationshipsAndCreateOntology(InputStream stream, EntityManager em) throws IOException {
+    protected void populateRelationships(InputStream stream, EntityManager em) throws IOException {
         LOG.info("Populating Relationships");
-        //HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
-        //StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
-
-        EntityTransaction tx = em.getTransaction();
-        tx.begin();
-
-        //Set<RelationshipStatement> statements = new HashSet<RelationshipStatement>();
-
-        Ontology ontology = new Ontology();
-        ontology.setId(IMPORTED_ONTOLOGY_ID);
-        ontology.setDescription("Incoming ontology from text files");
-        ontology.setName("incoming");
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
+        Transaction tx = session.beginTransaction();
 
         try {
-            //EntityTransaction tx = em.beginTransaction();
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             int currentLine = 1;
             String line = null;
 
             try {
                 line = br.readLine();
-
                 //skip the headers
                 line = br.readLine();
 
@@ -130,41 +117,35 @@ public class HibernateDatabaseImporter {
 
                     try {
                         statement.setId(Long.parseLong(splitIt.next()));
-                        Concept subject = em.find(Concept.class, Long.parseLong(splitIt.next()));
+                        long subjectId = Long.parseLong(splitIt.next());
+                        Concept subject = em.find(Concept.class, subjectId);
+                        if (subject == null){
+                            throw new InvalidInputException("Concept [" + subjectId + "] not found");
+                        }
                         statement.setSubject(subject);
                         statement.setRelationshipType(Long.parseLong(splitIt.next()));
-                        Concept object = em.find(Concept.class, Long.parseLong(splitIt.next()));
-                        statement.setObject(object);
-                        statement.setCharacteristicType(Integer.parseInt(splitIt.next()));
-                        statement.setRefinability(stringToBoolean(splitIt.next()));
-                        statement.setRelationShipGroup(Integer.parseInt(splitIt.next()));
-
-                        if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
-                            subject.addKindOf(object);
-                            object.addParentOf(subject);
+                        long objectId = Long.parseLong(splitIt.next());
+                        Concept object = em.find(Concept.class, objectId);
+                        if (object == null){
+                            throw new InvalidInputException("Concept [" + objectId + "] not found");
                         }
 
-                        subject.addSubjectOfRelationShipStatements(statement);
+                        statement.setObject(object);
+                        statement.setCharacteristicType(Integer.parseInt(splitIt.next()));
+                        statement.setRefinability(Integer.parseInt(splitIt.next()));
+                        statement.setRelationShipGroup(Integer.parseInt(splitIt.next()));
 
-                        //session.insert(relationshipStatement);
-                        em.persist(statement);
-
-                        //statements.add(statement);
-                        ontology.addRelationshipStatement(statement);
+                        session.insert(statement);
 
                     } catch (NumberFormatException e) {
                         LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
                     } catch (IllegalArgumentException e){
                         LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+                    } catch (InvalidInputException e) {
+                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
                     }
 
                     line = br.readLine();
-
-                    if (currentLine % 500 == 0){
-                        em.flush();
-                        em.clear();
-                    }
-
                 }
             } finally {
                 br.close();
@@ -172,18 +153,43 @@ public class HibernateDatabaseImporter {
             tx.commit();
             LOG.info("Populated [" + (currentLine - 1) + "] relationships");
         } finally {
-            //session.close();
+            session.close();
         }
-
-        //ontology.setRelationshipStatements(statements);
-
-        em.persist(ontology);
-
-        LOG.info("Populated Ontology [" + ontology.toString() + "]");
-        return ontology;
     }
 
-    protected static boolean stringToBoolean(String string){
+    protected void createIsKindOfHierarchy(EntityManager em){
+        LOG.info("Creating isA hierarchy");
+        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+        @SuppressWarnings("unchecked") List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
+        final Iterator<RelationshipStatement> stIt = statements.iterator();
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            session.doWork(new Work() {
+                public void execute(Connection connection) throws SQLException {
+                    PreparedStatement psKindOf = connection.prepareStatement("INSERT INTO KIND_OF (child_id, parent_id) VALUES (?, ?)");
+                    int counter = 1;
+                    while(stIt.hasNext()){
+                        RelationshipStatement statement = stIt.next();
+                        if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+                            psKindOf.setLong(1, statement.getSubject().getId());
+                            psKindOf.setLong(2, statement.getObject().getId());
+                            psKindOf.addBatch();
+                            counter++;
+                        }
+                    }
+                    psKindOf.executeBatch();
+                    LOG.info("Created " + counter + " isA relationships");
+                }
+            });
+            tx.commit();
+        } finally {
+            session.close();
+        }
+    }
+    
+    protected boolean stringToBoolean(String string){
         if (string.trim().equals("0")){
             return false;
         }
@@ -193,5 +199,48 @@ public class HibernateDatabaseImporter {
         else{
             throw new IllegalArgumentException("Unable to convert value [" + string + "] to boolean value");
         }
-    }
+    }    
+
+//    protected static void createAlgorithmStructures(EntityManager em){
+//        EntityTransaction tx = em.getTransaction();
+//        tx.begin();
+//        //Ontology o = em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+//        //LOG.info("Processing Step 2 for ontology [" + o +"]");
+//
+//        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+//        List<RelationshipStatement> c = (List<RelationshipStatement>) query.getResultList();
+//
+//
+//        Iterator<RelationshipStatement> stIt = c.iterator();
+//        //= o.getRelationshipStatements().iterator();
+//        int counter = 0;
+//        while (stIt.hasNext()){
+//            RelationshipStatement statement = stIt.next();
+//
+//            if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+//                statement.getSubject().addKindOf(statement.getObject());
+//                statement.getObject().addParentOf(statement.getSubject());
+//            }
+//
+//            statement.getSubject().addSubjectOfRelationShipStatements(statement);
+//
+////            em.merge(statement.getSubject());
+////            em.merge(statement.getObject());
+//
+////            em.merge(statement);
+//
+//            if (counter % 10000 == 0){
+//                em.flush();
+//                LOG.debug("Processed [" + counter + "] concepts");
+//                //em.clear();
+//            }
+//            counter++;
+//
+////            if (counter % 10000 == 0){
+////                LOG.debug("Processed [" + counter + "] concepts");
+////            }
+//        }
+//        LOG.debug("Done. Processed [" + counter + "] concepts");
+//        tx.commit();
+//    }
 }

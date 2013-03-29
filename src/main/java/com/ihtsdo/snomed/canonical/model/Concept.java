@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -30,7 +29,7 @@ public class Concept {
     private Set<RelationshipStatement> subjectOfRelationShipStatements = new HashSet<RelationshipStatement>();
 
     @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinTable(name = "KIND_OF",
+    @JoinTable(name = "KIND_OF", 
     joinColumns = @JoinColumn(name="child_id"),
     inverseJoinColumns = @JoinColumn(name="parent_id"))
     private Set<Concept> kindOf = new HashSet<Concept>();
