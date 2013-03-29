@@ -16,15 +16,15 @@ public class Ontology {
 	private String description;
 	
 	@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
-	private Set<Relationship> relationships = new HashSet<Relationship>();
+	private Set<RelationshipStatement> relationshipStatements = new HashSet<RelationshipStatement>();
 	
     @Override
     public String toString() {
-        return "id: " + id + ", name: " + name + ", description: " + description + ", number of relationships: " + relationships.size();
+        return "id: " + id + ", name: " + name + ", description: " + description + ", number of relationshipStatements: " + relationshipStatements.size();
     }
     
-    public void addRelationship(Relationship r){
-    	relationships.add(r);
+    public void addRelationshipStatement(RelationshipStatement r){
+    	relationshipStatements.add(r);
     }
 
     
@@ -57,12 +57,12 @@ public class Ontology {
 		this.description = description;
 	}
 
-	public Set<Relationship> getRelationships() {
-		return relationships;
+	public Set<RelationshipStatement> getRelationshipStatements() {
+		return relationshipStatements;
 	}
 
-	public void setRelationships(Set<Relationship> relationships) {
-		this.relationships = relationships;
+	public void setRelationshipStatements(Set<RelationshipStatement> relationshipStatements) {
+		this.relationshipStatements = relationshipStatements;
 	}
 
 

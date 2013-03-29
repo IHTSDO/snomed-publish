@@ -4,11 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
@@ -20,12 +19,14 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.Relationship;
+import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class HibernateDatabaseImporter {
 	
 	private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporter.class );
 	public static final long IMPORTED_ONTOLOGY_ID = 2;
+	
+	protected static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
 	
 	public static Ontology populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
 		LOG.info("Populating database");
@@ -91,16 +92,24 @@ public class HibernateDatabaseImporter {
 
 	protected static Ontology populateRelationshipsAndCreateOntology(InputStream stream, EntityManager em) throws IOException {
 		LOG.info("Populating Relationships");
-		HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
-		StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
-		Set<Relationship> relationships = new HashSet<Relationship>();
+		//HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+		//StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
+		
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();		
+		
+		//Set<RelationshipStatement> statements = new HashSet<RelationshipStatement>();
+		
+		Ontology ontology = new Ontology();
+		ontology.setId(IMPORTED_ONTOLOGY_ID);
+		ontology.setDescription("Incoming ontology from text files");
+		ontology.setName("incoming");
 		
 		try {
-			Transaction tx = session.beginTransaction();
+			//EntityTransaction tx = em.beginTransaction();
 			BufferedReader br = new BufferedReader(new InputStreamReader(stream));
 			int currentLine = 1;
 			String line = null;
-			
 			
 			try {
 				line = br.readLine();
@@ -117,19 +126,31 @@ public class HibernateDatabaseImporter {
 					Iterable<String> split = Splitter.on('\t').split(line);
 					Iterator<String> splitIt = split.iterator();
 
-					Relationship relationship = new Relationship();
+					RelationshipStatement statement = new RelationshipStatement();
 					
 					try {
-						relationship.setId(Long.parseLong(splitIt.next()));
-						relationship.setConcept1(em.find(Concept.class, Long.parseLong(splitIt.next())));
-						relationship.setRelationshipType(Long.parseLong(splitIt.next()));
-						relationship.setConcept2(em.find(Concept.class, Long.parseLong(splitIt.next())));
-						relationship.setCharacteristicType(Integer.parseInt(splitIt.next()));
-						relationship.setRefinability(stringToBoolean(splitIt.next()));
-						relationship.setRelationShipGroup(Integer.parseInt(splitIt.next()));
+						statement.setId(Long.parseLong(splitIt.next()));
+						Concept subject = em.find(Concept.class, Long.parseLong(splitIt.next()));
+						statement.setSubject(subject);
+						statement.setRelationshipType(Long.parseLong(splitIt.next()));
+						Concept object = em.find(Concept.class, Long.parseLong(splitIt.next()));
+						statement.setObject(object);
+						statement.setCharacteristicType(Integer.parseInt(splitIt.next()));
+						statement.setRefinability(stringToBoolean(splitIt.next()));
+						statement.setRelationShipGroup(Integer.parseInt(splitIt.next()));
 						
-						session.insert(relationship);
-						relationships.add(relationship);
+						if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+							subject.addKindOf(object);
+							object.addParentOf(subject);
+						}
+						
+						subject.addSubjectOfRelationShipStatements(statement);
+						
+						//session.insert(relationshipStatement);
+						em.persist(statement);
+						
+						//statements.add(statement);
+						ontology.addRelationshipStatement(statement);
 
 					} catch (NumberFormatException e) {
 						LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
@@ -139,6 +160,11 @@ public class HibernateDatabaseImporter {
 					
 					line = br.readLine();
 					
+					if (currentLine % 500 == 0){
+						em.flush();
+						em.clear();
+					}
+					
 				}
 			} finally {
 				br.close();
@@ -146,14 +172,10 @@ public class HibernateDatabaseImporter {
 			tx.commit();
 			LOG.info("Populated [" + (currentLine - 1) + "] relationships");
 		} finally {
-			session.close();
+			//session.close();
 		}
-		
-		Ontology ontology = new Ontology();
-		ontology.setId(IMPORTED_ONTOLOGY_ID);
-		ontology.setDescription("Incoming ontology from text files");
-		ontology.setName("incoming");
-		ontology.setRelationships(relationships);
+
+		//ontology.setRelationshipStatements(statements);
 		
 		em.persist(ontology);
 		

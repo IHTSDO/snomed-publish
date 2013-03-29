@@ -1,6 +1,8 @@
 package com.ihtsdo.snomed.canonical.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
@@ -9,12 +11,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import com.google.common.primitives.Longs;
 
 @Entity
-public class Relationship {
+public class RelationshipStatement {
 	
 	@Id private long id;
-	@OneToOne private Concept concept1;
+	
+	@OneToOne (cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+	private Concept subject;
+
 	private long relationshipType;
-	@OneToOne private Concept concept2;
+	@OneToOne private Concept object;
 	private int characteristicType;
 	private boolean refinability;
 	private int relationShipGroup;
@@ -31,8 +36,8 @@ public class Relationship {
     
     @Override
     public boolean equals(Object o){
-    	if (o instanceof Relationship){
-    		Relationship r = (Relationship) o;
+    	if (o instanceof RelationshipStatement){
+    		RelationshipStatement r = (RelationshipStatement) o;
     		if (r.id == this.id){
     			return true;
     		}
@@ -40,23 +45,20 @@ public class Relationship {
     	return false; 
     }
     
-    
-    
     /*
      * Generated Getters and Setters
-     */
-	
+     */	
 	public long getId() {
 		return id;
 	}
 	public void setId(long id) {
 		this.id = id;
 	}
-	public Concept getConcept1() {
-		return concept1;
+	public Concept getSubject() {
+		return subject;
 	}
-	public void setConcept1(Concept concept1) {
-		this.concept1 = concept1;
+	public void setSubject(Concept subject) {
+		this.subject = subject;
 	}
 	public long getRelationshipType() {
 		return relationshipType;
@@ -64,11 +66,11 @@ public class Relationship {
 	public void setRelationshipType(long relationshipType) {
 		this.relationshipType = relationshipType;
 	}
-	public Concept getConcept2() {
-		return concept2;
+	public Concept getObject() {
+		return object;
 	}
-	public void setConcept2(Concept concept2) {
-		this.concept2 = concept2;
+	public void setObject(Concept object) {
+		this.object = object;
 	}
 	public int getCharacteristicType() {
 		return characteristicType;
