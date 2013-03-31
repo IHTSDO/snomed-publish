@@ -29,7 +29,7 @@ and produces an output file called 'canonical form' of this form:
 The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF].
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
-The disk based database is slower to use, but requires a smaller memory footprint. The in-memory database requires about 
+The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
 2Gb of heap space, to be specified on launch using the Java option '-Xmx2000m'.
 
 You will need to have the Java 7 JRE and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
