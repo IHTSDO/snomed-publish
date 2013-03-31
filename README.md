@@ -30,7 +30,7 @@ The rules for the transformation taking place can be found in [this PDF document
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
-2Gb of heap space, to be specified on launch using the Java option '-Xmx2000m'.
+2Gb of heap space ('-Xmx2000m').
 
 You will need to have the Java 7 JRE and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
