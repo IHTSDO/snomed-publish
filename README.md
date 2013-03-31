@@ -66,7 +66,6 @@ Or, to launch with a disk backed databse, you can use this command:
     
 The output from the console will look something like this:
 
-    2013-03-31 18:52:28,004 INFO [com.ihtsdo.snomed.canonical.Main] - db is null
     2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Using an in-memory database
     2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Initialising database
     2013-03-31 18:52:28,048 DEBUG [org.jboss.logging] - Logging Provider: org.jboss.logging.Log4jLoggerProvider
