@@ -1,5 +1,5 @@
 target/
-src/main/resources/*.ont.txt
+dependency-reduced-pom.xml
 .settings
 .metadata
 .classpath
