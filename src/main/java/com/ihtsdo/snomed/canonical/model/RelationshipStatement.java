@@ -1,16 +1,19 @@
 package com.ihtsdo.snomed.canonical.model;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.google.common.primitives.Longs;
 
 @Entity(name="RelationshipStatement")
+@Table(name="RELATIONSHIP_STATEMENT")
 public class RelationshipStatement {
 
     @Id private long id;
@@ -18,10 +21,16 @@ public class RelationshipStatement {
     @OneToOne (cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Concept subject;
 
+    @Column(name="relationship_type")
     private long relationshipType;
     @OneToOne private Concept object;
+    
+    @Column(name="characteristic_type")
     private int characteristicType;
+    
     private int refinability;
+    
+    @Column(name="relationship_group")
     private int relationShipGroup;
 
     @Override

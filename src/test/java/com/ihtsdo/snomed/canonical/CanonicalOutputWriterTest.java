@@ -23,7 +23,8 @@ public class CanonicalOutputWriterTest {
             "100523008\t116680004\t100523009\t1";
     
     private Collection<RelationshipStatement> statements = new HashSet<RelationshipStatement>();
-
+    private CanonicalOutputWriter writer = new CanonicalOutputWriter();
+    
     @Before
     public void setUp() throws Exception {
         Concept c1 = new Concept();
@@ -57,8 +58,8 @@ public class CanonicalOutputWriterTest {
     @Test
     public void shouldPrintOntologyInSpecifiedFormat() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            CanonicalOutputWriter.write(writer, statements);
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
+            writer.write(pw, statements);
         }
         baos.flush();
         assertEquals(EXPECTED_RESULT, baos.toString());

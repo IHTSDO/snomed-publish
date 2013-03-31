@@ -87,8 +87,71 @@ public class HibernateDatabaseImporter {
             session.close();
         }
     }
+    
+    
+    
+    protected void populateRelationships(final InputStream stream, EntityManager em) throws IOException {
+        LOG.info("Populating Relationships");
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        try {
+            Transaction tx = session.beginTransaction();
+            session.doWork(new Work() {
+                public void execute(Connection connection) throws SQLException {
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (id, subject_id, relationship_type, object_id, characteristic_type, refinability, relationship_group) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
+                        int currentLine = 1;
+                        String line = null;
+                        try {
+                            line = br.readLine();
+                            //skip the headers
+                            line = br.readLine();
 
-    protected void populateRelationships(InputStream stream, EntityManager em) throws IOException {
+                            while (line != null) {
+                                currentLine++;
+                                if (line.isEmpty()){
+                                    line = br.readLine();
+                                    continue;
+                                }
+                                Iterable<String> split = Splitter.on('\t').split(line);
+                                Iterator<String> splitIt = split.iterator();
+                                try {
+                                    ps.setLong(1, Long.parseLong(splitIt.next()));
+                                    ps.setLong(2, Long.parseLong(splitIt.next()));
+                                    ps.setLong(3, Long.parseLong(splitIt.next()));
+                                    ps.setLong(4, Long.parseLong(splitIt.next()));
+                                    ps.setInt(5, Integer.parseInt(splitIt.next()));
+                                    ps.setInt(6, Integer.parseInt(splitIt.next()));
+                                    ps.setInt(7, Integer.parseInt(splitIt.next()));
+                                    ps.addBatch();
+                                } catch (NumberFormatException e) {
+                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                } catch (IllegalArgumentException e){
+                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                }
+                                line = br.readLine();
+                            }
+                            ps.executeBatch();
+                            LOG.info("Populated [" + (currentLine - 1) + "] relationships");
+                        }finally {
+                            br.close();
+                        }
+                    } catch (IOException e1) {
+                        LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
+                    } 
+                }
+            });
+            tx.commit();
+        } finally {
+            session.close();
+        }
+    }    
+    
+    
+    
+    
+
+    protected void populateRelationships2(InputStream stream, EntityManager em) throws IOException {
         LOG.info("Populating Relationships");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
@@ -180,7 +243,7 @@ public class HibernateDatabaseImporter {
                         }
                     }
                     psKindOf.executeBatch();
-                    LOG.info("Created " + counter + " isA relationships");
+                    LOG.info("Created [" + counter + "] isA relationships");
                 }
             });
             tx.commit();

@@ -26,8 +26,6 @@ public class HibernateDatabaseImporterTest {
     private static HibernateDatabaseImporter importer;
     private static Main main;
 
-    private static final String COMPLETE_CONCEPTS = "sct1_Concepts_Core_INT_20130131.ont.txt";
-    private static final String COMPLETE_RELATIONSHIPS = "sct1_Relationships_Core_INT_20130131.ont.txt";
     private static final String TEST_CONCEPTS = "test_concepts.txt";
     private static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
     private static final String TEST_RELATIONSHIPS = "test_relationships.txt";
@@ -47,7 +45,7 @@ public class HibernateDatabaseImporterTest {
 
     @Before
     public void setUp() throws Exception {
-        main.initDb();
+        main.initDb(null);
     }
 
     @After
