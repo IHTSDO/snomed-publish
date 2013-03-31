@@ -54,4 +54,32 @@ You will then see this output:
     -d, --database  Optional. Specify location of database file. If not specified, 
                     defaults to an in-memory database (minium 2Gb of heap space required)
 
-So 
+For example, to launch with an in-memory database, use this command:
+
+    java -Xmx2000m -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt
+
+Don't forget the '-Xmx=2000m' option, or the program will not complete. 
+
+Or, to launch with a disk backed databse, you can use this command:
+
+    java -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt -d /tmp/canonical.tmp.db
+    
+The output from the console will look something like this:
+
+    2013-03-31 18:52:28,004 INFO [com.ihtsdo.snomed.canonical.Main] - db is null
+    2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Using an in-memory database
+    2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Initialising database
+    2013-03-31 18:52:28,048 DEBUG [org.jboss.logging] - Logging Provider: org.jboss.logging.Log4jLoggerProvider
+    2013-03-31 18:52:29,795 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating database
+    2013-03-31 18:52:29,795 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Concepts
+    2013-03-31 18:52:33,580 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [397787] concepts
+    2013-03-31 18:52:33,580 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Relationships
+    2013-03-31 18:52:46,257 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [1454681] relationships
+    2013-03-31 18:52:46,260 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Creating isA hierarchy
+    2013-03-31 18:53:21,221 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Created [542486] isA relationships
+    2013-03-31 18:53:21,222 INFO [com.ihtsdo.snomed.canonical.Main] - Completed import in 51 seconds
+    2013-03-31 18:53:21,222 INFO [com.ihtsdo.snomed.canonical.Main] - Writing results to /tmp/canonical.txt
+    2013-03-31 18:53:23,849 INFO [com.ihtsdo.snomed.canonical.Main] - Wrote 1454683 lines
+    2013-03-31 18:53:23,850 INFO [com.ihtsdo.snomed.canonical.Main] - Closing database
+
+And the results will be stored in canonical.out.txt.
