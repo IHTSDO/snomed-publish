@@ -1,5 +1,5 @@
-IHTSDO Snomed Publication Toolssnomed-publish
-=============================================
+IHTSDO Snomed Publication Tools
+===============================
 
 Canonical Form
 --------------
