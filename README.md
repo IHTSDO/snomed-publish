@@ -66,19 +66,26 @@ Or, to launch with a disk backed databse, you can use this command:
     
 The output from the console will look something like this:
 
-    2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Using an in-memory database
-    2013-03-31 18:52:28,006 INFO [com.ihtsdo.snomed.canonical.Main] - Initialising database
-    2013-03-31 18:52:28,048 DEBUG [org.jboss.logging] - Logging Provider: org.jboss.logging.Log4jLoggerProvider
-    2013-03-31 18:52:29,795 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating database
-    2013-03-31 18:52:29,795 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Concepts
-    2013-03-31 18:52:33,580 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [397787] concepts
-    2013-03-31 18:52:33,580 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Relationships
-    2013-03-31 18:52:46,257 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [1454681] relationships
-    2013-03-31 18:52:46,260 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Creating isA hierarchy
-    2013-03-31 18:53:21,221 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Created [542486] isA relationships
-    2013-03-31 18:53:21,222 INFO [com.ihtsdo.snomed.canonical.Main] - Completed import in 51 seconds
-    2013-03-31 18:53:21,222 INFO [com.ihtsdo.snomed.canonical.Main] - Writing results to /tmp/canonical.txt
-    2013-03-31 18:53:23,849 INFO [com.ihtsdo.snomed.canonical.Main] - Wrote 1454683 lines
-    2013-03-31 18:53:23,850 INFO [com.ihtsdo.snomed.canonical.Main] - Closing database
+    2013-04-02 18:34:20,677 INFO [com.ihtsdo.snomed.canonical.Main] - Using an in-memory database
+    2013-04-02 18:34:20,677 INFO [com.ihtsdo.snomed.canonical.Main] - Initialising database
+    2013-04-02 18:34:20,718 DEBUG [org.jboss.logging] - Logging Provider: org.jboss.logging.Log4jLoggerProvider
+    2013-04-02 18:34:22,482 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating database
+    2013-04-02 18:34:22,482 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Concepts
+    2013-04-02 18:34:26,298 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [397787] concepts
+    2013-04-02 18:34:26,298 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating relationships
+    2013-04-02 18:34:39,003 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [1454681] relationships
+    2013-04-02 18:34:39,005 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Creating isA hierarchy
+    2013-04-02 18:35:14,570 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Created [542486] isA relationships
+    2013-04-02 18:35:14,571 INFO [com.ihtsdo.snomed.canonical.Main] - Completed import in 52 seconds
+    2013-04-02 18:35:14,571 INFO [com.ihtsdo.snomed.canonical.Main] - Running algorithm
+    2013-04-02 18:35:15,239 INFO [com.ihtsdo.snomed.canonical.Main] - Calculating unshared defining characteristics
+    2013-04-02 18:35:38,237 INFO [com.ihtsdo.snomed.canonical.Main] - Found 510392 unshared defining characteristics
+    2013-04-02 18:35:38,237 INFO [com.ihtsdo.snomed.canonical.Main] - Calculating immidiate primitive concepts
+    2013-04-02 18:35:46,365 INFO [com.ihtsdo.snomed.canonical.Main] - Found 38692 immidiate primitive concepts
+    2013-04-02 18:35:46,449 INFO [com.ihtsdo.snomed.canonical.Main] - Completed algorithm in 31 seconds
+    2013-04-02 18:35:46,449 INFO [com.ihtsdo.snomed.canonical.Main] - Writing results to target/output.txt
+    2013-04-02 18:35:47,468 INFO [com.ihtsdo.snomed.canonical.Main] - Wrote 549086 lines
+    2013-04-02 18:35:47,471 INFO [com.ihtsdo.snomed.canonical.Main] - Overall program completion in 86 seconds
+    2013-04-02 18:35:47,471 INFO [com.ihtsdo.snomed.canonical.Main] - Closing database
 
-And the results will be stored in canonical.out.txt.
+where the results would be stored in canonical.out.txt, as specified above
