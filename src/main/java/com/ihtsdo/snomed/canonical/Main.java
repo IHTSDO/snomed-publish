@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
+import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class Main {
@@ -41,6 +44,7 @@ public class Main {
     protected EntityManager em = null;
     private HibernateDatabaseImporter importer = new HibernateDatabaseImporter();
     private CanonicalOutputWriter writer = new CanonicalOutputWriter();
+    private CanonicalAlgorithm algorithm = new CanonicalAlgorithm();
 
     protected void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -63,28 +67,65 @@ public class Main {
 
     protected void runMain(String conceptFile, String triplesFile, String outputFile, String db) throws IOException{
         try{
+            Stopwatch overAllstopwatch = new Stopwatch().start();
             initDb(db);
             
             Stopwatch stopwatch = new Stopwatch().start();
             
             importer.populateDb(new FileInputStream(conceptFile),
                 new FileInputStream(triplesFile), em);
+            
             stopwatch.stop();
-            
-            LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
-            
-            writeOut(outputFile);
+            LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");            
 
+            Set<RelationshipStatement> finalStatements = runAlgorithm();
+            
+            writeOut(outputFile, finalStatements);
+            
+            overAllstopwatch.stop();
+            LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds"); 
         }finally{
             closeDb();
         }
     }
 
-    private void writeOut(String outputFile) throws IOException {
-        LOG.info("Writing results to " + outputFile);
-        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+    private Set<RelationshipStatement> runAlgorithm() {
+        Stopwatch stopwatch = new Stopwatch().start();
+        LOG.info("Running algorithm");
+        Query query = em.createQuery("SELECT c FROM Concept c");            
         @SuppressWarnings("unchecked")
-        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
+        List<Concept> concepts = (List<Concept>) query.getResultList();
+        
+        LOG.info("Calculating unshared defining characteristics");
+        Set<RelationshipStatement> allUndefinedCharacteristicsStatements = new HashSet<RelationshipStatement>();
+        for (Concept concept : concepts){
+            allUndefinedCharacteristicsStatements.addAll(
+                    algorithm.getAllUnsharedDefiningCharacteristics(concept, true));
+        }
+        LOG.info("Found " + allUndefinedCharacteristicsStatements.size() + " unshared defining characteristics");
+        
+        LOG.info("Calculating immidiate primitive concepts");
+        Set<RelationshipStatement> allImmidiatePrimitiveConceptStatements = new HashSet<RelationshipStatement>();
+        for (Concept concept : concepts){
+            allImmidiatePrimitiveConceptStatements.addAll(
+                    algorithm.getAllImmidiatePrimitiveConceptStatements(concept, true));
+        }
+        LOG.info("Found " + allImmidiatePrimitiveConceptStatements.size() + " immidiate primitive concepts");
+        
+        Set<RelationshipStatement> returnSet = new HashSet<RelationshipStatement>();
+        returnSet.addAll(allUndefinedCharacteristicsStatements);
+        returnSet.addAll(allImmidiatePrimitiveConceptStatements);
+        
+        stopwatch.stop();
+        LOG.info("Completed algorithm in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");            
+        return returnSet;
+    }
+
+    private void writeOut(String outputFile, Set<RelationshipStatement> statements) throws IOException {
+        LOG.info("Writing results to " + outputFile);
+//        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+//        @SuppressWarnings("unchecked")
+//        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
         
         File outFile = new File(outputFile);
         if (!outFile.exists()) outFile.createNewFile();
@@ -122,11 +163,8 @@ public class Main {
         String concepts = commandLine.getOptionValue('c');
         String triples = commandLine.getOptionValue('t');
         String db = commandLine.getOptionValue('d');
-        
-        
-        
+
         testInputs(helpString, commandLine, output, concepts, triples, db);
-        LOG.info("db is " + db);
         new Main().runMain(concepts, triples, output, db);
     }
 

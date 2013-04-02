@@ -1,3 +1,4 @@
+
 package com.ihtsdo.snomed.canonical.model;
 
 import java.util.HashSet;
@@ -11,13 +12,21 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.primitives.Longs;
 
 @Entity
 public class Concept {
+    
+    private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
+    
+    @Transient
+    private Set<Concept> cache;
+    
     @Id private long id;
     private int status;
     private String fullySpecifiedName;
@@ -32,16 +41,54 @@ public class Concept {
     @JoinTable(name = "KIND_OF", 
     joinColumns = @JoinColumn(name="child_id"),
     inverseJoinColumns = @JoinColumn(name="parent_id"))
-    private Set<Concept> kindOf = new HashSet<Concept>();
+    private Set<Concept> kindOfs = new HashSet<Concept>();
 
-    @ManyToMany(mappedBy="kindOf", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(mappedBy="kindOfs", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Concept> parentOf = new HashSet<Concept>();
+    
+    public Concept(){}
+    public Concept(long id){this.id = id;}
+
+    /**
+     * This method has been optimized with a cache.
+     * Therefore, DO NOT call this method with caching until ALL concepts 
+     * have been loaded and ALL kindOf relationships have been discovered
+     */
+    
+    public Set<Concept> getKindOfPrimitiveConcepts(boolean useCache){
+        if (useCache && (cache != null)){
+            if (LOG.isDebugEnabled()){
+                StringBuffer debugStringBuffer = new StringBuffer("Cache hit for concept " + this.getId() + " with values {");
+                for (Concept c : cache){
+                    debugStringBuffer.append(c.getId()+ ", ");
+                }
+                if (!cache.isEmpty()){
+                    debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
+                }
+                debugStringBuffer.append("}");
+                LOG.debug(debugStringBuffer.toString());
+            }
+            return cache;
+        }
+        LOG.debug("Populating cache for concept " + getId());
+        cache = new HashSet<Concept>();
+        
+        for (Concept kindOf : kindOfs){
+            if (kindOf.isPrimitive){
+                cache.add(kindOf);
+            }
+            else{
+                cache.addAll(kindOf.getKindOfPrimitiveConcepts(useCache));
+            }
+        }   
+        return cache;
+    }
 
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return Long.toString(id);
+        //return ToStringBuilder.reflectionToString(this);
     }
-
 
     @Override
     public int hashCode(){
@@ -100,12 +147,12 @@ public class Concept {
         this.isPrimitive = isPrimitive;
     }
 
-    public Set<Concept> getKindOf() {
-        return kindOf;
+    public Set<Concept> getKindOfs() {
+        return kindOfs;
     }
-
-    public void setKindOf(Set<Concept> kindOf) {
-        this.kindOf = kindOf;
+    
+    public void setKindOfs(Set<Concept> kindOfs) {
+        this.kindOfs = kindOfs;
     }
 
     public Set<Concept> getParentOf() {
@@ -117,11 +164,15 @@ public class Concept {
     }
 
     public void addKindOf(Concept concept){
-        this.kindOf.add(concept);
+        this.kindOfs.add(concept);
     }
 
     public void addParentOf(Concept concept){
         this.parentOf.add(concept);
+    }
+    
+    public void addSubjectOfRelationshipStatement(RelationshipStatement relationshipStatement){
+        subjectOfRelationShipStatements.add(relationshipStatement);
     }
 
     public Set<RelationshipStatement> getSubjectOfRelationShipStatements(){

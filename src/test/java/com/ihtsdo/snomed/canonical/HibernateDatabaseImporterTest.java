@@ -52,13 +52,7 @@ public class HibernateDatabaseImporterTest {
     public void tearDown() throws Exception {
         main.closeDb();
     }
-
-//    @Test
-//    public void shouldPopulateALLItems() throws IOException {
-//        importer.populateDb(ClassLoader.getSystemResourceAsStream(COMPLETE_CONCEPTS),
-//                ClassLoader.getSystemResourceAsStream(COMPLETE_RELATIONSHIPS), main.em);
-//    }
-
+    
     @Test
     public void shouldPopulateConcepts() throws IOException {
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), main.em);
@@ -174,7 +168,7 @@ public class HibernateDatabaseImporterTest {
         assertEquals(1, r1000.getSubject().getId());
         assertEquals(2, r2000.getSubject().getId());
         assertEquals(3, r3000.getSubject().getId());
-        assertTrue(r1000.getSubject().getKindOf().contains(r2000.getSubject()));
+        assertTrue(r1000.getSubject().getKindOfs().contains(r2000.getSubject()));
         assertTrue(r2000.getSubject().getParentOf().contains(r1000.getSubject()));
     }
 

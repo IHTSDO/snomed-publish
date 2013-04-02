@@ -8,14 +8,18 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import com.google.common.primitives.Longs;
 
 @Entity(name="RelationshipStatement")
 @Table(name="RELATIONSHIP_STATEMENT")
 public class RelationshipStatement {
-
+    
+    public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
+    protected static final int DEFINING_CHARACTERISTIC_RELATIONSHIP_GROUP = 0;
+    
+    public RelationshipStatement(){};
+    public RelationshipStatement(long id){this.id = id;}
+    
     @Id private long id;
 
     @OneToOne (cascade=CascadeType.ALL, fetch=FetchType.LAZY)
@@ -33,9 +37,18 @@ public class RelationshipStatement {
     @Column(name="relationship_group")
     private int relationShipGroup;
 
+    public boolean isKindOfRelationship(){
+        return (relationshipType == IS_KIND_OF_RELATIONSHIP_TYPE_ID);
+    }
+    
+    public boolean isDefiningCharacteristic(){
+        return relationShipGroup == DEFINING_CHARACTERISTIC_RELATIONSHIP_GROUP;
+    }
+    
     @Override
     public String toString() {
-        return ToStringBuilder.reflectionToString(this);
+        return "{id: " + getId() + ", " + getSubject() + "-" + getRelationshipType() + "-" + getObject() + ", group: " + getRelationShipGroup() + "}";
+        //return ToStringBuilder.reflectionToString(this);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class HibernateDatabaseImporter {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporter.class );
     public static final long IMPORTED_ONTOLOGY_ID = 2;
 
-    protected static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
+    
 
     public void populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
         LOG.info("Populating database");
@@ -91,7 +91,7 @@ public class HibernateDatabaseImporter {
     
     
     protected void populateRelationships(final InputStream stream, EntityManager em) throws IOException {
-        LOG.info("Populating Relationships");
+        LOG.info("Populating relationships");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         try {
@@ -235,7 +235,7 @@ public class HibernateDatabaseImporter {
                     int counter = 1;
                     while(stIt.hasNext()){
                         RelationshipStatement statement = stIt.next();
-                        if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+                        if (statement.isKindOfRelationship()){
                             psKindOf.setLong(1, statement.getSubject().getId());
                             psKindOf.setLong(2, statement.getObject().getId());
                             psKindOf.addBatch();
