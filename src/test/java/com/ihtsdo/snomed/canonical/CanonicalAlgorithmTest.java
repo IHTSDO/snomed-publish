@@ -232,6 +232,36 @@ public class CanonicalAlgorithmTest {
        assertEquals(1, immidiatePrimitive.size());
        assertTrue(immidiatePrimitive.contains(c2));
    }
+   
+   /*
+   * Test case 7:
+   * ------------
+   * {1,2,3,4} is primitive
+   * 1 isKindOf 2
+   * 2 isKindOf 3
+   * 3 isKindof 4
+   * 1 isKindOf 4
+   * 
+   * should return for concept 1:
+   * 1 isKindOf {2,4}
+   */
+  @Test
+  public void shouldPassImmidiatePrimitiveTestCase7() {
+      c1.setPrimitive(true);
+      c2.setPrimitive(true);
+      c3.setPrimitive(true);
+      c4.setPrimitive(true);
+      
+      c1.addKindOf(c2);
+      c2.addKindOf(c3);
+      c3.addKindOf(c4);
+      c1.addKindOf(c4);
+      
+      Set<Concept> immidiatePrimitive = algorithm.getAllImmidiatePrimitiveConcepts(c1, true);
+      assertEquals(2, immidiatePrimitive.size());
+      assertTrue(immidiatePrimitive.contains(c2));
+      assertTrue(immidiatePrimitive.contains(c4));
+  }   
 
    /*
     * Test case 1:
@@ -294,7 +324,7 @@ public class CanonicalAlgorithmTest {
    }
    
    /*
-    * Test case 1:
+    * Test case 3:
     * {r(1000)} is NOT a defining characteristic
     * c1 isKindOf c2
     * c1 r(1000) c3

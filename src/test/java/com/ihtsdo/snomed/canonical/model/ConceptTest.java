@@ -48,8 +48,7 @@ public class ConceptTest {
      * c1 has primitive supertypes {c3,c5}
      * 
      */
-    @Test
-    public void test() {
+    private void setupTestCase1() {
         c1.setPrimitive(true);
         c2.setPrimitive(false);
         c3.setPrimitive(true);
@@ -60,11 +59,26 @@ public class ConceptTest {
         c2.addKindOf(c3);
         c2.addKindOf(c4);
         c4.addKindOf(c5);
-        
+    } 
+    
+    @Test
+    public void shouldPassTestCase1WithCache() {
+        setupTestCase1();
         Set<Concept> results = c1.getKindOfPrimitiveConcepts(true);
         assertEquals(2, results.size());
         assertTrue(results.contains(c3));
         assertTrue(results.contains(c5));
     }
+    
+    @Test
+    public void shouldPassTestCase1WithoutCache() {
+        setupTestCase1();
+        Set<Concept> results = c1.getKindOfPrimitiveConcepts(false);
+        assertEquals(2, results.size());
+        assertTrue(results.contains(c3));
+        assertTrue(results.contains(c5));
+    }
+
+   
 
 }
