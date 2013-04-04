@@ -55,7 +55,7 @@ public class Concept {
      * have been loaded and ALL kindOf relationships have been discovered
      */
     
-    public Set<Concept> getKindOfPrimitiveConcepts(boolean useCache){
+    public Set<Concept> getKindOfProximalConcepts(boolean useCache){
         if (useCache && (cache != null)){
             if (LOG.isDebugEnabled()){
                 StringBuffer debugStringBuffer = new StringBuffer("Cache hit for concept " + this.getId() + " with values {");
@@ -73,15 +73,18 @@ public class Concept {
         LOG.debug("Populating cache for concept " + getId());
         cache = new HashSet<Concept>();
         
+        
         for (Concept kindOf : kindOfs){
             if (kindOf.isPrimitive){
                 cache.add(kindOf);
             }
-            else{
-                cache.addAll(kindOf.getKindOfPrimitiveConcepts(useCache));
-            }
+            cache.addAll(kindOf.getKindOfProximalConcepts(useCache));
         }   
         return cache;
+    }
+    
+    public boolean isLeaf(){
+        return parentOf.isEmpty();
     }
 
     @Override

@@ -20,7 +20,7 @@ public class CanonicalOutputWriter {
         Iterator<RelationshipStatement> rIt = statements.iterator();
         int counter = 2;
         while (rIt.hasNext()){
-            w.write("\n");
+            w.write("\r\n");
             printRelationship(w, rIt.next());
             counter++;
         }

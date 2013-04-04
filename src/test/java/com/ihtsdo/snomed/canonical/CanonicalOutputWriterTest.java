@@ -18,8 +18,8 @@ import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 public class CanonicalOutputWriterTest {
 
     private static final String EXPECTED_RESULT =
-            "CONCEPTID1\tRELATIONSHIPTYPE\tCONCEPTID2\tRELATIONSHIPGROUP\n" +
-            "100523006\t116680003\t100523007\t0\n" +
+            "CONCEPTID1\tRELATIONSHIPTYPE\tCONCEPTID2\tRELATIONSHIPGROUP\r\n" +
+            "100523006\t116680003\t100523007\t0\r\n" +
             "100523008\t116680004\t100523009\t1";
     
     private Collection<RelationshipStatement> statements = new HashSet<RelationshipStatement>();

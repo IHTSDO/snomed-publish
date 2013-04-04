@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.exception.InvalidInputException;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
@@ -31,13 +33,16 @@ public class HibernateDatabaseImporter {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporter.class );
     public static final long IMPORTED_ONTOLOGY_ID = 2;
 
-    
-
-    public void populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
+    public List<Concept> populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
+        Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Populating database");
         populateConcepts(conceptsStream, em);
         populateRelationships(relationshipsStream, em);
         createIsKindOfHierarchy(em);
+        List<Concept> concepts = em.createQuery("SELECT c FROM Concept c", Concept.class).getResultList();
+        stopwatch.stop();
+        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+        return concepts;
     }
 
     protected void populateConcepts(InputStream stream, EntityManager em) throws IOException {

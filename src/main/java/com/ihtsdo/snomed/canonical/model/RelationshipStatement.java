@@ -15,7 +15,7 @@ import com.google.common.primitives.Longs;
 public class RelationshipStatement {
     
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
-    protected static final int DEFINING_CHARACTERISTIC_RELATIONSHIP_GROUP = 0;
+    protected static final int DEFINING_CHARACTERISTIC_TYPE = 0;
     
     public RelationshipStatement(){};
     public RelationshipStatement(long id){this.id = id;}
@@ -42,7 +42,7 @@ public class RelationshipStatement {
     }
     
     public boolean isDefiningCharacteristic(){
-        return relationShipGroup == DEFINING_CHARACTERISTIC_RELATIONSHIP_GROUP;
+        return characteristicType == DEFINING_CHARACTERISTIC_TYPE;
     }
     
     @Override

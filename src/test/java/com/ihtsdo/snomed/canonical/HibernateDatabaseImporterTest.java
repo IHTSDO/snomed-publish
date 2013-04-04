@@ -99,7 +99,7 @@ public class HibernateDatabaseImporterTest {
         assertNotNull(r);
         assertNotNull(r.getSubject());
         assertNotNull(r.getObject());
-        assertEquals (100000028, r.getId());
+        assertEquals (100000028l, r.getId());
         assertEquals (280844000, r.getSubject().getId());
         assertEquals (116680003, r.getRelationshipType(), 116680003);
         assertEquals (71737002, r.getObject().getId());
