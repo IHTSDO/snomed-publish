@@ -3,7 +3,6 @@ package com.ihtsdo.snomed.canonical;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,41 +17,43 @@ import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class CanonicalAlgorithmTest {
 
-    private static HibernateDatabaseImporter importer;
-    private static Main main;
+    //private static HibernateDatabaseImporter importer;
+    //private static Main main;
     private static CanonicalAlgorithm algorithm;
 
     RelationshipStatement rs1, rs2, rs3, rs4, rs5;
-    Concept c1, c2, c3, c4, c5;
-
-
+    Concept c1, c2, c3, c4, c5, cA, cB;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        importer = new HibernateDatabaseImporter();
-        main = new Main();
+//        importer = new HibernateDatabaseImporter();
+//        main = new Main();
         algorithm = new CanonicalAlgorithm();
     }
 
     @Before
     public void setUp() throws Exception {
-        main.initDb(null);
+        //main.initDb(null);
         c1 = new Concept(1);
         c2 = new Concept(2);
         c3 = new Concept(3);
         c4 = new Concept(4);
         c5 = new Concept(5);
+        cA = new Concept(10);
+        cB = new Concept(11);
 
         c1.setPrimitive(true);
         c2.setPrimitive(true);
         c3.setPrimitive(true);
         c4.setPrimitive(true);
         c5.setPrimitive(true);
+        cA.setPrimitive(true);
+        cB.setPrimitive(true);
     }
 
     @After
     public void tearDown() throws Exception {
-        main.closeDb();
+        //main.closeDb();
     }
 
 
@@ -346,7 +347,6 @@ public class CanonicalAlgorithmTest {
         assertTrue(proximalPrimitives.contains(c2));
     }   
 
-
     /*
      * Test case 5:
      * ------------
@@ -381,7 +381,194 @@ public class CanonicalAlgorithmTest {
         }
     }
 
+    
+    /* ---------------------------------------
+     * Unshared Defining Characteristics [UDC]
+     * --------------------------------------- */
+    
+    /*
+     * Test case 1:
+     * {c1,cA} are primitive types
+     * Triple (c1,r1,cA) are a defining characteristics
+     */
+    @Test
+    public void shouldPassUDCTestCase1(){ 
+        RelationshipStatement r1 = new RelationshipStatement(101, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(1, foundUDC.size());
+        assertTrue(foundUDC.contains(r1));
+    }
+    
+    /*
+     * Test case 2:
+     * {c1,c2,cA} are primitive types
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c2,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase2(){ 
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }
+    
+    /*
+     * Test case 3:
+     * {c1,c2,c3,cA} are primitive types
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c3,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     * c2 isKindOf c3
+     */
+    @Test
+    public void shouldPassUDCTestCase3(){ 
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        c2.addKindOf(c3);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }    
 
+    
+    /*
+     * Test case 4:
+     * {c1,c3,cA} are primitive types. {c2} is not a primitive type
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c3,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     * c2 isKindOf c3
+     */
+    @Test
+    public void shouldPassUDCTestCase4(){ 
+        c2.setPrimitive(false);
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        c2.addKindOf(c3);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(1, foundUDC.size());
+        assertTrue(foundUDC.contains(r));
+    }    
+    
+    /*
+     * Test case 5:
+     * {c1,c2,cA,cB} are primitive types
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c2,r1,cB) is a defining characteristic
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase5(){ 
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c2, 1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(1, foundUDC.size());
+        assertTrue(foundUDC.contains(r));
+    }    
+    
+    /*
+     * Test case 6:
+     * {c1,c3,cA} are primitive types. {c2} is not a primitive type 
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c3,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     * c2 isKindOf c3
+     */
+    @Test
+    public void shouldPassUDCTestCase6(){ 
+        c2.setPrimitive(false);
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        c2.addKindOf(c3);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }  
+    
+    /*
+     * Test case 7:
+     * {c1,c2,cA} are primitive types 
+     * Triple (c2,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase7(){ 
+        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }
+    
+    /*
+     * Test case 8:
+     * {c1,cA} are primitive types 
+     * Triple (c2,r1,cA) is not a defining characteristic
+     */
+    @Test
+    public void shouldPassUDCTestCase8(){ 
+        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }  
+    
+    /*
+     * Test case 9:
+     * {c1,c2,cA} are primitive types
+     * Triple (c1,r1,cA) is a defining characteristic
+     * Triple (c2,r1,cA) is not a defining characteristic
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase9(){ 
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(1, foundUDC.size());
+        assertTrue(foundUDC.contains(r));
+    }  
+    
+    /*
+     * Test case 10:
+     * {c1,c2,cA} are primitive types
+     * Triple (c1,r1,cA) is not a defining characteristic
+     * Triple (c2,r1,cA) is a defining characteristic
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase10(){ 
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        c1.addKindOf(c2);
+        
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        
+        assertEquals(0, foundUDC.size());
+    }  
+    
     /*
      * Test case 1:
      * {r(1000)} is a defining characteristic
@@ -394,21 +581,7 @@ public class CanonicalAlgorithmTest {
      * c2 r(1000) c3 [103]
      * c3 has no relationships
      */
-    @Test
-    public void shouldPassUnsharedDefiningCharacteristicsTestCase1() throws IOException{
-        importer.populateDb(ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_concepts.txt"),
-                ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_case_1_relationships.txt"), main.em);
-
-        Concept pc1 = main.em.find(Concept.class, (long)1);
-        Concept pc2 = main.em.find(Concept.class, (long)2);
-        Concept pc3 = main.em.find(Concept.class, (long)3);
-
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc1, true).isEmpty());
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc3, true).isEmpty());
-        Set<RelationshipStatement> allUnsharedDefiningCharacteristicsC2 = algorithm.getAllUnsharedDefiningCharacteristics(pc2, true);
-        assertEquals(1, allUnsharedDefiningCharacteristicsC2.size());
-        assertTrue(allUnsharedDefiningCharacteristicsC2.contains(new RelationshipStatement(102)));
-    }
+  
 
     /*
      * Test case 2:
@@ -424,23 +597,7 @@ public class CanonicalAlgorithmTest {
      * c3 r(1000) c4 [103]
      * c4 has no relationships
      */
-    @Test
-    public void shouldPassUnsharedDefiningCharacteristicsTestCase2() throws IOException{
-        importer.populateDb(ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_concepts.txt"),
-                ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_case_2_relationships.txt"), main.em);
 
-        Concept pc1 = main.em.find(Concept.class, (long)1);
-        Concept pc2 = main.em.find(Concept.class, (long)2);
-        Concept pc3 = main.em.find(Concept.class, (long)3);
-        Concept pc4 = main.em.find(Concept.class, (long)4);
-
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc1, true).isEmpty());
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc2, true).isEmpty());
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc4, true).isEmpty());
-        Set<RelationshipStatement> allUnsharedDefiningCharacteristicsC3 = algorithm.getAllUnsharedDefiningCharacteristics(pc3, true);
-        assertEquals(1, allUnsharedDefiningCharacteristicsC3.size());
-        assertTrue(allUnsharedDefiningCharacteristicsC3.contains(new RelationshipStatement(104)));
-    }
 
     /*
      * Test case 3:
@@ -454,17 +611,5 @@ public class CanonicalAlgorithmTest {
      * c2 has no relationships
      * c3 has no relationships
      */
-    @Test
-    public void shouldPassUnsharedDefiningCharacteristicsTestCase3() throws IOException{
-        importer.populateDb(ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_concepts.txt"),
-                ClassLoader.getSystemResourceAsStream("UnsharedDefiningCharacteristics/test_case_3_relationships.txt"), main.em);
 
-        Concept pc1 = main.em.find(Concept.class, (long)1);
-        Concept pc2 = main.em.find(Concept.class, (long)2);
-        Concept pc3 = main.em.find(Concept.class, (long)2);
-
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc1, true).isEmpty());
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc2, true).isEmpty());
-        assertTrue(algorithm.getAllUnsharedDefiningCharacteristics(pc3, true).isEmpty());
-    }   
 }

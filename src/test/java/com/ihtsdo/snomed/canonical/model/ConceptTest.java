@@ -40,7 +40,7 @@ public class ConceptTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+        Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
         assertEquals(2, allPrimitive.size());
         assertTrue(allPrimitive.contains(c2));
         assertTrue(allPrimitive.contains(c3));
@@ -51,7 +51,7 @@ public class ConceptTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+        Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
         assertEquals(2, allPrimitive.size());
         assertTrue(allPrimitive.contains(c2));
         assertTrue(allPrimitive.contains(c3));
@@ -74,7 +74,7 @@ public class ConceptTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+        Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
         assertEquals(1, allPrimitive.size());
         assertTrue(allPrimitive.contains(c3));
     }
@@ -85,7 +85,7 @@ public class ConceptTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+        Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
         assertEquals(1, allPrimitive.size());
         assertTrue(allPrimitive.contains(c3));
     }
@@ -110,7 +110,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
        assertEquals(1, allPrimitive.size());
        assertTrue(allPrimitive.contains(c4));
    }    
@@ -124,7 +124,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
        assertEquals(1, allPrimitive.size());
        assertTrue(allPrimitive.contains(c4));
    }      
@@ -147,7 +147,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
        assertEquals(3, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c3));
@@ -160,7 +160,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
        assertEquals(3, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c3));
@@ -186,7 +186,7 @@ public class ConceptTest {
        c2.addKindOf(c4);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
        assertEquals(3, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c3));
@@ -200,7 +200,7 @@ public class ConceptTest {
        c2.addKindOf(c4);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
        assertEquals(3, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c3));
@@ -226,7 +226,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
        assertEquals(2, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c4));
@@ -240,7 +240,7 @@ public class ConceptTest {
        c2.addKindOf(c3);
        c3.addKindOf(c4);
        
-       Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+       Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
        assertEquals(2, allPrimitive.size());
        assertTrue(allPrimitive.contains(c2));
        assertTrue(allPrimitive.contains(c4));
@@ -268,7 +268,7 @@ public class ConceptTest {
       c3.addKindOf(c4);
       c1.addKindOf(c4);
       
-      Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+      Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
       assertEquals(1, allPrimitive.size());
       assertTrue(allPrimitive.contains(c4));
   }   
@@ -283,7 +283,7 @@ public class ConceptTest {
       c3.addKindOf(c4);
       c1.addKindOf(c4);
       
-      Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+      Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
       assertEquals(1, allPrimitive.size());
       assertTrue(allPrimitive.contains(c4));
   }   
@@ -309,7 +309,7 @@ public class ConceptTest {
      c2.addKindOf(c4);
      c3.addKindOf(c4);
      
-     Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(true);
+     Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(true);
      assertEquals(2, allPrimitive.size());
      assertTrue(allPrimitive.contains(c4));
      assertTrue(allPrimitive.contains(c2));
@@ -324,7 +324,7 @@ public class ConceptTest {
      c2.addKindOf(c4);
      c3.addKindOf(c4);
      
-     Set<Concept> allPrimitive = c1.getKindOfProximalConcepts(false);
+     Set<Concept> allPrimitive = c1.getAllKindOfPrimitiveConcepts(false);
      assertEquals(2, allPrimitive.size());
      assertTrue(allPrimitive.contains(c4));
      assertTrue(allPrimitive.contains(c2));

@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import com.google.common.primitives.Longs;
 
 @Entity(name="RelationshipStatement")
@@ -15,10 +17,19 @@ import com.google.common.primitives.Longs;
 public class RelationshipStatement {
     
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
-    protected static final int DEFINING_CHARACTERISTIC_TYPE = 0;
+    public static final int DEFINING_CHARACTERISTIC_TYPE = 0;
+    public static final int NOT_DEFINING_CHARACTERISTIC_TYPE = 1;
     
     public RelationshipStatement(){};
     public RelationshipStatement(long id){this.id = id;}
+    public RelationshipStatement(long id, Concept subject, long relationshipType, Concept object, int characteristicType){
+        this.id = id;
+        this.subject = subject;
+        this.object = object;
+        this.relationshipType = relationshipType;
+        this.characteristicType = characteristicType;
+        subject.addSubjectOfRelationshipStatement(this);
+    }
     
     @Id private long id;
 
@@ -47,8 +58,12 @@ public class RelationshipStatement {
     
     @Override
     public String toString() {
-        return "{id: " + getId() + ", " + getSubject() + "-" + getRelationshipType() + "-" + getObject() + ", group: " + getRelationShipGroup() + "}";
-        //return ToStringBuilder.reflectionToString(this);
+        //return "(" + getId() + ": " + getSubject() + " --" + getRelationshipType() + "-> " + getObject() + ", group: " + getRelationShipGroup() + ")";
+        return ToStringBuilder.reflectionToString(this);
+    }
+    
+    public String shortToString(){
+        return "[" + getId() + ": " + getSubject() + "(" + getRelationshipType() + ")" + getObject() + ", type:" + getCharacteristicType() + "]";
     }
 
     @Override

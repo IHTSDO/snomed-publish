@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.canonical.exception.InvalidInputException;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
@@ -54,47 +53,45 @@ public class HibernateDatabaseImporter {
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             int currentLine = 1;
             String line = null;
-                try {
-                    line = br.readLine();
-                    //skip the headers
-                    line = br.readLine();
-                    while (line != null) {
-                        currentLine++;
-                        if (line.isEmpty()){
-                            line = br.readLine();
-                            continue;
-                        }
-                        Iterable<String> split = Splitter.on('\t').split(line);
-                        Iterator<String> splitIt = split.iterator();
-                        Concept concept = new Concept();
-                        try {
-                            concept.setId(Long.parseLong(splitIt.next()));
-                            concept.setStatus(Integer.parseInt(splitIt.next()));
-                            concept.setFullySpecifiedName(splitIt.next());
-                            concept.setCtv3id(splitIt.next());
-                            concept.setSnomedId(splitIt.next());
-                            concept.setPrimitive(stringToBoolean(splitIt.next()));
-                            session.insert(concept);
-
-                        } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
-                        } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
-                        }
+            try {
+                line = br.readLine();
+                //skip the headers
+                line = br.readLine();
+                while (line != null) {
+                    currentLine++;
+                    if (line.isEmpty()){
                         line = br.readLine();
+                        continue;
                     }
-                } finally {
-                    br.close();
+                    Iterable<String> split = Splitter.on('\t').split(line);
+                    Iterator<String> splitIt = split.iterator();
+                    Concept concept = new Concept();
+                    try {
+                        concept.setId(Long.parseLong(splitIt.next()));
+                        concept.setStatus(Integer.parseInt(splitIt.next()));
+                        concept.setFullySpecifiedName(splitIt.next());
+                        concept.setCtv3id(splitIt.next());
+                        concept.setSnomedId(splitIt.next());
+                        concept.setPrimitive(stringToBoolean(splitIt.next()));
+                        session.insert(concept);
+
+                    } catch (NumberFormatException e) {
+                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+                    } catch (IllegalArgumentException e){
+                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+                    }
+                    line = br.readLine();
                 }
+            } finally {
+                br.close();
+            }
             tx.commit();
             LOG.info("Populated [" + (currentLine - 1) + "] concepts");
         } finally {
             session.close();
         }
     }
-    
-    
-    
+
     protected void populateRelationships(final InputStream stream, EntityManager em) throws IOException {
         LOG.info("Populating relationships");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -150,79 +147,6 @@ public class HibernateDatabaseImporter {
         } finally {
             session.close();
         }
-    }    
-    
-    
-    
-    
-
-    protected void populateRelationships2(InputStream stream, EntityManager em) throws IOException {
-        LOG.info("Populating Relationships");
-        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
-        StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            int currentLine = 1;
-            String line = null;
-
-            try {
-                line = br.readLine();
-                //skip the headers
-                line = br.readLine();
-
-                while (line != null) {
-                    currentLine++;
-                    if (line.isEmpty()){
-                        line = br.readLine();
-                        continue;
-                    }
-                    Iterable<String> split = Splitter.on('\t').split(line);
-                    Iterator<String> splitIt = split.iterator();
-
-                    RelationshipStatement statement = new RelationshipStatement();
-
-                    try {
-                        statement.setId(Long.parseLong(splitIt.next()));
-                        long subjectId = Long.parseLong(splitIt.next());
-                        Concept subject = em.find(Concept.class, subjectId);
-                        if (subject == null){
-                            throw new InvalidInputException("Concept [" + subjectId + "] not found");
-                        }
-                        statement.setSubject(subject);
-                        statement.setRelationshipType(Long.parseLong(splitIt.next()));
-                        long objectId = Long.parseLong(splitIt.next());
-                        Concept object = em.find(Concept.class, objectId);
-                        if (object == null){
-                            throw new InvalidInputException("Concept [" + objectId + "] not found");
-                        }
-
-                        statement.setObject(object);
-                        statement.setCharacteristicType(Integer.parseInt(splitIt.next()));
-                        statement.setRefinability(Integer.parseInt(splitIt.next()));
-                        statement.setRelationShipGroup(Integer.parseInt(splitIt.next()));
-
-                        session.insert(statement);
-
-                    } catch (NumberFormatException e) {
-                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
-                    } catch (IllegalArgumentException e){
-                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
-                    } catch (InvalidInputException e) {
-                        LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
-                    }
-
-                    line = br.readLine();
-                }
-            } finally {
-                br.close();
-            }
-            tx.commit();
-            LOG.info("Populated [" + (currentLine - 1) + "] relationships");
-        } finally {
-            session.close();
-        }
     }
 
     protected void createIsKindOfHierarchy(EntityManager em){
@@ -256,7 +180,7 @@ public class HibernateDatabaseImporter {
             session.close();
         }
     }
-    
+
     protected boolean stringToBoolean(String string){
         if (string.trim().equals("0")){
             return false;
@@ -269,46 +193,118 @@ public class HibernateDatabaseImporter {
         }
     }    
 
-//    protected static void createAlgorithmStructures(EntityManager em){
-//        EntityTransaction tx = em.getTransaction();
-//        tx.begin();
-//        //Ontology o = em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
-//        //LOG.info("Processing Step 2 for ontology [" + o +"]");
-//
-//        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
-//        List<RelationshipStatement> c = (List<RelationshipStatement>) query.getResultList();
-//
-//
-//        Iterator<RelationshipStatement> stIt = c.iterator();
-//        //= o.getRelationshipStatements().iterator();
-//        int counter = 0;
-//        while (stIt.hasNext()){
-//            RelationshipStatement statement = stIt.next();
-//
-//            if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
-//                statement.getSubject().addKindOf(statement.getObject());
-//                statement.getObject().addParentOf(statement.getSubject());
-//            }
-//
-//            statement.getSubject().addSubjectOfRelationShipStatements(statement);
-//
-////            em.merge(statement.getSubject());
-////            em.merge(statement.getObject());
-//
-////            em.merge(statement);
-//
-//            if (counter % 10000 == 0){
-//                em.flush();
-//                LOG.debug("Processed [" + counter + "] concepts");
-//                //em.clear();
-//            }
-//            counter++;
-//
-////            if (counter % 10000 == 0){
-////                LOG.debug("Processed [" + counter + "] concepts");
-////            }
-//        }
-//        LOG.debug("Done. Processed [" + counter + "] concepts");
-//        tx.commit();
-//    }
+    //    protected static void createAlgorithmStructures(EntityManager em){
+    //        EntityTransaction tx = em.getTransaction();
+    //        tx.begin();
+    //        //Ontology o = em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+    //        //LOG.info("Processing Step 2 for ontology [" + o +"]");
+    //
+    //        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+    //        List<RelationshipStatement> c = (List<RelationshipStatement>) query.getResultList();
+    //
+    //
+    //        Iterator<RelationshipStatement> stIt = c.iterator();
+    //        //= o.getRelationshipStatements().iterator();
+    //        int counter = 0;
+    //        while (stIt.hasNext()){
+    //            RelationshipStatement statement = stIt.next();
+    //
+    //            if (statement.getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+    //                statement.getSubject().addKindOf(statement.getObject());
+    //                statement.getObject().addParentOf(statement.getSubject());
+    //            }
+    //
+    //            statement.getSubject().addSubjectOfRelationShipStatements(statement);
+    //
+    ////            em.merge(statement.getSubject());
+    ////            em.merge(statement.getObject());
+    //
+    ////            em.merge(statement);
+    //
+    //            if (counter % 10000 == 0){
+    //                em.flush();
+    //                LOG.debug("Processed [" + counter + "] concepts");
+    //                //em.clear();
+    //            }
+    //            counter++;
+    //
+    ////            if (counter % 10000 == 0){
+    ////                LOG.debug("Processed [" + counter + "] concepts");
+    ////            }
+    //        }
+    //        LOG.debug("Done. Processed [" + counter + "] concepts");
+    //        tx.commit();
+    //    }
+
+
+
+    //  protected void populateRelationships2(InputStream stream, EntityManager em) throws IOException {
+    //      LOG.info("Populating Relationships");
+    //      HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+    //      StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
+    //      Transaction tx = session.beginTransaction();
+    //
+    //      try {
+    //          BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+    //          int currentLine = 1;
+    //          String line = null;
+    //
+    //          try {
+    //              line = br.readLine();
+    //              //skip the headers
+    //              line = br.readLine();
+    //
+    //              while (line != null) {
+    //                  currentLine++;
+    //                  if (line.isEmpty()){
+    //                      line = br.readLine();
+    //                      continue;
+    //                  }
+    //                  Iterable<String> split = Splitter.on('\t').split(line);
+    //                  Iterator<String> splitIt = split.iterator();
+    //
+    //                  RelationshipStatement statement = new RelationshipStatement();
+    //
+    //                  try {
+    //                      statement.setId(Long.parseLong(splitIt.next()));
+    //                      long subjectId = Long.parseLong(splitIt.next());
+    //                      Concept subject = em.find(Concept.class, subjectId);
+    //                      if (subject == null){
+    //                          throw new InvalidInputException("Concept [" + subjectId + "] not found");
+    //                      }
+    //                      statement.setSubject(subject);
+    //                      statement.setRelationshipType(Long.parseLong(splitIt.next()));
+    //                      long objectId = Long.parseLong(splitIt.next());
+    //                      Concept object = em.find(Concept.class, objectId);
+    //                      if (object == null){
+    //                          throw new InvalidInputException("Concept [" + objectId + "] not found");
+    //                      }
+    //
+    //                      statement.setObject(object);
+    //                      statement.setCharacteristicType(Integer.parseInt(splitIt.next()));
+    //                      statement.setRefinability(Integer.parseInt(splitIt.next()));
+    //                      statement.setRelationShipGroup(Integer.parseInt(splitIt.next()));
+    //
+    //                      session.insert(statement);
+    //
+    //                  } catch (NumberFormatException e) {
+    //                      LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+    //                  } catch (IllegalArgumentException e){
+    //                      LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+    //                  } catch (InvalidInputException e) {
+    //                      LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing");
+    //                  }
+    //
+    //                  line = br.readLine();
+    //              }
+    //          } finally {
+    //              br.close();
+    //          }
+    //          tx.commit();
+    //          LOG.info("Populated [" + (currentLine - 1) + "] relationships");
+    //      } finally {
+    //          session.close();
+    //      }
+    //  }    
+
 }
