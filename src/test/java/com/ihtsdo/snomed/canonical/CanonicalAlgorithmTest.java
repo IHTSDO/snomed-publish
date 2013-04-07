@@ -380,6 +380,60 @@ public class CanonicalAlgorithmTest {
                     contains(r.getId()));
         }
     }
+    
+    /*
+     * Test case 9:
+     * ------------
+     * {2,4} is primitive, {1,3} is not primitive
+     * 1 isKindOf 2
+     * 1 isKindOf 3
+     * 2 isKindof 4
+     * 3 isKindOf 4
+     * 
+     * Proximial primitive supertypes for concept 1: 
+     * {2}
+     */
+    @Test
+    public void shouldPassTestCase9_WithCache() {
+        c3.setPrimitive(false);
+        c1.setPrimitive(false);
+
+        c1.addKindOf(c2);
+        c1.addKindOf(c3);
+        c2.addKindOf(c4);
+        c3.addKindOf(c4);
+
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        assertEquals(1, proximalPrimitives.size());
+        assertTrue(proximalPrimitives.contains(c2));
+    }  
+    
+    /*
+     * Test case 10:
+     * -------------
+     * {2,3,4} is primitive, {1} is not primitive
+     * 1 isKindOf 2
+     * 1 isKindOf 3
+     * 2 isKindof 4
+     * 3 isKindOf 4
+     * 
+     * Proximial primitive supertypes for concept 1: 
+     * {2,3}
+     */
+    @Test
+    public void shouldPassTestCase10_WithCache() {
+        c1.setPrimitive(false);
+
+        c1.addKindOf(c2);
+        c1.addKindOf(c3);
+        c2.addKindOf(c4);
+        c3.addKindOf(c4);
+
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        assertEquals(2, proximalPrimitives.size());
+        assertTrue(proximalPrimitives.contains(c2));
+        assertTrue(proximalPrimitives.contains(c3));
+    }      
 
     
     /* ---------------------------------------

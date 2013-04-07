@@ -3,31 +3,31 @@ package com.ihtsdo.snomed.canonical.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
-@Entity
+@Entity(name="Ontology")
 public class Ontology {
     @Id private long id;
     private String name;
     private String description;
 
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval=true)
+    @OneToMany(mappedBy="ontology")
+    //@JoinColumn(name="ontology_id")
     private Set<RelationshipStatement> relationshipStatements = new HashSet<RelationshipStatement>();
 
     @Override
     public String toString() {
-        return "id: " + id + ", name: " + name + ", description: " + description + ", number of relationshipStatements: " + relationshipStatements.size();
+        return "id: " + getId() + ", name: " + getName() + ", description: " + getDescription() + ", number of relationshipStatements: " + getRelationshipStatements().size();
     }
 
     public void addRelationshipStatement(RelationshipStatement r){
-        relationshipStatements.add(r);
+        getRelationshipStatements().add(r);
     }
 
-
+    
 
     /*
      * Generated Getters and Setters

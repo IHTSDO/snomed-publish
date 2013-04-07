@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
+import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class HibernateDatabaseImporter {
 
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporter.class );
-    public static final long IMPORTED_ONTOLOGY_ID = 2;
 
     public List<Concept> populateDb(InputStream conceptsStream, InputStream relationshipsStream, EntityManager em) throws IOException{
         Stopwatch stopwatch = new Stopwatch().start();
@@ -44,12 +44,13 @@ public class HibernateDatabaseImporter {
         return concepts;
     }
 
-    protected void populateConcepts(InputStream stream, EntityManager em) throws IOException {
+    public void populateConcepts(InputStream stream, EntityManager em) throws IOException {
         LOG.info("Populating Concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         StatelessSession session = ((Session) hem.getDelegate()).getSessionFactory().openStatelessSession();
         try {
             Transaction tx = session.beginTransaction();
+            
             BufferedReader br = new BufferedReader(new InputStreamReader(stream));
             int currentLine = 1;
             String line = null;
@@ -196,7 +197,7 @@ public class HibernateDatabaseImporter {
     //    protected static void createAlgorithmStructures(EntityManager em){
     //        EntityTransaction tx = em.getTransaction();
     //        tx.begin();
-    //        //Ontology o = em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+    //        //Ontology o = em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_LONG_INPUT_ONTOLOGY_ID);
     //        //LOG.info("Processing Step 2 for ontology [" + o +"]");
     //
     //        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");

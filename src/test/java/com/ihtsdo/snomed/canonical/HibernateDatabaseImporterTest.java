@@ -198,10 +198,10 @@ public class HibernateDatabaseImporterTest {
 ////      importer.populateDb(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
 ////              ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS), main.em);
 ////
-////      Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID);
+////      Ontology ontology = main.em.find(Ontology.class, HibernateDatabaseImporter.IMPORTED_LONG_INPUT_ONTOLOGY_ID);
 ////      assertNotNull(ontology);
 ////      assertEquals(10, ontology.getRelationshipStatements().size());
-////      assertEquals(HibernateDatabaseImporter.IMPORTED_ONTOLOGY_ID, ontology.getId());
+////      assertEquals(HibernateDatabaseImporter.IMPORTED_LONG_INPUT_ONTOLOGY_ID, ontology.getId());
 ////      RelationshipStatement r = new RelationshipStatement();
 ////      r.setId(100000028);
 ////      assertTrue(ontology.getRelationshipStatements().contains(r));

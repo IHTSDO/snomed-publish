@@ -4,6 +4,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -31,7 +33,12 @@ public class RelationshipStatement {
         subject.addSubjectOfRelationshipStatement(this);
     }
     
-    @Id private long id;
+    @OneToOne
+    private Ontology ontology;
+    
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @OneToOne (cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Concept subject;
@@ -43,23 +50,24 @@ public class RelationshipStatement {
     @Column(name="characteristic_type")
     private int characteristicType;
     
+    @Column(nullable=true)
     private int refinability;
     
     @Column(name="relationship_group")
     private int relationShipGroup;
 
     public boolean isKindOfRelationship(){
-        return (relationshipType == IS_KIND_OF_RELATIONSHIP_TYPE_ID);
+        return (getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID);
     }
     
     public boolean isDefiningCharacteristic(){
-        return characteristicType == DEFINING_CHARACTERISTIC_TYPE;
+        return getCharacteristicType() == DEFINING_CHARACTERISTIC_TYPE;
     }
     
     @Override
     public String toString() {
-        //return "(" + getId() + ": " + getSubject() + " --" + getRelationshipType() + "-> " + getObject() + ", group: " + getRelationShipGroup() + ")";
-        return ToStringBuilder.reflectionToString(this);
+        return "(" + getId() + ": " + getSubject() + " --" + getRelationshipType() + "-> " + getObject() + ", group: " + getRelationShipGroup() + ")";
+        //return ToStringBuilder.reflectionToString(this);
     }
     
     public String shortToString(){
@@ -68,14 +76,14 @@ public class RelationshipStatement {
 
     @Override
     public int hashCode(){
-        return Longs.hashCode(id);
+        return Longs.hashCode(getId());
     }
 
     @Override
     public boolean equals(Object o){
         if (o instanceof RelationshipStatement){
             RelationshipStatement r = (RelationshipStatement) o;
-            if (r.id == this.id){
+            if (r.getId() == this.getId()){
                 return true;
             }
         }

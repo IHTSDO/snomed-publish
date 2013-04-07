@@ -67,7 +67,7 @@ public class CliParser {
             System.exit(-1);
         }
         
-        if (!new File(concepts).isFile()){
+        if (!new File(triples).isFile()){
             System.out.println("Unable to locate triples input file '" + triples + "'");
             System.exit(-1);
         }

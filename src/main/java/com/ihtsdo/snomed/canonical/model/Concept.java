@@ -32,7 +32,7 @@ public class Concept {
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
-    private boolean isPrimitive;
+    private boolean primitive;
 
     @OneToMany(mappedBy="subject", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<RelationshipStatement> subjectOfRelationShipStatements = new HashSet<RelationshipStatement>();
@@ -75,7 +75,7 @@ public class Concept {
         
         
         for (Concept kindOf : kindOfs){
-            if (kindOf.isPrimitive){
+            if (kindOf.isPrimitive()){
                 cache.add(kindOf);
             }
             cache.addAll(kindOf.getAllKindOfPrimitiveConcepts(useCache));
@@ -84,25 +84,25 @@ public class Concept {
     }
     
     public boolean isLeaf(){
-        return parentOf.isEmpty();
+        return getParentOf().isEmpty();
     }
 
     @Override
     public String toString() {
-        return Long.toString(id);
+        return Long.toString(getId());
         //return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode(){
-        return Longs.hashCode(id);
+        return Longs.hashCode(getId());
     }
 
     @Override
     public boolean equals(Object o){
         if (o instanceof Concept){
             Concept c = (Concept) o;
-            if (c.id == this.id){
+            if (c.getId() == this.getId()){
                 return true;
             }
         }
@@ -144,10 +144,10 @@ public class Concept {
         this.snomedId = snomedId;
     }
     public boolean isPrimitive() {
-        return isPrimitive;
+        return primitive;
     }
-    public void setPrimitive(boolean isPrimitive) {
-        this.isPrimitive = isPrimitive;
+    public void setPrimitive(boolean primitive) {
+        this.primitive = primitive;
     }
 
     public Set<Concept> getKindOfs() {

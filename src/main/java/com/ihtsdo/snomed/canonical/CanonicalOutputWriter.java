@@ -12,8 +12,8 @@ import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class CanonicalOutputWriter {
 
-    private static final char DELIMITER = '\t';
-    private static final Logger LOG = LoggerFactory.getLogger( Main.class );
+    protected static final char DELIMITER = '\t';
+    private static final Logger LOG = LoggerFactory.getLogger( CanonicalOutputWriter.class );
     
     public void write (Writer w, Collection<RelationshipStatement> statements) throws IOException{
         printHeading(w);
@@ -27,12 +27,12 @@ public class CanonicalOutputWriter {
         LOG.info("Wrote " + counter + " lines");
     }
 
-    private void printHeading(Writer w) throws IOException{
+    protected void printHeading(Writer w) throws IOException{
         w.write("CONCEPTID1" + DELIMITER + "RELATIONSHIPTYPE" + DELIMITER +
                 "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP");
     }
 
-    private void printRelationship(Writer w, RelationshipStatement r) throws IOException{
+    protected void printRelationship(Writer w, RelationshipStatement r) throws IOException{
         w.write(Long.toString(r.getSubject().getId())
                 + DELIMITER + Long.toString(r.getRelationshipType())
                 + DELIMITER + Long.toString(r.getObject().getId())
