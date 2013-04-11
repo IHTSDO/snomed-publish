@@ -1,33 +1,42 @@
 package com.ihtsdo.snomed.canonical.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+
+import com.google.common.base.Objects;
 
 @Entity(name="Ontology")
 public class Ontology {
-    @Id private long id;
+    
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private long id;
+    
     private String name;
-    private String description;
 
     @OneToMany(mappedBy="ontology")
-    //@JoinColumn(name="ontology_id")
-    private Set<RelationshipStatement> relationshipStatements = new HashSet<RelationshipStatement>();
+    private Set<RelationshipStatement> relationshipStatements;
 
+    @OneToMany(mappedBy="ontology")
+    private Set<Concept> concepts;
+    
     @Override
     public String toString() {
-        return "id: " + getId() + ", name: " + getName() + ", description: " + getDescription() + ", number of relationshipStatements: " + getRelationshipStatements().size();
+        return Objects.toStringHelper(this).
+                add("id", getId()).
+                add("name", getId()).
+                add("statements", getRelationshipStatements() == null ? 0 : getRelationshipStatements().size()).
+                add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
+                toString();
     }
 
     public void addRelationshipStatement(RelationshipStatement r){
         getRelationshipStatements().add(r);
     }
-
-    
 
     /*
      * Generated Getters and Setters
@@ -49,20 +58,20 @@ public class Ontology {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Set<RelationshipStatement> getRelationshipStatements() {
         return relationshipStatements;
     }
 
     public void setRelationshipStatements(Set<RelationshipStatement> relationshipStatements) {
         this.relationshipStatements = relationshipStatements;
+    }
+
+    public Set<Concept> getConcepts() {
+        return concepts;
+    }
+
+    public void setConcepts(Set<Concept> concepts) {
+        this.concepts = concepts;
     }
 
 

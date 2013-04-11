@@ -17,16 +17,18 @@ import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class CanonicalAlgorithmTest {
 
-    //private static HibernateDatabaseImporter importer;
+    //private static HibernateDbImporter importer;
     //private static Main main;
     private static CanonicalAlgorithm algorithm;
+    
+    public static final int NOT_DEFINING_CHARACTERISTIC_TYPE = 1;
 
     RelationshipStatement rs1, rs2, rs3, rs4, rs5;
     Concept c1, c2, c3, c4, c5, cA, cB;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-//        importer = new HibernateDatabaseImporter();
+//        importer = new HibernateDbImporter();
 //        main = new Main();
         algorithm = new CanonicalAlgorithm();
     }
@@ -72,7 +74,7 @@ public class CanonicalAlgorithmTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }
@@ -81,7 +83,7 @@ public class CanonicalAlgorithmTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }
@@ -103,7 +105,7 @@ public class CanonicalAlgorithmTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c3));
     }
@@ -114,7 +116,7 @@ public class CanonicalAlgorithmTest {
         c1.addKindOf(c2);
         c2.addKindOf(c3);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c3));
     }    
@@ -139,7 +141,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c4));
     }
@@ -153,7 +155,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c4));
     }    
@@ -175,7 +177,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }
@@ -185,7 +187,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }   
@@ -209,7 +211,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(2, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
         assertTrue(proximalPrimitives.contains(c3));
@@ -222,7 +224,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(2, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
         assertTrue(proximalPrimitives.contains(c3));
@@ -247,7 +249,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }
@@ -260,7 +262,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c3);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }   
@@ -287,7 +289,7 @@ public class CanonicalAlgorithmTest {
         c3.addKindOf(c4);
         c1.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c4));
     }   
@@ -302,7 +304,7 @@ public class CanonicalAlgorithmTest {
         c3.addKindOf(c4);
         c1.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c4));
     }    
@@ -328,7 +330,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     } 
@@ -342,7 +344,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, false, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }   
@@ -366,7 +368,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<RelationshipStatement> statements = algorithm.createProximalPrimitiveStatementsForConcept(c1, true);
+        Set<RelationshipStatement> statements = algorithm.createProximalPrimitiveStatementsForConcept(c1, true, true, null);
         assertEquals(2, statements.size());
         
         for (RelationshipStatement r : statements){
@@ -377,7 +379,7 @@ public class CanonicalAlgorithmTest {
             assertTrue(new HashSet<Long>(Arrays.asList(
                     CanonicalAlgorithm.RELATIONSHIP_IDS_ARE_NEVER_LARGER_THAN_THIS, 
                     CanonicalAlgorithm.RELATIONSHIP_IDS_ARE_NEVER_LARGER_THAN_THIS + 1)).
-                    contains(r.getId()));
+                    contains(r.getSerialisedId()));
         }
     }
     
@@ -403,7 +405,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(1, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
     }  
@@ -429,7 +431,7 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true);
+        Set<Concept> proximalPrimitives = algorithm.getProximalPrimitiveConcepts(c1, true, true, null);
         assertEquals(2, proximalPrimitives.size());
         assertTrue(proximalPrimitives.contains(c2));
         assertTrue(proximalPrimitives.contains(c3));
@@ -447,9 +449,9 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase1(){ 
-        RelationshipStatement r1 = new RelationshipStatement(101, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        RelationshipStatement r1 = new RelationshipStatement(101, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r1));
@@ -464,11 +466,11 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase2(){ 
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }
@@ -483,12 +485,12 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase3(){ 
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }    
@@ -505,12 +507,12 @@ public class CanonicalAlgorithmTest {
     @Test
     public void shouldPassUDCTestCase4(){ 
         c2.setPrimitive(false);
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -525,11 +527,11 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase5(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c2, 1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, 1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -546,12 +548,12 @@ public class CanonicalAlgorithmTest {
     @Test
     public void shouldPassUDCTestCase6(){ 
         c2.setPrimitive(false);
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  
@@ -564,10 +566,10 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase7(){ 
-        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }
@@ -579,9 +581,9 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase8(){ 
-        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c2, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  
@@ -595,11 +597,11 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase9(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
+        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -614,11 +616,11 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase10(){ 
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.NOT_DEFINING_CHARACTERISTIC_TYPE);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE);
+        new RelationshipStatement(100, c1, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true); 
+        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  

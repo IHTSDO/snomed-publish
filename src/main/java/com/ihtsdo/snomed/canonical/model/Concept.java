@@ -4,63 +4,66 @@ package com.ihtsdo.snomed.canonical.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @Entity
 public class Concept {
-    
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
+        
+    @Transient private Set<Concept> cache;
     
-    @Transient
-    private Set<Concept> cache;
-    
-    @Id private long id;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private long id;
+
+    private long serialisedId;
     private int status;
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
     private boolean primitive;
+    
+    @OneToOne
+    private Ontology ontology;
 
-    @OneToMany(mappedBy="subject", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @OneToMany(mappedBy="subject")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<RelationshipStatement> subjectOfRelationShipStatements = new HashSet<RelationshipStatement>();
 
-    @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany//(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinTable(name = "KIND_OF", 
-    joinColumns = @JoinColumn(name="child_id"),
-    inverseJoinColumns = @JoinColumn(name="parent_id"))
+        joinColumns = @JoinColumn(name="child_id"),
+        inverseJoinColumns = @JoinColumn(name="parent_id"),
+        uniqueConstraints=@UniqueConstraint(columnNames={"parent_id", "child_id"}))
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> kindOfs = new HashSet<Concept>();
 
-    @ManyToMany(mappedBy="kindOfs", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany(mappedBy="kindOfs")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Concept> parentOf = new HashSet<Concept>();
     
     public Concept(){}
-    public Concept(long id){this.id = id;}
-
-    /**
-     * This method has been optimized with a cache.
-     * Therefore, DO NOT call this method with caching until ALL concepts 
-     * have been loaded and ALL kindOf relationships have been discovered
-     */
+    public Concept(long serialisedId){this.serialisedId = serialisedId;}
     
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
         if (useCache && (cache != null)){
             if (LOG.isDebugEnabled()){
-                StringBuffer debugStringBuffer = new StringBuffer("Cache hit for concept " + this.getId() + " with values {");
+                StringBuffer debugStringBuffer = new StringBuffer("Cache hit for concept " + this.getSerialisedId() + " with values {");
                 for (Concept c : cache){
-                    debugStringBuffer.append(c.getId()+ ", ");
+                    debugStringBuffer.append(c.getSerialisedId()+ ", ");
                 }
                 if (!cache.isEmpty()){
                     debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
@@ -70,9 +73,8 @@ public class Concept {
             }
             return cache;
         }
-        LOG.debug("Populating cache for concept " + getId());
+        LOG.debug("Populating cache for concept " + getSerialisedId());
         cache = new HashSet<Concept>();
-        
         
         for (Concept kindOf : kindOfs){
             if (kindOf.isPrimitive()){
@@ -89,20 +91,28 @@ public class Concept {
 
     @Override
     public String toString() {
-        return Long.toString(getId());
-        //return ToStringBuilder.reflectionToString(this);
+        return Objects.toStringHelper(this)
+                .add("id", getId())
+                .add("internalId", getSerialisedId())
+                .add("ontology", getOntology() == null ? null : getOntology().getId())
+                .add("status", getStatus())
+                .add("fullySpecifiedName", getFullySpecifiedName())
+                .add("ctv3id", getCtv3id())
+                .add("snomedId", getSnomedId())
+                .add("primitive", isPrimitive())
+                .toString();
     }
 
     @Override
     public int hashCode(){
-        return Longs.hashCode(getId());
+        return Longs.hashCode(getSerialisedId());
     }
 
     @Override
     public boolean equals(Object o){
         if (o instanceof Concept){
             Concept c = (Concept) o;
-            if (c.getId() == this.getId()){
+            if (c.getSerialisedId() == this.getSerialisedId()){
                 return true;
             }
         }
@@ -185,4 +195,17 @@ public class Concept {
     public void addSubjectOfRelationShipStatements(RelationshipStatement statement){
         this.subjectOfRelationShipStatements.add(statement);
     }
+    public Ontology getOntology() {
+        return ontology;
+    }
+    public void setOntology(Ontology ontology) {
+        this.ontology = ontology;
+    }
+    public long getSerialisedId() {
+        return serialisedId;
+    }
+    public void setSerialisedId(long serialisedId) {
+        this.serialisedId = serialisedId;
+    }
+    
 }

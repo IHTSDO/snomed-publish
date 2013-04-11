@@ -23,7 +23,7 @@ public class CanonicalAlgorithm {
         return idCounter++;
     }
 
-    Set<RelationshipStatement> runAlgorithm(Collection<Concept> concepts) {
+    public Set<RelationshipStatement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds) {
         Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Running algorithm");
     
@@ -31,7 +31,7 @@ public class CanonicalAlgorithm {
         Set<RelationshipStatement> allImmidiatePrimitiveConceptStatements = new HashSet<RelationshipStatement>();
         for (Concept concept : concepts){
             allImmidiatePrimitiveConceptStatements.addAll(
-                    createProximalPrimitiveStatementsForConcept(concept, true));
+                    createProximalPrimitiveStatementsForConcept(concept, true, showDetails, showDetailsConceptIds));
         }
         LOG.info("Found [" + allImmidiatePrimitiveConceptStatements.size() + "] immidiate primitive concepts");
        
@@ -40,7 +40,7 @@ public class CanonicalAlgorithm {
         Set<RelationshipStatement> allUndefinedCharacteristicsStatements = new HashSet<RelationshipStatement>();
         for (Concept concept : concepts){
             allUndefinedCharacteristicsStatements.addAll(
-                    getUnsharedDefiningCharacteristicsForConcept(concept, true));
+                    getUnsharedDefiningCharacteristicsForConcept(concept, true, showDetails, showDetailsConceptIds));
         }
         LOG.info("Found [" + allUndefinedCharacteristicsStatements.size() + "] unshared defining characteristics");
      
@@ -53,73 +53,83 @@ public class CanonicalAlgorithm {
         return returnSet;
     }    
     
-    protected Set<Concept> getProximalPrimitiveConcepts(Concept concept, boolean useCache){
-        LOG.debug("Attempting to find all proximal primitive isKindOf concepts for concept {}",  concept.getId());
+    protected Set<RelationshipStatement> createProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
+        Set<RelationshipStatement> returnStatements = new HashSet<RelationshipStatement>();
+        for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
+            returnStatements.add(new RelationshipStatement(getNewId(), concept, RelationshipStatement.IS_KIND_OF_RELATIONSHIP_TYPE_ID, proximalPrimitiveConcept));
+        }
+        return returnStatements;
+    }
 
+    protected Set<RelationshipStatement> getProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
+        Set<RelationshipStatement> returnStatements = new HashSet<RelationshipStatement>();
+        for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
+            for (RelationshipStatement r : proximalPrimitiveConcept.getSubjectOfRelationShipStatements()){
+                if (r.isKindOfRelationship()){
+                    
+                }
+            }
+        }
+        return returnStatements;
+    }    
+    
+    protected Set<Concept> getProximalPrimitiveConcepts(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
+        boolean shouldShowDetails = showDetails && ((showDetailsConceptIds == null) || (showDetailsConceptIds.contains(concept.getSerialisedId())));
+
+        if (shouldShowDetails){
+            LOG.info("Attempting to find all proximal primitive isKindOf concepts for concept {}",  concept.getSerialisedId());    
+        }
         Set<Concept> proximalParentsOnly = new HashSet<Concept>(concept.getAllKindOfPrimitiveConcepts(useCache));
         
-        if (LOG.isDebugEnabled()){
-            StringBuffer debugStringBuffer = new StringBuffer("All primitive isA concepts for concept " + concept.getId() + " are {");
+        if (shouldShowDetails){
+            StringBuffer debugStringBuffer = new StringBuffer("All primitive super concepts for concept " + concept.getSerialisedId() + " are {");
             for (Concept c : concept.getAllKindOfPrimitiveConcepts(useCache)){
-                debugStringBuffer.append(c.getId()+ ", ");
+                debugStringBuffer.append(c.getSerialisedId()+ ", ");
             }
             if (!concept.getAllKindOfPrimitiveConcepts(useCache).isEmpty()){
                 debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
             }
             debugStringBuffer.append("}");
-            LOG.debug(debugStringBuffer.toString());
+            LOG.info(debugStringBuffer.toString());
         }
         
         for (Concept parentUnderTest : concept.getAllKindOfPrimitiveConcepts(useCache)){
-            if (LOG.isDebugEnabled()){
+            if (shouldShowDetails){
                 if (parentUnderTest.getAllKindOfPrimitiveConcepts(useCache).isEmpty()){
-                    LOG.debug("Concept " + parentUnderTest.getId() + " has no isA relationships, continuing");
+                    LOG.info("Concept " + parentUnderTest.getSerialisedId() + " has no isA relationships, continuing");
                 }
             }
             for (Concept parentOfParentUnderTest : parentUnderTest.getAllKindOfPrimitiveConcepts(useCache)){
-                LOG.debug("Found that concept {} isA concept {}", parentUnderTest.getId(), parentOfParentUnderTest.getId());
+                if (shouldShowDetails) LOG.info("Found that concept {} isA concept {}", parentUnderTest.getSerialisedId(), parentOfParentUnderTest.getSerialisedId());
                 if (concept.getAllKindOfPrimitiveConcepts(useCache).contains(parentOfParentUnderTest)){
-                    LOG.debug("Since concept {} isA concept {}, concept {} is not an proximal isA for concept {}", parentUnderTest.getId(), parentOfParentUnderTest.getId(), parentOfParentUnderTest.getId(), concept.getId());
+                    if (shouldShowDetails) LOG.info("Since concept {} isA concept {}, concept {} is not an proximal isA for concept {}", parentUnderTest.getSerialisedId(), parentOfParentUnderTest.getSerialisedId(), parentOfParentUnderTest.getSerialisedId(), concept.getSerialisedId());
                     proximalParentsOnly.remove(parentOfParentUnderTest);
                 }
             }
         }
-        if (LOG.isDebugEnabled()){
-            StringBuffer debugStringBuffer = new StringBuffer("Found that concept " + concept.getId() + " has proximal primitive isA concept(s) of {");
+        if (shouldShowDetails){
+            StringBuffer debugStringBuffer = new StringBuffer("Found that concept " + concept.getSerialisedId() + " has proximal primitive isA concept(s) of {");
             for (Concept c : proximalParentsOnly){
-                debugStringBuffer.append(c.getId() + ", ");
+                debugStringBuffer.append(c.getSerialisedId() + ", ");
             }
             if (!proximalParentsOnly.isEmpty()){
                 debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
             }
             debugStringBuffer.append("}");
-            LOG.debug(debugStringBuffer.toString());
+            LOG.info(debugStringBuffer.toString());
         }
 
         return proximalParentsOnly;
     }
     
-    protected Set<RelationshipStatement> createProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache){
-        Set<RelationshipStatement> returnStatements = new HashSet<RelationshipStatement>();
-        for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache)){
-            RelationshipStatement r = new RelationshipStatement();
-            r.setId(getNewId());
-            r.setSubject(concept);
-            r.setObject(proximalPrimitiveConcept);
-            r.setRelationshipType(RelationshipStatement.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
-            r.setRelationShipGroup(0);
-            returnStatements.add(r);
-        }
-        return returnStatements;
-    }
-    
-    protected Set<RelationshipStatement> getUnsharedDefiningCharacteristicsForConcept(Concept concept, boolean useCache){
-        LOG.debug("Attempting to find all unshared defining characteristics for concept [{}]",  concept.getId());
+    protected Set<RelationshipStatement> getUnsharedDefiningCharacteristicsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
+        boolean shouldShowDetails = showDetails && ((showDetailsConceptIds == null) || (showDetailsConceptIds.contains(concept.getSerialisedId())));
+        if(shouldShowDetails) LOG.info("Attempting to find all unshared defining characteristics for concept [{}]",  concept.getSerialisedId());
         
         Set<RelationshipStatement> allStatementsForConcept = new HashSet<RelationshipStatement>(concept.getSubjectOfRelationShipStatements());
         
-        if (LOG.isDebugEnabled()){
-            StringBuffer debugStringBuffer = new StringBuffer("Relationships for concept [" + concept.getId() + "] are {");
+        if (shouldShowDetails){
+            StringBuffer debugStringBuffer = new StringBuffer("Relationships for concept [" + concept.getSerialisedId() + "] are {");
             for (RelationshipStatement rs : concept.getSubjectOfRelationShipStatements()){
                 debugStringBuffer.append(rs.shortToString() + ", ");
             }
@@ -128,7 +138,7 @@ public class CanonicalAlgorithm {
                 debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
             }
             debugStringBuffer.append("}");
-            LOG.debug(debugStringBuffer.toString());
+            LOG.info(debugStringBuffer.toString());
         }
         
         for (RelationshipStatement rUnderTest : concept.getSubjectOfRelationShipStatements()){
@@ -137,40 +147,43 @@ public class CanonicalAlgorithm {
                 continue;
             }
             
-            if (LOG.isDebugEnabled()){
+            if (shouldShowDetails){
                 if (!rUnderTest.isDefiningCharacteristic()){
-                    LOG.debug("Skipping non-defining characteristic relationship {}", rUnderTest);
+                    LOG.info("Skipping non-defining characteristic relationship {}", rUnderTest);
                 }
                 else if (rUnderTest.isKindOfRelationship()){
-                    LOG.debug("Skipping non-characteristic isA relationship {}", rUnderTest);
+                    LOG.info("Skipping non-characteristic isA relationship {}", rUnderTest);
                 }
                 else{
-                    LOG.debug("Testing for existence of relationship [{}] in parent primitive concepts", rUnderTest.getId());
+                    LOG.info("Testing for existence of relationship [{}] in parent primitive concepts", rUnderTest.getSerialisedId());
                 }
                 if (concept.getAllKindOfPrimitiveConcepts(useCache).isEmpty()){
-                    LOG.debug("Concept [" + concept.getId() + "] has no isA relationships, continuing");
+                    LOG.info("Concept [" + concept.getSerialisedId() + "] has no isA relationships, continuing");
                 }
             }
             for (Concept parentConcept : concept.getAllKindOfPrimitiveConcepts(useCache)){
-                LOG.debug("Concept [{}] has a primitive parent concept of [{}]", concept.getId(), parentConcept.getId());
-                if (LOG.isDebugEnabled()){
+                if (shouldShowDetails){
+                    LOG.info("Concept [{}] has a primitive parent concept of [{}]", concept.getSerialisedId(), parentConcept.getSerialisedId());
                     if (parentConcept.getSubjectOfRelationShipStatements().isEmpty()){
-                        LOG.debug("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept);
+                        LOG.info("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept);
                     }
                 }
                 for (RelationshipStatement rParent : parentConcept.getSubjectOfRelationShipStatements()){
-                    if (LOG.isDebugEnabled()) LOG.debug("Found that parent concept [{}] has relationship {}", parentConcept, rParent.shortToString());
+                    if (shouldShowDetails) LOG.info("Found that parent concept [{}] has relationship {}", parentConcept, rParent.shortToString());
                     if ((rUnderTest.getRelationshipType() == rParent.getRelationshipType())&& 
                             rUnderTest.getObject().equals(rParent.getObject())&& 
                             rParent.isDefiningCharacteristic())
                     {
-                        if (LOG.isDebugEnabled()) LOG.debug("Found that relationship under test {} is also defined in parent concept as {}", rUnderTest.shortToString(), rParent.shortToString());
+                        if (shouldShowDetails) {
+                            LOG.info("Found that relationship under test {} is also defined in parent concept as {}", rUnderTest.shortToString(), rParent.shortToString());
+                            LOG.info("Removing statement [{}] from output because parent concept [{}] has defined relationship [{}]",  rUnderTest.shortToString(), parentConcept.getSerialisedId(), rParent.shortToString());
+                        }
                         allStatementsForConcept.remove(rUnderTest);
                     }
                 }
             }
-            if (LOG.isDebugEnabled()){
-                StringBuffer debugStringBuffer = new StringBuffer("Found that concept " + concept.getId() + " has defining characteristic relationships {");
+            if (shouldShowDetails){
+                StringBuffer debugStringBuffer = new StringBuffer("Found that concept " + concept.getSerialisedId() + " has defining characteristic relationships {");
                 for (RelationshipStatement r : allStatementsForConcept){
                     debugStringBuffer.append(r.shortToString() + ", ");
                 }
@@ -178,7 +191,7 @@ public class CanonicalAlgorithm {
                     debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
                 }
                 debugStringBuffer.append("}");
-                LOG.debug(debugStringBuffer.toString());
+                LOG.info(debugStringBuffer.toString());
             }
         }
         

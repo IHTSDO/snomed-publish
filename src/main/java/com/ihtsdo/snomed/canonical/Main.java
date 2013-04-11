@@ -21,20 +21,23 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
+import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class Main {
+    
     private static final Logger LOG = LoggerFactory.getLogger( Main.class );
     
     private static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
+    private static final String DEFAULT_ONTOLOGY_NAME = "LongForm";
     
     private   EntityManagerFactory emf           = null;
-    protected EntityManager em                   = null;
-    private   HibernateDatabaseImporter importer = new HibernateDatabaseImporter();
+    public    EntityManager em                   = null;
+    private   HibernateDbImporter importer = new HibernateDbImporter();
     private   CanonicalOutputWriter writer       = new CanonicalOutputWriter();
     private   CanonicalAlgorithm algorithm       = new CanonicalAlgorithm();
 
-    protected void initDb(String db){
+    public void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
         
         if ((db != null) && (!db.isEmpty())){
@@ -48,7 +51,7 @@ public class Main {
         em = emf.createEntityManager();
     }
 
-    protected void closeDb(){
+    public void closeDb(){
         LOG.info("Closing database");
         emf.close();
     }
@@ -61,17 +64,33 @@ public class Main {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db) throws IOException{
+    protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException{
         try{
             initDb(db);  
-            
-            List<Concept> concepts = importer.populateDb(new FileInputStream(conceptFile),
-                new FileInputStream(triplesFile), em);
-            
-            writeOut(outputFile, algorithm.runAlgorithm(concepts));
+            //em.getTransaction().begin();
+            Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, 
+                    new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
+
+            List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();
+
+            writeOut(outputFile, runAlgorithm(show, concepts));
         }finally{
+            em.getTransaction().commit();
             closeDb();
         }
+    }
+
+    private Set<RelationshipStatement> runAlgorithm(String show, List<Concept> concepts) {
+        Set<RelationshipStatement> resultStatements = null;
+        if (show == null){
+            resultStatements = algorithm.runAlgorithm(concepts, false, null);
+        }
+        else if (show.toUpperCase().equals(CliParser.SHOW_ALL)){
+            resultStatements = algorithm.runAlgorithm(concepts, true, null);
+        }else{
+            resultStatements = algorithm.runAlgorithm(concepts, true, CliParser.parseShowString(show));
+        }
+        return resultStatements;
     }
 
     private void writeOut(String outputFile, Set<RelationshipStatement> statements) throws IOException {

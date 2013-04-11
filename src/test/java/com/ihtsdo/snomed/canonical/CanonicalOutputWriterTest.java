@@ -27,29 +27,13 @@ public class CanonicalOutputWriterTest {
     
     @Before
     public void setUp() throws Exception {
-        Concept c1 = new Concept();
-        c1.setId((long)100523006);
-        Concept c2 = new Concept();
-        c2.setId((long)100523007);
+        Concept c1 = new Concept(100523006l);
+        Concept c2 = new Concept(100523007);
+        Concept c3 = new Concept(100523008l);
+        Concept c4 = new Concept(100523009l);
 
-        Concept c3 = new Concept();
-        c3.setId((long)100523008);
-        Concept c4 = new Concept();
-        c4.setId((long)100523009);
-
-        RelationshipStatement r1 = new RelationshipStatement();
-        r1.setId(0);
-        r1.setSubject(c1);
-        r1.setRelationshipType((long)116680003);
-        r1.setObject(c2);
-        r1.setRelationShipGroup(0);
-
-        RelationshipStatement r2 = new RelationshipStatement();
-        r2.setId(1);
-        r2.setSubject(c3);
-        r2.setRelationshipType((long)116680004);
-        r2.setObject(c4);
-        r2.setRelationShipGroup(1);
+        RelationshipStatement r1 = new RelationshipStatement(0, c1, 116680003l, c2, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r2 = new RelationshipStatement(1, c3, 116680004l, c4, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 1);
 
         statements.add(r1);
         statements.add(r2);

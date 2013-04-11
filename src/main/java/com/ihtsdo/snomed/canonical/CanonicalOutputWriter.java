@@ -33,9 +33,9 @@ public class CanonicalOutputWriter {
     }
 
     protected void printRelationship(Writer w, RelationshipStatement r) throws IOException{
-        w.write(Long.toString(r.getSubject().getId())
+        w.write(Long.toString(r.getSubject().getSerialisedId())
                 + DELIMITER + Long.toString(r.getRelationshipType())
-                + DELIMITER + Long.toString(r.getObject().getId())
-                + DELIMITER + Integer.toString(r.getRelationShipGroup()));
+                + DELIMITER + Long.toString(r.getObject().getSerialisedId())
+                + DELIMITER + Integer.toString(r.getGroup()));
     }
 }
