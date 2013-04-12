@@ -41,7 +41,7 @@ public class HibernateDatabaseImporterTest {
     private static final String TEST_RELATIONSHIPS_LONG_FORM_WITH_PARSE_ERROR = "test_relationships_longform_with_parse_error.txt";
 
     private static final String TEST_RELATIONSHIPS_SHORT_FORM = "test_relationships_shortform.txt";
-    private static final String TEST_RELATIONSHIPS_SHORT_FORM_WITH_PARSE_ERROR = "test_relationships_shortform_with_parse_error.txt";
+    //private static final String TEST_RELATIONSHIPS_SHORT_FORM_WITH_PARSE_ERROR = "test_relationships_shortform_with_parse_error.txt";
     private static final String TEST_IS_KIND_OF_RELATIONSHIPS = "test_is_kind_of_relationships.txt";
     private static final String TEST_IS_KIND_OF_CONCEPTS = "test_is_kind_of_concepts.txt";
 

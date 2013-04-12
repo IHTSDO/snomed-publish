@@ -1,41 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ihtsdo.snomed</groupId>
+    <parent>
+        <groupId>com.ihtsdo.snomed</groupId>
+        <artifactId>snomed-publish</artifactId>
+        <version>0.5</version> 
+    </parent>   
+    <packaging>war</packaging>
     <artifactId>browse</artifactId>
-    <version>0.5</version>
     <name>browse</name>
-
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j.version>1.7.3</slf4j.version>
-        <hibernate.version>4.2.0.CR2</hibernate.version>
-        <hibernate.validator.version>5.0.0.CR2</hibernate.validator.version>
-        <log4j.version>1.2.17</log4j.version>
-        <junit.version>4.11</junit.version>
-        <mysql.version>5.1.24</mysql.version>
-        <guava.version>14.0.1</guava.version>
-        <junit.version>4.11</junit.version>
-        <c3p0.version>0.9.1.2</c3p0.version>
-        <mchange.commons.version>0.2.3.3</mchange.commons.version>
         <spring.version>3.2.2.RELEASE</spring.version>
         <jetty.version>9.0.0.v20130308</jetty.version>
     </properties>
-
-
     <build>
-        <finalName>snomed</finalName>
+        <finalName>browse</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-
             <plugin>
               <groupId>org.eclipse.jetty</groupId>
               <artifactId>jetty-maven-plugin</artifactId>
@@ -43,29 +23,35 @@
             </plugin>
         </plugins>
     </build>
-
     <dependencies>
+    
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
-            <artifactId>canonical</artifactId>
-            <version>0.5</version>
+            <artifactId>model</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>${spring.version}</version>
         </dependency>
- 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
- 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        
+        <!-- Spring AOP -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
             <version>${spring.version}</version>
         </dependency>
         
@@ -92,8 +78,7 @@
             <artifactId>spring-tx</artifactId>
             <version>${spring.version}</version>
         </dependency>        
-        
-        
+
         <!-- H2 Database -->
         <dependency>
             <groupId>com.h2database</groupId>
@@ -122,13 +107,8 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.0.Final</version>
+            <version>${hibernate.validator.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-        </dependency>        
         
         <!-- JDBC Connection Pooling -->
         <dependency>
@@ -141,14 +121,5 @@
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.2</version>
         </dependency>        
-        
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>maven2-repository.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-    </repositories>
 </project>

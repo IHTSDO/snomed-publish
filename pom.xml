@@ -11,6 +11,7 @@
         <module>importexport</module>
         <module>canonical</module>
         <module>test</module>
+        <module>web</module>
     </modules>
 
     <properties>
