@@ -6,7 +6,7 @@ IHTSDO Snomed Publication Tools
 * ####Canonical
         Create the canonical form of the publication
 
-* ####test
+* ####Test
         Sanity test for the canonical form of the publication
     
 * ####Web
