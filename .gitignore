@@ -1,8 +1,7 @@
-target/
-dependency-reduced-pom.xml
-.settings
-.metadata
-.classpath
-.DS_Store
-.project
-doc
+**/target/
+**/dependency-reduced-pom.xml
+**/.settings
+**/.metadata
+**/.classpath
+**/.DS_Store
+**/.project
