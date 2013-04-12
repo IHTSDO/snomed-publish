@@ -67,7 +67,6 @@ public class Main {
     protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException{
         try{
             initDb(db);  
-            //em.getTransaction().begin();
             Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
 
@@ -75,7 +74,6 @@ public class Main {
 
             writeOut(outputFile, runAlgorithm(show, concepts));
         }finally{
-            em.getTransaction().commit();
             closeDb();
         }
     }
