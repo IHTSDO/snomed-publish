@@ -23,7 +23,6 @@ import com.ihtsdo.snomed.service.HibernateDbImporter;
 public class TestingAlgorithmTest {
     private static final Logger LOG = LoggerFactory.getLogger( TestingAlgorithmTest.class );
 
-    private static final String DEFAULT_ONTOLOGY_NAME = "Test";
     private static HibernateDbImporter importer;
     private   TestingAlgorithm tester = new TestingAlgorithm();
 
