@@ -23,16 +23,17 @@ import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.service.CanonicalOutputWriter;
+import com.ihtsdo.snomed.service.HibernateDbImporter;
 
 public class Main {
     
     private static final Logger LOG = LoggerFactory.getLogger( Main.class );
     
-    private static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
     private static final String DEFAULT_ONTOLOGY_NAME = "LongForm";
     
     private   EntityManagerFactory emf           = null;
-    public    EntityManager em                   = null;
+    private   EntityManager em                   = null;
     private   HibernateDbImporter importer = new HibernateDbImporter();
     private   CanonicalOutputWriter writer       = new CanonicalOutputWriter();
     private   CanonicalAlgorithm algorithm       = new CanonicalAlgorithm();
@@ -47,7 +48,7 @@ public class Main {
             LOG.info("Using an in-memory database");
         }
         LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 

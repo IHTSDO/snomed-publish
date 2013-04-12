@@ -5,12 +5,12 @@
         <groupId>com.ihtsdo.snomed</groupId>
         <artifactId>snomed-publish</artifactId>
         <version>0.5</version> 
-    </parent>
-    <artifactId>canonical</artifactId>
+    </parent>    
+    <artifactId>test</artifactId>
     <packaging>jar</packaging>
-    <name>canonical</name>
+    <name>test</name>
     <build>
-        <finalName>canonical</finalName>
+        <finalName>test</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
@@ -25,8 +25,9 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ihtsdo.snomed.canonical.Main</mainClass>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.ihtsdo.snomed.canonical.test.Main</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -36,7 +37,6 @@
         </plugins>
     </build>
     <dependencies>
-    
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
             <artifactId>importexport</artifactId>
@@ -48,19 +48,6 @@
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.1</version>
-        </dependency>
-
-<!-- JDBC Connection Pooling -->
-<!--         <dependency> -->
-<!--             <groupId>c3p0</groupId> -->
-<!--             <artifactId>c3p0</artifactId> -->
-<!--             <version>${c3p0.version}</version> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>com.mchange</groupId> -->
-<!--             <artifactId>mchange-commons-java</artifactId> -->
-<!--             <version>${mchange.commons.version}</version> -->
-<!--         </dependency> -->
-
+        </dependency>        
     </dependencies>
 </project>
