@@ -3,7 +3,6 @@ snomed-publish
 
 IHTSDO Snomed Publication Tools
 
-See individual projects for more info
 * ####Canonical
         Create the canonical form of the publication
 
