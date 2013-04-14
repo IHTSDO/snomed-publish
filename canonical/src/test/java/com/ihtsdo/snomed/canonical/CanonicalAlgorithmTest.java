@@ -24,7 +24,7 @@ public class CanonicalAlgorithmTest {
     public static final int NOT_DEFINING_CHARACTERISTIC_TYPE = 1;
 
     RelationshipStatement rs1, rs2, rs3, rs4, rs5;
-    Concept c1, c2, c3, c4, c5, cA, cB;
+    Concept c1, c2, c3, c4, c5, cp1, cA, cB;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -35,7 +35,8 @@ public class CanonicalAlgorithmTest {
 
     @Before
     public void setUp() throws Exception {
-        //main.initDb(null);
+        new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
+
         c1 = new Concept(1);
         c2 = new Concept(2);
         c3 = new Concept(3);
@@ -43,6 +44,8 @@ public class CanonicalAlgorithmTest {
         c5 = new Concept(5);
         cA = new Concept(10);
         cB = new Concept(11);
+        
+        cp1 = new Concept(1);
 
         c1.setPrimitive(true);
         c2.setPrimitive(true);
@@ -449,7 +452,7 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase1(){ 
-        RelationshipStatement r1 = new RelationshipStatement(101, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r1 = new RelationshipStatement(101, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
@@ -466,8 +469,8 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase2(){ 
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
@@ -485,8 +488,8 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase3(){ 
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c3, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
@@ -507,8 +510,8 @@ public class CanonicalAlgorithmTest {
     @Test
     public void shouldPassUDCTestCase4(){ 
         c2.setPrimitive(false);
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
@@ -527,8 +530,8 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase5(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, 1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, cp1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
@@ -548,8 +551,8 @@ public class CanonicalAlgorithmTest {
     @Test
     public void shouldPassUDCTestCase6(){ 
         c2.setPrimitive(false);
-        new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c3, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c3, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
@@ -566,7 +569,7 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase7(){ 
-        new RelationshipStatement(100, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
@@ -581,7 +584,7 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase8(){ 
-        new RelationshipStatement(100, c2, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c2, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
@@ -597,8 +600,8 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase9(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
@@ -616,8 +619,8 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase10(){ 
-        new RelationshipStatement(100, c1, 1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, 1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(100, c1, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
         Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 

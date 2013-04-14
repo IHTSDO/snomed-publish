@@ -56,19 +56,7 @@ public class CanonicalAlgorithm {
     protected Set<RelationshipStatement> createProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
         Set<RelationshipStatement> returnStatements = new HashSet<RelationshipStatement>();
         for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
-            returnStatements.add(new RelationshipStatement(getNewId(), concept, RelationshipStatement.IS_KIND_OF_RELATIONSHIP_TYPE_ID, proximalPrimitiveConcept));
-        }
-        return returnStatements;
-    }
-
-    protected Set<RelationshipStatement> getProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
-        Set<RelationshipStatement> returnStatements = new HashSet<RelationshipStatement>();
-        for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
-            for (RelationshipStatement r : proximalPrimitiveConcept.getSubjectOfRelationShipStatements()){
-                if (r.isKindOfRelationship()){
-                    
-                }
-            }
+            returnStatements.add(new RelationshipStatement(getNewId(), concept, Concept.getKindOfPredicate(), proximalPrimitiveConcept));
         }
         return returnStatements;
     }    
@@ -126,22 +114,22 @@ public class CanonicalAlgorithm {
         boolean shouldShowDetails = showDetails && ((showDetailsConceptIds == null) || (showDetailsConceptIds.contains(concept.getSerialisedId())));
         if(shouldShowDetails) LOG.info("Attempting to find all unshared defining characteristics for concept [{}]",  concept.getSerialisedId());
         
-        Set<RelationshipStatement> allStatementsForConcept = new HashSet<RelationshipStatement>(concept.getSubjectOfRelationShipStatements());
+        Set<RelationshipStatement> allStatementsForConcept = new HashSet<RelationshipStatement>(concept.getSubjectOfRelationshipStatements());
         
         if (shouldShowDetails){
             StringBuffer debugStringBuffer = new StringBuffer("Relationships for concept [" + concept.getSerialisedId() + "] are {");
-            for (RelationshipStatement rs : concept.getSubjectOfRelationShipStatements()){
+            for (RelationshipStatement rs : concept.getSubjectOfRelationshipStatements()){
                 debugStringBuffer.append(rs.shortToString() + ", ");
             }
 
-            if (!concept.getSubjectOfRelationShipStatements().isEmpty()){
+            if (!concept.getSubjectOfRelationshipStatements().isEmpty()){
                 debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
             }
             debugStringBuffer.append("}");
             LOG.info(debugStringBuffer.toString());
         }
         
-        for (RelationshipStatement rUnderTest : concept.getSubjectOfRelationShipStatements()){
+        for (RelationshipStatement rUnderTest : concept.getSubjectOfRelationshipStatements()){
             if ((rUnderTest.isKindOfRelationship()) || (!rUnderTest.isDefiningCharacteristic())){
                 allStatementsForConcept.remove(rUnderTest);
                 continue;
@@ -164,13 +152,13 @@ public class CanonicalAlgorithm {
             for (Concept parentConcept : concept.getAllKindOfPrimitiveConcepts(useCache)){
                 if (shouldShowDetails){
                     LOG.info("Concept [{}] has a primitive parent concept of [{}]", concept.getSerialisedId(), parentConcept.getSerialisedId());
-                    if (parentConcept.getSubjectOfRelationShipStatements().isEmpty()){
+                    if (parentConcept.getSubjectOfRelationshipStatements().isEmpty()){
                         LOG.info("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept);
                     }
                 }
-                for (RelationshipStatement rParent : parentConcept.getSubjectOfRelationShipStatements()){
+                for (RelationshipStatement rParent : parentConcept.getSubjectOfRelationshipStatements()){
                     if (shouldShowDetails) LOG.info("Found that parent concept [{}] has relationship {}", parentConcept, rParent.shortToString());
-                    if ((rUnderTest.getRelationshipType() == rParent.getRelationshipType())&& 
+                    if ((rUnderTest.getPredicate() == rParent.getPredicate())&& 
                             rUnderTest.getObject().equals(rParent.getObject())&& 
                             rParent.isDefiningCharacteristic())
                     {

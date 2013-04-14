@@ -169,11 +169,11 @@ public class TestingAlgorithm {
         for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
             if (!rUnderTest.getRelationshipStatement().isKindOfRelationship()){
                 for (Concept parentConcept : rUnderTest.getRelationshipStatement().getSubject().getAllKindOfPrimitiveConcepts(true)){
-                    for (RelationshipStatement parentRelationshipStatement : parentConcept.getSubjectOfRelationShipStatements()){
+                    for (RelationshipStatement parentRelationshipStatement : parentConcept.getSubjectOfRelationshipStatements()){
                         if (!parentRelationshipStatement.isDefiningCharacteristic()){
                             continue;
                         }
-                        if ((parentRelationshipStatement.getRelationshipType() == rUnderTest.getRelationshipStatement().getRelationshipType()) &&
+                        if ((parentRelationshipStatement.getPredicate() == rUnderTest.getRelationshipStatement().getPredicate()) &&
                                 parentRelationshipStatement.getObject().equals(rUnderTest.getRelationshipStatement().getObject())){
                             udcInPrimitiveParentConcept.add(rUnderTest);
                         }

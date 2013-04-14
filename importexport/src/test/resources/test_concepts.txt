@@ -1,4 +1,5 @@
 CONCEPTID	CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
+116680003	0	Is a (attribute)	XU48G	G-C509	1
 280844000	0	Entire body of seventh thoracic vertebra (body structure)	Xa1Y9	T-11875	1
 280845004	0	Entire body of eighth thoracic vertebra (body structure)	Xa1YA	T-11876	1
 280846003	0	Entire body of ninth thoracic vertebra (body structure)	Xa1YB	T-11877	1

@@ -16,7 +16,6 @@ import com.google.common.primitives.Longs;
 public class RelationshipStatement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;
-    public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
     public static final int DEFINING_CHARACTERISTIC_TYPE = 0;
    
     @OneToOne
@@ -30,8 +29,10 @@ public class RelationshipStatement {
     @OneToOne// (cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Concept subject;
 
-    @Column(name="relationship_type")
-    private long relationshipType;
+    //@Column(name="relationship_type")
+    @OneToOne
+    private Concept predicate;
+    
     @OneToOne private Concept object;
     
     @Column(name="characteristic_type")
@@ -45,31 +46,35 @@ public class RelationshipStatement {
 
     public RelationshipStatement(){};
     public RelationshipStatement(long serialisedId){this.serialisedId = serialisedId;}
-    public RelationshipStatement(long serialisedId, Concept subject, long relationshipType, 
+    public RelationshipStatement(long serialisedId, Concept subject, Concept predicate, 
             Concept object, int characteristicType, int group)
     {
         this.group = group;
         this.serialisedId = serialisedId;
         this.subject = subject;
         this.object = object;
-        this.relationshipType = relationshipType;
+        this.predicate = predicate;
         this.characteristicType = characteristicType;
         subject.addSubjectOfRelationshipStatement(this);
+        object.addObjectOfRelationshipStatement(this);
+        predicate.addPredicateOfRelationshipStatement(this);
     }
     
     public RelationshipStatement(long serialisedId, Concept subject,
-            long relationshipType, Concept object) 
+            Concept predicate, Concept object) 
     {
         this.serialisedId = serialisedId;
         this.subject = subject;
         this.object = object;
-        this.relationshipType = relationshipType;    
+        this.predicate = predicate;    
         subject.addSubjectOfRelationshipStatement(this);
+        object.addObjectOfRelationshipStatement(this);
+        predicate.addPredicateOfRelationshipStatement(this);
     }
 
     
     public boolean isKindOfRelationship(){
-        return (getRelationshipType() == IS_KIND_OF_RELATIONSHIP_TYPE_ID);
+        return (getPredicate().isKindOfPredicate());
     }
     
     public boolean isDefiningCharacteristic(){
@@ -83,7 +88,7 @@ public class RelationshipStatement {
             .add("internalId", getSerialisedId())
             .add("ontology", getOntology() == null ? null : getOntology().getId())
             .add("subject", getSubject() == null ? null : getSubject().getSerialisedId())
-            .add("predicate", getRelationshipType())
+            .add("predicate", getPredicate())
             .add("object", getObject() == null ? null : getObject().getSerialisedId())
             .add("characteristic", getCharacteristicType())
             .add("refinability", getRefinability())
@@ -92,7 +97,7 @@ public class RelationshipStatement {
     }
     
     public String shortToString(){
-        return "[" + getSerialisedId() + ": " + getSubject() + "(" + getRelationshipType() + ")" + getObject() + " type:" + getCharacteristicType() + "]";
+        return "[" + getSerialisedId() + ": " + getSubject() + "(" + getPredicate() + ")" + getObject() + " type:" + getCharacteristicType() + "]";
     }
 
     @Override
@@ -111,7 +116,7 @@ public class RelationshipStatement {
             if ((r.getSerialisedId() == SERIALISED_ID_NOT_DEFINED) || (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED)){
                 return (r.getSubject().equals(this.getSubject())
                         && r.getObject().equals(this.getObject())
-                        && r.getRelationshipType() == (this.getRelationshipType()));
+                        && r.getPredicate() == (this.getPredicate()));
             }
             
             if (r.getSerialisedId() == this.getSerialisedId()){
@@ -136,11 +141,11 @@ public class RelationshipStatement {
     public void setSubject(Concept subject) {
         this.subject = subject;
     }
-    public long getRelationshipType() {
-        return relationshipType;
+    public Concept getPredicate() {
+        return predicate;
     }
-    public void setRelationshipType(long relationshipType) {
-        this.relationshipType = relationshipType;
+    public void setPredicate(Concept predicate) {
+        this.predicate = predicate;
     }
     public Concept getObject() {
         return object;

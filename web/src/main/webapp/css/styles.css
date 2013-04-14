@@ -1,0 +1,188 @@
+.concept{  
+    float: left;
+    width: 40%; 
+}
+
+.relationship{
+    width: 5em;
+    float: left;
+}
+.relationship h4{
+    float: left;
+}
+
+.section{
+    margin: 0 0 1em 0;
+}
+
+.relationship.identifier {
+    height: 2em;
+}
+
+.relationship.identifier a{
+    font-size: 0.8em;    
+}
+
+#ontology{
+    float: right;
+}
+
+#heading h1{
+    margin: 0;  
+}
+
+#heading h2{
+    margin: 0 0 1em 0;
+}
+
+#heading h3{
+    margin: 0 0 0.5em 0;
+    font-weight: normal;
+    min-height: 1em;
+}
+
+#title{
+    
+}
+
+#title h1{
+    float: left;
+}
+
+.ids{
+    font-family: "Courier New",Courier,monospace;
+}
+
+#title .ids{
+    float: right;
+    padding-top: 0.9em;
+    text-align: right;
+    width: 20em;
+}
+
+
+#heading .attributes{
+    font-family: Georgia,serif;
+    font-style: italic;
+    float: right; 
+    margin: 0.2em;
+}
+
+.section h3{
+    margin: 1em 0;
+    font-family: Georgia,serif;
+    font-size: 1.2em;
+}
+
+.section h4{
+    font-style: italic;
+    font-weight: normal;
+    margin: 0 0 0.5em 0;
+}
+
+.section .entry{
+     margin: 0 0 0.5em;
+}
+
+.section .ids{
+    font-size: 0.8em;
+    float: left;
+    padding-right: 1em;
+}
+
+.section .attributes{
+    font-size: 0.8em;
+    font-family: "Courier New",Courier,monospace;
+    margin: 0 0 0 1em;
+}
+
+.section.single{
+    float: left;
+    width: 40%;
+}
+
+.section.single.left {
+    padding-right: 5em;
+}
+
+.section.single .concept{
+    float: none;
+    width: 100%;
+}
+
+.section.flow .concept{
+    padding-right: 5em;
+}
+
+body {
+    padding: 2em; 
+}
+
+.relationship-property .title {
+    float: left;
+    width: 8em;
+}
+
+.relationship-property .value {
+    float: left;
+}
+
+.relationship-property .line {
+}
+
+.clearfix:after { 
+   content: "."; 
+   visibility: hidden; 
+   display: block; 
+   height: 0; 
+   clear: both;
+}
+
+
+
+
+
+a.tooltip {
+    outline:none; 
+}
+a.tooltip strong {
+    line-height:30px;
+}
+a.tooltip:hover {
+    text-decoration:none;
+} 
+a.tooltip span {
+    z-index:10;
+    display:none; 
+    padding:14px 20px;
+    margin-top:-30px; 
+    margin-left:28px;
+    width:auto; 
+    line-height:16px;
+}
+a.tooltip:hover span{
+    display:inline; 
+    position:absolute; 
+    color:#111;
+    border:1px solid #DCA; 
+    background:#fffAF0;
+}
+.callout {
+    z-index:20;
+    position:absolute;
+    top:30px;
+    border:0;
+    left:-12px;
+}
+    
+/*CSS3 extras*/
+a.tooltip span
+{
+    border-radius:4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+        
+    -moz-box-shadow: 5px 5px 8px #CCC;
+    -webkit-box-shadow: 5px 5px 8px #CCC;
+    box-shadow: 5px 5px 8px #CCC;
+}

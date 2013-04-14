@@ -14,7 +14,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javassist.NotFoundException;
+
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -25,14 +28,15 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
+import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
 public class HibernateDbImporter {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDbImporter.class );
-    
+
     public static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
-    
+
     private static final int DEFAULT_REFINABILITY = 0;
     private static final int DEFAULT_CHARACTERISTIC_TYPE = 0;
 
@@ -50,10 +54,10 @@ public class HibernateDbImporter {
         //return ontology;
         return em.find(Ontology.class, ontology.getId());
     }
-    
+
     public Ontology populateDbFromShortForm(String ontologyName, InputStream conceptsStream, 
             InputStream relationshipsStream, EntityManager em) throws IOException
-   {
+            {
         Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Populating database");        
         Ontology ontology = createOntology(em, ontologyName);
@@ -64,22 +68,8 @@ public class HibernateDbImporter {
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         return em.find(Ontology.class, ontology.getId());
-    }    
-//    
-//    protected Ontology createOntology(EntityManager em, String name) throws IOException {
-//        Ontology o = null;
-//        try {
-//            o = new Ontology();
-//            o.setName(name);
-//            em.persist(o);
-//            LOG.info("Created ontology [{}({})]", o.getName(), o.getId());
-//        } finally{
-//            em.getTransaction().commit();
-//            em.getTransaction().begin();
-//        }
-//        return o;
-//    }      
-    
+            }    
+
     protected Ontology createOntology(EntityManager em, final String name) throws IOException {
         final Ontology ontology = new Ontology();
         ontology.setName(name);
@@ -110,60 +100,75 @@ public class HibernateDbImporter {
             //session.close();
         }
     }          
-    
+
     protected void populateConcepts(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating concepts for ontology [{}({})]", ontology.getName(), ontology.getId());
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            session.doWork(new Work() {
-                public void execute(Connection connection) throws SQLException {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, status, fullySpecifiedName, ctv3id, snomedId, primitive ,ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
-                        int currentLine = 1;
-                        String line = null;
-                        try {
-                            line = br.readLine();
-                            //skip the headers
-                            line = br.readLine();
-                            while (line != null) {
-                                currentLine++;
-                                if (line.isEmpty()){
-                                    line = br.readLine();
-                                    continue;
-                                }
-                                Iterable<String> split = Splitter.on('\t').split(line);
-                                Iterator<String> splitIt = split.iterator();
-                                try {
-                                    ps.setLong(1, Long.parseLong(splitIt.next()));
-                                    ps.setInt(2, Integer.parseInt(splitIt.next()));
-                                    ps.setString(3, splitIt.next());
-                                    ps.setString(4, splitIt.next());
-                                    ps.setString(5, splitIt.next());
-                                    ps.setBoolean(6, stringToBoolean(splitIt.next()));
-                                    ps.setLong(7, ontology.getId());
-                                    ps.addBatch();
-                                } catch (NumberFormatException e) {
-                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                                } catch (IllegalArgumentException e){
-                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                                }
+        Transaction tx = session.beginTransaction();
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, status, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
+                    int currentLine = 1;
+                    String line = null;
+                    try {
+                        line = br.readLine();
+                        //skip the headers
+                        line = br.readLine();
+                        while (line != null) {
+                            currentLine++;
+                            if (line.isEmpty()){
                                 line = br.readLine();
+                                continue;
                             }
-                            ps.executeBatch();
-                            LOG.info("Populated [" + (currentLine - 1) + "] concepts");
-                        }finally {
-                            br.close();
+                            Iterable<String> split = Splitter.on('\t').split(line);
+                            Iterator<String> splitIt = split.iterator();
+                            try {
+                                ps.setLong(1, Long.parseLong(splitIt.next())); //serialisedid
+                                ps.setInt(2, Integer.parseInt(splitIt.next())); //status
+                                String fsn = splitIt.next();
+                                if (fsn.lastIndexOf(')') == -1){
+                                    ps.setString(3, fsn); //fsn
+                                    ps.setString(4, ""); //type
+                                }else{
+                                    ps.setString(3, fsn.substring(0, fsn.lastIndexOf('(') - 1)); //fsn
+                                    ps.setString(4, fsn.trim().substring(fsn.trim().lastIndexOf('(') + 1, fsn.trim().length() - 1)); //type
+                                }
+                                ps.setString(5, splitIt.next()); //ctv3id
+                                ps.setString(6, splitIt.next()); //snomedid
+                                ps.setBoolean(7, stringToBoolean(splitIt.next())); // primitive
+                                ps.setLong(8, ontology.getId()); //ontologyid
+                                ps.addBatch();
+                            } catch (NumberFormatException e) {
+                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            } catch (IllegalArgumentException e){
+                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            }
+                            line = br.readLine();
                         }
-                    } catch (IOException e1) {
-                        LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
-                    } 
-                }
-            });
-            tx.commit();
-        } finally {
-            //session.close();
+                        ps.executeBatch();
+                        LOG.info("Populated [" + (currentLine - 1) + "] concepts");
+                    }finally {
+                        br.close();
+                    }
+                } catch (IOException e1) {
+                    LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
+                } 
+            }
+        });
+        tx.commit();
+        setKindOfPredicate(em, ontology);
+    }
+
+    protected void setKindOfPredicate(EntityManager em, Ontology o){
+        //        List<Concept> concepts = em.createNamedQuery("SELECT c FROM Concept c", Concept.class).getResultList();
+        //        if (!concepts.isEmpty()) System.out.println(concepts.size());
+        try {
+            Concept predicate = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID + " AND c.ontology.id=" + o.getId(), Concept.class).getSingleResult();
+            Concept.setKindOfPredicate(predicate);
+        } catch (NoResultException e) {
+            throw new IllegalStateException("The isA predicate does not exist in this ontology at this point");
         }
     }
 
@@ -172,59 +177,79 @@ public class HibernateDbImporter {
         final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
-        try {
-            Transaction tx = session.beginTransaction();
-            session.doWork(new Work() {
-                public void execute(Connection connection) throws SQLException {
-                    PreparedStatement psInsert = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedId, subject_id, relationship_type, object_id, characteristic_type, refinability, relationship_group, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                    try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
-                        int currentLine = 1;
-                        String line = null;
-                        try {
+
+        Transaction tx = session.beginTransaction();
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristic_type, refinability, relationship_group, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
+                    int currentLine = 1;
+                    String line = null;
+
+                    line = br.readLine();
+                    //skip the headers
+                    line = br.readLine();
+                    while (line != null) {
+                        if (line.isEmpty()){
                             line = br.readLine();
-                            //skip the headers
-                            line = br.readLine();
-                            while (line != null) {
-                                currentLine++;
-                                if (line.isEmpty()){
-                                    line = br.readLine();
-                                    continue;
-                                }
-                                Iterable<String> split = Splitter.on('\t').split(line);
-                                Iterator<String> splitIt = split.iterator();
-                                try {
-                                    psInsert.setLong(1, Long.parseLong(splitIt.next())); // serialised id
-                                    psInsert.setLong(2, map.get(Long.parseLong(splitIt.next())));
-                                    psInsert.setLong(3, Long.parseLong(splitIt.next())); //type
-                                    psInsert.setLong(4, map.get(Long.parseLong(splitIt.next())));
-                                    psInsert.setInt(5, Integer.parseInt(splitIt.next())); //characteristic type
-                                    psInsert.setInt(6, Integer.parseInt(splitIt.next())); //refinability
-                                    psInsert.setInt(7, Integer.parseInt(splitIt.next())); // group
-                                    psInsert.setLong(8, ontology.getId()); //ontology id
-                                    psInsert.addBatch();
-                                } catch (NumberFormatException e) {
-                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                                } catch (IllegalArgumentException e){
-                                    LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                                }
-                                line = br.readLine();
-                            }
-                            psInsert.executeBatch();
-                            LOG.info("Populated [" + (currentLine - 1) + "] relationships");
-                        }finally {
-                            br.close();
+                            continue;
                         }
-                    } catch (IOException e1) {
-                        LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
-                    } 
+                        Iterable<String> split = Splitter.on('\t').trimResults().split(line);
+                        Iterator<String> splitIt = split.iterator();
+                        try {
+                            long serialisedId = Long.parseLong(splitIt.next());
+                            psInsert.setLong(1, serialisedId); // serialised id
+                            {
+                                Long subject = new Long(splitIt.next());
+                                if (!map.containsKey(subject)){
+                                    throw new NotFoundException("Concept [" + subject + "] not found in concept definition for relationship [" +serialisedId + "]");
+                                }
+                                psInsert.setLong(2, map.get(subject)); //subject
+                            }
+                            {
+                                Long predicate = new Long(splitIt.next());                               
+                                if (!map.containsKey(predicate)){
+                                    throw new NotFoundException("Concept [" + predicate + "] not found in concept definition for relationship [" +serialisedId + "]" );
+                                }
+                                psInsert.setLong(3, map.get(predicate)); //predicate
+                            }
+                            {
+                                Long object = new Long(splitIt.next());
+                                if (!map.containsKey(object)){
+                                    throw new NotFoundException("Concept [" + object + "] not found in concept definition for relationship [" +serialisedId + "]" );
+                                }
+                                psInsert.setLong(4, map.get(object)); //object
+                            }
+                            psInsert.setInt(5, Integer.parseInt(splitIt.next())); //characteristic type
+                            psInsert.setInt(6, Integer.parseInt(splitIt.next())); //refinability
+                            psInsert.setInt(7, Integer.parseInt(splitIt.next())); // group
+                            psInsert.setLong(8, ontology.getId()); //ontology id
+                            psInsert.addBatch();
+                        } catch (NumberFormatException e) {
+                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                        } catch (IllegalArgumentException e){
+                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                        } catch (NullPointerException e){
+                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
+                            throw e;
+                        } catch (NotFoundException e){
+                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                        }
+                        line = br.readLine();
+                        currentLine++;
+                    }
+                    psInsert.executeBatch();
+                    LOG.info("Populated [" + (currentLine - 1) + "] relationships");
+                } 
+                catch (IOException e1) {
+                    LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
                 }
-            });
-            tx.commit();
-        } finally {
-            //session.close();
-        }
+            }
+        });
+        tx.commit();
+
     }
-    
+
     protected void populateShortFormRelationships(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating relationships for ontology [{}({})]", ontology.getName(), ontology.getId());
         final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
@@ -234,7 +259,7 @@ public class HibernateDbImporter {
             Transaction tx = session.beginTransaction();
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedid, subject_id, relationship_type, object_id, relationship_group, characteristic_type, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedid, subject_id, predicate_id, object_id, relationship_group, characteristic_type, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                         int currentLine = 1;
                         String line = null;
@@ -253,9 +278,9 @@ public class HibernateDbImporter {
                                 Iterator<String> splitIt = split.iterator();
                                 try {
                                     ps.setLong(1, RelationshipStatement.SERIALISED_ID_NOT_DEFINED);
-                                    ps.setLong(2, map.get(Long.parseLong(splitIt.next())));
-                                    ps.setLong(3, Long.parseLong(splitIt.next()));
-                                    ps.setLong(4, map.get(Long.parseLong(splitIt.next())));
+                                    ps.setLong(2, map.get(Long.parseLong(splitIt.next()))); //subject
+                                    ps.setLong(3, map.get(Long.parseLong(splitIt.next())));//predicate
+                                    ps.setLong(4, map.get(Long.parseLong(splitIt.next()))); //object
                                     ps.setInt(5, Integer.parseInt(splitIt.next()));
                                     ps.setInt(6, DEFAULT_CHARACTERISTIC_TYPE);
                                     ps.setInt(7,  DEFAULT_REFINABILITY);
@@ -283,7 +308,7 @@ public class HibernateDbImporter {
             //session.close();
         }
     }    
-    
+
     protected Map<Long, Long> createConceptSerialisedIdMapToDatabaseIdForOntology(final Ontology ontology, EntityManager em){
         final HashMap<Long, Long> map = new HashMap<Long, Long>();
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -319,27 +344,18 @@ public class HibernateDbImporter {
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
                     PreparedStatement psKindOf = connection.prepareStatement("INSERT INTO KIND_OF (child_id, parent_id) VALUES (?, ?)");
-                    PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, relationship_type, object_id FROM RELATIONSHIP_STATEMENT WHERE ontology_id = ?");
+                    PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, predicate_id, object_id FROM RELATIONSHIP_STATEMENT WHERE ontology_id = ?");
                     int counter = 1;
                     psStatements.setLong(1, o.getId());
                     ResultSet rs = psStatements.executeQuery();
                     while (rs.next()){
-                        if (rs.getLong(2) == RelationshipStatement.IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+                        if (rs.getLong(2) == Concept.getKindOfPredicate().getId()){
                             psKindOf.setLong(1, rs.getLong(1));
                             psKindOf.setLong(2, rs.getLong(3));
                             psKindOf.addBatch();
                             counter++;
                         }
                     }
-//                    while(stIt.hasNext()){
-//                        RelationshipStatement statement = stIt.next();
-//                        if (statement.isKindOfRelationship()){
-//                            psKindOf.setLong(1, statement.getSubject().getId());
-//                            psKindOf.setLong(2, statement.getObject().getId());
-//                            psKindOf.addBatch();
-//                            counter++;
-//                        }
-//                    }
                     psKindOf.executeBatch();
                     LOG.info("Created [" + counter + "] isA relationships");
                 }

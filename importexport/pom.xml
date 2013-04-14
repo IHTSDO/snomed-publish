@@ -8,7 +8,48 @@
   <artifactId>importexport</artifactId>
   <packaging>jar</packaging>
   <name>importexport</name>
-  
+    <build>
+        <plugins>
+            <!-- mvn hibernate3:hbm2ddl -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>hibernate3-maven-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <components>
+                        <component>
+                            <name>hbm2ddl</name>
+                            <implementation>jpaconfiguration</implementation>
+                        </component>
+                    </components>
+                    <hibernatetool>
+                        <classpath>
+                            <path location="${project.build.directory}/classes" />
+                            <path
+                                location="${project.basedir}/src/main/resources/META-INF/" />
+                        </classpath>
+                        <jpaconfiguration
+                            persistenceunit="persistenceManager" />
+                        <hbm2ddl create="true" export="false"
+                            drop="true" outputfilename="configuration.sql"
+                            format="true" console="true" />
+                    </hibernatetool>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.hibernate.javax.persistence</groupId>
+                        <artifactId>hibernate-jpa-2.0-api</artifactId>
+                        <version>1.0.0.Final</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.hibernate</groupId>
+                        <artifactId>hibernate-entitymanager</artifactId>
+                        <version>3.6.7.Final</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+  </build>
   <dependencies>
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>

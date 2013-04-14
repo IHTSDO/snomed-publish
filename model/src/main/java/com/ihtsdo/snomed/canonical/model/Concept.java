@@ -24,8 +24,13 @@ import com.google.common.primitives.Longs;
 
 @Entity
 public class Concept {
+    private static final String ATTRIBUTE = "attribute";
+
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
-        
+    
+    public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
+    private static Concept kindOfPredicate;
+    
     @Transient private Set<Concept> cache;
     
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -37,13 +42,21 @@ public class Concept {
     private String ctv3id;
     private String snomedId;
     private boolean primitive;
+    private String type;
     
     @OneToOne
     private Ontology ontology;
 
     @OneToMany(mappedBy="subject")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<RelationshipStatement> subjectOfRelationShipStatements = new HashSet<RelationshipStatement>();
+    private Set<RelationshipStatement> subjectOfRelationshipStatements = new HashSet<RelationshipStatement>();
 
+    @OneToMany(mappedBy="object")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    private Set<RelationshipStatement> objectOfRelationshipStatements = new HashSet<RelationshipStatement>();    
+    
+    @OneToMany(mappedBy="predicate")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    private Set<RelationshipStatement> predicateOfRelationshipStatements = new HashSet<RelationshipStatement>();
+    
+    
     @ManyToMany//(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinTable(name = "KIND_OF", 
         joinColumns = @JoinColumn(name="child_id"),
@@ -56,7 +69,12 @@ public class Concept {
     private Set<Concept> parentOf = new HashSet<Concept>();
     
     public Concept(){}
-    public Concept(long serialisedId){this.serialisedId = serialisedId;}
+    public Concept(long serialisedId){
+        this.serialisedId = serialisedId;
+        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+            kindOfPredicate = this;
+        }
+    }
     
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
         if (useCache && (cache != null)){
@@ -89,6 +107,29 @@ public class Concept {
         return getParentOf().isEmpty();
     }
 
+    public boolean isKindOfPredicate(){
+        return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
+    }
+    
+    public static boolean isKindOfPredicateSerialisedId(long serialisedId){
+        return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
+    }
+    
+    public static void setKindOfPredicate(Concept kindOfPredicateToSet){
+        kindOfPredicate = kindOfPredicateToSet;
+    }
+    
+    public static Concept getKindOfPredicate() throws IllegalStateException{
+        if (kindOfPredicate == null){
+            throw new IllegalStateException("The isA predicate does not exist in this ontology at this point");
+        }
+        return kindOfPredicate;
+    }
+    
+    public boolean isPredicate(){
+        return ((type != null) && (!type.isEmpty()) && type.equals(ATTRIBUTE));
+    }
+    
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -167,7 +208,7 @@ public class Concept {
     public void setKindOfs(Set<Concept> kindOfs) {
         this.kindOfs = kindOfs;
     }
-
+    
     public Set<Concept> getParentOf() {
         return parentOf;
     }
@@ -175,25 +216,29 @@ public class Concept {
     public void setParentOf(Set<Concept> parentOf) {
         this.parentOf = parentOf;
     }
-
     public void addKindOf(Concept concept){
         this.kindOfs.add(concept);
     }
-
     public void addParentOf(Concept concept){
         this.parentOf.add(concept);
     }
-    
     public void addSubjectOfRelationshipStatement(RelationshipStatement relationshipStatement){
-        subjectOfRelationShipStatements.add(relationshipStatement);
+        subjectOfRelationshipStatements.add(relationshipStatement);
     }
-
-    public Set<RelationshipStatement> getSubjectOfRelationShipStatements(){
-        return subjectOfRelationShipStatements;
+    public Set<RelationshipStatement> getSubjectOfRelationshipStatements(){
+        return subjectOfRelationshipStatements;
     }
-
-    public void addSubjectOfRelationShipStatements(RelationshipStatement statement){
-        this.subjectOfRelationShipStatements.add(statement);
+    public void addPredicateOfRelationshipStatement(RelationshipStatement relationshipStatement){
+        predicateOfRelationshipStatements.add(relationshipStatement);
+    }
+    public Set<RelationshipStatement> getPredicateOfRelationshipStatements(){
+        return predicateOfRelationshipStatements;
+    }
+    public void addObjectOfRelationshipStatement(RelationshipStatement relationshipStatement){
+        objectOfRelationshipStatements.add(relationshipStatement);
+    }
+    public Set<RelationshipStatement> getObjectOfRelationshipStatements(){
+        return objectOfRelationshipStatements;
     }
     public Ontology getOntology() {
         return ontology;
@@ -201,11 +246,20 @@ public class Concept {
     public void setOntology(Ontology ontology) {
         this.ontology = ontology;
     }
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
     public long getSerialisedId() {
         return serialisedId;
     }
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
+        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+            kindOfPredicate = this;
+        }
     }
     
 }

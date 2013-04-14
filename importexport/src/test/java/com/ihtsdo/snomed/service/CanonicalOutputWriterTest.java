@@ -32,9 +32,12 @@ public class CanonicalOutputWriterTest {
         Concept c2 = new Concept(100523007);
         Concept c3 = new Concept(100523008l);
         Concept c4 = new Concept(100523009l);
+        
+        Concept cp1 = new Concept(116680003l);
+        Concept cp2 = new Concept(116680004l);
 
-        RelationshipStatement r1 = new RelationshipStatement(0, c1, 116680003l, c2, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        RelationshipStatement r2 = new RelationshipStatement(1, c3, 116680004l, c4, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        RelationshipStatement r1 = new RelationshipStatement(0, c1, cp1, c2, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        RelationshipStatement r2 = new RelationshipStatement(1, c3, cp2, c4, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 1);
 
         statements.add(r1);
         statements.add(r2);

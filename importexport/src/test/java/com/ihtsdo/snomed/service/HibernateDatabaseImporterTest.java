@@ -108,7 +108,7 @@ public class HibernateDatabaseImporterTest {
     }
 
     @Test
-    public void dbShouldHave7ConceptsAfterPopulation() throws IOException{
+    public void dbShouldHave8ConceptsAfterPopulation() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
 
@@ -117,7 +117,7 @@ public class HibernateDatabaseImporterTest {
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
 
         long result = em.createQuery(criteriaQuery).getSingleResult();
-        assertEquals(7, result);
+        assertEquals(8, result);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class HibernateDatabaseImporterTest {
         assertNotNull(r.getObject());
         assertEquals (100000028l, r.getSerialisedId());
         assertEquals (280844000, r.getSubject().getSerialisedId());
-        assertEquals (116680003, r.getRelationshipType(), 116680003);
+        assertEquals (116680003, r.getPredicate().getSerialisedId(), 116680003);
         assertEquals (71737002, r.getObject().getSerialisedId());
         assertEquals (0, r.getCharacteristicType());
         assertEquals (0, r.getRefinability());
@@ -155,7 +155,8 @@ public class HibernateDatabaseImporterTest {
         assertNotNull(c);
         assertEquals (280844000, c.getSerialisedId());
         assertEquals (0, c.getStatus());
-        assertEquals ("Entire body of seventh thoracic vertebra (body structure)", c.getFullySpecifiedName());
+        assertEquals ("Entire body of seventh thoracic vertebra", c.getFullySpecifiedName());
+        assertEquals ("body structure", c.getType());
         assertEquals ("Xa1Y9", c.getCtv3id());
         assertEquals ("T-11875", c.getSnomedId());
         assertEquals (true, c.isPrimitive());
@@ -175,7 +176,7 @@ public class HibernateDatabaseImporterTest {
         Iterator<RelationshipStatement> stIt = statements.iterator();
         while (stIt.hasNext()){
             RelationshipStatement statement = stIt.next();
-            assertTrue(statement.getSubject().getSubjectOfRelationShipStatements().contains(statement));
+            assertTrue(statement.getSubject().getSubjectOfRelationshipStatements().contains(statement));
         }
     }
 
@@ -225,7 +226,7 @@ public class HibernateDatabaseImporterTest {
         relationshipCriteriaQuery.select(criteriaBuilder.count(relationshipCriteriaQuery.from(RelationshipStatement.class)));
         long relationshipResult = em.createQuery(relationshipCriteriaQuery).getSingleResult();
 
-        assertEquals(9, conceptResult);
+        assertEquals(11, conceptResult);
         assertEquals(9, relationshipResult);
     }
 
