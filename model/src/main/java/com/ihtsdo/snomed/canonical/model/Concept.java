@@ -4,6 +4,7 @@ package com.ihtsdo.snomed.canonical.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -41,6 +42,8 @@ public class Concept {
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
+    
+    @Column(columnDefinition = "BIT", length = 1)
     private boolean primitive;
     private String type;
     

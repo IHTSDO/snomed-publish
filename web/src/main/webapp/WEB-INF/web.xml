@@ -1,25 +1,24 @@
 <web-app id="WebApp_ID" version="2.4"
-    xmlns="http://java.sun.com/xml/ns/j2ee" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
     http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     <display-name>Snomed Browse Application</display-name>
-     <context-param>
+    <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:applicationContext.xml</param-value>
     </context-param>
     <servlet>
         <servlet-name>mvc-dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-		<init-param>
-			<param-name>contextConfigLocation</param-name>
-			<param-value>/WEB-INF/mvc-dispatcher-servlet.xml</param-value>
-		</init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/mvc-dispatcher-servlet.xml</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <listener>
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-    </listener>    
+    </listener>
     <servlet-mapping>
         <servlet-name>mvc-dispatcher</servlet-name>
         <url-pattern>/browse/*</url-pattern>
@@ -27,4 +26,37 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+
+
+    <security-constraint>
+        <display-name>authorizedUsers</display-name>
+        <web-resource-collection>
+            <web-resource-name>ALL URLs</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>USER</role-name>
+        </auth-constraint>
+        <!--user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> 
+            </user-data-constraint -->
+    </security-constraint>
+
+<!--     <security-constraint> -->
+<!--         <display-name>publicAccess</display-name> -->
+<!--         <web-resource-collection> -->
+<!--             <web-resource-name>Public pages</web-resource-name> -->
+<!--             <url-pattern>/public/*</url-pattern> -->
+<!--         </web-resource-collection> -->
+<!--     </security-constraint> -->
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Snomed</realm-name>
+    </login-config>
+
+    <security-role>
+        <description>user access</description>
+        <role-name>USER</role-name>
+    </security-role>
+
 </web-app>
