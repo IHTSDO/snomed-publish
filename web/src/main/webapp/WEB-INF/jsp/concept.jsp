@@ -113,7 +113,7 @@ function changeOntology(value) {
   <c:if test="${!predicateOf.isEmpty()}">
     <div class="section clearfix double">
       <h3>Role of triple(s)</h3>  
-      <div class="line">
+      <div class="line clearfix">
         <div class="relationship">
           <h4>Triple</h4>
         </div>
