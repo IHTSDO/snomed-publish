@@ -1,5 +1,7 @@
 IHTSDO Snomed Publication Tools
--------------------------------
+===============================
+Components
+----------
 * ####Canonical
         Tool for creating the canonical form of the publication
 
@@ -17,8 +19,8 @@ IHTSDO Snomed Publication Tools
         Library - Marshall from long/short form serialisation formats, unmarshall to short form
 
 
-###How to build
-
+How to build
+------------
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it. 
 To build the distribution, enter the root project directory and type:
 
