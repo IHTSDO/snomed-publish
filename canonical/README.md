@@ -4,7 +4,7 @@ IHTSDO Snomed Publication Tools
 Canonical Form
 --------------
 
-This program takes an an input 2 text files:
+This program takes as an input 2 text files:
 
 1. Set of concepts of this form:
 
@@ -30,16 +30,16 @@ The rules for the transformation taking place can be found in [this PDF document
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
-2Gb of heap space ('-Xmx2000m').
+3Gb of heap space ('-Xmx3000m').
 
-You will need to have the Java 7 JRE and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
+You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
-To build the distribution, enter the project directory and type:
+To build the distribution, enter the root project directory (on up from this folder) and type:
 
     mvn clean package
     
-The distribution jar file can be found at target/canonical.jar after this. No other file is required in order to run the program,
-and can be distributed as a single file.
+The distribution jar file can be found at canonical/target/canonical.jar after this. No other file is required in order to run the program,
+and can be distributed as this single file.
 
 For help on how to run the program, type:
 
@@ -53,39 +53,40 @@ You will then see this output:
     -o, --output    Destination file to write the canonical output results to
     -d, --database  Optional. Specify location of database file. If not specified, 
                     defaults to an in-memory database (minium 2Gb of heap space required)
+    -s, --show      Optional. Show reasoning details for concept(s). 
+                    Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
 
 For example, to launch with an in-memory database, use this command:
 
-    java -Xmx2000m -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt
+    java -Xmx3000m -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt
 
-Don't forget the '-Xmx=2000m' option, or the program will not complete. 
+Don't forget the '-Xmx=3000m' option, or the program will not complete. 
 
-Or, to launch with a disk backed databse, you can use this command:
+Or, to launch with a disk backed database, you can use this command, requiring only a minimum amount of heap space:
 
     java -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt -d /tmp/canonical.tmp.db
     
 The output from the console will look something like this:
 
-    2013-04-02 18:34:20,677 INFO [com.ihtsdo.snomed.canonical.Main] - Using an in-memory database
-    2013-04-02 18:34:20,677 INFO [com.ihtsdo.snomed.canonical.Main] - Initialising database
-    2013-04-02 18:34:20,718 DEBUG [org.jboss.logging] - Logging Provider: org.jboss.logging.Log4jLoggerProvider
-    2013-04-02 18:34:22,482 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating database
-    2013-04-02 18:34:22,482 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating Concepts
-    2013-04-02 18:34:26,298 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [397787] concepts
-    2013-04-02 18:34:26,298 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populating relationships
-    2013-04-02 18:34:39,003 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Populated [1454681] relationships
-    2013-04-02 18:34:39,005 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Creating isA hierarchy
-    2013-04-02 18:35:14,570 INFO [com.ihtsdo.snomed.canonical.HibernateDatabaseImporter] - Created [542486] isA relationships
-    2013-04-02 18:35:14,571 INFO [com.ihtsdo.snomed.canonical.Main] - Completed import in 52 seconds
-    2013-04-02 18:35:14,571 INFO [com.ihtsdo.snomed.canonical.Main] - Running algorithm
-    2013-04-02 18:35:15,239 INFO [com.ihtsdo.snomed.canonical.Main] - Calculating unshared defining characteristics
-    2013-04-02 18:35:38,237 INFO [com.ihtsdo.snomed.canonical.Main] - Found 510392 unshared defining characteristics
-    2013-04-02 18:35:38,237 INFO [com.ihtsdo.snomed.canonical.Main] - Calculating immidiate primitive concepts
-    2013-04-02 18:35:46,365 INFO [com.ihtsdo.snomed.canonical.Main] - Found 38692 immidiate primitive concepts
-    2013-04-02 18:35:46,449 INFO [com.ihtsdo.snomed.canonical.Main] - Completed algorithm in 31 seconds
-    2013-04-02 18:35:46,449 INFO [com.ihtsdo.snomed.canonical.Main] - Writing results to target/output.txt
-    2013-04-02 18:35:47,468 INFO [com.ihtsdo.snomed.canonical.Main] - Wrote 549086 lines
-    2013-04-02 18:35:47,471 INFO [com.ihtsdo.snomed.canonical.Main] - Overall program completion in 86 seconds
-    2013-04-02 18:35:47,471 INFO [com.ihtsdo.snomed.canonical.Main] - Closing database
+    Using an in-memory database
+    Initialising database
+    Populating database
+    Populating concepts for ontology [LongForm(1)]
+    Populated [396109] concepts
+    Populating relationships for ontology [LongForm(1)]
+    Populated [1446149] relationships
+    Creating isA hierarchy
+    Created [539711] isA relationships
+    Completed import in 28 seconds
+    Running algorithm
+    Calculating immidiate primitive concepts
+    Found [434197] immidiate primitive concepts
+    Calculating unshared defining characteristics
+    Found [272177] unshared defining characteristics
+    Completed algorithm in 106 seconds with [706374] statements
+    Writing results to canonical.out.txt
+    Wrote 706376 lines
+    Closing database
+    Overall program completion in 154 seconds
 
-where the results would be stored in canonical.out.txt, as specified above
+and the results would be stored in canonical.out.txt, as specified above.
