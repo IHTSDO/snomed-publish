@@ -98,56 +98,31 @@ switch to display the reasoning behind that concept's inclusion/exclusion. By sp
   
 the program will print detailed reasoning information like this
 
+    Using an in-memory database
+    Initialising database
+    Populating database
+    Populating concepts for ontology [LongForm(1)]
+    Populated [396109] concepts
+    Populating relationships for ontology [LongForm(1)]
+    Populated [1446149] relationships
+    Creating isA hierarchy
+    Created [539711] isA relationships
+    Completed import in 28 seconds
     Running algorithm
     Calculating immidiate primitive concepts
+    
     Attempting to find all proximal primitive isKindOf concepts for concept 229395005
     All primitive super concepts for concept 229395005 are {229392008, 243120004, 229373006, 229391001, 138875005, 229390000, 71388002}
     Found that concept 229392008 isA concept 243120004
     Since concept 229392008 isA concept 243120004, concept 243120004 is not an proximal isA for concept 229395005
     Found that concept 229392008 isA concept 229373006
     Since concept 229392008 isA concept 229373006, concept 229373006 is not an proximal isA for concept 229395005
-    Found that concept 229392008 isA concept 138875005
-    Since concept 229392008 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
-    Found that concept 229392008 isA concept 229391001
-    Since concept 229392008 isA concept 229391001, concept 229391001 is not an proximal isA for concept 229395005
-    Found that concept 229392008 isA concept 229390000
-    Since concept 229392008 isA concept 229390000, concept 229390000 is not an proximal isA for concept 229395005
-    Found that concept 229392008 isA concept 71388002
-    Since concept 229392008 isA concept 71388002, concept 71388002 is not an proximal isA for concept 229395005
-    Found that concept 243120004 isA concept 138875005
-    Since concept 243120004 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
-    Found that concept 243120004 isA concept 71388002
-    Since concept 243120004 isA concept 71388002, concept 71388002 is not an proximal isA for concept 229395005
-    Found that concept 229373006 isA concept 243120004
-    Since concept 229373006 isA concept 243120004, concept 243120004 is not an proximal isA for concept 229395005
-    Found that concept 229373006 isA concept 138875005
-    Since concept 229373006 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
-    Found that concept 229373006 isA concept 71388002
-    Since concept 229373006 isA concept 71388002, concept 71388002 is not an proximal isA for concept 229395005
-    Found that concept 229391001 isA concept 243120004
-    Since concept 229391001 isA concept 243120004, concept 243120004 is not an proximal isA for concept 229395005
-    Found that concept 229391001 isA concept 229373006
-    Since concept 229391001 isA concept 229373006, concept 229373006 is not an proximal isA for concept 229395005
-    Found that concept 229391001 isA concept 138875005
-    Since concept 229391001 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
-    Found that concept 229391001 isA concept 229390000
-    Since concept 229391001 isA concept 229390000, concept 229390000 is not an proximal isA for concept 229395005
-    Found that concept 229391001 isA concept 71388002
-    Since concept 229391001 isA concept 71388002, concept 71388002 is not an proximal isA for concept 229395005
-    Concept 138875005 has no isA relationships, continuing
-    Found that concept 229390000 isA concept 243120004
-    Since concept 229390000 isA concept 243120004, concept 243120004 is not an proximal isA for concept 229395005
-    Found that concept 229390000 isA concept 229373006
-    Since concept 229390000 isA concept 229373006, concept 229373006 is not an proximal isA for concept 229395005
-    Found that concept 229390000 isA concept 138875005
-    Since concept 229390000 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
-    Found that concept 229390000 isA concept 71388002
-    Since concept 229390000 isA concept 71388002, concept 71388002 is not an proximal isA for concept 229395005
-    Found that concept 71388002 isA concept 138875005
-    Since concept 71388002 isA concept 138875005, concept 138875005 is not an proximal isA for concept 229395005
+    ...
     Found that concept 229395005 has proximal primitive isA concept(s) of {229392008}
+    
     Found [434197] immidiate primitive concepts
     Calculating unshared defining characteristics
+    
     Attempting to find all unshared defining characteristics for concept [229395005]
     Relationships for concept [229395005] are {[1467951023: 229395005(260870009)272125009 type:1], [3364178029: 229395005(260686004)129409008 type:0], [3364177023: 229395005(405813007)127863007 type:0], [100000000146834: 229395005(116680003)229392008 type:0], [39411024: 229395005(116680003)229392008 type:0]}
     Testing for existence of relationship [3364178029] in parent primitive concepts
@@ -158,88 +133,9 @@ the program will print detailed reasoning information like this
     Found that parent concept [229392008] has relationship [3467953022: 229392008(260686004)129409008 type:0]
     Found that relationship under test [3364178029: 229395005(260686004)129409008 type:0] is also defined in parent concept as [3467953022: 229392008(260686004)129409008 type:0]
     Removing statement [[3364178029: 229395005(260686004)129409008 type:0]] from output because parent concept [229392008] has defined relationship [[3467953022: 229392008(260686004)129409008 type:0]]
-    Found that parent concept [229392008] has relationship [3441868023: 229392008(405813007)27949001 type:0]
-    Concept [229395005] has a primitive parent concept of [243120004]
-    Found that parent concept [243120004] has relationship [60487025: 243120004(116680003)71388002 type:0]
-    Found that parent concept [243120004] has relationship [100000000163141: 243120004(116680003)71388002 type:0]
-    Found that parent concept [243120004] has relationship [1519147021: 243120004(260870009)272125009 type:1]
-    Concept [229395005] has a primitive parent concept of [229373006]
-    Found that parent concept [229373006] has relationship [3532559023: 229373006(260686004)129409008 type:0]
-    Found that relationship under test [3364178029: 229395005(260686004)129409008 type:0] is also defined in parent concept as [3532559023: 229373006(260686004)129409008 type:0]
-    Removing statement [[3364178029: 229395005(260686004)129409008 type:0]] from output because parent concept [229373006] has defined relationship [[3532559023: 229373006(260686004)129409008 type:0]]
-    Found that parent concept [229373006] has relationship [1467907025: 229373006(260870009)272125009 type:1]
-    Found that parent concept [229373006] has relationship [100000000146809: 229373006(116680003)243120004 type:0]
-    Found that parent concept [229373006] has relationship [2531872027: 229373006(116680003)118710009 type:0]
-    Found that parent concept [229373006] has relationship [3286995026: 229373006(116680003)229319000 type:0]
-    Found that parent concept [229373006] has relationship [3532560029: 229373006(405813007)61685007 type:0]
-    Concept [229395005] has a primitive parent concept of [229391001]
-    Found that parent concept [229391001] has relationship [100000000146830: 229391001(116680003)229390000 type:0]
-    Found that parent concept [229391001] has relationship [1467943020: 229391001(260870009)272125009 type:1]
-    Found that parent concept [229391001] has relationship [39404020: 229391001(116680003)229390000 type:0]
-    Found that parent concept [229391001] has relationship [3441867029: 229391001(260686004)129409008 type:0]
-    Found that relationship under test [3364178029: 229395005(260686004)129409008 type:0] is also defined in parent concept as [3441867029: 229391001(260686004)129409008 type:0]
-    Removing statement [[3364178029: 229395005(260686004)129409008 type:0]] from output because parent concept [229391001] has defined relationship [[3441867029: 229391001(260686004)129409008 type:0]]
-    Found that parent concept [229391001] has relationship [3417080026: 229391001(405813007)26552008 type:0]
-    Concept [229395005] has a primitive parent concept of [138875005]
-    Concept [138875005] is not the subject of any relationship statements. Continuing
-    Concept [229395005] has a primitive parent concept of [229390000]
-    Found that parent concept [229390000] has relationship [100000000146828: 229390000(116680003)229373006 type:0]
-    Found that parent concept [229390000] has relationship [3437317023: 229390000(405813007)26552008 type:0]
-    Found that parent concept [229390000] has relationship [39402024: 229390000(116680003)129182005 type:0]
-    Found that parent concept [229390000] has relationship [3437318029: 229390000(260686004)129409008 type:0]
-    Found that relationship under test [3364178029: 229395005(260686004)129409008 type:0] is also defined in parent concept as [3437318029: 229390000(260686004)129409008 type:0]
-    Removing statement [[3364178029: 229395005(260686004)129409008 type:0]] from output because parent concept [229390000] has defined relationship [[3437318029: 229390000(260686004)129409008 type:0]]
-    Found that parent concept [229390000] has relationship [39403025: 229390000(116680003)118716003 type:0]
-    Found that parent concept [229390000] has relationship [39401028: 229390000(116680003)229373006 type:0]
-    Found that parent concept [229390000] has relationship [3216456029: 229390000(116680003)74251004 type:0]
-    Found that parent concept [229390000] has relationship [1467941022: 229390000(260870009)272125009 type:1]
-    Concept [229395005] has a primitive parent concept of [71388002]
-    Found that parent concept [71388002] has relationship [1903382025: 71388002(260507000)309795001 type:1]
-    Found that parent concept [71388002] has relationship [1903383024: 71388002(260870009)272125009 type:1]
-    Found that parent concept [71388002] has relationship [100000000401529: 71388002(116680003)138875005 type:0]
-    Found that parent concept [71388002] has relationship [146315028: 71388002(116680003)138875005 type:0]
+    ...
     Found that concept 229395005 has defining characteristic relationships {[3364177023: 229395005(405813007)127863007 type:0], [100000000146834: 229395005(116680003)229392008 type:0], [39411024: 229395005(116680003)229392008 type:0]}
-    Testing for existence of relationship [3364177023] in parent primitive concepts
-    Concept [229395005] has a primitive parent concept of [229392008]
-    Found that parent concept [229392008] has relationship [100000000146831: 229392008(116680003)229391001 type:0]
-    Found that parent concept [229392008] has relationship [1467945029: 229392008(260870009)272125009 type:1]
-    Found that parent concept [229392008] has relationship [39405021: 229392008(116680003)229391001 type:0]
-    Found that parent concept [229392008] has relationship [3467953022: 229392008(260686004)129409008 type:0]
-    Found that parent concept [229392008] has relationship [3441868023: 229392008(405813007)27949001 type:0]
-    Concept [229395005] has a primitive parent concept of [243120004]
-    Found that parent concept [243120004] has relationship [60487025: 243120004(116680003)71388002 type:0]
-    Found that parent concept [243120004] has relationship [100000000163141: 243120004(116680003)71388002 type:0]
-    Found that parent concept [243120004] has relationship [1519147021: 243120004(260870009)272125009 type:1]
-    Concept [229395005] has a primitive parent concept of [229373006]
-    Found that parent concept [229373006] has relationship [3532559023: 229373006(260686004)129409008 type:0]
-    Found that parent concept [229373006] has relationship [1467907025: 229373006(260870009)272125009 type:1]
-    Found that parent concept [229373006] has relationship [100000000146809: 229373006(116680003)243120004 type:0]
-    Found that parent concept [229373006] has relationship [2531872027: 229373006(116680003)118710009 type:0]
-    Found that parent concept [229373006] has relationship [3286995026: 229373006(116680003)229319000 type:0]
-    Found that parent concept [229373006] has relationship [3532560029: 229373006(405813007)61685007 type:0]
-    Concept [229395005] has a primitive parent concept of [229391001]
-    Found that parent concept [229391001] has relationship [100000000146830: 229391001(116680003)229390000 type:0]
-    Found that parent concept [229391001] has relationship [1467943020: 229391001(260870009)272125009 type:1]
-    Found that parent concept [229391001] has relationship [39404020: 229391001(116680003)229390000 type:0]
-    Found that parent concept [229391001] has relationship [3441867029: 229391001(260686004)129409008 type:0]
-    Found that parent concept [229391001] has relationship [3417080026: 229391001(405813007)26552008 type:0]
-    Concept [229395005] has a primitive parent concept of [138875005]
-    Concept [138875005] is not the subject of any relationship statements. Continuing
-    Concept [229395005] has a primitive parent concept of [229390000]
-    Found that parent concept [229390000] has relationship [100000000146828: 229390000(116680003)229373006 type:0]
-    Found that parent concept [229390000] has relationship [3437317023: 229390000(405813007)26552008 type:0]
-    Found that parent concept [229390000] has relationship [39402024: 229390000(116680003)129182005 type:0]
-    Found that parent concept [229390000] has relationship [3437318029: 229390000(260686004)129409008 type:0]
-    Found that parent concept [229390000] has relationship [39403025: 229390000(116680003)118716003 type:0]
-    Found that parent concept [229390000] has relationship [39401028: 229390000(116680003)229373006 type:0]
-    Found that parent concept [229390000] has relationship [3216456029: 229390000(116680003)74251004 type:0]
-    Found that parent concept [229390000] has relationship [1467941022: 229390000(260870009)272125009 type:1]
-    Concept [229395005] has a primitive parent concept of [71388002]
-    Found that parent concept [71388002] has relationship [1903382025: 71388002(260507000)309795001 type:1]
-    Found that parent concept [71388002] has relationship [1903383024: 71388002(260870009)272125009 type:1]
-    Found that parent concept [71388002] has relationship [100000000401529: 71388002(116680003)138875005 type:0]
-    Found that parent concept [71388002] has relationship [146315028: 71388002(116680003)138875005 type:0]
-    Found that concept 229395005 has defining characteristic relationships {[3364177023: 229395005(405813007)127863007 type:0], [100000000146834: 229395005(116680003)229392008 type:0], [39411024: 229395005(116680003)229392008 type:0]}
+    
     Found [272177] unshared defining characteristics
     Completed algorithm in 86 seconds with [706374] statements
     Writing results to /Users/henrikpettersen/Downloads/output.20120731.txt
