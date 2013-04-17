@@ -138,7 +138,7 @@ the program will print detailed reasoning information like this
     
     Found [272177] unshared defining characteristics
     Completed algorithm in 86 seconds with [706374] statements
-    Writing results to /Users/henrikpettersen/Downloads/output.20120731.txt
+    Writing results to canonical.out.txt
     Wrote 706376 lines
     Closing database
 
