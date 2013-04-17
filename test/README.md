@@ -13,9 +13,9 @@ This sanity tests then compares the "expected" triple set against the "generated
 
 We then do a number of error checks on the "generated" and "expected" output, using the "original" input ontology, to see if any of the "generated" or "expected" statements are erroneous, and if so, why.
 
-We noticed during our testing that several problems exists with the legacy PL/SQL algorithm:
-- There are several isA statements in the isA output that should not be there. This error exists **only** in the most recent release of the PL/SQL algorithm
-- There are some 14,000 unshared defining characteristic statements in the "expected' output that are erroneous. This error seems to go back at least 2 releases of the PL/SQL algorithm. 
+*We noticed during our testing that several problems exists with the legacy PL/SQL algorithm:*
+- *There are several isA statements in the isA output that should not be there. This error exists **only** in the most recent release of the PL/SQL algorithm*
+- *There are some 14,000 unshared defining characteristic statements in the "expected' output that are erroneous. This error seems to go back at least 2 releases of the PL/SQL algorithm.*
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database. The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 6Gb of heap space ('-Xmx6000m').
 
@@ -45,15 +45,17 @@ You will then see this output:
 
 For example, to launch with an in-memory database, use this command:
 
-    java -Xmx6000m -jar target/test.jar -g generated.txt -e expected.txt -c concepts.txt -x extras.txt -m missing.txt -o original.txt 
+    java -Xmx6000m -jar target/test.jar -g generated.txt -e expected.txt -c concepts.txt -x extras.txt -m missing.txt 
+    -o original.txt 
     
 Don't forget the '-Xmx=6000m' option, or the program will not complete.
 
 Or, to launch with a disk backed database, you can use this command, requiring only a minimum amount of heap space:
 
-    java -Xmx6000m -jar target/test.jar -g generated.txt -e expected.txt -c concepts.txt -x extras.txt -m missing.txt -o original.txt -d /tmp/test.tmp.db
+    java -jar target/test.jar -g generated.txt -e expected.txt -c concepts.txt -x extras.txt -m missing.txt 
+    -o original.txt -d test-db
     
-Warning! Using s disc backed database like this will make the program very slow, and might take a long time to complete.
+Warning! Using a disc backed database like this will make the program very slow, and might take a long time to complete.
 
 The output from the console will look something like this:
 
@@ -101,9 +103,9 @@ The output from the console will look something like this:
     Writing all missing statements to missing.txt
     Wrote 14276 lines
     Finding errors
-    Objects of isA statements in the expected output, _must_ also appear as objects of isA statements in the input
+    Objects of isA statements in the expected output must also appear as objects of isA statements in the input
     Number of IsA statements in the expected output in violation of this : 0
-    Objects of udc statements in the expected output, _must_ also appear as objects of udc statements in the input
+    Objects of udc statements in the expected output must also appear as objects of udc statements in the input
     Number of udc statements in the expected output in violation of this : 0
     Number of udc statements that are not charateristic types: 0
     For all missing udc statements, check if udc exists in primitive parent concept
