@@ -29,23 +29,29 @@ Along with these two formats for triples, the library also needs an input file f
         
 The library is configured to use an in-memory H2 database by default, which requires about 3Gb of heap space with the current size of the Snomed triples set. However, this default can be overriden like this:
 
-    Map<String, Object> overrides = new HashMap<String, Object>();
-    overrides.put("javax.persistence.jdbc.url", "new url");
-    overrides.put("javax.persistence.jdbc.driver", "new driver");
-    //etc.
-    emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
-    em = emf.createEntityManager();
-    Ontology ontology1 = new HibernateDbImporter().populateDbFromLongForm("ontology name", 
-        new FileInputStream("conceptFile"), new FileInputStream("triplesFile"), em);
-    //or
-    Ontology ontology2 = new HibernateDbImporter().populateDbFromLongForm("ontology name", 
-        new FileInputStream("conceptFile"), new FileInputStream("triplesFile"), em);
+```java
+Map<String, Object> overrides = new HashMap<String, Object>();
+overrides.put("javax.persistence.jdbc.url", "new url");
+overrides.put("javax.persistence.jdbc.driver", "new driver");
+
+emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+em = emf.createEntityManager();
+
+Ontology ontology1 = new HibernateDbImporter().populateDbFromLongForm("ontology name", 
+    new FileInputStream("conceptFile"), new FileInputStream("triplesFile"), em);
+    
+Ontology ontology2 = new HibernateDbImporter().populateDbFromLongForm("ontology name", 
+    new FileInputStream("conceptFile"), new FileInputStream("triplesFile"), em);
+```
+
+
 
 
 Please note that this library has a depency on Hibernate, using its APIs for getting a JDBC connection from the EntityManager, for performance reasons.
 
 For writing out to the short form format:
 
-    try(FileWriter fw = new FileWriter("outFile"); BufferedWriter bw = new BufferedWriter(fw)){
-        new CanonicalOutputWriter().write(bw, statements);
-    }
+```java
+try(FileWriter fw = new FileWriter("outFile"); BufferedWriter bw = new BufferedWriter(fw)){
+    new CanonicalOutputWriter().write(bw, statements);
+}
