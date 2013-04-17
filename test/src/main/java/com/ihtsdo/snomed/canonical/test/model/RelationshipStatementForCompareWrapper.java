@@ -49,7 +49,7 @@ public class RelationshipStatementForCompareWrapper {
         if (o instanceof RelationshipStatementForCompareWrapper){
             RelationshipStatementForCompareWrapper r = (RelationshipStatementForCompareWrapper) o;
             return r.getRelationshipStatement().getSubject().equals(this.getRelationshipStatement().getSubject()) &&
-                    (r.getRelationshipStatement().getPredicate() == this.getRelationshipStatement().getPredicate()) &&
+                    (r.getRelationshipStatement().getPredicate().equals(this.getRelationshipStatement().getPredicate())) &&
                     r.getRelationshipStatement().getObject().equals(this.getRelationshipStatement().getObject());
                     
         }

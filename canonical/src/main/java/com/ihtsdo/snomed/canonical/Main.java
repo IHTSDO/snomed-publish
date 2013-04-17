@@ -34,7 +34,7 @@ public class Main {
     
     private   EntityManagerFactory emf           = null;
     private   EntityManager em                   = null;
-    private   HibernateDbImporter importer = new HibernateDbImporter();
+    private   HibernateDbImporter importer       = new HibernateDbImporter();
     private   CanonicalOutputWriter writer       = new CanonicalOutputWriter();
     private   CanonicalAlgorithm algorithm       = new CanonicalAlgorithm();
 

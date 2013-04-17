@@ -6,12 +6,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.ihtsdo.snomed.canonical.model.Concept;
@@ -27,35 +31,28 @@ public class TestingAlgorithm {
     public void findDifference(EntityManager em, File extraFile, File missingFile, Ontology originalOntology, 
             Ontology expectedOntology, Ontology generatedOntology) throws IOException
     {
-        LOG.info("Finding set differences");
-        //em.getTransaction().begin();
-        // UNCOMMENT THESE - USEFULL
-        //        int expectedStatementsSize = expectedOntology.getRelationshipStatements().size();
-        //        LOG.info("Total number of expected statements: " + expectedStatementsSize);
-        //        int generatedStatementsSize = generatedOntology.getRelationshipStatements().size();
-        //        LOG.info("Total number of generated statements: " + generatedStatementsSize);
-        //        int originalStatementsSize = originalOntology.getRelationshipStatements().size();
-        //        LOG.info("Total number of original statements: " + originalStatementsSize);
+        Stopwatch stopwatch = new Stopwatch().start();
+        LOG.info("Starting sanity check");
 
+        int expectedStatementsSize = expectedOntology.getRelationshipStatements().size();
+        LOG.info("Total number of expected statements: " + expectedStatementsSize);
+        int generatedStatementsSize = generatedOntology.getRelationshipStatements().size();
+        LOG.info("Total number of generated statements: " + generatedStatementsSize);
+        int originalStatementsSize = originalOntology.getRelationshipStatements().size();
+        LOG.info("Total number of original statements: " + originalStatementsSize);
+
+        LOG.info("Comparing the inputs");
+        
+        //LOG.info("Wrapping expected statements");
         Set<RelationshipStatementForCompareWrapper> expectedWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        LOG.info("Wrapping expected statements");
         for (RelationshipStatement r : expectedOntology.getRelationshipStatements()){
             expectedWrappedStatements.add(new RelationshipStatementForCompareWrapper(r));
         }
+        //LOG.info("Wrapping generated statements");
         Set<RelationshipStatementForCompareWrapper> generatedWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        LOG.info("Wrapping generated statements");
         for (RelationshipStatement r : generatedOntology.getRelationshipStatements()){
             generatedWrappedStatements.add(new RelationshipStatementForCompareWrapper(r));
         }
-        //        Set<RelationshipStatementForCompareWrapper> originalWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        //        LOG.info("Wrapping original statements");
-        //        counter = 0;
-        //        for (RelationshipStatement r : originalOntology.getRelationshipStatements()){
-        //            originalWrappedStatements.add(new RelationshipStatementForCompareWrapper(r));
-        //            if (counter % 25000 == 0){
-        //                LOG.info(Integer.toString(counter));
-        //            }
-        //        }
 
         //LOG.info("Splitting generated statements");
         Set<RelationshipStatementForCompareWrapper> generatedIsKindOfWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
@@ -65,10 +62,7 @@ public class TestingAlgorithm {
             }
         }
         LOG.info("Found [" + generatedIsKindOfWrappedStatements.size() + "] generated isKindOf statements");
-        Set<RelationshipStatementForCompareWrapper> generatedUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(generatedWrappedStatements);
-        generatedUdcWrappedStatements.removeAll(generatedIsKindOfWrappedStatements);
-        LOG.info("Found [" + generatedUdcWrappedStatements.size() + "] generated udc statements");
-
+        
         //LOG.info("Splitting expected statements");
         Set<RelationshipStatementForCompareWrapper> expectedIsKindOfWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
         for (RelationshipStatementForCompareWrapper r : expectedWrappedStatements){
@@ -77,21 +71,14 @@ public class TestingAlgorithm {
             }
         }
         LOG.info("Found [" + expectedIsKindOfWrappedStatements.size() + "] expected isKindOf statements");
+        
+        Set<RelationshipStatementForCompareWrapper> generatedUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(generatedWrappedStatements);
+        generatedUdcWrappedStatements.removeAll(generatedIsKindOfWrappedStatements);
+        LOG.info("Found [" + generatedUdcWrappedStatements.size() + "] generated udc statements");
+
         Set<RelationshipStatementForCompareWrapper> expectedUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(expectedWrappedStatements);
         expectedUdcWrappedStatements.removeAll(expectedIsKindOfWrappedStatements);
         LOG.info("Found [" + expectedUdcWrappedStatements.size() + "] expected udc statements");
-
-        //        Set<RelationshipStatementForCompareWrapper> originalIsKindOfWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        //        for (RelationshipStatementForCompareWrapper r : originalWrappedStatements){
-        //            if (r.getRelationshipStatement().isKindOfRelationship()){
-        //                originalIsKindOfWrappedStatements.add(r);
-        //            }
-        //        }
-        //        LOG.info("Found [" + originalIsKindOfWrappedStatements.size() + "] original isKindOf statements");
-        //        Set<RelationshipStatementForCompareWrapper> originalUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(originalWrappedStatements);
-        //        originalUdcWrappedStatements.removeAll(originalIsKindOfWrappedStatements);
-        //        LOG.info("Found [" + originalUdcWrappedStatements.size() + "] original udc statements");
-        //        
 
         SetView<RelationshipStatementForCompareWrapper> missingIsKindOfFromGeneratedOutput = Sets.difference(expectedIsKindOfWrappedStatements, generatedIsKindOfWrappedStatements);
         LOG.info("There are [{}] missing isA statements", missingIsKindOfFromGeneratedOutput.size());
@@ -115,46 +102,73 @@ public class TestingAlgorithm {
         Set<RelationshipStatementForCompareWrapper> erroneousExpectedIsaStatements = new HashSet<RelationshipStatementForCompareWrapper>();
         Set<RelationshipStatementForCompareWrapper> erroneousExpectedUdcStatements = new HashSet<RelationshipStatementForCompareWrapper>();
 
-        //LOG.info("Building isA object index from original input statements");
+        Set<Long> allOriginalIsAStatementObjects = buildSerialisedIdIndexForOriginalIsaStatements(originalOntology);
+
+        Set<Long> allOriginalUdcStatementObjects = buildSerialisedIdIndexForOriginalUdcStatements(originalOntology);
+
+        checkObjectsOfIsaStatementsMustAppearInOriginalStatementsAsObjects(
+                missingIsKindOfFromGeneratedOutput,
+                erroneousExpectedIsaStatements, allOriginalIsAStatementObjects);
+
+
+        checkObjectsOfUdcStatementsMustAppearInOriginalStatementsAsObjects(
+                missingUdcFromGeneratedOutput,
+                erroneousExpectedUdcStatements, allOriginalUdcStatementObjects);
+
+        checkIfAnyUdcStatementsAreNotPrimitiveStatements(missingUdcFromGeneratedOutput);
+
+        checkIfUdcStatementsExistsInPrimitiveParentConcept(missingUdcFromGeneratedOutput);
+        
+        stopwatch.stop();
+        LOG.info("Completed sanity check in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+    }
+
+    private Set<Long> buildSerialisedIdIndexForOriginalUdcStatements(
+            Ontology originalOntology) {
+        Set<Long> allOriginalUdcStatementObjects = new HashSet<Long>();
+        for (RelationshipStatement r : originalOntology.getRelationshipStatements()){
+            if (!r.isKindOfRelationship()) allOriginalUdcStatementObjects.add(r.getObject().getSerialisedId());
+        }
+        return allOriginalUdcStatementObjects;
+    }
+
+    private Set<Long> buildSerialisedIdIndexForOriginalIsaStatements(
+            Ontology originalOntology) {
         Set<Long> allOriginalIsAStatementObjects = new HashSet<Long>();
         for (RelationshipStatement r : originalOntology.getRelationshipStatements()){
             if (r.isKindOfRelationship()) allOriginalIsAStatementObjects.add(r.getObject().getSerialisedId());
         }
-        //LOG.info("Building udc object index from original input statements");
-        Set<Long> allOriginalUdcStatementObjects = new HashSet<Long>();
-        for (RelationshipStatement r : originalOntology.getRelationshipStatements()){
-            if (!r.isKindOfRelationship()) allOriginalUdcStatementObjects.add(r.getObject().getSerialisedId());
-        }        
+        return allOriginalIsAStatementObjects;
+    }
 
-        LOG.info("Objects of isA statements in the expected output, _must_ also appear as objects of isA statements in the input");
+    private void checkObjectsOfIsaStatementsMustAppearInOriginalStatementsAsObjects(
+            SetView<RelationshipStatementForCompareWrapper> missingIsKindOfFromGeneratedOutput,
+            Set<RelationshipStatementForCompareWrapper> erroneousExpectedIsaStatements,
+            Set<Long> allOriginalIsAStatementObjects) {
+        LOG.info("Objects of isA statements in the expected output must also appear as objects of isA statements in the input");
         for (RelationshipStatementForCompareWrapper rUnderTest : missingIsKindOfFromGeneratedOutput){
             if (rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalIsAStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
                 erroneousExpectedIsaStatements.add(rUnderTest);
             }
         }
         LOG.info("Number of IsA statements in the expected output in violation of this : {}", erroneousExpectedIsaStatements.size());
-//        LOG.info("Writing these errors to 'expected.isa.output.never.object.errors.txt'");
-//        File file = new File("expected.isa.output.never.object.errors.txt");
-//        if (!file.exists()) file.createNewFile();
-//        try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
-//            writer.writeCompareStatements(bw, erroneousExpectedIsaStatements);
-//        }
+    }
 
-        LOG.info("Objects of udc statements in the expected output, _must_ also appear as objects of udc statements in the input");
+    private void checkObjectsOfUdcStatementsMustAppearInOriginalStatementsAsObjects(
+            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput,
+            Set<RelationshipStatementForCompareWrapper> erroneousExpectedUdcStatements,
+            Set<Long> allOriginalUdcStatementObjects) {
+        LOG.info("Objects of udc statements in the expected output must also appear as objects of udc statements in the input");
         for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
             if (!rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalUdcStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
                 erroneousExpectedUdcStatements.add(rUnderTest);
             }
         }
+        LOG.info("Number of udc statements in the expected output in violation of this : {}", erroneousExpectedUdcStatements.size());
+    }
 
-        LOG.info("Number of udc statements in the expected output in violation of this : {}", erroneousExpectedIsaStatements.size());
-//        LOG.info("Writing errors to 'expected.udc.output.never.object.errors.txt'");
-//        File udcFile = new File("expected.udc.output.never.object.errors.txt");
-//        if (!udcFile.exists()) udcFile.createNewFile();
-//        try(FileWriter fw = new FileWriter(udcFile); BufferedWriter bw = new BufferedWriter(fw)){
-//            writer.writeCompareStatements(bw, erroneousExpectedUdcStatements);
-//        }
-
+    private void checkIfAnyUdcStatementsAreNotPrimitiveStatements(
+            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
         Set<RelationshipStatementForCompareWrapper> notCharacteristicType = new HashSet<RelationshipStatementForCompareWrapper>();
         for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
             if (!rUnderTest.getRelationshipStatement().isDefiningCharacteristic()){
@@ -162,8 +176,10 @@ public class TestingAlgorithm {
             }
         }
         LOG.info("Number of udc statements that are not charateristic types: " + notCharacteristicType.size());
+    }
 
-        
+    private void checkIfUdcStatementsExistsInPrimitiveParentConcept(
+            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
         LOG.info("For all missing udc statements, check if udc exists in primitive parent concept");
         Set<RelationshipStatementForCompareWrapper> udcInPrimitiveParentConcept = new HashSet<RelationshipStatementForCompareWrapper>();
         for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
@@ -183,18 +199,11 @@ public class TestingAlgorithm {
             }
         }
         LOG.info("Found expected [{}] udc statements already defined in a primitive parent subject concept as a characteristic type", udcInPrimitiveParentConcept.size());
-//        LOG.info("Writing errors to 'expected.udc.output.parent.defined.errors.txt'");
-//        File udcFileParent = new File("expected.udc.output.parent.defined.errors.txt");
-//        if (!udcFileParent.exists()) udcFileParent.createNewFile();
-//        try(FileWriter fw = new FileWriter(udcFileParent); BufferedWriter bw = new BufferedWriter(fw)){
-//            writer.writeCompareStatements(bw, udcInPrimitiveParentConcept);
-//        }
-
     }
 
     private void writeErrors(File file, SetView<RelationshipStatementForCompareWrapper> isKindOfStatements, 
             SetView<RelationshipStatementForCompareWrapper> udcfStatements) throws IOException 
-    {
+            {
         Set <RelationshipStatementForCompareWrapper> allStatements = new HashSet<RelationshipStatementForCompareWrapper>(isKindOfStatements);
         allStatements.addAll(udcfStatements);
         if (!file.exists()){
@@ -203,5 +212,27 @@ public class TestingAlgorithm {
         try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
             writer.writeCompareStatements(bw, allStatements);
         }
-    }
+            }
 }
+
+
+//LOG.info("Writing these errors to 'expected.isa.output.never.object.errors.txt'");
+//File file = new File("expected.isa.output.never.object.errors.txt");
+//if (!file.exists()) file.createNewFile();
+//try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
+//  writer.writeCompareStatements(bw, erroneousExpectedIsaStatements);
+//}
+
+//LOG.info("Writing errors to 'expected.udc.output.never.object.errors.txt'");
+//File udcFile = new File("expected.udc.output.never.object.errors.txt");
+//if (!udcFile.exists()) udcFile.createNewFile();
+//try(FileWriter fw = new FileWriter(udcFile); BufferedWriter bw = new BufferedWriter(fw)){
+//  writer.writeCompareStatements(bw, erroneousExpectedUdcStatements);
+//}
+
+//LOG.info("Writing errors to 'expected.udc.output.parent.defined.errors.txt'");
+//File udcFileParent = new File("expected.udc.output.parent.defined.errors.txt");
+//if (!udcFileParent.exists()) udcFileParent.createNewFile();
+//try(FileWriter fw = new FileWriter(udcFileParent); BufferedWriter bw = new BufferedWriter(fw)){
+//    writer.writeCompareStatements(bw, udcInPrimitiveParentConcept);
+//}
