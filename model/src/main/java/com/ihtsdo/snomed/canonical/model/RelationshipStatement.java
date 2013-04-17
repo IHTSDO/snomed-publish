@@ -97,7 +97,7 @@ public class RelationshipStatement {
     }
     
     public String shortToString(){
-        return "[" + getSerialisedId() + ": " + getSubject() + "(" + getPredicate() + ")" + getObject() + " type:" + getCharacteristicType() + "]";
+        return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + " type:" + getCharacteristicType() + "]";
     }
 
     @Override

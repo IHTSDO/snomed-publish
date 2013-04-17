@@ -153,11 +153,11 @@ public class CanonicalAlgorithm {
                 if (shouldShowDetails){
                     LOG.info("Concept [{}] has a primitive parent concept of [{}]", concept.getSerialisedId(), parentConcept.getSerialisedId());
                     if (parentConcept.getSubjectOfRelationshipStatements().isEmpty()){
-                        LOG.info("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept);
+                        LOG.info("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept.getSerialisedId());
                     }
                 }
                 for (RelationshipStatement rParent : parentConcept.getSubjectOfRelationshipStatements()){
-                    if (shouldShowDetails) LOG.info("Found that parent concept [{}] has relationship {}", parentConcept, rParent.shortToString());
+                    if (shouldShowDetails) LOG.info("Found that parent concept [{}] has relationship {}", parentConcept.getSerialisedId(), rParent.shortToString());
                     if ((rUnderTest.getPredicate() == rParent.getPredicate())&& 
                             rUnderTest.getObject().equals(rParent.getObject())&& 
                             rParent.isDefiningCharacteristic())

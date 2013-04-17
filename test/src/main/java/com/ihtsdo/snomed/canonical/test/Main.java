@@ -55,7 +55,6 @@ public class Main{
             String extraFile, String missingFile, String originalFile, String db) throws IOException{
         try{
             initDb(db);
-            //em.getTransaction().begin();
             
             Ontology originalOntology = importer.populateDbFromLongForm(ORIGINAL_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(originalFile), em);
@@ -63,22 +62,13 @@ public class Main{
                     new FileInputStream(expectedFile), em);
             Ontology generatedOntology = importer.populateDbFromShortForm(GENERATED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(generatedFile), em);
-
-            //em.getTransaction().begin();
             
             tester.findDifference(em, new File(extraFile), new File(missingFile), 
                     originalOntology, 
                     expectedOntology, 
                     generatedOntology);
-            
-//            tester.findDifference(em, new File(extraFile), new File(missingFile), 
-//                    em.find(Ontology.class, originalOntology.getId()),
-//                    em.find(Ontology.class, expectedOntology.getId()),
-//                    em.find(Ontology.class, generatedOntology.getId())
-//                    ); 
-            
+
         }finally{
-            //em.getTransaction().commit();
             closeDb();
         }
     }    
