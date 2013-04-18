@@ -38,8 +38,9 @@ function changeOntology(value) {
     <div id="title" class="clearfix">
       <h1>${concept.getFullySpecifiedName()}</h1>
       <div class="ids">[${concept.getSerialisedId()}, ${concept.getCtv3id()}, ${concept.getSnomedId()}]</div>
+      <div class="attributes"><c:out value="${concept.isPrimitive() ? 'Primitive' : 'Not primitive'}" />, Status <c:out value="${concept.getStatus()}"/></div>
     </div>
-    <div class="attributes"><c:out value="${concept.isPrimitive() ? 'Primitive' : 'Not primitive'}" />, Status <c:out value="${concept.getStatus()}"/></div>
+    
   </div>
   
   <c:if test="${!subjectOf.isEmpty()}">
@@ -49,6 +50,9 @@ function changeOntology(value) {
         <div class="relationship">
           <h4>Triple</h4>
         </div>
+<!--         <div class="group"> -->
+<!--             <h4>Group</h4> -->
+<!--         </div>         -->
         <div class="concept left">
           <h4>Role</h4>
         </div>
@@ -58,11 +62,12 @@ function changeOntology(value) {
       </div>
       <c:forEach var="r" items="${subjectOf}"> 
         <c:if test="${!r.isKindOfRelationship()}">
-          <div class="line clearfix">
+          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
             <div class="relationship identifier">
               <c:set var="showRelationship" value="${r}" />
               <%@include file="relationship.identifier.jsp"%>
-            </div>        
+            </div>
+<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
             <div class="concept left">
               <c:set var="showConcept" value="${r.getPredicate()}" />
               <%@include file="entity.jsp"%>
@@ -82,7 +87,10 @@ function changeOntology(value) {
       <div class="line clearfix">
         <div class="relationship">
           <h4>Triple</h4>
-        </div>      
+        </div>
+<!--         <div class="group"> -->
+<!--             <h4>Group</h4> -->
+<!--         </div>           -->
         <div class="concept left">
           <h4>Subject</h4>
         </div>
@@ -92,11 +100,12 @@ function changeOntology(value) {
       </div>
       <c:forEach var="r" items="${objectOf}">
         <c:if test="${!r.isKindOfRelationship()}">
-          <div class="line clearfix">
+          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
             <div class="relationship identifier">
               <c:set var="showRelationship" value="${r}" />
               <%@include file="relationship.identifier.jsp"%>
-            </div>  
+            </div>
+<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
             <div class="concept left">
               <c:set var="showConcept" value="${r.getSubject()}" />
               <%@include file="entity.jsp"%>
@@ -114,6 +123,9 @@ function changeOntology(value) {
     <div class="section clearfix double">
       <h3>Role of triple(s)</h3>  
       <div class="line clearfix">
+<!--         <div class="group"> -->
+<!--             <h4>Group</h4> -->
+<!--         </div> -->
         <div class="relationship">
           <h4>Triple</h4>
         </div>
@@ -125,11 +137,12 @@ function changeOntology(value) {
         </div>
       </div>
       <c:forEach var="r" items="${predicateOf}">
-          <div class="line clearfix">
+          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
             <div class="relationship identifier">
               <c:set var="showRelationship" value="${r}" />
               <%@include file="relationship.identifier.jsp"%>
-            </div>  
+            </div>
+<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
             <div class="concept left">
               <c:set var="showConcept" value="${r.getSubject()}" />
               <%@include file="entity.jsp"%>

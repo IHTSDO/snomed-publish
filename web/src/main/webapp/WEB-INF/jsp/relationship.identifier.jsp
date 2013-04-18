@@ -6,4 +6,5 @@
       <div class="line"><div class="title">Group</div><div class="value"><c:out value="${showRelationship.getGroup() }"/></div></div>
   </span>
 </a>
+<div class="group">[<c:out value="${showRelationship.getGroup()}"/>]</div>
  

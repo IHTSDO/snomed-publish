@@ -25,7 +25,7 @@
     
     <jpa:repositories base-package="com.ihtsdo.snomed.canonical.model" />
     
-    <context:property-placeholder location="classpath:browse.properties"
-        system-properties-mode="OVERRIDE" ignore-unresolvable="false" />
+<!--     <context:property-placeholder location="classpath:browse.properties" -->
+<!--         system-properties-mode="OVERRIDE" ignore-unresolvable="false" /> -->
 
 </beans>

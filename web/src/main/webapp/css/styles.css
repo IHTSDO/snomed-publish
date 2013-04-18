@@ -4,24 +4,51 @@
 }
 
 .relationship{
-    width: 5em;
+    width: 6em;
     float: left;
 }
 .relationship h4{
     float: left;
 }
 
+.group{
+     font-family: "Courier New",Courier,monospace;
+}
+
+/* .group{ */
+/*     width: 3em; */
+/*     float: left; */
+/*     text-align: center; */
+/* } */
+/* .group h4{ */
+/*     float: left; */
+/* } */
+
 .section{
     margin: 0 0 1em 0;
 }
 
 .relationship.identifier {
-    height: 2em;
+    padding-top: 0.35em;
+    font-size: 0.75em;
+    width: 8em;
 }
 
-.relationship.identifier a{
-    font-size: 0.8em;    
+.relationship.identifier a{ 
+
 }
+
+.line.group-0 {background-color: #C4FFD7;}
+.line.group-1 {background-color: #FEFFEB;}
+.line.group-2 {background-color: #F0EBFF;}
+.line.group-3 {background-color: #FFE0E0;}
+.line.group-4 {background-color: #7979FC;}
+.line.group-5 {background-color: #FF4845;}
+.line.group-6 {background-color: #5445FF;}
+.line.group-7 {background-color: #45FF54;}
+.line.group-8 {background-color: #FF45E9;}
+.line.group-9 {background-color: #45FFFF;}
+.line.group-10 {background-color: #F9FF45;}
 
 #ontology{
     float: right;
@@ -47,6 +74,7 @@
 
 #title h1{
     float: left;
+    width: 70%;
 }
 
 .ids{
@@ -57,7 +85,7 @@
     float: right;
     padding-top: 0.9em;
     text-align: right;
-    width: 20em;
+    width: 30%;
 }
 
 

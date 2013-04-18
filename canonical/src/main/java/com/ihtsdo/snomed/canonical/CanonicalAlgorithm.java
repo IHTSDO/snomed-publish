@@ -158,7 +158,7 @@ public class CanonicalAlgorithm {
                 }
                 for (RelationshipStatement rParent : parentConcept.getSubjectOfRelationshipStatements()){
                     if (shouldShowDetails) LOG.info("Found that parent concept [{}] has relationship {}", parentConcept.getSerialisedId(), rParent.shortToString());
-                    if ((rUnderTest.getPredicate() == rParent.getPredicate())&& 
+                    if ((rUnderTest.getPredicate().equals(rParent.getPredicate()))&& 
                             rUnderTest.getObject().equals(rParent.getObject())&& 
                             rParent.isDefiningCharacteristic())
                     {
