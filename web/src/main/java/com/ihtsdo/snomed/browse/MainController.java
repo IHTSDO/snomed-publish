@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.browse;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +28,6 @@ import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
-
-
 @Controller
 @RequestMapping("/")
 public class MainController {    
@@ -41,12 +41,47 @@ public class MainController {
     private Map<Long, List<RelationshipStatement>> predicateOfCache = new HashMap<Long, List<RelationshipStatement>>();
 
     
-    private Ordering<RelationshipStatement> byGroup = new Ordering<RelationshipStatement>() {
+    private Ordering<RelationshipStatement> byGroupAndSubjectFsn = new Ordering<RelationshipStatement>() {
         @Override
         public int compare(RelationshipStatement r1, RelationshipStatement r2) {
-           return Ints.compare(r1.getGroup(), r2.getGroup());
+            if (r1.getGroup() == r2.getGroup()){
+                return r1.getSubject().getFullySpecifiedName().compareTo(r2.getSubject().getFullySpecifiedName());
+            }
+            else{
+                return Ints.compare(r1.getGroup(), r2.getGroup());
+            }
         }
-    };    
+    };
+    
+//    private Ordering<RelationshipStatement> byGroupAndObjectFsn = new Ordering<RelationshipStatement>() {
+//        @Override
+//        public int compare(RelationshipStatement r1, RelationshipStatement r2) {
+//            if (r1.getGroup() == r2.getGroup()){
+//                return r1.getObject().getFullySpecifiedName().compareTo(r2.getObject().getFullySpecifiedName());
+//            }
+//            else{
+//                return Ints.compare(r1.getGroup(), r2.getGroup());
+//            }
+//        }
+//    };   
+    
+    private Ordering<RelationshipStatement> byGroupAndPredicateFsn = new Ordering<RelationshipStatement>() {
+        @Override
+        public int compare(RelationshipStatement r1, RelationshipStatement r2) {
+            if (r1.getGroup() == r2.getGroup()){
+                return r1.getPredicate().getFullySpecifiedName().compareTo(r2.getPredicate().getFullySpecifiedName());
+            }
+            else{
+                return Ints.compare(r1.getGroup(), r2.getGroup());
+            }
+        }
+    };     
+
+    @Transactional
+    @RequestMapping(value="/", method = RequestMethod.GET)
+    public void landingPage(HttpServletResponse response, HttpServletRequest request) throws IOException{
+        response.sendRedirect("ontology/1/concept/138875005");
+    }
     
     @Transactional
     @RequestMapping(value="/ontology/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
@@ -68,7 +103,7 @@ public class MainController {
                     subjectOf.add(r);
                 }
             }
-            Collections.sort(subjectOf, byGroup.nullsLast());
+            Collections.sort(subjectOf, byGroupAndPredicateFsn.nullsLast());
             subjectOfCache.put(c.getId(), subjectOf);
         }
         
@@ -79,7 +114,7 @@ public class MainController {
                     objectOf.add(r);
                 }
             }
-            Collections.sort(objectOf, byGroup.nullsLast());
+            Collections.sort(objectOf, byGroupAndSubjectFsn.nullsLast());
             objectOfCache.put(c.getId(), objectOf);
         }
         
@@ -90,12 +125,12 @@ public class MainController {
                     predicateOf.add(r);
                 }
             }
-            Collections.sort(predicateOf, byGroup.nullsLast());
-            objectOfCache.put(c.getId(), predicateOf);
+            Collections.sort(predicateOf, byGroupAndSubjectFsn.nullsLast());
+            predicateOfCache.put(c.getId(), predicateOf);
         }        
         
         model.addAttribute("objectOf", objectOfCache.get(c.getId()));
-        model.addAttribute("predicateOf", c.getPredicateOfRelationshipStatements());
+        model.addAttribute("predicateOf", predicateOfCache.get(c.getId()));
         model.addAttribute("subjectOf", subjectOfCache.get(c.getId()));
         
 //        model.addAttribute("predicateOf", c.getPredicateOfRelationshipStatements());

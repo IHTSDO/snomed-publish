@@ -38,17 +38,48 @@
 
 }
 
-.line.group-0 {background-color: #C4FFD7;}
-.line.group-1 {background-color: #FEFFEB;}
-.line.group-2 {background-color: #F0EBFF;}
-.line.group-3 {background-color: #FFE0E0;}
-.line.group-4 {background-color: #7979FC;}
-.line.group-5 {background-color: #FF4845;}
-.line.group-6 {background-color: #5445FF;}
-.line.group-7 {background-color: #45FF54;}
-.line.group-8 {background-color: #FF45E9;}
-.line.group-9 {background-color: #45FFFF;}
-.line.group-10 {background-color: #F9FF45;}
+/* Adobe Kuler - Heirloom one */
+.line.group-0 {background-color: #C7B773;}
+.line.group-1 {background-color: #E3DB9A;}
+.line.group-2 {background-color: #F5FCD0;}
+.line.group-3 {background-color: #B1C2B3;}
+.line.group-4 {background-color: #778691;}
+
+/* Adobe Kuler - Vintage beach  */
+/* .line.group-0 {background-color: #B89A7B;} */
+/* .line.group-1 {background-color: #9BBAAC;} */
+/* .line.group-2 {background-color: #F2D649;} */
+/* .line.group-3 {background-color: #D95D50;} */
+/* .line.group-4 {background-color: #DBDBDB;} */
+
+/* Adobe Kuler - Pleasant  */
+/* .line.group-0 {background-color: #8C7F56;} */
+/* .line.group-1 {background-color: #CCAB72;} */
+/* .line.group-2 {background-color: #D3DBA7;} */
+/* .line.group-3 {background-color: #D8F5BD;} */
+/* .line.group-4 {background-color: #FFF9F1;} */
+
+/* Adobe Kuler - Hidden in the crowd */
+.line.group-5 {background-color: #7BB2A3;}
+.line.group-6 {background-color: #8EAD79;}
+.line.group-7 {background-color: #ADB064;}
+.line.group-8 {background-color: #E0D867;}
+.line.group-9 {background-color: #161616;}
+
+.line.group-10 {background-color: #F2D649;}
+
+
+/* .line.group-0 {background-color: #C4FFD7;} */
+/* .line.group-1 {background-color: #FEFFEB;} */
+/* .line.group-2 {background-color: #F0EBFF;} */
+/* .line.group-3 {background-color: #FFE0E0;} */
+/* .line.group-4 {background-color: #7979FC;} */
+/* .line.group-5 {background-color: #FF4845;} */
+/* .line.group-6 {background-color: #5445FF;} */
+/* .line.group-7 {background-color: #45FF54;} */
+/* .line.group-8 {background-color: #FF45E9;} */
+/* .line.group-9 {background-color: #45FFFF;} */
+/* .line.group-10 {background-color: #F9FF45;} */
 
 #ontology{
     float: right;
