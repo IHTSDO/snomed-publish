@@ -4,9 +4,14 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">
+
+<script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
 <title>Concept ${concept.getSerialisedId()}</title>
 <meta name="description" content="Snomed browser">
 <meta name="author" content="Henrik Pettersen">
+
 <link rel="stylesheet" href="/css/styles.css?v=1.0">
 
 <script type="text/javascript">

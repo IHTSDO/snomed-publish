@@ -1,3 +1,11 @@
+h1,h2,h3,h4,h5{
+    font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;     
+}
+
+body{
+    font:13px "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif !important;
+    }
+
 .concept{  
     float: left;
     width: 40%; 
@@ -12,7 +20,7 @@
 }
 
 .group{
-     font-family: "Courier New",Courier,monospace;
+     font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
 }
 
 /* .group{ */
@@ -109,7 +117,7 @@
 }
 
 .ids{
-    font-family: "Courier New",Courier,monospace;
+    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
 }
 
 #title .ids{
@@ -121,8 +129,7 @@
 
 
 #heading .attributes{
-    font-family: Georgia,serif;
-    font-style: italic;
+    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
     float: right; 
     margin: 0.2em;
 }
@@ -134,7 +141,6 @@
 }
 
 .section h4{
-    font-style: italic;
     font-weight: normal;
     margin: 0 0 0.5em 0;
 }
@@ -147,12 +153,13 @@
     font-size: 0.8em;
     float: left;
     padding-right: 1em;
+    padding-top: 0.25em;
 }
 
 .section .attributes{
     font-size: 0.8em;
-    font-family: "Courier New",Courier,monospace;
-    margin: 0 0 0 1em;
+    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+    margin: 0.25em 0 0 1em;
 }
 
 .section.single{

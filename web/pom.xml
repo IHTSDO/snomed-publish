@@ -7,14 +7,14 @@
         <version>0.5</version>
     </parent>
     <packaging>war</packaging>
-    <artifactId>browse</artifactId>
-    <name>browse</name>
+    <artifactId>snomed</artifactId>
+    <name>snomed</name>
     <properties>
         <spring.version>3.2.2.RELEASE</spring.version>
         <jetty.version>9.0.0.v20130308</jetty.version>
     </properties>
     <build>
-        <finalName>browse</finalName>
+        <finalName>snomed</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <plugins>
             <plugin>
@@ -150,5 +150,13 @@
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.2</version>
         </dependency>
+        
+        <!--  JSTL  -->
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>        
+        
     </dependencies>
 </project>
