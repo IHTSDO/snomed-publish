@@ -4,195 +4,214 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">
-
 <script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-
-<title>Concept ${concept.getSerialisedId()}</title>
+<title>Snomed ${concept.getSerialisedId()}</title>
 <meta name="description" content="Snomed browser">
-<meta name="author" content="Henrik Pettersen">
-
+<meta name="author" content="Henrik Pettersen, Sparkling Ideas">
 <link rel="stylesheet" href="/css/styles.css?v=1.0">
-
 <script type="text/javascript">
 function changeOntology(value) {
     var redirect;
-    redirect = <c:if test="${(pageContext.request.contextPath != null) && (!pageContext.request.contextPath.isEmpty())}">"/<c:out value='${pageContext.request.contextPath}'/>/" + </c:if>"<c:out value='${servletPath}'/>/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
+    redirect = "/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
     document.location.href = redirect;
 }
 </script>
-
-<!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
 </head>
 <body>
-  <!--     <script src="js/scripts.js"></script>     -->
   <div id="heading" class="clearfix">
     <div id="ontology">
       <form>
-        <select id="ontology" onchange="changeOntology(this.value)">
+        <select onchange="changeOntology(this.value)">
           <c:forEach var="o" items="${ontologies}">
             <option ${o.getId()==ontologyId ? "selected=\"selected\"" : ""} value="<c:out value="${o.getId()}"/>"><c:out value="${o.getName()}"/></option>
           </c:forEach>
         </select>
       </form>
     </div>
-    <h2><c:out value="${concept.isPredicate() ? 'Role' : 'Concept'}" /></h2>
-    <h3 class="clearfix"><c:if test="${!concept.isPredicate()}"><c:out value="${((concept.getType() == null) || concept.getType().isEmpty()) ? 'Not specified' : concept.getType()}" /></c:if></h3>
-    <div id="title" class="clearfix">
-      <h1>${concept.getFullySpecifiedName()}</h1>
-      <div class="ids">[${concept.getSerialisedId()}, ${concept.getCtv3id()}, ${concept.getSnomedId()}]</div>
-      <div class="attributes"><c:out value="${concept.isPrimitive() ? 'Primitive' : 'Not primitive'}" />, Status <c:out value="${concept.getStatus()}"/></div>
+    <h2>${type}</h2>
+    <h1>${fullySpecifiedName}</h1>
+    <div class="properties">
+        <div class="ids">[${concept.getSerialisedId()}, ${concept.getCtv3id()}, ${concept.getSnomedId()}]</div>
+        <span class="primitive"><c:out value="${concept.isPrimitive() ? 'Primitive' : 'Not primitive'}" /></span>, 
+        <span class="status">Status <c:out value="${concept.getStatus()}"/></span>
     </div>
-    
   </div>
   
+  <!-- SUBJECT OF -->
   <c:if test="${!subjectOf.isEmpty()}">
-    <div class="section top clearfix">
-      <h3>Subject of triple(s)</h3>
-      <div class="line clearfix">
-        <div class="relationship">
-          <h4>Triple</h4>
-        </div>
-<!--         <div class="group"> -->
-<!--             <h4>Group</h4> -->
-<!--         </div>         -->
-        <div class="concept left">
-          <h4>Role</h4>
-        </div>
-        <div class="concept right">
-          <h4>Object</h4>
-        </div>
-      </div>
-      <c:forEach var="r" items="${subjectOf}"> 
-        <c:if test="${!r.isKindOfRelationship()}">
-          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
-            <div class="relationship identifier">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.jsp"%>
-            </div>
-<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
-            <div class="concept left">
-              <c:set var="showConcept" value="${r.getPredicate()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-            <div class="concept right">
-              <c:set var="showConcept" value="${r.getObject()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-          </div>
-        </c:if>
+    <h3 class="top triples">Subject of</h3>  
+    <table class="triples">
+      <tr>
+        <th>Statement</th>
+        <th>Role</th>
+        <th>Object</th>
+        <th></th>
+      </tr>
+      <c:set var="lastGroup" value="-1"/>
+      <c:forEach var="r" items="${subjectOf}">
+        <tr class="group-<c:out value="${r.getGroup()}"/>">
+          <td class="statement">
+            <c:set var="showRelationship" value="${r}" />
+            <%@include file="relationship.identifier.jsp"%>
+          </td>
+          <td class="concept left">
+            <c:set var="showConcept" value="${r.getPredicate()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="concept right">
+            <c:set var="showConcept" value="${r.getObject()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="group">
+            <c:if test="${r.getGroup() != lastGroup}" >
+              Group <c:out value="${r.getGroup()}"/>
+              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            </c:if>
+          </td>
+        </tr>
       </c:forEach>
-    </div>
+    </table>
   </c:if>
+  
+  <!-- OBJECT OF -->
   <c:if test="${!objectOf.isEmpty()}">
-    <div class="section clearfix double">
-      <h3>Object of triple(s)</h3>  
-      <div class="line clearfix">
-        <div class="relationship">
-          <h4>Triple</h4>
-        </div>
-<!--         <div class="group"> -->
-<!--             <h4>Group</h4> -->
-<!--         </div>           -->
-        <div class="concept left">
-          <h4>Subject</h4>
-        </div>
-        <div class="concept right">
-          <h4>Role</h4>
-        </div>
-      </div>
+    <h3 class="triples">Object of</h3>  
+    <table class="triples">
+      <tr>
+        <th>Statement</th>
+        <th>Subject</th>
+        <th>Role</th>
+        <th></th>
+      </tr>
+      <c:set var="lastGroup" value="-1"/>
       <c:forEach var="r" items="${objectOf}">
-        <c:if test="${!r.isKindOfRelationship()}">
-          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
-            <div class="relationship identifier">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.jsp"%>
-            </div>
-<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
-            <div class="concept left">
-              <c:set var="showConcept" value="${r.getSubject()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-            <div class="concept right">
-              <c:set var="showConcept" value="${r.getPredicate()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-          </div>
-        </c:if>
-      </c:forEach>    
-    </div>
-  </c:if>
-  <c:if test="${!predicateOf.isEmpty()}">
-    <div class="section clearfix double">
-      <h3>Role of triple(s)</h3>  
-      <div class="line clearfix">
-<!--         <div class="group"> -->
-<!--             <h4>Group</h4> -->
-<!--         </div> -->
-        <div class="relationship">
-          <h4>Triple</h4>
-        </div>
-        <div class="concept left">
-          <h4>Subject</h4>
-        </div>
-        <div class="concept right">
-          <h4>Object</h4>
-        </div>
-      </div>
-      <c:forEach var="r" items="${predicateOf}">
-          <div class="line clearfix group-<c:out value="${r.getGroup()}"/>">
-            <div class="relationship identifier">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.jsp"%>
-            </div>
-<%--             <div class="group"><c:out value="${r.getGroup()}"/></div> --%>
-            <div class="concept left">
-              <c:set var="showConcept" value="${r.getSubject()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-            <div class="concept right">
-              <c:set var="showConcept" value="${r.getObject()}" />
-              <%@include file="entity.jsp"%>
-            </div>
-          </div>
+        <tr class="group-<c:out value="${r.getGroup()}"/>">
+          <td class="statement">
+            <c:set var="showRelationship" value="${r}" />
+            <%@include file="relationship.identifier.jsp"%>
+          </td>
+          <td class="concept left">
+            <c:set var="showConcept" value="${r.getSubject()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="concept right">
+            <c:set var="showConcept" value="${r.getPredicate()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="group">
+            <c:if test="${r.getGroup() != lastGroup}" >
+              Group <c:out value="${r.getGroup()}"/>
+              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            </c:if>
+          </td>
+        </tr>
       </c:forEach>
+    </table>
+  </c:if>
+    
+  <!-- PREDICATE OF -->
+  <c:if test="${!predicateOf.isEmpty()}">
+    <h3 class="triples">Predicate of</h3>  
+    <table class="triples">
+      <tr>
+        <th>Statement</th>
+        <th>Subject</th>
+        <th>Object</th>
+        <th></th>
+      </tr>
+      <c:set var="lastGroup" value="-1"/>
+      <c:forEach var="r" items="${predicateOf}">
+        <tr class="group-<c:out value="${r.getGroup()}"/>">
+          <td class="statement">
+            <c:set var="showRelationship" value="${r}" />
+            <%@include file="relationship.identifier.jsp"%>
+          </td>
+          <td class="concept left">
+            <c:set var="showConcept" value="${r.getSubject()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="concept right">
+            <c:set var="showConcept" value="${r.getObject()}" />
+            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <%@include file="entity.jsp"%>          
+          </td>
+          <td class="group">
+            <c:if test="${r.getGroup() != lastGroup}" >
+              Group <c:out value="${r.getGroup()}"/>
+              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            </c:if>
+          </td>
+        </tr>
+      </c:forEach>
+    </table>
+  </c:if>  
+  
+  <c:if test="${!concept.getKindOfs().isEmpty()}">
+    <h3>Parent concept(s)</h3>
+    <div class="hierarchy clearfix">
+      <c:forEach var="c" items="${concept.getKindOfs()}">
+        <div class="concept">
+          <c:set var="showConcept" value="${c}" />
+          <c:choose>
+            <c:when test="${c.getFullySpecifiedName().length() < 85}">
+              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            </c:when>
+            <c:otherwise>
+              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+            </c:otherwise>
+          </c:choose>          
+          <%@include file="entity.jsp"%>
+        </div>
+      </c:forEach>  
     </div>
   </c:if>
-  <div class="block clearfix">
-    <c:if test="${!concept.getKindOfs().isEmpty()}">
-      <div class="section clearfix single left">
-        <h3>Parent concept(s)</h3>
-        <c:forEach var="ct" items="${concept.getKindOfs()}">
-          <div class="concept">
-            <c:set var="showConcept" value="${ct}" />
-            <%@include file="entity.jsp"%>
-          </div>
-        </c:forEach> 
-      </div>
-    </c:if>
-    <c:if test="${!concept.getParentOf().isEmpty()}">
-      <div class="section clearfix single right">
-        <h3>Child concept(s)</h3>
-        <c:forEach var="ct" items="${concept.getParentOf()}">
-          <div class="concept">
-            <c:set var="showConcept" value="${ct}" />
-            <%@include file="entity.jsp"%>
-          </div>
-        </c:forEach> 
-      </div>
-    </c:if>
-  </div>
-  <div class="section clearfix flow">
+
+  <c:if test="${!concept.getParentOf().isEmpty()}">
+    <h3>Child concept(s)</h3>
+    <div class="hierarchy clearfix">
+      <c:forEach var="c" items="${concept.getParentOf()}">
+        <div class="concept">
+          <c:set var="showConcept" value="${c}" />
+          <c:choose>
+            <c:when test="${c.getFullySpecifiedName().length() < 85}">
+              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            </c:when>
+            <c:otherwise>
+              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+            </c:otherwise>
+          </c:choose>
+          <%@include file="entity.jsp"%>
+        </div>
+      </c:forEach>
+    </div>  
+  </c:if>
+  
+
+  
     <h3>All primitive supertype(s)</h3>
-    <c:forEach var="ct" items="${concept.getAllKindOfPrimitiveConcepts(true)}">
-      <div class="concept">
-        <c:set var="showConcept" value="${ct}" />
-        <%@include file="entity.jsp"%>
-      </div>
-    </c:forEach> 
-  </div>
+    <div class="hierarchy clearfix">
+      <c:forEach var="c" items="${concept.getAllKindOfPrimitiveConcepts(true)}">
+        <div class="concept">
+          <c:set var="showConcept" value="${c}" />
+          <c:choose>
+            <c:when test="${c.getFullySpecifiedName().length() < 85}">
+              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            </c:when>
+            <c:otherwise>
+              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+            </c:otherwise>
+          </c:choose>          
+          <%@include file="entity.jsp"%>
+        </div>
+      </c:forEach>
+    </div> 
+  
   
   
 </body>

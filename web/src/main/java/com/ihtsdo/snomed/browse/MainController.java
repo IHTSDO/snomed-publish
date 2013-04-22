@@ -95,6 +95,8 @@ public class MainController {
         model.addAttribute("concept", c);
         model.addAttribute("ontologies", ontologies);
         model.addAttribute("ontologyId", ontologyId);
+        model.addAttribute("fullySpecifiedName", c.getFullySpecifiedName().toLowerCase().substring(0, 1).toUpperCase() + c.getFullySpecifiedName().toLowerCase().substring(1));
+        model.addAttribute("type", ((c.getType() == null) || c.getType().isEmpty()) ? "Type not specified" : c.getType().toLowerCase().substring(0, 1).toUpperCase() + c.getType().toLowerCase().substring(1));
         
         if (subjectOfCache.get(c.getId()) == null){
             List<RelationshipStatement> subjectOf = new ArrayList<RelationshipStatement>();
