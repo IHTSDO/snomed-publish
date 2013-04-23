@@ -10,7 +10,7 @@
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 </head>
 <body>
-    <h1 style="font-weight: normal; font-size: 2em; text-align: center; font-family : 'museo-sans-1','museo-sans-2', Georgia, Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, Geneva, Arial, Sans-serif;">Concept <c:out value="${id}"/> not found</h1>
-    <img style="width: 100%" src="/img/404.jpg"/>
+    <div style="position: relative; top: 710px; text-align: center; position: relative; font-weight: normal; font-size: 2.5em; text-align: center; font-family : 'museo-sans-1','museo-sans-2', Georgia, Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, Geneva, Arial, Sans-serif;">Concept <c:out value="${id}"/> was not found</div>
+    <img style="width: 1400px; margin-left: auto; margin-right: auto; display: block;" src="/img/404.jpg"/>
 </body>
 </html>
