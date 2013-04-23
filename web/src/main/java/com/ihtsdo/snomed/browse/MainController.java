@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +19,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Ints;
@@ -85,10 +88,17 @@ public class MainController {
     
     @Transactional
     @RequestMapping(value="/ontology/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
-    public String printWelcome(@PathVariable long ontologyId, 
-            @PathVariable long serialisedId, ModelMap model,
-            HttpServletRequest request) {        
-        Concept c = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
+    public String conceptDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
+            HttpServletRequest request) throws ConceptNotFoundException
+    {        
+       
+        Concept c;
+        try {
+            c = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ConceptNotFoundException(serialisedId, "o1");
+        }
+        
         List<Ontology> ontologies = em.createQuery("SELECT o from Ontology o", Ontology.class).getResultList();
         
         model.addAttribute("servletPath", request.getServletPath());
@@ -148,5 +158,12 @@ public class MainController {
         return "concept";
  
     }
-
+    
+    @ExceptionHandler(ConceptNotFoundException.class)
+    public ModelAndView handleConceptNotFoundException(HttpServletRequest request, ConceptNotFoundException exception){
+        ModelAndView modelAndView = new ModelAndView("notfound");
+        modelAndView.addObject("id", exception.getConceptId());
+        modelAndView.addObject("ontology", exception.getOntologyName());
+        return modelAndView;
+    }
 }

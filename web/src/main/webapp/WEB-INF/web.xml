@@ -27,36 +27,25 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
-
-    <security-constraint>
-        <display-name>authorizedUsers</display-name>
-        <web-resource-collection>
-            <web-resource-name>ALL URLs</web-resource-name>
-            <url-pattern>/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>USER</role-name>
-        </auth-constraint>
-        <!--user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> 
-            </user-data-constraint -->
-    </security-constraint>
-
 <!--     <security-constraint> -->
-<!--         <display-name>publicAccess</display-name> -->
+<!--         <display-name>authorizedUsers</display-name> -->
 <!--         <web-resource-collection> -->
-<!--             <web-resource-name>Public pages</web-resource-name> -->
-<!--             <url-pattern>/public/*</url-pattern> -->
+<!--             <web-resource-name>ALL URLs</web-resource-name> -->
+<!--             <url-pattern>/*</url-pattern> -->
 <!--         </web-resource-collection> -->
+<!--         <auth-constraint> -->
+<!--             <role-name>USER</role-name> -->
+<!--         </auth-constraint> -->
 <!--     </security-constraint> -->
 
-    <login-config>
-        <auth-method>BASIC</auth-method>
-        <realm-name>Snomed</realm-name>
-    </login-config>
+<!--     <login-config> -->
+<!--         <auth-method>BASIC</auth-method> -->
+<!--         <realm-name>Snomed</realm-name> -->
+<!--     </login-config> -->
 
-    <security-role>
-        <description>user access</description>
-        <role-name>USER</role-name>
-    </security-role>
+<!--     <security-role> -->
+<!--         <description>user access</description> -->
+<!--         <role-name>USER</role-name> -->
+<!--     </security-role> -->
 
 </web-app>
