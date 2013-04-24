@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
 
@@ -166,7 +167,9 @@ public class CanonicalAlgorithm {
                             LOG.info("Found that relationship under test {} is also defined in parent concept as {}", rUnderTest.shortToString(), rParent.shortToString());
                             LOG.info("Removing statement [{}] from output because parent concept [{}] has defined relationship [{}]",  rUnderTest.shortToString(), parentConcept.getSerialisedId(), rParent.shortToString());
                         }
-                        allStatementsForConcept.remove(rUnderTest);
+                        if ((rUnderTest.getGroup() == 0) || roleGroupsAreIdentical(rUnderTest, rParent)){
+                            allStatementsForConcept.remove(rUnderTest);
+                        }
                     }
                 }
             }
@@ -184,5 +187,51 @@ public class CanonicalAlgorithm {
         }
         
         return allStatementsForConcept;
+    }
+
+    private boolean roleGroupsAreIdentical(RelationshipStatement rUnderTest, RelationshipStatement rParent) {
+        
+        Set<RelationshipStatementDeepEqualsWrapper> conceptUnderTestSubjectOfRelationshipStatementsWithGivenGroup = new HashSet<RelationshipStatementDeepEqualsWrapper>();
+        for (RelationshipStatement r : rUnderTest.getSubject().getSubjectOfRelationshipStatements()){
+            if (r.getGroup() == rUnderTest.getGroup()){
+                conceptUnderTestSubjectOfRelationshipStatementsWithGivenGroup.add(new RelationshipStatementDeepEqualsWrapper(r));
+            }
+        }
+        
+        Set<RelationshipStatementDeepEqualsWrapper> parentConceptSubjectOfRelationshipStatementsWithGivenGroup = new HashSet<RelationshipStatementDeepEqualsWrapper>();
+        for (RelationshipStatement r : rParent.getSubject().getSubjectOfRelationshipStatements()){
+            if (r.getGroup() == rUnderTest.getGroup()){
+                parentConceptSubjectOfRelationshipStatementsWithGivenGroup.add(new RelationshipStatementDeepEqualsWrapper(r));
+            }
+        }
+        
+        return conceptUnderTestSubjectOfRelationshipStatementsWithGivenGroup.equals(parentConceptSubjectOfRelationshipStatementsWithGivenGroup);
+    }
+    
+    private class RelationshipStatementDeepEqualsWrapper{
+        private RelationshipStatement wrapped;
+        
+        public RelationshipStatementDeepEqualsWrapper(RelationshipStatement wrapped){
+            this.wrapped = wrapped;
+        }
+        
+        public boolean equals(Object o){
+            if (o instanceof RelationshipStatementDeepEqualsWrapper){
+                RelationshipStatementDeepEqualsWrapper r = (RelationshipStatementDeepEqualsWrapper) o;
+                
+                return //r.wrapped.getSubject().equals(this.wrapped.getSubject()) &&
+                r.wrapped.getObject().equals(this.wrapped.getObject())
+                && r.wrapped.getPredicate().equals(this.wrapped.getPredicate());
+            }
+            return false;
+        }
+        
+        public int hashCode(){
+            return Longs.hashCode(wrapped.getPredicate().getSerialisedId());
+        }
+        
+        public String toString(){
+            return "wrapped: " + wrapped.toString(); 
+        }
     }
 }

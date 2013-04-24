@@ -116,7 +116,7 @@ public class RelationshipStatement {
             if ((r.getSerialisedId() == SERIALISED_ID_NOT_DEFINED) || (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED)){
                 return (r.getSubject().equals(this.getSubject())
                         && r.getObject().equals(this.getObject())
-                        && r.getPredicate() == (this.getPredicate()));
+                        && r.getPredicate().equals(this.getPredicate()));
             }
             
             if (r.getSerialisedId() == this.getSerialisedId()){

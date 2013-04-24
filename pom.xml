@@ -10,6 +10,8 @@
         <module>model</module>
         <module>importexport</module>
         <module>canonical</module>
+        <module>canonical-main</module>
+        <module>canonical-plugin</module>
         <module>test</module>
         <module>web</module>
     </modules>

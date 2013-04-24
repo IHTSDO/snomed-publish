@@ -38,7 +38,7 @@ public class Main {
     private   CanonicalOutputWriter writer       = new CanonicalOutputWriter();
     private   CanonicalAlgorithm algorithm       = new CanonicalAlgorithm();
 
-    public void initDb(String db){
+    private void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
         
         if ((db != null) && (!db.isEmpty())){

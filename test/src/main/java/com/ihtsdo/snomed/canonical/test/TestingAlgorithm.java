@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +32,12 @@ public class TestingAlgorithm {
         Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Starting sanity check");
 
-        int expectedStatementsSize = expectedOntology.getRelationshipStatements().size();
-        LOG.info("Total number of expected statements: " + expectedStatementsSize);
-        int generatedStatementsSize = generatedOntology.getRelationshipStatements().size();
-        LOG.info("Total number of generated statements: " + generatedStatementsSize);
-        int originalStatementsSize = originalOntology.getRelationshipStatements().size();
-        LOG.info("Total number of original statements: " + originalStatementsSize);
+//        int expectedStatementsSize = expectedOntology.getRelationshipStatements().size();
+//        LOG.info("Total number of expected statements: " + expectedStatementsSize);
+//        int generatedStatementsSize = generatedOntology.getRelationshipStatements().size();
+//        LOG.info("Total number of generated statements: " + generatedStatementsSize);
+//        int originalStatementsSize = originalOntology.getRelationshipStatements().size();
+//        LOG.info("Total number of original statements: " + originalStatementsSize);
 
         LOG.info("Comparing the inputs");
         
