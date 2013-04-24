@@ -8,9 +8,10 @@
 <title>Concept <c:out value="${id}"/>not found</title>
 <script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+<link rel="stylesheet" href="/css/styles.css?v=1.0">
 </head>
-<body>
-    <div style="position: relative; top: 710px; text-align: center; position: relative; font-weight: normal; font-size: 2.5em; text-align: center; font-family : 'museo-sans-1','museo-sans-2', Georgia, Verdana, 'Bitstream Vera Sans', 'DejaVu Sans', Tahoma, Geneva, Arial, Sans-serif;">Concept <c:out value="${id}"/> was not found</div>
-    <img style="width: 1400px; margin-left: auto; margin-right: auto; display: block;" src="/img/404.jpg"/>
+<body id="notfound">
+    <img src="/img/404.png"/>
+    <h1>Concept <span class="id"><c:out value="${id}"/></span> not found!</h1>
 </body>
 </html>

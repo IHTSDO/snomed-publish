@@ -199,3 +199,25 @@ a.tooltip span
     -webkit-box-shadow: 5px 5px 8px #CCC;
     box-shadow: 5px 5px 8px #CCC;
 }
+
+body#notfound{
+    padding: 0;
+    margin: 0;
+}
+body#notfound img{
+    width: 100%;
+}
+body#notfound h1{
+    bottom: 60px;
+    float: none;
+    height: 0;
+    margin-left: 15px;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    font-size: 2em;
+}
+body#notfound span{
+    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+    font-weight: bold;
+}
