@@ -81,10 +81,10 @@ function changeOntology(value) {
     <h3 class="triples">Object of</h3>  
     <table class="triples">
       <tr>
-        <th>Statement</th>
-        <th>Subject</th>
-        <th>Role</th>
-        <th></th>
+        <th class="statement">Statement</th>
+        <th class="concept left">Subject</th>
+        <th class="concept right">Role</th>
+        <th class="group"></th>
       </tr>
       <c:set var="lastGroup" value="-1"/>
       <c:forEach var="r" items="${objectOf}">

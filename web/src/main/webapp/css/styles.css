@@ -63,7 +63,7 @@ table{
 table th{
     font-weight: normal;
     text-align: left;
-    padding-bottom: 0.5em;
+    padding: 0 0 0.5em 0.2em;
 }
 table td{
     vertical-align: top;
