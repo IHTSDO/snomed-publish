@@ -52,7 +52,7 @@ You will then see this output:
     -c, --concepts  File containing all the concepts referenced in the relationships file, aka 'Concepts_Core'
     -o, --output    Destination file to write the canonical output results to
     -d, --database  Optional. Specify location of database file. If not specified, 
-                    defaults to an in-memory database (minium 2Gb of heap space required)
+                    defaults to an in-memory database (minimum 3Gb of heap space required)
     -s, --show      Optional. Show reasoning details for concept(s). 
                     Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
 
