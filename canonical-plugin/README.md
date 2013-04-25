@@ -1,70 +1,88 @@
 IHTSDO Snomed Publication Tools
 ===============================
 
-Canonical Form
---------------
+Canonical Form Maven Mojo Plugin
+--------------------------------
 
-This program takes as an input 2 text files:
+This plugin project is a wrapper for the [Canonical library](/canonical/README.md), and makes it available as a [Maven Plugin](http://maven.apache.org/guides/mini/guide-configuring-plugins.html).
 
-1. Set of concepts of this form:
+The goal for this plugin is called 'generate-canonical'
+
+The configuration for this plugin looks like this:
+
+    <configuration>
+        <conceptFile>/path/to/file</conceptfile>
+        <relationshipFile>/path/to/file</relationshipfile>
+        <outputFile>/path/to/file</outputfile>
+        <databaseLocation>/path/to/file</databaseLocation> <!-- optional -->
+        <show>conceptid(s)</show> <!-- optional -->
+    </configuration>
+
+Here is a description of these parameters
+
+    relationshipFile   File containing all the relationships that you want to process, aka 'Relationships_Core'
+    conceptFile        File containing all the concepts referenced in the relationships file, aka 'Concepts_Core'
+    outputFile         Destination file to write the canonical output results to
+    databaseLocation   Optional. Specify location of database file. If not specified, 
+                       defaults to an in-memory database (minium 2Gb of heap space required)
+    show               Optional. Show reasoning details for concept(s). 
+                       Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
+
+
+So this program takes as an input 2 text files:
+
+1. Set of concepts of this form ('conceptFile'):
 
         CONCEPTID  CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
         280844000	0	Entire body of seventh thoracic vertebra (body structure)	Xa1Y9	T-11875	1
         280845004	0	Entire body of eighth thoracic vertebra (body structure)	Xa1YA	T-11876	1
         etc.
 
-2. Set of relationships of this form:
+2. Set of relationships of this form ('relationshipFile'):
 
         RELATIONSHIPID  CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP
         100000028	280844000	116680003	71737002	0	0	0
         100001029	280845004	116680003	280737002	0	0	0
         etc.
     
-and produces an output file called 'canonical form' of this form:
+and produces an output file called 'canonical form' of this form ('outputFile'):
 
     CONCEPTID1  RELATIONSHIPTYPE	CONCEPTID2	RELATIONSHIPGROUP
     280844000	116680003	71737002	0
     280845004	116680003	280737002	0
 
-The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF].
+The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm).
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
-3Gb of heap space ('-Xmx3000m').
+3Gb of heap space (export MAVEN_OPTS="$MAVEN_OPTS -Xmx3000m").
 
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
 To build the distribution, enter the root project directory (on up from this folder) and type:
 
-    mvn clean package
+    mvn clean package install
     
-The distribution jar file can be found at canonical/target/canonical.jar after this. No other file is required in order to run the program,
-and can be distributed as this single file.
+The distribution jar file can be found at canonical-plugin/target/canonical-plugin.jar after this, and will be installed in your maven repo. No other file is required in order to run the program, and can be distributed as this single file.
 
-For help on how to run the program, type:
+For example, to launch with an in-memory database, make sure MAVEN_OPTS contains '-Xmx3000m', and use this configuration:
 
-    java -jar canonical.jar -h
-    
-You will then see this output:
-
-    -h, --help      Print this help menu
-    -t. --triples   File containing all the relationships that you want to process, aka 'Relationships_Core'
-    -c, --concepts  File containing all the concepts referenced in the relationships file, aka 'Concepts_Core'
-    -o, --output    Destination file to write the canonical output results to
-    -d, --database  Optional. Specify location of database file. If not specified, 
-                    defaults to an in-memory database (minium 2Gb of heap space required)
-    -s, --show      Optional. Show reasoning details for concept(s). 
-                    Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
-
-For example, to launch with an in-memory database, use this command:
-
-    java -Xmx3000m -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt
+    <configuration>
+        <conceptFile>concepts.input.file.txt</conceptfile>
+        <relationshipFile>relationships.input.file.txt</relationshipfile>
+        <outputFile>canonical.out.txt</outputfile>
+    </configuration>
 
 Don't forget the '-Xmx=3000m' option, or the program will not complete. 
 
-Or, to launch with a disk backed database, you can use this command, requiring only a minimum amount of heap space:
+Or, to launch with a disk backed database, you can use this command, requiring only a minimum amount of heap space (and no 'MAVEN_OPTS=-Xmx...' parameter):
 
-    java -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt -d /tmp/canonical.tmp.db
+    <configuration>
+        <conceptFile>concepts.input.file.txt</conceptfile>
+        <relationshipFile>relationships.input.file.txt</relationshipfile>
+        <outputFile>canonical.out.txt</outputfile>
+        <databaseLocation>/tmp/canonical.tmp.db</databaseLocation>
+    </configuration>
     
 The output from the console will look something like this:
 
@@ -94,7 +112,12 @@ and the results would be stored in canonical.out.txt, as specified above.
 For determining the reasoning for why particular concept(s) exists in the canonical output, the program has an optional
 switch to display the reasoning behind that concept's inclusion/exclusion. By specifying
     
-    -s {conceptid1, conceptid2, etc.}
+    <configuration>
+        <conceptFile>concepts.input.file.txt</conceptfile>
+        <relationshipFile>relationships.input.file.txt</relationshipfile>
+        <outputFile>canonical.out.txt</outputfile>
+        <show>{conceptid1, conceptid2, etc.}</show>
+    </configuration>
   
 the program will print detailed reasoning information like this
 
@@ -145,7 +168,7 @@ the program will print detailed reasoning information like this
 
 Please note that there exists also a 'nuclear' option of where you can specify
 
-    -s all
+    <show>all</show>
     
 **WARNING!** This option will print detailed reasoning information for each and every concept/triple in the inputs, 
 and dump about 8Gb (!) of text to your console. Please use carefully.
