@@ -26,7 +26,7 @@ and produces an output file called 'canonical form' of this form:
     280844000	116680003	71737002	0
     280845004	116680003	280737002	0
 
-The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF].
+The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm)
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
