@@ -16,6 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
+@XmlRootElement
 @Entity
 public class Concept {
     private static final String ATTRIBUTE = "attribute";
@@ -30,9 +33,11 @@ public class Concept {
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
     
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
+    
+    @XmlTransient
     private static Concept kindOfPredicate;
     
-    @Transient private Set<Concept> cache;
+    @XmlTransient @Transient private Set<Concept> cache;
     
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
@@ -47,19 +52,24 @@ public class Concept {
     private boolean primitive;
     private String type;
     
+    @XmlTransient
     @OneToOne
     private Ontology ontology;
 
+    @XmlTransient
     @OneToMany(mappedBy="subject")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<RelationshipStatement> subjectOfRelationshipStatements = new HashSet<RelationshipStatement>();
 
+    @XmlTransient
     @OneToMany(mappedBy="object")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<RelationshipStatement> objectOfRelationshipStatements = new HashSet<RelationshipStatement>();    
     
+    @XmlTransient
     @OneToMany(mappedBy="predicate")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<RelationshipStatement> predicateOfRelationshipStatements = new HashSet<RelationshipStatement>();
     
     
+    @XmlTransient
     @ManyToMany//(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinTable(name = "KIND_OF", 
         joinColumns = @JoinColumn(name="child_id"),
@@ -68,6 +78,7 @@ public class Concept {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> kindOfs = new HashSet<Concept>();
 
+    @XmlTransient
     @ManyToMany(mappedBy="kindOfs")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Concept> parentOf = new HashSet<Concept>();
     

@@ -56,18 +56,6 @@ public class MainController {
         }
     };
     
-//    private Ordering<RelationshipStatement> byGroupAndObjectFsn = new Ordering<RelationshipStatement>() {
-//        @Override
-//        public int compare(RelationshipStatement r1, RelationshipStatement r2) {
-//            if (r1.getGroup() == r2.getGroup()){
-//                return r1.getObject().getFullySpecifiedName().compareTo(r2.getObject().getFullySpecifiedName());
-//            }
-//            else{
-//                return Ints.compare(r1.getGroup(), r2.getGroup());
-//            }
-//        }
-//    };   
-    
     private Ordering<RelationshipStatement> byGroupAndPredicateFsn = new Ordering<RelationshipStatement>() {
         @Override
         public int compare(RelationshipStatement r1, RelationshipStatement r2) {
@@ -86,77 +74,98 @@ public class MainController {
         response.sendRedirect("ontology/1/concept/138875005");
     }
     
+//    
+//    @Transactional
+//    @RequestMapping(value = "/ontology/{ontologyId}/concept/{serialisedId}/json", 
+//            method = RequestMethod.GET, 
+//            produces=MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    public Concept getConceptJson(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
+//        System.out.println("JSON!!");
+//        Concept c = getConcept(ontologyId, serialisedId);
+//        return c;
+//    }
+//    
+//    @Transactional
+//    @RequestMapping(value = "/ontology/{ontologyId}/concept/{serialisedId}/xml", 
+//            method = RequestMethod.GET, 
+//            produces=MediaType.APPLICATION_XML_VALUE)
+//    @ResponseBody
+//    public Concept getConceptXml(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
+//        System.out.println("XML!!");
+//        Concept c = getConcept(ontologyId, serialisedId);
+//        return c;
+//    }    
+//    
     @Transactional
     @RequestMapping(value="/ontology/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
-    public String conceptDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
+    public ModelAndView conceptDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
             HttpServletRequest request) throws ConceptNotFoundException
-    {        
-       
-        Concept c;
-        try {
-            c = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
-        } catch (NoResultException e) {
-            throw new ConceptNotFoundException(serialisedId, "o1");
-        }
-        
-        List<Ontology> ontologies = em.createQuery("SELECT o from Ontology o", Ontology.class).getResultList();
-        
-        model.addAttribute("servletPath", request.getServletPath());
-        model.addAttribute("concept", c);
-        model.addAttribute("ontologies", ontologies);
-        model.addAttribute("ontologyId", ontologyId);
-        model.addAttribute("fullySpecifiedName", c.getFullySpecifiedName().toLowerCase().substring(0, 1).toUpperCase() + c.getFullySpecifiedName().toLowerCase().substring(1));
-        model.addAttribute("type", ((c.getType() == null) || c.getType().isEmpty()) ? "Type not specified" : c.getType().toLowerCase().substring(0, 1).toUpperCase() + c.getType().toLowerCase().substring(1));
-        
-        if (subjectOfCache.get(c.getId()) == null){
-            List<RelationshipStatement> subjectOf = new ArrayList<RelationshipStatement>();
-            for (RelationshipStatement r : c.getSubjectOfRelationshipStatements()){
-                if (!r.isKindOfRelationship()){
-                    subjectOf.add(r);
-                }
-            }
-            Collections.sort(subjectOf, byGroupAndPredicateFsn.nullsLast());
-            subjectOfCache.put(c.getId(), subjectOf);
-        }
-        
-        if (objectOfCache.get(c.getId()) == null){
-            List<RelationshipStatement> objectOf = new ArrayList<RelationshipStatement>();
-            for (RelationshipStatement r : c.getObjectOfRelationshipStatements()){
-                if (!r.isKindOfRelationship()){
-                    objectOf.add(r);
-                }
-            }
-            Collections.sort(objectOf, byGroupAndSubjectFsn.nullsLast());
-            objectOfCache.put(c.getId(), objectOf);
-        }
-        
-        if (predicateOfCache.get(c.getId()) == null){
-            List<RelationshipStatement> predicateOf = new ArrayList<RelationshipStatement>();
-            for (RelationshipStatement r : c.getPredicateOfRelationshipStatements()){
-                if (!r.isKindOfRelationship()){
-                    predicateOf.add(r);
-                }
-            }
-            Collections.sort(predicateOf, byGroupAndSubjectFsn.nullsLast());
-            predicateOfCache.put(c.getId(), predicateOf);
-        }        
-        
+    {            
+        Concept c = getConcept(ontologyId, serialisedId);
+
         model.addAttribute("objectOf", objectOfCache.get(c.getId()));
         model.addAttribute("predicateOf", predicateOfCache.get(c.getId()));
         model.addAttribute("subjectOf", subjectOfCache.get(c.getId()));
-        
-//        model.addAttribute("predicateOf", c.getPredicateOfRelationshipStatements());
-//        model.addAttribute("subjectOf", c.getSubjectOfRelationshipStatements());
-//        model.addAttribute("objectOf", c.getObjectOfRelationshipStatements());
-        
+        model.addAttribute("servletPath", request.getServletPath());
+        model.addAttribute("concept", c);
+        model.addAttribute("ontologies", em.createQuery("SELECT o from Ontology o", Ontology.class).getResultList());
+        model.addAttribute("ontologyId", ontologyId);
+        model.addAttribute("fullySpecifiedName", c.getFullySpecifiedName().toLowerCase().substring(0, 1).toUpperCase() + c.getFullySpecifiedName().toLowerCase().substring(1));
+        model.addAttribute("type", ((c.getType() == null) || c.getType().isEmpty()) ? "Type not specified" : c.getType().toLowerCase().substring(0, 1).toUpperCase() + c.getType().toLowerCase().substring(1));
+
         LOG.debug("Concept: " + c);
         LOG.debug("subjectOf: " + subjectOfCache.get(c.getId()).size());
         LOG.debug("predicateOf: " + c.getPredicateOfRelationshipStatements().size());
         LOG.debug("objectOf: " + objectOfCache.get(c.getId()).size());
         LOG.debug("kindOf: " + c.getKindOfs().size());
         
-        return "concept";
+        return new ModelAndView("concept");
  
+    }
+
+    private Concept getConcept(long ontologyId, long serialisedId) throws ConceptNotFoundException {
+        try {
+            Concept c = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
+
+            if (subjectOfCache.get(c.getId()) == null){
+                List<RelationshipStatement> subjectOf = new ArrayList<RelationshipStatement>();
+                for (RelationshipStatement r : c.getSubjectOfRelationshipStatements()){
+                    if (!r.isKindOfRelationship()){
+                        subjectOf.add(r);
+                    }
+                }
+                Collections.sort(subjectOf, byGroupAndPredicateFsn.nullsLast());
+                subjectOfCache.put(c.getId(), subjectOf);
+            }
+            
+            if (objectOfCache.get(c.getId()) == null){
+                List<RelationshipStatement> objectOf = new ArrayList<RelationshipStatement>();
+                for (RelationshipStatement r : c.getObjectOfRelationshipStatements()){
+                    if (!r.isKindOfRelationship()){
+                        objectOf.add(r);
+                    }
+                }
+                Collections.sort(objectOf, byGroupAndSubjectFsn.nullsLast());
+                objectOfCache.put(c.getId(), objectOf);
+            }
+            
+            if (predicateOfCache.get(c.getId()) == null){
+                List<RelationshipStatement> predicateOf = new ArrayList<RelationshipStatement>();
+                for (RelationshipStatement r : c.getPredicateOfRelationshipStatements()){
+                    if (!r.isKindOfRelationship()){
+                        predicateOf.add(r);
+                    }
+                }
+                Collections.sort(predicateOf, byGroupAndSubjectFsn.nullsLast());
+                predicateOfCache.put(c.getId(), predicateOf);
+            }
+            
+            return c;
+            
+        } catch (NoResultException e) {
+            throw new ConceptNotFoundException(serialisedId, "o1");
+        }
     }
     
     @ExceptionHandler(ConceptNotFoundException.class)

@@ -20,12 +20,45 @@
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
 
-    <context:component-scan base-package="com.ihtsdo.snomed" />
     <import resource="hibernate-context.xml" />
-    
+    <mvc:annotation-driven/>
+    <context:component-scan base-package="com.ihtsdo.snomed" />
     <jpa:repositories base-package="com.ihtsdo.snomed.canonical.model" />
     
-<!--     <context:property-placeholder location="classpath:browse.properties" -->
-<!--         system-properties-mode="OVERRIDE" ignore-unresolvable="false" /> -->
+    <!-- ****************** -->
+    <!-- JAXB and JACKSON   -->
+    <!-- ****************** -->
+    <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="packagesToScan">
+            <list>
+                <value>com.ihtsdo.snomed.canonical.model.*</value>
+            </list>
+        </property>
+    </bean>
+<!--     <bean id="jaxbAnnotationInspector" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector" /> -->
+<!--     <bean id="jaxbJacksonObjectMapper" class="com.deluxemediatechnologies.insight.util.JaxbJacksonObjectMapper"> -->
+<!--         <property name="annotationIntrospector" ref="jaxbAnnotationInspector" /> -->
+<!--     </bean> -->
+    
+    <!-- ******************** -->
+    <!--  MESSAGE CONVERTERS  -->
+    <!-- ******************** -->
+    <bean id="jsonObjectMapperConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+<!--         <property name="objectMapper" ref="jaxbJacksonObjectMapper" /> -->
+        <property name="supportedMediaTypes">
+            <list>
+                <bean class="org.springframework.http.MediaType">
+                    <constructor-arg index="0" value="application" />
+                    <constructor-arg index="1" value="json" />
+                    <constructor-arg index="2" value="UTF-8" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <bean id="marshallingXmlHttpMessageConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+        <property name="marshaller" ref="jaxb2Marshaller" />
+        <property name="unmarshaller" ref="jaxb2Marshaller" />
+        <property name="supportedMediaTypes" value="application/xml"/>
+    </bean>    
 
 </beans>
