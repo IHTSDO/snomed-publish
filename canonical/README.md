@@ -6,7 +6,7 @@ Canonical Form Library
 
 This library provides an API for creating the canonical form of an ontology.
 
-The API has a single method in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/canonical/CanonicalAlgorithm.java) with this signature:
+The API has a single method in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/snomed/canonical/CanonicalAlgorithm.java) with this signature:
 
     public Set<RelationshipStatement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds)
 
