@@ -175,4 +175,11 @@ public class MainController {
         modelAndView.addObject("ontology", exception.getOntologyName());
         return modelAndView;
     }
+    
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleErrors(Exception exception){
+        ModelAndView modelAndView = new ModelAndView("error");
+        modelAndView.addObject("message", exception.getMessage());
+        return modelAndView;
+    }    
 }
