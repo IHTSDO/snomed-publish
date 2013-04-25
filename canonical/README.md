@@ -1,8 +1,13 @@
 IHTSDO Snomed Publication Tools
 ===============================
 
-Canonical Form
---------------
+Canonical Form Library
+----------------------
+
+This library provides an API for creating the canonical form of an ontology.
+
+The API has a single method in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/canonical/CanonicalAlgorithm.java) with this signature
+
 
 This program takes as an input 2 text files:
 
