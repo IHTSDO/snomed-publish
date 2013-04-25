@@ -70,7 +70,7 @@ public class CliParser {
                     "-t. --triples\t\tFile containing all the relationships that you want to process, aka 'Relationships_Core'\n" +
                     "-c, --concepts\t\tFile containing all the concepts referenced in the relationships file, aka 'Concepts_Core'\n" +
                     "-o, --output\t\tDestination file to write the canonical output results to\n" +
-                    "-d, --database\t\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database (minium 2Gb of heap space required)\n" + 
+                    "-d, --database\t\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database (minimum 3Gb of heap space required)\n" + 
                     "-s, --show\t\tOptional. Show reasoning details for concept(s). \n\t\t\tEither 'all' or a set of concept ids like '{c1id,c2id,etc.}'");
                     
             System.exit(0);
