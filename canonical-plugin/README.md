@@ -4,7 +4,7 @@ IHTSDO Snomed Publication Tools
 Canonical Form Maven Mojo Plugin
 --------------------------------
 
-This plugin project is a wrapper for the [Canonical library](/canonical/README.md), and makes it available as a [Maven Plugin](http://maven.apache.org/guides/mini/guide-configuring-plugins.html).
+This plugin project is a wrapper for the [Canonical library](/canonical), and makes it available as a [Maven Plugin](http://maven.apache.org/guides/mini/guide-configuring-plugins.html).
 
 The goal for this plugin is called 'generate-canonical'
 
