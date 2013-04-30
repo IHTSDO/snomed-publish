@@ -8,7 +8,7 @@
     </parent>
     <artifactId>canonical-main</artifactId>
     <packaging>jar</packaging>
-    <name>canonical-main</name>
+    <name>canonical</name>
     <description>Main method for canonical algorithm</description>
     <build>
         <plugins>
@@ -34,7 +34,7 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>canonical-main</finalName>
+        <finalName>canonical</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>        
     </build>
     <dependencies>

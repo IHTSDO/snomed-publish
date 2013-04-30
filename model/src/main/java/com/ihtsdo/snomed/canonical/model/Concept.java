@@ -1,7 +1,9 @@
 
 package com.ihtsdo.snomed.canonical.model;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -29,48 +31,36 @@ import com.google.common.primitives.Longs;
 @Entity
 public class Concept {
     private static final String ATTRIBUTE = "attribute";
-
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
-    
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
     
-    @XmlTransient
-    private static Concept kindOfPredicate;
-    
     @XmlTransient @Transient private Set<Concept> cache;
-    
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private long id;
+    @XmlTransient @Transient private Map<Integer, Group> subjectOfStatementGrouping = new HashMap<Integer, Group>();
+
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private long id;
+    @XmlTransient private static Concept kindOfPredicate;    
 
     private long serialisedId;
     private int status;
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
-    
-    @Column(columnDefinition = "BIT", length = 1)
-    private boolean primitive;
     private String type;
     
-    @XmlTransient
-    @OneToOne
-    private Ontology ontology;
+    @Column(columnDefinition = "BIT", length = 1) private boolean primitive;
+    @XmlTransient @OneToOne private Ontology ontology;
+
+    @XmlTransient @OneToMany(mappedBy="subject") 
+    private Set<Statement> subjectOfStatements = new HashSet<Statement>();
+
+    @XmlTransient @OneToMany(mappedBy="object")
+    private Set<Statement> objectOStatements = new HashSet<Statement>();    
+    
+    @XmlTransient @OneToMany(mappedBy="predicate")
+    private Set<Statement> predicateOfStatements = new HashSet<Statement>();
 
     @XmlTransient
-    @OneToMany(mappedBy="subject")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<RelationshipStatement> subjectOfRelationshipStatements = new HashSet<RelationshipStatement>();
-
-    @XmlTransient
-    @OneToMany(mappedBy="object")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<RelationshipStatement> objectOfRelationshipStatements = new HashSet<RelationshipStatement>();    
-    
-    @XmlTransient
-    @OneToMany(mappedBy="predicate")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<RelationshipStatement> predicateOfRelationshipStatements = new HashSet<RelationshipStatement>();
-    
-    
-    @XmlTransient
-    @ManyToMany//(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @ManyToMany
     @JoinTable(name = "KIND_OF", 
         joinColumns = @JoinColumn(name="child_id"),
         inverseJoinColumns = @JoinColumn(name="parent_id"),
@@ -78,11 +68,11 @@ public class Concept {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> kindOfs = new HashSet<Concept>();
 
-    @XmlTransient
-    @ManyToMany(mappedBy="kindOfs")//, cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @XmlTransient @ManyToMany(mappedBy="kindOfs")
     private Set<Concept> parentOf = new HashSet<Concept>();
     
     public Concept(){}
+    
     public Concept(long serialisedId){
         this.serialisedId = serialisedId;
         if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
@@ -116,16 +106,8 @@ public class Concept {
         }   
         return cache;
     }
-    
-    public boolean isLeaf(){
-        return getParentOf().isEmpty();
-    }
 
     public boolean isKindOfPredicate(){
-        return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
-    }
-    
-    public static boolean isKindOfPredicateSerialisedId(long serialisedId){
         return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
     }
     
@@ -173,6 +155,37 @@ public class Concept {
         }
         return false;
     }
+    
+    public void addSubjectOfStatement(Statement statement){
+        subjectOfStatements.add(statement);
+        populateGroup(statement);
+    }
+    
+    public Group getGroup(Statement statement){
+        Group group = subjectOfStatementGrouping.get(statement.getGroup());
+        if (group == null){
+            group = populateGroup(statement);    
+        }
+        return group;
+    }
+
+    private Group populateGroup(Statement statement) {
+        Group group = subjectOfStatementGrouping.get(statement.getGroup());
+        if (group == null) {
+            group = new Group(statement); 
+            subjectOfStatementGrouping.put(statement.getGroup(), group);
+        }else{
+            group.addStatement(statement);
+        }
+        return group;
+    }
+    
+    public void setSerialisedId(long serialisedId) {
+        this.serialisedId = serialisedId;
+        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
+            kindOfPredicate = this;
+        }
+    }    
 
     /*
      * Generated Getters and Setters
@@ -214,19 +227,15 @@ public class Concept {
     public void setPrimitive(boolean primitive) {
         this.primitive = primitive;
     }
-
     public Set<Concept> getKindOfs() {
         return kindOfs;
     }
-    
     public void setKindOfs(Set<Concept> kindOfs) {
         this.kindOfs = kindOfs;
     }
-    
     public Set<Concept> getParentOf() {
         return parentOf;
     }
-
     public void setParentOf(Set<Concept> parentOf) {
         this.parentOf = parentOf;
     }
@@ -236,23 +245,20 @@ public class Concept {
     public void addParentOf(Concept concept){
         this.parentOf.add(concept);
     }
-    public void addSubjectOfRelationshipStatement(RelationshipStatement relationshipStatement){
-        subjectOfRelationshipStatements.add(relationshipStatement);
+    public Set<Statement> getSubjectOfRelationshipStatements(){
+        return subjectOfStatements;
     }
-    public Set<RelationshipStatement> getSubjectOfRelationshipStatements(){
-        return subjectOfRelationshipStatements;
+    public void addPredicateOfStatement(Statement statement){
+        predicateOfStatements.add(statement);
     }
-    public void addPredicateOfRelationshipStatement(RelationshipStatement relationshipStatement){
-        predicateOfRelationshipStatements.add(relationshipStatement);
+    public Set<Statement> getPredicateOfRelationshipStatements(){
+        return predicateOfStatements;
     }
-    public Set<RelationshipStatement> getPredicateOfRelationshipStatements(){
-        return predicateOfRelationshipStatements;
+    public void addObjectOfStatement(Statement statement){
+        objectOStatements.add(statement);
     }
-    public void addObjectOfRelationshipStatement(RelationshipStatement relationshipStatement){
-        objectOfRelationshipStatements.add(relationshipStatement);
-    }
-    public Set<RelationshipStatement> getObjectOfRelationshipStatements(){
-        return objectOfRelationshipStatements;
+    public Set<Statement> getObjectOfRelationshipStatements(){
+        return objectOStatements;
     }
     public Ontology getOntology() {
         return ontology;
@@ -269,11 +275,4 @@ public class Concept {
     public long getSerialisedId() {
         return serialisedId;
     }
-    public void setSerialisedId(long serialisedId) {
-        this.serialisedId = serialisedId;
-        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
-            kindOfPredicate = this;
-        }
-    }
-    
 }

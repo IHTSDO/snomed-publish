@@ -1,7 +1,7 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
     <persistence-unit name="hibernatePersistenceUnit" transaction-type="RESOURCE_LOCAL">
         <class>com.ihtsdo.snomed.canonical.model.Concept</class>
-        <class>com.ihtsdo.snomed.canonical.model.RelationshipStatement</class>
+        <class>com.ihtsdo.snomed.canonical.model.Statement</class>
         <class>com.ihtsdo.snomed.canonical.model.Ontology</class>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="validate" />

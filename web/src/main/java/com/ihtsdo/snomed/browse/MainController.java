@@ -29,7 +29,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Ints;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 
 @Controller
 @RequestMapping("/")
@@ -39,14 +39,14 @@ public class MainController {
     @PersistenceContext(type=PersistenceContextType.EXTENDED)
     EntityManager em;
     
-    private Map<Long, List<RelationshipStatement>> subjectOfCache = new HashMap<Long, List<RelationshipStatement>>();
-    private Map<Long, List<RelationshipStatement>> objectOfCache = new HashMap<Long, List<RelationshipStatement>>();
-    private Map<Long, List<RelationshipStatement>> predicateOfCache = new HashMap<Long, List<RelationshipStatement>>();
+    private Map<Long, List<Statement>> subjectOfCache = new HashMap<Long, List<Statement>>();
+    private Map<Long, List<Statement>> objectOfCache = new HashMap<Long, List<Statement>>();
+    private Map<Long, List<Statement>> predicateOfCache = new HashMap<Long, List<Statement>>();
 
     
-    private Ordering<RelationshipStatement> byGroupAndSubjectFsn = new Ordering<RelationshipStatement>() {
+    private Ordering<Statement> byGroupAndSubjectFsn = new Ordering<Statement>() {
         @Override
-        public int compare(RelationshipStatement r1, RelationshipStatement r2) {
+        public int compare(Statement r1, Statement r2) {
             if (r1.getGroup() == r2.getGroup()){
                 return r1.getSubject().getFullySpecifiedName().compareTo(r2.getSubject().getFullySpecifiedName());
             }
@@ -56,9 +56,9 @@ public class MainController {
         }
     };
     
-    private Ordering<RelationshipStatement> byGroupAndPredicateFsn = new Ordering<RelationshipStatement>() {
+    private Ordering<Statement> byGroupAndPredicateFsn = new Ordering<Statement>() {
         @Override
-        public int compare(RelationshipStatement r1, RelationshipStatement r2) {
+        public int compare(Statement r1, Statement r2) {
             if (r1.getGroup() == r2.getGroup()){
                 return r1.getPredicate().getFullySpecifiedName().compareTo(r2.getPredicate().getFullySpecifiedName());
             }
@@ -129,8 +129,8 @@ public class MainController {
             Concept c = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
 
             if (subjectOfCache.get(c.getId()) == null){
-                List<RelationshipStatement> subjectOf = new ArrayList<RelationshipStatement>();
-                for (RelationshipStatement r : c.getSubjectOfRelationshipStatements()){
+                List<Statement> subjectOf = new ArrayList<Statement>();
+                for (Statement r : c.getSubjectOfRelationshipStatements()){
                     if (!r.isKindOfRelationship()){
                         subjectOf.add(r);
                     }
@@ -140,8 +140,8 @@ public class MainController {
             }
             
             if (objectOfCache.get(c.getId()) == null){
-                List<RelationshipStatement> objectOf = new ArrayList<RelationshipStatement>();
-                for (RelationshipStatement r : c.getObjectOfRelationshipStatements()){
+                List<Statement> objectOf = new ArrayList<Statement>();
+                for (Statement r : c.getObjectOfRelationshipStatements()){
                     if (!r.isKindOfRelationship()){
                         objectOf.add(r);
                     }
@@ -151,8 +151,8 @@ public class MainController {
             }
             
             if (predicateOfCache.get(c.getId()) == null){
-                List<RelationshipStatement> predicateOf = new ArrayList<RelationshipStatement>();
-                for (RelationshipStatement r : c.getPredicateOfRelationshipStatements()){
+                List<Statement> predicateOf = new ArrayList<Statement>();
+                for (Statement r : c.getPredicateOfRelationshipStatements()){
                     if (!r.isKindOfRelationship()){
                         predicateOf.add(r);
                     }

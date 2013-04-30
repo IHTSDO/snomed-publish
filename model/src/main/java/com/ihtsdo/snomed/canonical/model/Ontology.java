@@ -19,7 +19,7 @@ public class Ontology {
     private String name;
 
     @OneToMany(mappedBy="ontology")
-    private Set<RelationshipStatement> relationshipStatements;
+    private Set<Statement> statements;
 
     @OneToMany(mappedBy="ontology")
     private Set<Concept> concepts;
@@ -34,7 +34,7 @@ public class Ontology {
                 toString();
     }
 
-    public void addRelationshipStatement(RelationshipStatement r){
+    public void addRelationshipStatement(Statement r){
         getRelationshipStatements().add(r);
     }
 
@@ -58,12 +58,12 @@ public class Ontology {
         this.name = name;
     }
 
-    public Set<RelationshipStatement> getRelationshipStatements() {
-        return relationshipStatements;
+    public Set<Statement> getRelationshipStatements() {
+        return statements;
     }
 
-    public void setRelationshipStatements(Set<RelationshipStatement> relationshipStatements) {
-        this.relationshipStatements = relationshipStatements;
+    public void setRelationshipStatements(Set<Statement> statements) {
+        this.statements = statements;
     }
 
     public Set<Concept> getConcepts() {

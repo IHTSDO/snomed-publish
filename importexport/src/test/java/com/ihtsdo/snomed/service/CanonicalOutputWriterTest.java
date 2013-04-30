@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 import com.ihtsdo.snomed.service.CanonicalOutputWriter;
 
 public class CanonicalOutputWriterTest {
@@ -23,7 +23,7 @@ public class CanonicalOutputWriterTest {
             "100523006\t116680003\t100523007\t0\r\n" +
             "100523008\t116680004\t100523009\t1";
     
-    private Collection<RelationshipStatement> statements = new HashSet<RelationshipStatement>();
+    private Collection<Statement> statements = new HashSet<Statement>();
     private CanonicalOutputWriter writer = new CanonicalOutputWriter();
     
     @Before
@@ -36,8 +36,8 @@ public class CanonicalOutputWriterTest {
         Concept cp1 = new Concept(116680003l);
         Concept cp2 = new Concept(116680004l);
 
-        RelationshipStatement r1 = new RelationshipStatement(0, c1, cp1, c2, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        RelationshipStatement r2 = new RelationshipStatement(1, c3, cp2, c4, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        Statement r1 = new Statement(0, c1, cp1, c2, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        Statement r2 = new Statement(1, c3, cp2, c4, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
 
         statements.add(r1);
         statements.add(r2);

@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <!doctype html>
-<%@page import="com.ihtsdo.snomed.canonical.model.RelationshipStatement"%>
+<%@page import="com.ihtsdo.snomed.canonical.model.Statement"%>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">

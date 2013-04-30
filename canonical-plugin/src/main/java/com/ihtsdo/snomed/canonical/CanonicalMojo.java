@@ -29,7 +29,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 import com.ihtsdo.snomed.service.CanonicalOutputWriter;
 import com.ihtsdo.snomed.service.HibernateDbImporter;
 
@@ -105,8 +105,8 @@ public class CanonicalMojo extends AbstractMojo{
         getLog().info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");        
     }
     
-    private Set<RelationshipStatement> runAlgorithm(String show, List<Concept> concepts) {
-        Set<RelationshipStatement> resultStatements = null;
+    private Set<Statement> runAlgorithm(String show, List<Concept> concepts) {
+        Set<Statement> resultStatements = null;
         if (show == null){
             resultStatements = algorithm.runAlgorithm(concepts, false, null);
         }
@@ -127,7 +127,7 @@ public class CanonicalMojo extends AbstractMojo{
         return resultSet;
     }    
     
-    private void writeOut(String outputFile, Set<RelationshipStatement> statements) throws IOException {
+    private void writeOut(String outputFile, Set<Statement> statements) throws IOException {
         getLog().info("Writing results to " + outputFile);
 
         File outFile = new File(outputFile);

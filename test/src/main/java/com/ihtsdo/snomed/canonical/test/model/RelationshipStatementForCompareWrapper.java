@@ -1,20 +1,20 @@
 package com.ihtsdo.snomed.canonical.test.model;
 
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 
 
 public class RelationshipStatementForCompareWrapper {
     
-    private RelationshipStatement relationshipStatement;
+    private Statement statement;
     
     int hashCode;
     
-    public RelationshipStatementForCompareWrapper(RelationshipStatement relationshipStatement) {
-        this.relationshipStatement = relationshipStatement;
-//        int x = (int)relationshipStatement.getSubject().getId();
-//        int y = (int)relationshipStatement.getRelationshipType();
-//        int z = (int)relationshipStatement.getObject().getId();
+    public RelationshipStatementForCompareWrapper(Statement statement) {
+        this.statement = statement;
+//        int x = (int)statement.getSubject().getId();
+//        int y = (int)statement.getRelationshipType();
+//        int z = (int)statement.getObject().getId();
 //        int result = (int) (x ^ (x >>> 32));
 //        result = 31 * result + (int) (y ^ (y >>> 32));
 //        result = 31 * result + (int) (z ^ (z >>> 32));
@@ -28,9 +28,9 @@ public class RelationshipStatementForCompareWrapper {
 //    public int hashCode(){
 //        HashFunction hf = Hashing.goodFastHash(3);
 //        HashCode hc = hf.newHasher()
-//               .putLong(relationshipStatement.getSubject().getId())
-//               .putLong(relationshipStatement.getRelationshipType())
-//               .putLong(relationshipStatement.getObject().getId())
+//               .putLong(statement.getSubject().getId())
+//               .putLong(statement.getRelationshipType())
+//               .putLong(statement.getObject().getId())
 //               .hash();
 //        //System.out.println("HASH");
 //        
@@ -57,11 +57,11 @@ public class RelationshipStatementForCompareWrapper {
     }
     
     public String toString(){
-        return "Wrapped: " + relationshipStatement.toString();
+        return "Wrapped: " + statement.toString();
     }
     
-    public RelationshipStatement getRelationshipStatement(){
-        return relationshipStatement;
+    public Statement getRelationshipStatement(){
+        return statement;
     }
 
 }

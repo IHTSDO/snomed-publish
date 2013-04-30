@@ -30,7 +30,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+
 
 public class HibernateDbImporter {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDbImporter.class );
@@ -181,7 +181,7 @@ public class HibernateDbImporter {
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristic_type, refinability, relationship_group, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristic_type, refinability, relationship_group, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -259,7 +259,7 @@ public class HibernateDbImporter {
             Transaction tx = session.beginTransaction();
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
-                    PreparedStatement ps = connection.prepareStatement("INSERT INTO RELATIONSHIP_STATEMENT (serialisedid, subject_id, predicate_id, object_id, relationship_group, characteristic_type, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    PreparedStatement ps = connection.prepareStatement("INSERT INTO STATEMENT (serialisedid, subject_id, predicate_id, object_id, relationship_group, characteristic_type, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                         int currentLine = 1;
                         String line = null;
@@ -277,7 +277,7 @@ public class HibernateDbImporter {
                                 Iterable<String> split = Splitter.on('\t').split(line);
                                 Iterator<String> splitIt = split.iterator();
                                 try {
-                                    ps.setLong(1, RelationshipStatement.SERIALISED_ID_NOT_DEFINED);
+                                    ps.setLong(1, com.ihtsdo.snomed.canonical.model.Statement.SERIALISED_ID_NOT_DEFINED);
                                     ps.setLong(2, map.get(Long.parseLong(splitIt.next()))); //subject
                                     ps.setLong(3, map.get(Long.parseLong(splitIt.next())));//predicate
                                     ps.setLong(4, map.get(Long.parseLong(splitIt.next()))); //object
@@ -334,9 +334,9 @@ public class HibernateDbImporter {
 
     protected void createIsKindOfHierarchy(EntityManager em, final Ontology o){
         LOG.info("Creating isA hierarchy");
-        //Query query = em.createQuery("SELECT r FROM RelationshipStatement r WHERE r.ontology.id=" + o.getId());
-        //@SuppressWarnings("unchecked") List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
-        //final Iterator<RelationshipStatement> stIt = statements.iterator();
+        //Query query = em.createQuery("SELECT r FROM Statement r WHERE r.ontology.id=" + o.getId());
+        //@SuppressWarnings("unchecked") List<Statement> statements = (List<Statement>) query.getResultList();
+        //final Iterator<Statement> stIt = statements.iterator();
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         try {
@@ -344,7 +344,7 @@ public class HibernateDbImporter {
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
                     PreparedStatement psKindOf = connection.prepareStatement("INSERT INTO KIND_OF (child_id, parent_id) VALUES (?, ?)");
-                    PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, predicate_id, object_id FROM RELATIONSHIP_STATEMENT WHERE ontology_id = ?");
+                    PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, predicate_id, object_id FROM STATEMENT WHERE ontology_id = ?");
                     int counter = 1;
                     psStatements.setLong(1, o.getId());
                     ResultSet rs = psStatements.executeQuery();

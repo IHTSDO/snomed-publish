@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 
 public class HibernateDatabaseImporterTest {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporterTest.class );
@@ -101,7 +101,7 @@ public class HibernateDatabaseImporterTest {
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
-        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(RelationshipStatement.class)));
+        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Statement.class)));
 
         long result = em.createQuery(criteriaQuery).getSingleResult();
         assertEquals(5, result);
@@ -126,11 +126,11 @@ public class HibernateDatabaseImporterTest {
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
         importer.populateLongFormRelationships(ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_LONG_FORM), em, o);
 
-        TypedQuery<RelationshipStatement> query = em.createQuery(
-                "SELECT r FROM RelationshipStatement r where r.ontology.id=1 AND r.serialisedId=" + 100000028, 
-                RelationshipStatement.class);
+        TypedQuery<Statement> query = em.createQuery(
+                "SELECT r FROM Statement r where r.ontology.id=1 AND r.serialisedId=" + 100000028, 
+                Statement.class);
         
-        RelationshipStatement r = query.getSingleResult();        
+        Statement r = query.getSingleResult();        
 
         assertNotNull(r);
         assertNotNull(r.getSubject());
@@ -168,14 +168,14 @@ public class HibernateDatabaseImporterTest {
         importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_LONG_FORM), em);
 
-        Query query = em.createQuery("SELECT r FROM RelationshipStatement r");
+        Query query = em.createQuery("SELECT r FROM Statement r");
 
         @SuppressWarnings("unchecked")
-        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
+        List<Statement> statements = (List<Statement>) query.getResultList();
 
-        Iterator<RelationshipStatement> stIt = statements.iterator();
+        Iterator<Statement> stIt = statements.iterator();
         while (stIt.hasNext()){
-            RelationshipStatement statement = stIt.next();
+            Statement statement = stIt.next();
             assertTrue(statement.getSubject().getSubjectOfRelationshipStatements().contains(statement));
         }
     }
@@ -185,15 +185,15 @@ public class HibernateDatabaseImporterTest {
         importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_RELATIONSHIPS), em);
 
-        TypedQuery<RelationshipStatement> query = em.createQuery("SELECT r FROM RelationshipStatement r WHERE r.ontology.id=1", RelationshipStatement.class);
-        List<RelationshipStatement> statements = (List<RelationshipStatement>) query.getResultList();
+        TypedQuery<Statement> query = em.createQuery("SELECT r FROM Statement r WHERE r.ontology.id=1", Statement.class);
+        List<Statement> statements = (List<Statement>) query.getResultList();
 
-        RelationshipStatement r1000 = null;
-        RelationshipStatement r2000 = null;
-        RelationshipStatement r3000 = null;
-        Iterator<RelationshipStatement> rIt = statements.iterator();
+        Statement r1000 = null;
+        Statement r2000 = null;
+        Statement r3000 = null;
+        Iterator<Statement> rIt = statements.iterator();
         while (rIt.hasNext()){
-            RelationshipStatement r = rIt.next();
+            Statement r = rIt.next();
             if (r.getSerialisedId() == 1000){
                 r1000 = r;
             }
@@ -223,7 +223,7 @@ public class HibernateDatabaseImporterTest {
         long conceptResult = em.createQuery(conceptCriteriaQuery).getSingleResult();
 
         CriteriaQuery<Long> relationshipCriteriaQuery = criteriaBuilder.createQuery(Long.class);
-        relationshipCriteriaQuery.select(criteriaBuilder.count(relationshipCriteriaQuery.from(RelationshipStatement.class)));
+        relationshipCriteriaQuery.select(criteriaBuilder.count(relationshipCriteriaQuery.from(Statement.class)));
         long relationshipResult = em.createQuery(relationshipCriteriaQuery).getSingleResult();
 
         assertEquals(11, conceptResult);
@@ -238,7 +238,7 @@ public class HibernateDatabaseImporterTest {
         assertNotNull(ontology);
         assertEquals(5, ontology.getRelationshipStatements().size());
         assertEquals(1, ontology.getId());
-        RelationshipStatement r = new RelationshipStatement();
+        Statement r = new Statement();
         r.setSerialisedId((100000028));
         assertTrue(ontology.getRelationshipStatements().contains(r));
     }

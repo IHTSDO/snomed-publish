@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 
 public class CanonicalAlgorithmTest {
 
@@ -23,14 +23,13 @@ public class CanonicalAlgorithmTest {
     
     public static final int NOT_DEFINING_CHARACTERISTIC_TYPE = 1;
 
-    RelationshipStatement rs1, rs2, rs3, rs4, rs5;
-    Concept c1, c2, c3, c4, c5, cp1, cA, cB;
+    Statement rs1, rs2, rs3, rs4, rs5;
+    Concept c1, c2, c3, c4, c5, cp1, cp2, cp3, cA, cB, cC;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
 //        importer = new HibernateDbImporter();
 //        main = new Main();
-        algorithm = new CanonicalAlgorithm();
     }
 
     @Before
@@ -44,8 +43,11 @@ public class CanonicalAlgorithmTest {
         c5 = new Concept(5);
         cA = new Concept(10);
         cB = new Concept(11);
+        cC = new Concept(12);
         
-        cp1 = new Concept(1);
+        cp1 = new Concept(100);
+        cp2 = new Concept(101);
+        cp3 = new Concept(103);
 
         c1.setPrimitive(true);
         c2.setPrimitive(true);
@@ -54,6 +56,9 @@ public class CanonicalAlgorithmTest {
         c5.setPrimitive(true);
         cA.setPrimitive(true);
         cB.setPrimitive(true);
+        cC.setPrimitive(true);
+        
+        algorithm = new CanonicalAlgorithm();
     }
 
     @After
@@ -371,10 +376,10 @@ public class CanonicalAlgorithmTest {
         c2.addKindOf(c4);
         c3.addKindOf(c4);
 
-        Set<RelationshipStatement> statements = algorithm.createProximalPrimitiveStatementsForConcept(c1, true, true, null);
+        Set<Statement> statements = algorithm.createProximalPrimitiveStatementsForConcept(c1, true, true, null);
         assertEquals(2, statements.size());
         
-        for (RelationshipStatement r : statements){
+        for (Statement r : statements){
             assertEquals(c1, r.getSubject());
             assertTrue(r.isKindOfRelationship());
             assertTrue(new HashSet<Concept>(Arrays.asList(c2,c3)).contains(r.getObject()));
@@ -452,9 +457,9 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase1(){ 
-        RelationshipStatement r1 = new RelationshipStatement(101, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        Statement r1 = new Statement(101, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r1));
@@ -463,17 +468,19 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 2:
      * {c1,c2,cA} are primitive types
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c2,r1,cA) is a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      */
     @Test
     public void shouldPassUDCTestCase2(){ 
-        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }
@@ -481,19 +488,21 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 3:
      * {c1,c2,c3,cA} are primitive types
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c3,r1,cA) is a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c3,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      * c2 isKindOf c3
      */
     @Test
     public void shouldPassUDCTestCase3(){ 
-        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c3, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c3, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }    
@@ -502,20 +511,22 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 4:
      * {c1,c3,cA} are primitive types. {c2} is not a primitive type
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c3,r1,cA) is a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c3,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      * c2 isKindOf c3
      */
     @Test
     public void shouldPassUDCTestCase4(){ 
         c2.setPrimitive(false);
-        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        Statement r = new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -524,17 +535,19 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 5:
      * {c1,c2,cA,cB} are primitive types
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c2,r1,cB) is a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cB) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      */
     @Test
     public void shouldPassUDCTestCase5(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, cp1, cB, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        Statement r = new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -543,20 +556,22 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 6:
      * {c1,c3,cA} are primitive types. {c2} is not a primitive type 
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c3,r1,cA) is a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c3,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      * c2 isKindOf c3
      */
     @Test
     public void shouldPassUDCTestCase6(){ 
         c2.setPrimitive(false);
-        new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c3, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c3, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         c2.addKindOf(c3);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  
@@ -569,10 +584,10 @@ public class CanonicalAlgorithmTest {
      */
     @Test
     public void shouldPassUDCTestCase7(){ 
-        new RelationshipStatement(100, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }
@@ -580,13 +595,13 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 8:
      * {c1,cA} are primitive types 
-     * Triple (c2,r1,cA) is not a defining characteristic
+     * Triple (c1,r1,cA) is not a defining characteristic
      */
     @Test
     public void shouldPassUDCTestCase8(){ 
-        new RelationshipStatement(100, c2, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c1, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  
@@ -594,17 +609,19 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 9:
      * {c1,c2,cA} are primitive types
-     * Triple (c1,r1,cA) is a defining characteristic
-     * Triple (c2,r1,cA) is not a defining characteristic
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is not a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      */
     @Test
     public void shouldPassUDCTestCase9(){ 
-        RelationshipStatement r = new RelationshipStatement(100, c1, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
+        Statement r = new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(1, foundUDC.size());
         assertTrue(foundUDC.contains(r));
@@ -613,20 +630,254 @@ public class CanonicalAlgorithmTest {
     /*
      * Test case 10:
      * {c1,c2,cA} are primitive types
-     * Triple (c1,r1,cA) is not a defining characteristic
-     * Triple (c2,r1,cA) is a defining characteristic
+     * Triple t1(c1,r1,cA) is not a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
      * c1 isKindOf c2
      */
     @Test
     public void shouldPassUDCTestCase10(){ 
-        new RelationshipStatement(100, c1, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 0);
-        new RelationshipStatement(101, c2, cp1, cA, RelationshipStatement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(100, c1, cp1, cA, NOT_DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         c1.addKindOf(c2);
         
-        Set<RelationshipStatement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
         
         assertEquals(0, foundUDC.size());
     }  
+    
+// ASSUMING EXTENDED GROUP ID SEMANTICS
+    
+    /*
+     * Test case 11:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+//    public void shouldPassUDCTestCase11(){ 
+//        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+//        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+//        c1.addKindOf(c2);
+//        
+//        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+//        
+//        assertEquals(1, foundUDC.size());
+//    }
+    public void shouldPassUDCTestCase11(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(0, foundUDC.size());
+    }
+
+    
+    /*
+     * Test case 12:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 1
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase12(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(0, foundUDC.size());
+    }  
+    
+    /*
+     * Test case 13:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 0
+     * t2 has group 0
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase13(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(1, foundUDC.size());
+    }
+    
+    /*
+     * Test case 14:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 0
+     * t2 has group 1
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase14(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(1, foundUDC.size());
+    }
+    
+    /*
+     * Test case 15:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 0
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase15(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 0);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(1, foundUDC.size());
+    }
+    
+    /*
+     * Test case 16:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c1,r2,cB) is a defining characteristic
+     * Triple t3(c2,r1,cA) is a defining characteristic
+     * Triple t4(c2,r2,cB) is a defining characteristic
+     * t1, t2 has group 1
+     * t3, t4 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase16(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c1, cp2, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(102, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        new Statement(103, c2, cp2, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(0, foundUDC.size());
+    }    
+    
+    /*
+     * Test case 17:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c1,r2,cB) is a defining characteristic
+     * Triple t3(c2,r1,cA) is a defining characteristic
+     * t1, t2 has group 1
+     * t3 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase17(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c1, cp2, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(102, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(2, foundUDC.size());
+    }
+    
+    /*
+     * Test case 18:
+     * {c1,c2,cA} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c1,r2,cB) is a defining characteristic
+     * Triple t3(c2,r1,cA) is a defining characteristic
+     * Triple t4(c2,r2,cB) is a defining characteristic
+     * Triple t5(c2,r3,cC) is a defining characteristic 
+     * t1, t2 has group 1
+     * t3, t4, t5 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase18(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c1, cp2, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(102, c2, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        new Statement(103, c2, cp2, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        new Statement(104, c2, cp3, cC, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(2, foundUDC.size());
+    }  
+    
+    /*
+     * Test case 20:
+     * {c1,c2,cA, cB} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r1,cB) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase20(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp1, cB, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(1, foundUDC.size());
+    }
+    
+    /*
+     * Test case 21:
+     * {c1,c2,cA, cB} are primitive types
+     * Triple t1(c1,r1,cA) is a defining characteristic
+     * Triple t2(c2,r2,cA) is a defining characteristic
+     * t1 has group 1
+     * t2 has group 2
+     * c1 isKindOf c2
+     */
+    @Test
+    public void shouldPassUDCTestCase21(){ 
+        new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
+        new Statement(101, c2, cp2, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
+        c1.addKindOf(c2);
+        
+        Set<Statement> foundUDC = algorithm.getUnsharedDefiningCharacteristicsForConcept(c1, true, true, null); 
+        
+        assertEquals(1, foundUDC.size());
+    }    
+    
+    @Test
+    public void shouldGetNewId(){
+        assertEquals(CanonicalAlgorithm.RELATIONSHIP_IDS_ARE_NEVER_LARGER_THAN_THIS, algorithm.getNewId());
+        assertEquals(CanonicalAlgorithm.RELATIONSHIP_IDS_ARE_NEVER_LARGER_THAN_THIS + 1, algorithm.getNewId());
+    }
+    
+    
     
     /*
      * Test case 1:

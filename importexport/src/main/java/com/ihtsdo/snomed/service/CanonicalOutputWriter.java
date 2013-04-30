@@ -8,16 +8,16 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.canonical.model.RelationshipStatement;
+import com.ihtsdo.snomed.canonical.model.Statement;
 
 public class CanonicalOutputWriter {
 
     protected static final char DELIMITER = '\t';
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalOutputWriter.class );
     
-    public void write (Writer w, Collection<RelationshipStatement> statements) throws IOException{
+    public void write (Writer w, Collection<Statement> statements) throws IOException{
         printHeading(w);
-        Iterator<RelationshipStatement> rIt = statements.iterator();
+        Iterator<Statement> rIt = statements.iterator();
         int counter = 2;
         while (rIt.hasNext()){
             w.write("\r\n");
@@ -32,7 +32,7 @@ public class CanonicalOutputWriter {
                 "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP");
     }
 
-    protected void printRelationship(Writer w, RelationshipStatement r) throws IOException{
+    protected void printRelationship(Writer w, Statement r) throws IOException{
         w.write(Long.toString(r.getSubject().getSerialisedId())
                 + DELIMITER + Long.toString(r.getPredicate().getSerialisedId())
                 + DELIMITER + Long.toString(r.getObject().getSerialisedId())
