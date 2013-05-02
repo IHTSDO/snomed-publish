@@ -6,7 +6,7 @@ Domain Model Library
 
 This library contains the domain model for the snomed publication applications, complete with JPA annotations. The classes are:
 - [Concept](src/main/java/com/ihtsdo/snomed/canonical/model/Concept.java)
-- [RelationshipStatement] (src/main/java/com/ihtsdo/snomed/canonical/model/RelationshipStatement.java)
+- [Statement] (src/main/java/com/ihtsdo/snomed/canonical/model/Statement.java)
 - [Ontology](src/main/java/com/ihtsdo/snomed/canonical/model/Ontology.java)
 
 To build the distribution, enter the root project directory (on up from this folder) and type:

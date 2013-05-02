@@ -37,8 +37,7 @@ public class Concept {
     @XmlTransient @Transient private Set<Concept> cache;
     @XmlTransient @Transient private Map<Integer, Group> subjectOfStatementGrouping = new HashMap<Integer, Group>();
 
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private long id;
-    @XmlTransient private static Concept kindOfPredicate;    
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private long id;    
 
     private long serialisedId;
     private int status;
@@ -75,9 +74,6 @@ public class Concept {
     
     public Concept(long serialisedId){
         this.serialisedId = serialisedId;
-        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
-            kindOfPredicate = this;
-        }
     }
     
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
@@ -109,17 +105,6 @@ public class Concept {
 
     public boolean isKindOfPredicate(){
         return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
-    }
-    
-    public static void setKindOfPredicate(Concept kindOfPredicateToSet){
-        kindOfPredicate = kindOfPredicateToSet;
-    }
-    
-    public static Concept getKindOfPredicate() throws IllegalStateException{
-        if (kindOfPredicate == null){
-            throw new IllegalStateException("The isA predicate does not exist in this ontology at this point");
-        }
-        return kindOfPredicate;
     }
     
     public boolean isPredicate(){
@@ -182,9 +167,6 @@ public class Concept {
     
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
-        if (serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID){
-            kindOfPredicate = this;
-        }
     }    
 
     /*
@@ -245,19 +227,19 @@ public class Concept {
     public void addParentOf(Concept concept){
         this.parentOf.add(concept);
     }
-    public Set<Statement> getSubjectOfRelationshipStatements(){
+    public Set<Statement> getSubjectOfStatements(){
         return subjectOfStatements;
     }
     public void addPredicateOfStatement(Statement statement){
         predicateOfStatements.add(statement);
     }
-    public Set<Statement> getPredicateOfRelationshipStatements(){
+    public Set<Statement> getPredicateOfStatements(){
         return predicateOfStatements;
     }
     public void addObjectOfStatement(Statement statement){
         objectOStatements.add(statement);
     }
-    public Set<Statement> getObjectOfRelationshipStatements(){
+    public Set<Statement> getObjectOfStatements(){
         return objectOStatements;
     }
     public Ontology getOntology() {

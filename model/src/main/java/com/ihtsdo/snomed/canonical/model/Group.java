@@ -14,39 +14,42 @@ public class Group {
         this.statements.add(new StatementWrapperForAttributeCompare(statement));
         this.id = statement.getGroup();
     }
+    
+    public Group(int id){
+        this.id = id;
+    }
 
     public void addStatement(Statement statement){
         this.statements.add(new StatementWrapperForAttributeCompare(statement));
     }
+    @Override
+    public String toString(){
+        String value = "Group " + id + ": {";
+        for (StatementWrapperForAttributeCompare statement : statements){
+            value += statement.getStatement().shortToString() + ", ";
+        }
+        value += "}";
+        return value;
+    }
     
     @Override
     public int hashCode(){
-        return id;
-//        if (statements.size() == 0){
-//            return -1;
-//        }
-//        else{
-//            return Longs.hashCode(((Statement)statements.iterator().next().getStatement()).getSubject().getSerialisedId());
-//        }
+        return statements.size();
     }
     
     @Override
     public boolean equals (Object o){
         if (o instanceof Group){
             Group g = (Group) o;
-            
-//            if (this.id == g.id){
-//                return true;
-//            }
-            
             if (g.statements.size() != this.statements.size()){
+                //System.out.println("Statement.size are different, returning false");
                 return false;
             }
             
             if (this.statements.equals(g.statements)){
+                //System.out.println("sets are different, returning false");
                 return true;
             }
-            
         }
         return false;
     }

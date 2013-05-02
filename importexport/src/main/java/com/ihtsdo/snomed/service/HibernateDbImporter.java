@@ -166,7 +166,7 @@ public class HibernateDbImporter {
         //        if (!concepts.isEmpty()) System.out.println(concepts.size());
         try {
             Concept predicate = em.createQuery("SELECT c FROM Concept c WHERE c.serialisedId=" + Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID + " AND c.ontology.id=" + o.getId(), Concept.class).getSingleResult();
-            Concept.setKindOfPredicate(predicate);
+            o.setIsKindOfPredicate(predicate);
         } catch (NoResultException e) {
             throw new IllegalStateException("The isA predicate does not exist in this ontology at this point");
         }
@@ -349,7 +349,7 @@ public class HibernateDbImporter {
                     psStatements.setLong(1, o.getId());
                     ResultSet rs = psStatements.executeQuery();
                     while (rs.next()){
-                        if (rs.getLong(2) == Concept.getKindOfPredicate().getId()){
+                        if (rs.getLong(2) == o.getIsKindOfPredicate().getId()){
                             psKindOf.setLong(1, rs.getLong(1));
                             psKindOf.setLong(2, rs.getLong(3));
                             psKindOf.addBatch();

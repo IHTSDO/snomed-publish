@@ -83,7 +83,7 @@ public class CanonicalMojo extends AbstractMojo{
         Stopwatch overAllstopwatch = new Stopwatch().start();
         
         // bind slf4j to maven log
-        StaticLoggerBinder.getSingleton().setLog(getLog());        
+        ((org.apache.maven.plugin.Mojo) StaticLoggerBinder.getSingleton()).setLog(getLog());        
         
         testInputs();
         try{

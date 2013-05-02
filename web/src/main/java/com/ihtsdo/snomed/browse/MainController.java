@@ -116,7 +116,7 @@ public class MainController {
 
         LOG.debug("Concept: " + c);
         LOG.debug("subjectOf: " + subjectOfCache.get(c.getId()).size());
-        LOG.debug("predicateOf: " + c.getPredicateOfRelationshipStatements().size());
+        LOG.debug("predicateOf: " + c.getPredicateOfStatements().size());
         LOG.debug("objectOf: " + objectOfCache.get(c.getId()).size());
         LOG.debug("kindOf: " + c.getKindOfs().size());
         
@@ -130,7 +130,7 @@ public class MainController {
 
             if (subjectOfCache.get(c.getId()) == null){
                 List<Statement> subjectOf = new ArrayList<Statement>();
-                for (Statement r : c.getSubjectOfRelationshipStatements()){
+                for (Statement r : c.getSubjectOfStatements()){
                     if (!r.isKindOfRelationship()){
                         subjectOf.add(r);
                     }
@@ -141,7 +141,7 @@ public class MainController {
             
             if (objectOfCache.get(c.getId()) == null){
                 List<Statement> objectOf = new ArrayList<Statement>();
-                for (Statement r : c.getObjectOfRelationshipStatements()){
+                for (Statement r : c.getObjectOfStatements()){
                     if (!r.isKindOfRelationship()){
                         objectOf.add(r);
                     }
@@ -152,7 +152,7 @@ public class MainController {
             
             if (predicateOfCache.get(c.getId()) == null){
                 List<Statement> predicateOf = new ArrayList<Statement>();
-                for (Statement r : c.getPredicateOfRelationshipStatements()){
+                for (Statement r : c.getPredicateOfStatements()){
                     if (!r.isKindOfRelationship()){
                         predicateOf.add(r);
                     }

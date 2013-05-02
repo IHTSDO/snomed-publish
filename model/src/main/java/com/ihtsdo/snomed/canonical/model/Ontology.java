@@ -7,11 +7,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Objects;
 
 @Entity(name="Ontology")
 public class Ontology {
+	
+    
+    @Transient
+    @XmlTransient private Concept isKindOfPredicate;
     
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
@@ -29,14 +35,33 @@ public class Ontology {
         return Objects.toStringHelper(this).
                 add("id", getId()).
                 add("name", getId()).
-                add("statements", getRelationshipStatements() == null ? 0 : getRelationshipStatements().size()).
+                add("statements", getStatements() == null ? 0 : getStatements().size()).
                 add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
                 toString();
     }
 
-    public void addRelationshipStatement(Statement r){
-        getRelationshipStatements().add(r);
+    public void addStatement(Statement r){
+        getStatements().add(r);
     }
+    
+    public Concept getIsKindOfPredicate(){
+        if (isKindOfPredicate == null){
+            for (Concept c : concepts){
+                if (c.isKindOfPredicate()){
+                    isKindOfPredicate = c;
+                    return isKindOfPredicate;
+                }
+            }
+            throw new IllegalStateException("IsA Concept not found in ontology");
+        }
+        else{
+        	return isKindOfPredicate;
+        }
+    }
+
+    public void setIsKindOfPredicate(Concept isKindOfPredicate) {
+        this.isKindOfPredicate = isKindOfPredicate;
+    }    
 
     /*
      * Generated Getters and Setters
@@ -58,11 +83,11 @@ public class Ontology {
         this.name = name;
     }
 
-    public Set<Statement> getRelationshipStatements() {
+    public Set<Statement> getStatements() {
         return statements;
     }
 
-    public void setRelationshipStatements(Set<Statement> statements) {
+    public void setStatements(Set<Statement> statements) {
         this.statements = statements;
     }
 

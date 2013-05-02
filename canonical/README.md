@@ -8,7 +8,7 @@ This library provides an API for creating the canonical form of an ontology.
 
 The API has a single method in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/snomed/canonical/CanonicalAlgorithm.java) with this signature:
 
-    public Set<RelationshipStatement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds)
+    public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds)
 
 This method will generate the set of canonical form statements for a set of input concepts. 
 
@@ -16,7 +16,7 @@ If showDetails is true, and showDetailsConceptIds is null or empty, the method w
 
 Example usage:
 
-    Set<RelationshipStatement> resultStatements = new CanonicalAlgorithm().runAlgorithm(concepts, false, null);
+    Set<Statement> resultStatements = new CanonicalAlgorithm().runAlgorithm(concepts, false, null);
 
 
 The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm).

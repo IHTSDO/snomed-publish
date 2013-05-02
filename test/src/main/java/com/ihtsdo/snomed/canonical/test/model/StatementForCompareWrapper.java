@@ -4,13 +4,13 @@ import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.canonical.model.Statement;
 
 
-public class RelationshipStatementForCompareWrapper {
+public class StatementForCompareWrapper {
     
     private Statement statement;
     
     int hashCode;
     
-    public RelationshipStatementForCompareWrapper(Statement statement) {
+    public StatementForCompareWrapper(Statement statement) {
         this.statement = statement;
 //        int x = (int)statement.getSubject().getId();
 //        int y = (int)statement.getRelationshipType();
@@ -40,17 +40,17 @@ public class RelationshipStatementForCompareWrapper {
     @Override
     public int hashCode()
     {
-        return Longs.hashCode(getRelationshipStatement().getSubject().getSerialisedId());
+        return Longs.hashCode(getStatement().getSubject().getSerialisedId());
     }    
     
     @Override
     public boolean equals(Object o){
         //System.out.println("EQUALS");
-        if (o instanceof RelationshipStatementForCompareWrapper){
-            RelationshipStatementForCompareWrapper r = (RelationshipStatementForCompareWrapper) o;
-            return r.getRelationshipStatement().getSubject().equals(this.getRelationshipStatement().getSubject()) &&
-                    (r.getRelationshipStatement().getPredicate().equals(this.getRelationshipStatement().getPredicate())) &&
-                    r.getRelationshipStatement().getObject().equals(this.getRelationshipStatement().getObject());
+        if (o instanceof StatementForCompareWrapper){
+            StatementForCompareWrapper r = (StatementForCompareWrapper) o;
+            return r.getStatement().getSubject().equals(this.getStatement().getSubject()) &&
+                    (r.getStatement().getPredicate().equals(this.getStatement().getPredicate())) &&
+                    r.getStatement().getObject().equals(this.getStatement().getObject());
                     
         }
         return false;
@@ -60,7 +60,7 @@ public class RelationshipStatementForCompareWrapper {
         return "Wrapped: " + statement.toString();
     }
     
-    public Statement getRelationshipStatement(){
+    public Statement getStatement(){
         return statement;
     }
 

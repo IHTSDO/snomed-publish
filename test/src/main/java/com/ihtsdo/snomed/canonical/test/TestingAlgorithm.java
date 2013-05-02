@@ -20,7 +20,7 @@ import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Statement;
-import com.ihtsdo.snomed.canonical.test.model.RelationshipStatementForCompareWrapper;
+import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
 
 public class TestingAlgorithm {
     private static final Logger LOG = LoggerFactory.getLogger( TestingAlgorithm.class );
@@ -43,52 +43,52 @@ public class TestingAlgorithm {
         LOG.info("Comparing the inputs");
         
         //LOG.info("Wrapping expected statements");
-        Set<RelationshipStatementForCompareWrapper> expectedWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (Statement r : expectedOntology.getRelationshipStatements()){
-            expectedWrappedStatements.add(new RelationshipStatementForCompareWrapper(r));
+        Set<StatementForCompareWrapper> expectedWrappedStatements = new HashSet<StatementForCompareWrapper>();
+        for (Statement r : expectedOntology.getStatements()){
+            expectedWrappedStatements.add(new StatementForCompareWrapper(r));
         }
         //LOG.info("Wrapping generated statements");
-        Set<RelationshipStatementForCompareWrapper> generatedWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (Statement r : generatedOntology.getRelationshipStatements()){
-            generatedWrappedStatements.add(new RelationshipStatementForCompareWrapper(r));
+        Set<StatementForCompareWrapper> generatedWrappedStatements = new HashSet<StatementForCompareWrapper>();
+        for (Statement r : generatedOntology.getStatements()){
+            generatedWrappedStatements.add(new StatementForCompareWrapper(r));
         }
 
         //LOG.info("Splitting generated statements");
-        Set<RelationshipStatementForCompareWrapper> generatedIsKindOfWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (RelationshipStatementForCompareWrapper r : generatedWrappedStatements){
-            if (r.getRelationshipStatement().isKindOfRelationship()){
+        Set<StatementForCompareWrapper> generatedIsKindOfWrappedStatements = new HashSet<StatementForCompareWrapper>();
+        for (StatementForCompareWrapper r : generatedWrappedStatements){
+            if (r.getStatement().isKindOfRelationship()){
                 generatedIsKindOfWrappedStatements.add(r);
             }
         }
         LOG.info("Found [" + generatedIsKindOfWrappedStatements.size() + "] generated isKindOf statements");
         
         //LOG.info("Splitting expected statements");
-        Set<RelationshipStatementForCompareWrapper> expectedIsKindOfWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (RelationshipStatementForCompareWrapper r : expectedWrappedStatements){
-            if (r.getRelationshipStatement().isKindOfRelationship()){
+        Set<StatementForCompareWrapper> expectedIsKindOfWrappedStatements = new HashSet<StatementForCompareWrapper>();
+        for (StatementForCompareWrapper r : expectedWrappedStatements){
+            if (r.getStatement().isKindOfRelationship()){
                 expectedIsKindOfWrappedStatements.add(r);
             }
         }
         LOG.info("Found [" + expectedIsKindOfWrappedStatements.size() + "] expected isKindOf statements");
         
-        Set<RelationshipStatementForCompareWrapper> generatedUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(generatedWrappedStatements);
+        Set<StatementForCompareWrapper> generatedUdcWrappedStatements = new HashSet<StatementForCompareWrapper>(generatedWrappedStatements);
         generatedUdcWrappedStatements.removeAll(generatedIsKindOfWrappedStatements);
         LOG.info("Found [" + generatedUdcWrappedStatements.size() + "] generated udc statements");
 
-        Set<RelationshipStatementForCompareWrapper> expectedUdcWrappedStatements = new HashSet<RelationshipStatementForCompareWrapper>(expectedWrappedStatements);
+        Set<StatementForCompareWrapper> expectedUdcWrappedStatements = new HashSet<StatementForCompareWrapper>(expectedWrappedStatements);
         expectedUdcWrappedStatements.removeAll(expectedIsKindOfWrappedStatements);
         LOG.info("Found [" + expectedUdcWrappedStatements.size() + "] expected udc statements");
 
-        SetView<RelationshipStatementForCompareWrapper> missingIsKindOfFromGeneratedOutput = Sets.difference(expectedIsKindOfWrappedStatements, generatedIsKindOfWrappedStatements);
+        SetView<StatementForCompareWrapper> missingIsKindOfFromGeneratedOutput = Sets.difference(expectedIsKindOfWrappedStatements, generatedIsKindOfWrappedStatements);
         LOG.info("There are [{}] missing isA statements", missingIsKindOfFromGeneratedOutput.size());
 
-        SetView<RelationshipStatementForCompareWrapper> extraIsKindOfInGeneratedOutput = Sets.difference(generatedIsKindOfWrappedStatements, expectedIsKindOfWrappedStatements);
+        SetView<StatementForCompareWrapper> extraIsKindOfInGeneratedOutput = Sets.difference(generatedIsKindOfWrappedStatements, expectedIsKindOfWrappedStatements);
         LOG.info("There are [{}] extra isA statements", extraIsKindOfInGeneratedOutput.size());
 
-        SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput = Sets.difference(expectedUdcWrappedStatements, generatedUdcWrappedStatements);
+        SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput = Sets.difference(expectedUdcWrappedStatements, generatedUdcWrappedStatements);
         LOG.info("There are [{}] missing unshared defining characteristic statements", missingUdcFromGeneratedOutput.size());
 
-        SetView<RelationshipStatementForCompareWrapper> extraUdcInGeneratedOutput = Sets.difference(generatedUdcWrappedStatements, expectedUdcWrappedStatements);
+        SetView<StatementForCompareWrapper> extraUdcInGeneratedOutput = Sets.difference(generatedUdcWrappedStatements, expectedUdcWrappedStatements);
         LOG.info("There are [{}] extra unshared defining characteristic statements", extraUdcInGeneratedOutput.size());
 
         LOG.info("Writing all extra statements to " + extraFile);
@@ -125,7 +125,7 @@ public class TestingAlgorithm {
         LOG.info("Completed sanity check in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }
     
-    private void testForSwappedIdenticalGroups(Set<RelationshipStatementForCompareWrapper> extraStatements, EntityManager em) throws IOException{
+    private void testForSwappedIdenticalGroups(Set<StatementForCompareWrapper> extraStatements, EntityManager em) throws IOException{
         Set<SetEquivalent> setEquivalents = new HashSet<SetEquivalent>(4000);
         Set<Concept> allSubjects = getAllSubjects(extraStatements); 
         LOG.info("There are unique " + allSubjects.size() + " subject concepts in the extra statements");
@@ -149,7 +149,7 @@ public class TestingAlgorithm {
             
             for (Integer subjectGroup : subjectGroups){
                 Set<Statement> statementsInGroup = new HashSet<Statement>();
-                for (Statement s : originalVersionOfConcept.getSubjectOfRelationshipStatements()){
+                for (Statement s : originalVersionOfConcept.getSubjectOfStatements()){
                     if (s.getGroup() == subjectGroup){
                         statementsInGroup.add(s);
                     }
@@ -172,7 +172,7 @@ public class TestingAlgorithm {
                         se.parentConcept = parent;
                         se.childConcept = c;
                         se.childStatements = statementsInGroup;
-                        for (Statement s : parent.getSubjectOfRelationshipStatements()){
+                        for (Statement s : parent.getSubjectOfStatements()){
                             if (s.getGroup() == parentGroup){
                                 se.parentStatements.add(s);
                             }
@@ -190,15 +190,15 @@ public class TestingAlgorithm {
         }
         LOG.info("There are " + setEquivalents.size() + " parent-child concepts that have equivalent sets with different group ids");
         
-        Set<RelationshipStatementForCompareWrapper> statementsWithPossibleGroupSwap = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (RelationshipStatementForCompareWrapper r : extraStatements){
+        Set<StatementForCompareWrapper> statementsWithPossibleGroupSwap = new HashSet<StatementForCompareWrapper>();
+        for (StatementForCompareWrapper r : extraStatements){
             for (SetEquivalent se : setEquivalents){
-                if (se.childStatements.contains(r.getRelationshipStatement())){
-                    statementsWithPossibleGroupSwap.add(new RelationshipStatementForCompareWrapper(r.getRelationshipStatement()));
+                if (se.childStatements.contains(r.getStatement())){
+                    statementsWithPossibleGroupSwap.add(new StatementForCompareWrapper(r.getStatement()));
                 }
             }
         }
-        Set<RelationshipStatementForCompareWrapper> remainingProblems = new HashSet<RelationshipStatementForCompareWrapper>(extraStatements); 
+        Set<StatementForCompareWrapper> remainingProblems = new HashSet<StatementForCompareWrapper>(extraStatements); 
         remainingProblems.removeAll(statementsWithPossibleGroupSwap);
         
         File file = new File("remaining");
@@ -230,10 +230,10 @@ public class TestingAlgorithm {
         }
     }
 
-    private Set<Concept> getAllSubjects(Set<RelationshipStatementForCompareWrapper> udcStatements) {
+    private Set<Concept> getAllSubjects(Set<StatementForCompareWrapper> udcStatements) {
         Set<Concept> allSubjects = new HashSet<Concept>();
-        for (RelationshipStatementForCompareWrapper r : udcStatements){
-            allSubjects.add(r.getRelationshipStatement().getSubject());
+        for (StatementForCompareWrapper r : udcStatements){
+            allSubjects.add(r.getStatement().getSubject());
         }
         return allSubjects;
     }
@@ -241,7 +241,7 @@ public class TestingAlgorithm {
     private int findSetEqualGroup(Concept concept, Set<Statement> incomingStatementsInGroup) {
         for (int group : findAllGroups(concept)){
             Set<StatementWrapperForAttributeCompare> statementsInGroupToCompare = new HashSet<StatementWrapperForAttributeCompare>();
-            for (Statement s : concept.getSubjectOfRelationshipStatements()){
+            for (Statement s : concept.getSubjectOfStatements()){
                 if (s.getGroup() == group){
                     statementsInGroupToCompare.add(new StatementWrapperForAttributeCompare(s));
                 }
@@ -264,7 +264,7 @@ public class TestingAlgorithm {
 
     private Set<Integer> findAllGroups(Concept concept) {
         Set<Integer> groups = new HashSet<Integer>();
-        for (Statement s : concept.getSubjectOfRelationshipStatements()){
+        for (Statement s : concept.getSubjectOfStatements()){
             groups.add(s.getGroup());
         }
         return groups;
@@ -281,8 +281,8 @@ public class TestingAlgorithm {
         public boolean equals(Object o){
             if (o instanceof StatementWrapperForAttributeCompare){
                 StatementWrapperForAttributeCompare r = (StatementWrapperForAttributeCompare) o;            
-                if (r.getRelationshipStatement().getPredicate().equals(this.getRelationshipStatement().getPredicate()) &&
-                    r.getRelationshipStatement().getObject().equals(this.getRelationshipStatement().getObject()))
+                if (r.getStatement().getPredicate().equals(this.getStatement().getPredicate()) &&
+                    r.getStatement().getObject().equals(this.getStatement().getObject()))
                 {
                     return true;
                 }
@@ -292,14 +292,14 @@ public class TestingAlgorithm {
         
         @Override
         public int hashCode(){
-            return Longs.hashCode(getRelationshipStatement().getPredicate().getSerialisedId());
+            return Longs.hashCode(getStatement().getPredicate().getSerialisedId());
         }
         
         public String toString(){
             return "wrapped: " + statement.toString();
         }
         
-        public Statement getRelationshipStatement(){
+        public Statement getStatement(){
             return statement;
         }
         
@@ -308,7 +308,7 @@ public class TestingAlgorithm {
     private Set<Long> buildSerialisedIdIndexForOriginalUdcStatements(
             Ontology originalOntology) {
         Set<Long> allOriginalUdcStatementObjects = new HashSet<Long>();
-        for (Statement r : originalOntology.getRelationshipStatements()){
+        for (Statement r : originalOntology.getStatements()){
             if (!r.isKindOfRelationship()) allOriginalUdcStatementObjects.add(r.getObject().getSerialisedId());
         }
         return allOriginalUdcStatementObjects;
@@ -317,19 +317,19 @@ public class TestingAlgorithm {
     private Set<Long> buildSerialisedIdIndexForOriginalIsaStatements(
             Ontology originalOntology) {
         Set<Long> allOriginalIsAStatementObjects = new HashSet<Long>();
-        for (Statement r : originalOntology.getRelationshipStatements()){
+        for (Statement r : originalOntology.getStatements()){
             if (r.isKindOfRelationship()) allOriginalIsAStatementObjects.add(r.getObject().getSerialisedId());
         }
         return allOriginalIsAStatementObjects;
     }
 
     private void checkObjectsOfIsaStatementsMustAppearInOriginalStatementsAsObjects(
-            SetView<RelationshipStatementForCompareWrapper> missingIsKindOfFromGeneratedOutput,
-            Set<RelationshipStatementForCompareWrapper> erroneousExpectedIsaStatements,
+            SetView<StatementForCompareWrapper> missingIsKindOfFromGeneratedOutput,
+            Set<StatementForCompareWrapper> erroneousExpectedIsaStatements,
             Set<Long> allOriginalIsAStatementObjects) {
         LOG.info("Objects of isA statements in the expected output must also appear as objects of isA statements in the input");
-        for (RelationshipStatementForCompareWrapper rUnderTest : missingIsKindOfFromGeneratedOutput){
-            if (rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalIsAStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
+        for (StatementForCompareWrapper rUnderTest : missingIsKindOfFromGeneratedOutput){
+            if (rUnderTest.getStatement().isKindOfRelationship() && (!allOriginalIsAStatementObjects.contains(rUnderTest.getStatement().getObject().getSerialisedId()))){
                 erroneousExpectedIsaStatements.add(rUnderTest);
             }
         }
@@ -337,12 +337,12 @@ public class TestingAlgorithm {
     }
 
     private void checkObjectsOfUdcStatementsMustAppearInOriginalStatementsAsObjects(
-            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput,
-            Set<RelationshipStatementForCompareWrapper> erroneousExpectedUdcStatements,
+            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput,
+            Set<StatementForCompareWrapper> erroneousExpectedUdcStatements,
             Set<Long> allOriginalUdcStatementObjects) {
         LOG.info("Objects of udc statements in the expected output must also appear as objects of udc statements in the input");
-        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalUdcStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
+        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+            if (!rUnderTest.getStatement().isKindOfRelationship() && (!allOriginalUdcStatementObjects.contains(rUnderTest.getStatement().getObject().getSerialisedId()))){
                 erroneousExpectedUdcStatements.add(rUnderTest);
             }
         }
@@ -350,10 +350,10 @@ public class TestingAlgorithm {
     }
 
     private void checkIfAnyUdcStatementsAreNotPrimitiveStatements(
-            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
-        Set<RelationshipStatementForCompareWrapper> notCharacteristicType = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getRelationshipStatement().isDefiningCharacteristic()){
+            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput) {
+        Set<StatementForCompareWrapper> notCharacteristicType = new HashSet<StatementForCompareWrapper>();
+        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+            if (!rUnderTest.getStatement().isDefiningCharacteristic()){
                 notCharacteristicType.add(rUnderTest);
             }
         }
@@ -361,18 +361,18 @@ public class TestingAlgorithm {
     }
 
     private void checkIfUdcStatementsExistsInPrimitiveParentConcept(
-            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
+            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput) {
         LOG.info("For all missing udc statements, check if udc exists in primitive parent concept");
-        Set<RelationshipStatementForCompareWrapper> udcInPrimitiveParentConcept = new HashSet<RelationshipStatementForCompareWrapper>();
-        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getRelationshipStatement().isKindOfRelationship()){
-                for (Concept parentConcept : rUnderTest.getRelationshipStatement().getSubject().getAllKindOfPrimitiveConcepts(true)){
-                    for (Statement parentRelationshipStatement : parentConcept.getSubjectOfRelationshipStatements()){
-                        if (!parentRelationshipStatement.isDefiningCharacteristic()){
+        Set<StatementForCompareWrapper> udcInPrimitiveParentConcept = new HashSet<StatementForCompareWrapper>();
+        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+            if (!rUnderTest.getStatement().isKindOfRelationship()){
+                for (Concept parentConcept : rUnderTest.getStatement().getSubject().getAllKindOfPrimitiveConcepts(true)){
+                    for (Statement parentStatement : parentConcept.getSubjectOfStatements()){
+                        if (!parentStatement.isDefiningCharacteristic()){
                             continue;
                         }
-                        if ((parentRelationshipStatement.getPredicate() == rUnderTest.getRelationshipStatement().getPredicate()) &&
-                                parentRelationshipStatement.getObject().equals(rUnderTest.getRelationshipStatement().getObject())){
+                        if ((parentStatement.getPredicate() == rUnderTest.getStatement().getPredicate()) &&
+                                parentStatement.getObject().equals(rUnderTest.getStatement().getObject())){
                             udcInPrimitiveParentConcept.add(rUnderTest);
                         }
 
@@ -383,10 +383,10 @@ public class TestingAlgorithm {
         LOG.info("Found expected [{}] udc statements already defined in a primitive parent subject concept as a characteristic type", udcInPrimitiveParentConcept.size());
     }
 
-    private void writeErrors(File file, SetView<RelationshipStatementForCompareWrapper> isKindOfStatements, 
-            SetView<RelationshipStatementForCompareWrapper> udcfStatements) throws IOException 
+    private void writeErrors(File file, SetView<StatementForCompareWrapper> isKindOfStatements, 
+            SetView<StatementForCompareWrapper> udcfStatements) throws IOException 
             {
-        Set <RelationshipStatementForCompareWrapper> allStatements = new HashSet<RelationshipStatementForCompareWrapper>(isKindOfStatements);
+        Set <StatementForCompareWrapper> allStatements = new HashSet<StatementForCompareWrapper>(isKindOfStatements);
         allStatements.addAll(udcfStatements);
         if (!file.exists()){
             file.createNewFile();

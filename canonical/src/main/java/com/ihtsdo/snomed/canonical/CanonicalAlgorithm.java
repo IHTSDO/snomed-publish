@@ -22,6 +22,12 @@ public class CanonicalAlgorithm {
     protected long getNewId(){
         return idCounter++;
     }
+    
+    public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails) {
+    	return runAlgorithm(concepts, showDetails, null);
+    	
+    }
+
 
     public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds) {
         Stopwatch stopwatch = new Stopwatch().start();
@@ -56,7 +62,7 @@ public class CanonicalAlgorithm {
     protected Set<Statement> createProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
         Set<Statement> returnStatements = new HashSet<Statement>();
         for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
-            returnStatements.add(new Statement(getNewId(), concept, Concept.getKindOfPredicate(), proximalPrimitiveConcept));
+            returnStatements.add(new Statement(getNewId(), concept, concept.getOntology().getIsKindOfPredicate(), proximalPrimitiveConcept));
         }
         return returnStatements;
     }    
@@ -114,22 +120,22 @@ public class CanonicalAlgorithm {
         boolean shouldShowDetails = showDetails && ((showDetailsConceptIds == null) || (showDetailsConceptIds.contains(concept.getSerialisedId())));
         if(shouldShowDetails) LOG.info("Attempting to find all unshared defining characteristics for concept [{}]",  concept.getSerialisedId());
         
-        Set<Statement> allStatementsForConcept = new HashSet<Statement>(concept.getSubjectOfRelationshipStatements());
+        Set<Statement> allStatementsForConcept = new HashSet<Statement>(concept.getSubjectOfStatements());
         
         if (shouldShowDetails && LOG.isDebugEnabled()){
             StringBuffer debugStringBuffer = new StringBuffer("Relationships for concept [" + concept.getSerialisedId() + "] are {");
-            for (Statement rs : concept.getSubjectOfRelationshipStatements()){
+            for (Statement rs : concept.getSubjectOfStatements()){
                 debugStringBuffer.append(rs.shortToString() + ", ");
             }
 
-            if (!concept.getSubjectOfRelationshipStatements().isEmpty()){
+            if (!concept.getSubjectOfStatements().isEmpty()){
                 debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
             }
             debugStringBuffer.append("}");
             LOG.debug(debugStringBuffer.toString());
         }
         
-        for (Statement rUnderTest : concept.getSubjectOfRelationshipStatements()){
+        for (Statement rUnderTest : concept.getSubjectOfStatements()){
             if ((rUnderTest.isKindOfRelationship()) || (!rUnderTest.isDefiningCharacteristic())){
                 allStatementsForConcept.remove(rUnderTest);
                 continue;
@@ -152,11 +158,11 @@ public class CanonicalAlgorithm {
             for (Concept parentConcept : concept.getAllKindOfPrimitiveConcepts(useCache)){
                 if (shouldShowDetails && LOG.isDebugEnabled()){
                     LOG.debug("Concept [{}] has a primitive parent concept of [{}]", concept.getSerialisedId(), parentConcept.getSerialisedId());
-                    if (parentConcept.getSubjectOfRelationshipStatements().isEmpty()){
+                    if (parentConcept.getSubjectOfStatements().isEmpty()){
                         LOG.debug("Concept [{}] is not the subject of any relationship statements. Continuing", parentConcept.getSerialisedId());
                     }
                 }
-                for (Statement rParent : parentConcept.getSubjectOfRelationshipStatements()){
+                for (Statement rParent : parentConcept.getSubjectOfStatements()){
                     if (shouldShowDetails) LOG.debug("Found that parent concept [{}] has relationship {}", parentConcept.getSerialisedId(), rParent.shortToString());
                     if ((rUnderTest.getPredicate().equals(rParent.getPredicate()))&& 
                             rUnderTest.getObject().equals(rParent.getObject())&& 
@@ -166,7 +172,25 @@ public class CanonicalAlgorithm {
                             LOG.info("Found that relationship under test {} is also defined in parent concept as {}", rUnderTest.shortToString(), rParent.shortToString());
                         }
 
-                        if ((rUnderTest.getGroup() != 0) && (rParent.getGroup() != 0) && concept.getGroup(rUnderTest).equals(parentConcept.getGroup(rParent)))
+                        
+                        if ((!rUnderTest.isMemberOfGroup()) && (!rParent.isMemberOfGroup())){
+                            if (shouldShowDetails){
+                                LOG.info("Both parent concept statement and child concept statement are members of group 0 (no group), so statement is removed");
+                                LOG.info("Removing statement [{}] from output because parent concept [{}] has defined relationship [{}]",  rUnderTest.shortToString(), parentConcept.getSerialisedId(), rParent.shortToString());
+                            }
+                            allStatementsForConcept.remove(rUnderTest);
+                        }
+                        else  if ((rUnderTest.isMemberOfGroup()) && (!rParent.isMemberOfGroup())){
+                            if (shouldShowDetails){
+                                LOG.info("Parent concept statement is a member of group 0 (no group), but the child concept statement is not, so statement is kept");
+                            }
+                        }
+                        else if ((!rUnderTest.isMemberOfGroup()) && (rParent.isMemberOfGroup())){
+                            if (shouldShowDetails){
+                                LOG.info("Child concept statement is a member of group 0 (no group), but the parent concept statement is not, so statement is kept");
+                            }
+                        }
+                        else if (concept.getGroup(rUnderTest).equals(parentConcept.getGroup(rParent)))
                         {
                             if (shouldShowDetails) {
                                 LOG.info("Because parent concept statement is part of a group that is identical to the group of the child concept statement, and because both the parent and child group id is not 0 (no group), we can remove");
@@ -175,14 +199,7 @@ public class CanonicalAlgorithm {
 
                             allStatementsForConcept.remove(rUnderTest);
                         }else if (shouldShowDetails){
-                            if (rUnderTest.getGroup() == 0){
-                                LOG.info("But group id for child concept is 0 (no group), so statement is kept");
-                            }else if (rParent.getGroup() == 0){
-                                LOG.info("But group id for parent concept is 0 (no group), so statement is kept");
-                            }else{
-                                LOG.info("But the child concept statement's group is not the same as the parent concept statement's group, so the statement is kept");
-                            }
-                            
+                            LOG.info("But the child concept statement's group is not the same as the parent concept statement's group, and neither of the groups are 0 (no group), so the statement is kept");                            
                         }
                     }
                 }

@@ -111,6 +111,10 @@ public class Statement {
         }
         return false;
     }
+    
+    public boolean isMemberOfGroup(){
+        return (group != 0);
+    }    
 
     /*
      * Generated Getters and Setters
