@@ -28,14 +28,14 @@ public class Statement {
     private long serialisedId = SERIALISED_ID_NOT_DEFINED;
     @Column(name="characteristic_type") private int characteristicType;
     @Column(nullable=true) private int refinability;
-    @Column(name="relationship_group") private int group;
+    @Column(name="relationship_group") private int groupId;
 
     public Statement(){};
     public Statement(long serialisedId){this.serialisedId = serialisedId;}
     public Statement(long serialisedId, Concept subject, Concept predicate, 
             Concept object, int characteristicType, int group)
     {
-        this.group = group;
+        this.groupId = group;
         this.serialisedId = serialisedId;
         this.subject = subject;
         this.object = object;
@@ -58,15 +58,6 @@ public class Statement {
         predicate.addPredicateOfStatement(this);
     }
 
-    
-    public boolean isKindOfRelationship(){
-        return (getPredicate().isKindOfPredicate());
-    }
-    
-    public boolean isDefiningCharacteristic(){
-        return getCharacteristicType() == DEFINING_CHARACTERISTIC_TYPE;
-    }
-    
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
@@ -78,18 +69,17 @@ public class Statement {
             .add("object", getObject() == null ? null : getObject().getSerialisedId())
             .add("characteristic", getCharacteristicType())
             .add("refinability", getRefinability())
-            .add("group", getGroup())
+            .add("group", getGroupId())
             .toString();
     }
     
     public String shortToString(){
-        return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + ", T" + getCharacteristicType() + ", G" + getGroup()+"]";
+        return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + ", T" + getCharacteristicType() + ", G" + getGroupId()+"]";
     }
 
     @Override
     public int hashCode(){
         if (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED){
-            //HERE
             return Longs.hashCode((this.getSubject() == null) ? -1 : this.getSubject().getSerialisedId());
         }
         return Longs.hashCode(getSerialisedId());
@@ -113,8 +103,21 @@ public class Statement {
         return false;
     }
     
+    public Group getGroup(){
+        return getSubject().getGroup(this);
+    }
+    
+    public boolean isKindOfStatement(){
+        return (getPredicate().isKindOfPredicate());
+    }
+    
+    public boolean isDefiningCharacteristic(){
+        return getCharacteristicType() == DEFINING_CHARACTERISTIC_TYPE;
+    }
+        
+    
     public boolean isMemberOfGroup(){
-        return (group != 0);
+        return (groupId != 0);
     }    
 
     /*
@@ -156,11 +159,11 @@ public class Statement {
     public void setRefinability(int refinability) {
         this.refinability = refinability;
     }
-    public int getGroup() {
-        return group;
+    public int getGroupId() {
+        return groupId;
     }
-    public void setGroup(int group) {
-        this.group = group;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
     public Ontology getOntology() {
         return ontology;
@@ -174,7 +177,4 @@ public class Statement {
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
     }
-
-
-
 }

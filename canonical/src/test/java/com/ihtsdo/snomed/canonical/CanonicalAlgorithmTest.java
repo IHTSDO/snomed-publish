@@ -261,7 +261,7 @@ public class CanonicalAlgorithmTest {
         
         for (Statement r : statements){
             assertEquals(c1, r.getSubject());
-            assertTrue(r.isKindOfRelationship());
+            assertTrue(r.isKindOfStatement());
             assertTrue(new HashSet<Concept>(Arrays.asList(c2,c3)).contains(r.getObject()));
             assertTrue(r.isDefiningCharacteristic());
             assertTrue(new HashSet<Long>(Arrays.asList(

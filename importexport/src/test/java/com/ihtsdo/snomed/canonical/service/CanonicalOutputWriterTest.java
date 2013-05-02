@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.canonical.service;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Statement;
-import com.ihtsdo.snomed.service.CanonicalOutputWriter;
+import com.ihtsdo.snomed.canonical.service.CanonicalOutputWriter;
 
 public class CanonicalOutputWriterTest {
 

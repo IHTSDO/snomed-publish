@@ -2,17 +2,21 @@ package com.ihtsdo.snomed.canonical.model;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class GroupTest {
+import com.ihtsdo.snomed.canonical.service.InvalidInputException;
+
+public class GroupTest{
 
     @Before
     public void setUp() throws Exception {
     }
 
     @Test
-    public void shouldReturnEqual() {
+    public void shouldReturnEqual1() {
         Concept subject1 = new Concept(1);
         Concept subject2 = new Concept(2);
         Concept predicate1 = new Concept(3);
@@ -39,5 +43,73 @@ public class GroupTest {
 
         assertTrue(group1.equals(group2));        
     }
+    
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionWhenSettingWrongStatementInGroup() throws InvalidInputException{
+        Statement s1 = new Statement(123);
+        Statement s2 = new Statement(1234);
+        s1.setSubject(new Concept(1));
+        s2.setSubject(new Concept(2));
+        s1.setPredicate(new Concept(3));
+        s2.setPredicate(new Concept(4));
+        
+        new Group(Arrays.asList(s1, s2));
+    }
+    
+    @Test
+    public void shouldSetWrappedStatements(){
+        Statement s1 = new Statement(123);
+        s1.setPredicate(new Concept(1));
+        Group group = new Group(s1);
+        
+        assertEquals(1, group.statements.size());
+        assertEquals(s1, group.statements.iterator().next().statement);
+    }
+    
+    @Test
+    public void shouldEqualStatementWrapperForAttributeCompare(){
+        Statement s1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        Statement s2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        s1.setObject(new Concept(1));
+        s2.setObject(new Concept(1));
+        s1.setPredicate(new Concept(2));
+        s2.setPredicate(new Concept(2));
+        
+        Group.StatementWrapperForAttributeCompare w1 = new Group.StatementWrapperForAttributeCompare(s1);
+        Group.StatementWrapperForAttributeCompare w2 = new Group.StatementWrapperForAttributeCompare(s2);
+        
+        assertEquals(w1, w2);
+    }
+    
+    @Test
+    public void shouldNotEqualStatementWrapperForAttributeCompare1(){
+        Statement s1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        Statement s2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        s1.setObject(new Concept(1));
+        s2.setObject(new Concept(1));
+        s1.setPredicate(new Concept(3));
+        s2.setPredicate(new Concept(2));
+        
+        Group.StatementWrapperForAttributeCompare w1 = new Group.StatementWrapperForAttributeCompare(s1);
+        Group.StatementWrapperForAttributeCompare w2 = new Group.StatementWrapperForAttributeCompare(s2);
+        
+        assertNotEquals(w1, w2);
+    }
+    
+    @Test
+    public void shouldEqualStatementWrapperForAttributeCompare2(){
+        Statement s1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        Statement s2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
+        s1.setObject(new Concept(3));
+        s2.setObject(new Concept(1));
+        s1.setPredicate(new Concept(2));
+        s2.setPredicate(new Concept(2));
+        
+        Group.StatementWrapperForAttributeCompare w1 = new Group.StatementWrapperForAttributeCompare(s1);
+        Group.StatementWrapperForAttributeCompare w2 = new Group.StatementWrapperForAttributeCompare(s2);
+        
+        assertNotEquals(w1, w2);
+    }    
 
 }

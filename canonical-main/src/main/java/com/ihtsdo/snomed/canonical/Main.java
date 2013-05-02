@@ -23,8 +23,8 @@ import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Statement;
-import com.ihtsdo.snomed.service.CanonicalOutputWriter;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
+import com.ihtsdo.snomed.canonical.service.CanonicalOutputWriter;
+import com.ihtsdo.snomed.canonical.service.HibernateDbImporter;
 
 public class Main {
     

@@ -8,8 +8,8 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ihtsdo.snomed.canonical.service.CanonicalOutputWriter;
 import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
-import com.ihtsdo.snomed.service.CanonicalOutputWriter;
 
 public class CanonicalWrappedStatementWriter extends CanonicalOutputWriter {
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalWrappedStatementWriter.class );

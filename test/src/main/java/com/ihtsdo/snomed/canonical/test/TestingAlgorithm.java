@@ -54,7 +54,7 @@ public class TestingAlgorithm {
         //LOG.info("Splitting generated statements");
         Set<StatementForCompareWrapper> generatedIsKindOfWrappedStatements = new HashSet<StatementForCompareWrapper>();
         for (StatementForCompareWrapper r : generatedWrappedStatements){
-            if (r.getStatement().isKindOfRelationship()){
+            if (r.getStatement().isKindOfStatement()){
                 generatedIsKindOfWrappedStatements.add(r);
             }
         }
@@ -63,7 +63,7 @@ public class TestingAlgorithm {
         //LOG.info("Splitting expected statements");
         Set<StatementForCompareWrapper> expectedIsKindOfWrappedStatements = new HashSet<StatementForCompareWrapper>();
         for (StatementForCompareWrapper r : expectedWrappedStatements){
-            if (r.getStatement().isKindOfRelationship()){
+            if (r.getStatement().isKindOfStatement()){
                 expectedIsKindOfWrappedStatements.add(r);
             }
         }

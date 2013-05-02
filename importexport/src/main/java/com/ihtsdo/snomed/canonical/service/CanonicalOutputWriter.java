@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.canonical.service;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -36,6 +36,6 @@ public class CanonicalOutputWriter {
         w.write(Long.toString(r.getSubject().getSerialisedId())
                 + DELIMITER + Long.toString(r.getPredicate().getSerialisedId())
                 + DELIMITER + Long.toString(r.getObject().getSerialisedId())
-                + DELIMITER + Integer.toString(r.getGroup()));
+                + DELIMITER + Integer.toString(r.getGroupId()));
     }
 }

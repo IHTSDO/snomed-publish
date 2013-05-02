@@ -1,30 +1,41 @@
 package com.ihtsdo.snomed.canonical.model;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.canonical.service.InvalidInputException;
 
 public class Group {
     
-    private final Set<StatementWrapperForAttributeCompare> statements = new HashSet<StatementWrapperForAttributeCompare>();
-    private final int id;
+    protected final Set<StatementWrapperForAttributeCompare> statements = new HashSet<StatementWrapperForAttributeCompare>();
+    private Concept groupForConcept;
+    
+    public Group(){}
     
     public Group(Statement statement){
+        groupForConcept = statement.getSubject();
         this.statements.add(new StatementWrapperForAttributeCompare(statement));
-        this.id = statement.getGroup();
     }
     
-    public Group(int id){
-        this.id = id;
+    public Group(Collection<Statement> statements) throws InvalidInputException{
+        if (groupForConcept == null) groupForConcept = statements.iterator().next().getSubject();
+        for (Statement s : statements){
+            if (!groupForConcept.equals(s.getSubject())){
+                throw new InvalidInputException("Attempting to add statement " + s.toString() + " to group allready determined to be for concept " + groupForConcept.toString());
+            }
+            this.statements.add(new StatementWrapperForAttributeCompare(s));
+        }
     }
 
     public void addStatement(Statement statement){
         this.statements.add(new StatementWrapperForAttributeCompare(statement));
     }
+    
     @Override
     public String toString(){
-        String value = "Group " + id + ": {";
+        String value = "Group: {";
         for (StatementWrapperForAttributeCompare statement : statements){
             value += statement.getStatement().shortToString() + ", ";
         }
@@ -42,19 +53,17 @@ public class Group {
         if (o instanceof Group){
             Group g = (Group) o;
             if (g.statements.size() != this.statements.size()){
-                //System.out.println("Statement.size are different, returning false");
                 return false;
             }
             
             if (this.statements.equals(g.statements)){
-                //System.out.println("sets are different, returning false");
                 return true;
             }
         }
         return false;
     }
     
-    private class StatementWrapperForAttributeCompare{
+    protected static class StatementWrapperForAttributeCompare{
         Statement statement;
         
         public StatementWrapperForAttributeCompare(Statement statement){

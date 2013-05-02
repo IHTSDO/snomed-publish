@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.canonical.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,26 +28,27 @@ import org.slf4j.LoggerFactory;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Statement;
+import com.ihtsdo.snomed.canonical.service.HibernateDbImporter;
 
 public class HibernateDatabaseImporterTest {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporterTest.class );
 
-    private static final String DEFAULT_ONTOLOGY_NAME = "Test";
-    private static HibernateDbImporter importer;
+    protected static final String DEFAULT_ONTOLOGY_NAME = "Test";
+    protected static HibernateDbImporter importer;
     
 
-    private static final String TEST_CONCEPTS = "test_concepts.txt";
-    private static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
-    private static final String TEST_RELATIONSHIPS_LONG_FORM = "test_relationships_longform.txt";
-    private static final String TEST_RELATIONSHIPS_LONG_FORM_WITH_PARSE_ERROR = "test_relationships_longform_with_parse_error.txt";
+    protected static final String TEST_CONCEPTS = "test_concepts.txt";
+    protected static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
+    protected static final String TEST_RELATIONSHIPS_LONG_FORM = "test_relationships_longform.txt";
+    protected static final String TEST_RELATIONSHIPS_LONG_FORM_WITH_PARSE_ERROR = "test_relationships_longform_with_parse_error.txt";
 
-    private static final String TEST_RELATIONSHIPS_SHORT_FORM = "test_relationships_shortform.txt";
+    protected static final String TEST_RELATIONSHIPS_SHORT_FORM = "test_relationships_shortform.txt";
     //private static final String TEST_RELATIONSHIPS_SHORT_FORM_WITH_PARSE_ERROR = "test_relationships_shortform_with_parse_error.txt";
-    private static final String TEST_IS_KIND_OF_RELATIONSHIPS = "test_is_kind_of_relationships.txt";
-    private static final String TEST_IS_KIND_OF_CONCEPTS = "test_is_kind_of_concepts.txt";
+    protected static final String TEST_IS_KIND_OF_RELATIONSHIPS = "test_is_kind_of_relationships.txt";
+    protected static final String TEST_IS_KIND_OF_CONCEPTS = "test_is_kind_of_concepts.txt";
 
-    private static EntityManagerFactory emf = null;
-    private static EntityManager em = null;
+    protected static EntityManagerFactory emf = null;
+    protected static EntityManager em = null;
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -138,7 +139,7 @@ public class HibernateDatabaseImporterTest {
         assertEquals (71737002, r.getObject().getSerialisedId());
         assertEquals (0, r.getCharacteristicType());
         assertEquals (0, r.getRefinability());
-        assertEquals (0, r.getGroup());
+        assertEquals (0, r.getGroupId());
     }
     
     @Test
@@ -162,7 +163,7 @@ public class HibernateDatabaseImporterTest {
         assertEquals (71737002, r.getObject().getSerialisedId());
         assertEquals (0, r.getCharacteristicType());
         assertEquals (0, r.getRefinability());
-        assertEquals (1, r.getGroup());
+        assertEquals (1, r.getGroupId());
     }    
 
     @Test
@@ -355,13 +356,12 @@ public class HibernateDatabaseImporterTest {
         importer.stringToBoolean("blah");
     }    
     
-//HERE
-//    @Test
-//    public void shouldSetKindOfPredicate() throws IOException{
-//        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-//                ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_LONG_FORM), em);
-//        
-//        assertNotNull(ontology.getIsKindOfPredicate());
-//        assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());
-//    }
+    @Test
+    public void shouldSetKindOfPredicate() throws IOException{
+        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RELATIONSHIPS_LONG_FORM), em);
+        
+        assertNotNull(ontology.getIsKindOfPredicate());
+        assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());
+    }
 }

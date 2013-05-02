@@ -135,7 +135,7 @@ public class CanonicalAlgorithm {
         }
         
         for (Statement rUnderTest : concept.getSubjectOfStatements()){
-            if ((rUnderTest.isKindOfRelationship()) || (!rUnderTest.isDefiningCharacteristic())){
+            if ((rUnderTest.isKindOfStatement()) || (!rUnderTest.isDefiningCharacteristic())){
                 allStatementsForConcept.remove(rUnderTest);
                 continue;
             }
@@ -144,7 +144,7 @@ public class CanonicalAlgorithm {
                 if (!rUnderTest.isDefiningCharacteristic()){
                     LOG.debug("Skipping non-defining characteristic relationship {}", rUnderTest);
                 }
-                else if (rUnderTest.isKindOfRelationship()){
+                else if (rUnderTest.isKindOfStatement()){
                     LOG.debug("Skipping non-characteristic isA relationship {}", rUnderTest);
                 }
                 else{
@@ -189,7 +189,7 @@ public class CanonicalAlgorithm {
                                 LOG.info("Child concept statement is a member of group 0 (no group), but the parent concept statement is not, so statement is kept");
                             }
                         }
-                        else if (concept.getGroup(rUnderTest).equals(parentConcept.getGroup(rParent)))
+                        else if (rUnderTest.getGroup().equals(rParent.getGroup()))
                         {
                             if (shouldShowDetails) {
                                 LOG.info("Because parent concept statement is part of a group that is identical to the group of the child concept statement, and because both the parent and child group id is not 0 (no group), we can remove");

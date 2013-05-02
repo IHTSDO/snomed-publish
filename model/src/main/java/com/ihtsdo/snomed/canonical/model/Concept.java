@@ -30,12 +30,12 @@ import com.google.common.primitives.Longs;
 @XmlRootElement
 @Entity
 public class Concept {
-    private static final String ATTRIBUTE = "attribute";
+    protected static final String ATTRIBUTE = "attribute";
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003;
     
     @XmlTransient @Transient private Set<Concept> cache;
-    @XmlTransient @Transient private Map<Integer, Group> subjectOfStatementGrouping = new HashMap<Integer, Group>();
+    @XmlTransient @Transient private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
 
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private long id;    
 
@@ -141,25 +141,18 @@ public class Concept {
         return false;
     }
     
-    public Group getGroup(Statement statement){
-        Group group = subjectOfStatementGrouping.get(statement.getGroup());
+    /*package level*/ Group getGroup(Statement statement){
+        Group group = groupMap.get(statement.getGroupId());
         if (group == null){
-            group = new Group(statement.getGroup());
-            subjectOfStatementGrouping.put(statement.getGroup(), group);
-            for (Statement s : getSubjectOfStatements()){
-                if (s.isKindOfRelationship()){
-                    continue;
-                }
-                if (s.getGroup() == statement.getGroup()){
-                    group.addStatement(s);
+            group = new Group();
+            groupMap.put(statement.getGroupId(), group);
+            for (Statement otherStatement : getSubjectOfStatements()){
+                if (!otherStatement.isKindOfStatement() && (otherStatement.getGroupId() == statement.getGroupId())){
+                    group.addStatement(otherStatement);
                 }
             }
         }
         return group; 
-    }    
-    
-    public void setSerialisedId(long serialisedId) {
-        this.serialisedId = serialisedId;
     }    
 
     /*
@@ -250,6 +243,9 @@ public class Concept {
     public void setType(String type) {
         this.type = type;
     }
+    public void setSerialisedId(long serialisedId) {
+        this.serialisedId = serialisedId;
+    }        
     public long getSerialisedId() {
         return serialisedId;
     }

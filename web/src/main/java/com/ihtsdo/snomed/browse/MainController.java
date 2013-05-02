@@ -47,11 +47,11 @@ public class MainController {
     private Ordering<Statement> byGroupAndSubjectFsn = new Ordering<Statement>() {
         @Override
         public int compare(Statement r1, Statement r2) {
-            if (r1.getGroup() == r2.getGroup()){
+            if (r1.getGroupId() == r2.getGroupId()){
                 return r1.getSubject().getFullySpecifiedName().compareTo(r2.getSubject().getFullySpecifiedName());
             }
             else{
-                return Ints.compare(r1.getGroup(), r2.getGroup());
+                return Ints.compare(r1.getGroupId(), r2.getGroupId());
             }
         }
     };
@@ -59,11 +59,11 @@ public class MainController {
     private Ordering<Statement> byGroupAndPredicateFsn = new Ordering<Statement>() {
         @Override
         public int compare(Statement r1, Statement r2) {
-            if (r1.getGroup() == r2.getGroup()){
+            if (r1.getGroupId() == r2.getGroupId()){
                 return r1.getPredicate().getFullySpecifiedName().compareTo(r2.getPredicate().getFullySpecifiedName());
             }
             else{
-                return Ints.compare(r1.getGroup(), r2.getGroup());
+                return Ints.compare(r1.getGroupId(), r2.getGroupId());
             }
         }
     };     
@@ -131,7 +131,7 @@ public class MainController {
             if (subjectOfCache.get(c.getId()) == null){
                 List<Statement> subjectOf = new ArrayList<Statement>();
                 for (Statement r : c.getSubjectOfStatements()){
-                    if (!r.isKindOfRelationship()){
+                    if (!r.isKindOfStatement()){
                         subjectOf.add(r);
                     }
                 }
@@ -142,7 +142,7 @@ public class MainController {
             if (objectOfCache.get(c.getId()) == null){
                 List<Statement> objectOf = new ArrayList<Statement>();
                 for (Statement r : c.getObjectOfStatements()){
-                    if (!r.isKindOfRelationship()){
+                    if (!r.isKindOfStatement()){
                         objectOf.add(r);
                     }
                 }
@@ -153,7 +153,7 @@ public class MainController {
             if (predicateOfCache.get(c.getId()) == null){
                 List<Statement> predicateOf = new ArrayList<Statement>();
                 for (Statement r : c.getPredicateOfStatements()){
-                    if (!r.isKindOfRelationship()){
+                    if (!r.isKindOfStatement()){
                         predicateOf.add(r);
                     }
                 }

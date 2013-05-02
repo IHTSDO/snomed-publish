@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.canonical.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.canonical.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -37,14 +38,13 @@ public class Ontology {
                 add("name", getId()).
                 add("statements", getStatements() == null ? 0 : getStatements().size()).
                 add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
-                //HERE
                 add("isA", (isKindOfPredicate == null) ? "not set" : "set").toString();
     }
 
     public void addStatement(Statement r){
         getStatements().add(r);
     }
-    //HERE
+    
     public Concept getIsKindOfPredicate(){
         if (isKindOfPredicate == null){
             for (Concept c : concepts){
@@ -95,31 +95,13 @@ public class Ontology {
     public Set<Concept> getConcepts() {
         return concepts;
     }
+    
+    public void addConcept(Concept c){
+        if (concepts == null) concepts = new HashSet<Concept>();
+        concepts.add(c);
+    }
 
     public void setConcepts(Set<Concept> concepts) {
         this.concepts = concepts;
     }
-
-    //HERE
-//    public Concept getIsKindOfPredicate(){
-//        if (isKindOfPredicate == null){
-//            for (Statement s : getStatements()){
-//                if (s.isKindOfRelationship()){
-//                    isKindOfPredicate = s.getPredicate();
-//                    break;
-//                }
-//            }
-//        }
-//        if (isKindOfPredicate == null){
-//            throw new IllegalStateException("IsA Concept not found in ontology");
-//        }
-//        return isKindOfPredicate;
-//    }
-//
-//    public void setIsKindOfPredicate(Concept isKindOfPredicate) {
-//        this.isKindOfPredicate = isKindOfPredicate;
-//    }
-
-    
-
 }

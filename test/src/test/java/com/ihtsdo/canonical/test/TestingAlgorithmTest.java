@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.canonical.model.Ontology;
+import com.ihtsdo.snomed.canonical.service.HibernateDbImporter;
 import com.ihtsdo.snomed.canonical.test.TestingAlgorithm;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
 
 public class TestingAlgorithmTest {
     private static final Logger LOG = LoggerFactory.getLogger( TestingAlgorithmTest.class );
