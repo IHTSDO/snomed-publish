@@ -141,29 +141,22 @@ public class Concept {
         return false;
     }
     
-    public void addSubjectOfStatement(Statement statement){
-        subjectOfStatements.add(statement);
-        populateGroup(statement);
-    }
-    
     public Group getGroup(Statement statement){
         Group group = subjectOfStatementGrouping.get(statement.getGroup());
         if (group == null){
-            group = populateGroup(statement);    
-        }
-        return group;
-    }
-
-    private Group populateGroup(Statement statement) {
-        Group group = subjectOfStatementGrouping.get(statement.getGroup());
-        if (group == null) {
-            group = new Group(statement); 
+            group = new Group(statement.getGroup());
             subjectOfStatementGrouping.put(statement.getGroup(), group);
-        }else{
-            group.addStatement(statement);
+            for (Statement s : getSubjectOfStatements()){
+                if (s.isKindOfRelationship()){
+                    continue;
+                }
+                if (s.getGroup() == statement.getGroup()){
+                    group.addStatement(s);
+                }
+            }
         }
-        return group;
-    }
+        return group; 
+    }    
     
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
@@ -230,6 +223,9 @@ public class Concept {
     public Set<Statement> getSubjectOfStatements(){
         return subjectOfStatements;
     }
+    public void addSubjectOfStatement(Statement statement){
+        subjectOfStatements.add(statement);
+    }    
     public void addPredicateOfStatement(Statement statement){
         predicateOfStatements.add(statement);
     }
