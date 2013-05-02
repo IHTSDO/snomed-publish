@@ -22,6 +22,6 @@
 </head>
 <body id="error">
     <h1>Error: <span class="id"><c:out value="${message}"/></h1>
-    <img style="height: 100%" src="/img/DOh.jpg"/>
+    <img style="height: 40em" src="/img/DOh.jpg"/>
 </body>
 </html>

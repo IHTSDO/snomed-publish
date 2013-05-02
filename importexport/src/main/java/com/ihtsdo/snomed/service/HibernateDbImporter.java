@@ -31,12 +31,10 @@ import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 
-
 public class HibernateDbImporter {
     private static final Logger LOG = LoggerFactory.getLogger( HibernateDbImporter.class );
 
     public static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
-
     private static final int DEFAULT_REFINABILITY = 0;
     private static final int DEFAULT_CHARACTERISTIC_TYPE = 0;
 
@@ -346,7 +344,7 @@ public class HibernateDbImporter {
         tx.commit();
     }
 
-    protected boolean stringToBoolean(String string){
+    protected boolean stringToBoolean(String string) throws IllegalArgumentException{
         if (string.trim().equals("0")){
             return false;
         }

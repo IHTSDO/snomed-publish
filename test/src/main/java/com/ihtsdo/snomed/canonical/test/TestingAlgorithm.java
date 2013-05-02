@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Statement;
 import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
@@ -33,11 +31,11 @@ public class TestingAlgorithm {
         Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Starting sanity check");
  
-//        int expectedStatementsSize = expectedOntology.getRelationshipStatements().size();
+//        int expectedStatementsSize = expectedOntology.getStatements().size();
 //        LOG.info("Total number of expected statements: " + expectedStatementsSize);
-//        int generatedStatementsSize = generatedOntology.getRelationshipStatements().size();
+//        int generatedStatementsSize = generatedOntology.getStatements().size();
 //        LOG.info("Total number of generated statements: " + generatedStatementsSize);
-//        int originalStatementsSize = originalOntology.getRelationshipStatements().size();
+//        int originalStatementsSize = originalOntology.getStatements().size();
 //        LOG.info("Total number of original statements: " + originalStatementsSize);
 
         LOG.info("Comparing the inputs");
@@ -125,263 +123,256 @@ public class TestingAlgorithm {
         LOG.info("Completed sanity check in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }
     
-    private void testForSwappedIdenticalGroups(Set<StatementForCompareWrapper> extraStatements, EntityManager em) throws IOException{
-        Set<SetEquivalent> setEquivalents = new HashSet<SetEquivalent>(4000);
-        Set<Concept> allSubjects = getAllSubjects(extraStatements); 
-        LOG.info("There are unique " + allSubjects.size() + " subject concepts in the extra statements");
-        Set<Concept> swapProblemConcepts = new HashSet<Concept>();
-        for (Concept c : allSubjects){
-            
-            Concept originalVersionOfConcept = em.createQuery(
-                    "select c from Concept c where c.ontology.id = 1 and c.serialisedId = " + c.getSerialisedId(), 
-                    Concept.class).getSingleResult();
-            
-            
-//            for (Statement originalStatement : originalStatements){
-//                if (originalStatement.getSubject().getSerialisedId() == c.getSerialisedId()){
-//                    originalVersionOfConcept = originalStatement.getSubject();
+//    private void testForSwappedIdenticalGroups(Set<RelationshipStatementForCompareWrapper> extraStatements, EntityManager em) throws IOException{
+//        Set<SetEquivalent> setEquivalents = new HashSet<SetEquivalent>(4000);
+//        Set<Concept> allSubjects = getAllSubjects(extraStatements); 
+//        LOG.info("There are unique " + allSubjects.size() + " subject concepts in the extra statements");
+//        Set<Concept> swapProblemConcepts = new HashSet<Concept>();
+//        for (Concept c : allSubjects){
+//            
+//            Concept originalVersionOfConcept = em.createQuery(
+//                    "select c from Concept c where c.ontology.id = 1 and c.serialisedId = " + c.getSerialisedId(), 
+//                    Concept.class).getSingleResult();
+//            
+//            LOG.debug("Testing if subject " + originalVersionOfConcept.getSerialisedId() + " has at least one swapped group in parent");
+//            Set<Integer> subjectGroups = findAllGroups(originalVersionOfConcept);
+//            LOG.debug("Subject {} has groups [{}]", originalVersionOfConcept.getSerialisedId(), subjectGroups);
+//            
+//            for (Integer subjectGroup : subjectGroups){
+//                Set<Statement> statementsInGroup = new HashSet<Statement>();
+//                for (Statement s : originalVersionOfConcept.getSubjectOfRelationshipStatements()){
+//                    if (s.getGroup() == subjectGroup){
+//                        statementsInGroup.add(s);
+//                    }
+//                }
+//                LOG.debug("Found a total of {} statements in group {} for concept [{}]", 
+//                        statementsInGroup.size(), subjectGroup, c.getSerialisedId());
+//                
+//                for (Concept parent : originalVersionOfConcept.getAllKindOfPrimitiveConcepts(true)){
+//                    LOG.debug("Looking for group in parent concept {} identical to group {} in concept {}", 
+//                            parent.getSerialisedId(), subjectGroup, originalVersionOfConcept.getSerialisedId());
+//                    int parentGroup = findSetEqualGroup(parent, statementsInGroup);
+//                    if ((parentGroup != -1) && (parentGroup != subjectGroup)){
+////                        LOG.info("Group {} in child concept {} is set identical to group {} in parent concept {}",
+////                                subjectGroup, c.getSerialisedId(), parentGroup, parent.getSerialisedId());
+//                        swapProblemConcepts.add(c);
+//                        
+//                        SetEquivalent se = new SetEquivalent();
+//                        se.childGroup = subjectGroup;
+//                        se.parentGroup = parentGroup;
+//                        se.parentConcept = parent;
+//                        se.childConcept = c;
+//                        se.childStatements = statementsInGroup;
+//                        for (Statement s : parent.getSubjectOfRelationshipStatements()){
+//                            if (s.getGroup() == parentGroup){
+//                                se.parentStatements.add(s);
+//                            }
+//                        }
+//                        setEquivalents.add(se);
+//                        
+//                    }else{
+//                        LOG.debug("Not found");
+//                    }
 //                }
 //            }
-            
-            LOG.debug("Testing if subject " + originalVersionOfConcept.getSerialisedId() + " has at least one swapped group in parent");
-            Set<Integer> subjectGroups = findAllGroups(originalVersionOfConcept);
-            LOG.debug("Subject {} has groups [{}]", originalVersionOfConcept.getSerialisedId(), subjectGroups);
-            
-            for (Integer subjectGroup : subjectGroups){
-                Set<Statement> statementsInGroup = new HashSet<Statement>();
-                for (Statement s : originalVersionOfConcept.getSubjectOfStatements()){
-                    if (s.getGroup() == subjectGroup){
-                        statementsInGroup.add(s);
-                    }
-                }
-                LOG.debug("Found a total of {} statements in group {} for concept [{}]", 
-                        statementsInGroup.size(), subjectGroup, c.getSerialisedId());
-                
-                for (Concept parent : originalVersionOfConcept.getAllKindOfPrimitiveConcepts(true)){
-                    LOG.debug("Looking for group in parent concept {} identical to group {} in concept {}", 
-                            parent.getSerialisedId(), subjectGroup, originalVersionOfConcept.getSerialisedId());
-                    int parentGroup = findSetEqualGroup(parent, statementsInGroup);
-                    if ((parentGroup != -1) && (parentGroup != subjectGroup)){
-//                        LOG.info("Group {} in child concept {} is set identical to group {} in parent concept {}",
-//                                subjectGroup, c.getSerialisedId(), parentGroup, parent.getSerialisedId());
-                        swapProblemConcepts.add(c);
-                        
-                        SetEquivalent se = new SetEquivalent();
-                        se.childGroup = subjectGroup;
-                        se.parentGroup = parentGroup;
-                        se.parentConcept = parent;
-                        se.childConcept = c;
-                        se.childStatements = statementsInGroup;
-                        for (Statement s : parent.getSubjectOfStatements()){
-                            if (s.getGroup() == parentGroup){
-                                se.parentStatements.add(s);
-                            }
-                        }
-                        setEquivalents.add(se);
-                        
-                    }else{
-                        LOG.debug("Not found");
-                    }
-                }
-            }
-        }
-        for (SetEquivalent se : setEquivalents){
-            LOG.info(se.toString());
-        }
-        LOG.info("There are " + setEquivalents.size() + " parent-child concepts that have equivalent sets with different group ids");
-        
-        Set<StatementForCompareWrapper> statementsWithPossibleGroupSwap = new HashSet<StatementForCompareWrapper>();
-        for (StatementForCompareWrapper r : extraStatements){
-            for (SetEquivalent se : setEquivalents){
-                if (se.childStatements.contains(r.getStatement())){
-                    statementsWithPossibleGroupSwap.add(new StatementForCompareWrapper(r.getStatement()));
-                }
-            }
-        }
-        Set<StatementForCompareWrapper> remainingProblems = new HashSet<StatementForCompareWrapper>(extraStatements); 
-        remainingProblems.removeAll(statementsWithPossibleGroupSwap);
-        
-        File file = new File("remaining");
-        if (!file.exists()){
-            file.createNewFile();
-        }            
-        try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
-            LOG.info("Writing remaining " + remainingProblems.size() + " extra statements to file 'remaining'"); 
-            writer.writeCompareStatements(bw, remainingProblems);
-        }
-        
-        LOG.info("There are " + statementsWithPossibleGroupSwap.size() + " extra statements that are defined in a group that has a set equivalent group in a parent concept, but under a different group id");
-    }
+//        }
+//        for (SetEquivalent se : setEquivalents){
+//            LOG.info(se.toString());
+//        }
+//        LOG.info("There are " + setEquivalents.size() + " parent-child concepts that have equivalent sets with different group ids");
+//        
+//        Set<RelationshipStatementForCompareWrapper> statementsWithPossibleGroupSwap = new HashSet<RelationshipStatementForCompareWrapper>();
+//        for (RelationshipStatementForCompareWrapper r : extraStatements){
+//            for (SetEquivalent se : setEquivalents){
+//                if (se.childStatements.contains(r.getRelationshipStatement())){
+//                    statementsWithPossibleGroupSwap.add(new RelationshipStatementForCompareWrapper(r.getRelationshipStatement()));
+//                }
+//            }
+//        }
+//        Set<RelationshipStatementForCompareWrapper> remainingProblems = new HashSet<RelationshipStatementForCompareWrapper>(extraStatements); 
+//        remainingProblems.removeAll(statementsWithPossibleGroupSwap);
+//        
+//        File file = new File("remaining");
+//        if (!file.exists()){
+//            file.createNewFile();
+//        }            
+//        try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
+//            LOG.info("Writing remaining " + remainingProblems.size() + " extra statements to file 'remaining'"); 
+//            writer.writeCompareStatements(bw, remainingProblems);
+//        }
+//        
+//        LOG.info("There are " + statementsWithPossibleGroupSwap.size() + " extra statements that are defined in a group that has a set equivalent group in a parent concept, but under a different group id");
+//    }
     
-    private class SetEquivalent{
-        public Concept childConcept;
-        public int childGroup;
-        public Set<Statement> childStatements = new HashSet<Statement>();
-        
-        public Concept parentConcept;
-        public int parentGroup;
-        public Set<Statement> parentStatements = new HashSet<Statement>();
-        
-        public String toString(){
-            return "Group " + childGroup + " in child concept " + (childConcept == null ? null : childConcept.getSerialisedId()) + 
-                    " has " + childStatements.size() + " relationships and is set identical to group " + 
-                    parentGroup + " in parent concept " + (parentConcept == null ? null : parentConcept.getSerialisedId() + 
-                            " with " + parentStatements.size() + " relationships");
-        }
-    }
+//    private class SetEquivalent{
+//        public Concept childConcept;
+//        public int childGroup;
+//        public Set<Statement> childStatements = new HashSet<Statement>();
+//        
+//        public Concept parentConcept;
+//        public int parentGroup;
+//        public Set<Statement> parentStatements = new HashSet<Statement>();
+//        
+//        public String toString(){
+//            return "Group " + childGroup + " in child concept " + (childConcept == null ? null : childConcept.getSerialisedId()) + 
+//                    " has " + childStatements.size() + " relationships and is set identical to group " + 
+//                    parentGroup + " in parent concept " + (parentConcept == null ? null : parentConcept.getSerialisedId() + 
+//                            " with " + parentStatements.size() + " relationships");
+//        }
+//    }
+//
+//    private Set<Concept> getAllSubjects(Set<RelationshipStatementForCompareWrapper> udcStatements) {
+//        Set<Concept> allSubjects = new HashSet<Concept>();
+//        for (RelationshipStatementForCompareWrapper r : udcStatements){
+//            allSubjects.add(r.getRelationshipStatement().getSubject());
+//        }
+//        return allSubjects;
+//    }
+//
+//    private int findSetEqualGroup(Concept concept, Set<Statement> incomingStatementsInGroup) {
+//        for (int group : findAllGroups(concept)){
+//            Set<StatementWrapperForAttributeCompare> statementsInGroupToCompare = new HashSet<StatementWrapperForAttributeCompare>();
+//            for (Statement s : concept.getSubjectOfRelationshipStatements()){
+//                if (s.getGroup() == group){
+//                    statementsInGroupToCompare.add(new StatementWrapperForAttributeCompare(s));
+//                }
+//                if (statementsInGroupToCompare.equals(wrapStatements(incomingStatementsInGroup))){
+//                    return group;
+//                }
+//            }
+//        }
+//        return -1;
+//    }
 
-    private Set<Concept> getAllSubjects(Set<StatementForCompareWrapper> udcStatements) {
-        Set<Concept> allSubjects = new HashSet<Concept>();
-        for (StatementForCompareWrapper r : udcStatements){
-            allSubjects.add(r.getStatement().getSubject());
-        }
-        return allSubjects;
-    }
-
-    private int findSetEqualGroup(Concept concept, Set<Statement> incomingStatementsInGroup) {
-        for (int group : findAllGroups(concept)){
-            Set<StatementWrapperForAttributeCompare> statementsInGroupToCompare = new HashSet<StatementWrapperForAttributeCompare>();
-            for (Statement s : concept.getSubjectOfStatements()){
-                if (s.getGroup() == group){
-                    statementsInGroupToCompare.add(new StatementWrapperForAttributeCompare(s));
-                }
-                if (statementsInGroupToCompare.equals(wrapStatements(incomingStatementsInGroup))){
-                    return group;
-                }
-            }
-        }
-        return -1;
-    }
-
-    private Set<StatementWrapperForAttributeCompare> wrapStatements(
-            Set<Statement> incomingStatementsInGroup) {
-        Set<StatementWrapperForAttributeCompare> wrappedIncomingStatementsInGroup = new HashSet<StatementWrapperForAttributeCompare>();
-        for (Statement r : incomingStatementsInGroup){
-            wrappedIncomingStatementsInGroup.add(new StatementWrapperForAttributeCompare(r));
-        }
-        return wrappedIncomingStatementsInGroup;
-    }
-
-    private Set<Integer> findAllGroups(Concept concept) {
-        Set<Integer> groups = new HashSet<Integer>();
-        for (Statement s : concept.getSubjectOfStatements()){
-            groups.add(s.getGroup());
-        }
-        return groups;
-    }
-
-    private class StatementWrapperForAttributeCompare{
-        Statement statement;
-        
-        public StatementWrapperForAttributeCompare(Statement statement){
-            this.statement = statement;
-        }
-        
-        @Override
-        public boolean equals(Object o){
-            if (o instanceof StatementWrapperForAttributeCompare){
-                StatementWrapperForAttributeCompare r = (StatementWrapperForAttributeCompare) o;            
-                if (r.getStatement().getPredicate().equals(this.getStatement().getPredicate()) &&
-                    r.getStatement().getObject().equals(this.getStatement().getObject()))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        @Override
-        public int hashCode(){
-            return Longs.hashCode(getStatement().getPredicate().getSerialisedId());
-        }
-        
-        public String toString(){
-            return "wrapped: " + statement.toString();
-        }
-        
-        public Statement getStatement(){
-            return statement;
-        }
-        
-    }
-    
-    private Set<Long> buildSerialisedIdIndexForOriginalUdcStatements(
-            Ontology originalOntology) {
-        Set<Long> allOriginalUdcStatementObjects = new HashSet<Long>();
-        for (Statement r : originalOntology.getStatements()){
-            if (!r.isKindOfRelationship()) allOriginalUdcStatementObjects.add(r.getObject().getSerialisedId());
-        }
-        return allOriginalUdcStatementObjects;
-    }
-
-    private Set<Long> buildSerialisedIdIndexForOriginalIsaStatements(
-            Ontology originalOntology) {
-        Set<Long> allOriginalIsAStatementObjects = new HashSet<Long>();
-        for (Statement r : originalOntology.getStatements()){
-            if (r.isKindOfRelationship()) allOriginalIsAStatementObjects.add(r.getObject().getSerialisedId());
-        }
-        return allOriginalIsAStatementObjects;
-    }
-
-    private void checkObjectsOfIsaStatementsMustAppearInOriginalStatementsAsObjects(
-            SetView<StatementForCompareWrapper> missingIsKindOfFromGeneratedOutput,
-            Set<StatementForCompareWrapper> erroneousExpectedIsaStatements,
-            Set<Long> allOriginalIsAStatementObjects) {
-        LOG.info("Objects of isA statements in the expected output must also appear as objects of isA statements in the input");
-        for (StatementForCompareWrapper rUnderTest : missingIsKindOfFromGeneratedOutput){
-            if (rUnderTest.getStatement().isKindOfRelationship() && (!allOriginalIsAStatementObjects.contains(rUnderTest.getStatement().getObject().getSerialisedId()))){
-                erroneousExpectedIsaStatements.add(rUnderTest);
-            }
-        }
-        LOG.info("Number of IsA statements in the expected output in violation of this : {}", erroneousExpectedIsaStatements.size());
-    }
-
-    private void checkObjectsOfUdcStatementsMustAppearInOriginalStatementsAsObjects(
-            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput,
-            Set<StatementForCompareWrapper> erroneousExpectedUdcStatements,
-            Set<Long> allOriginalUdcStatementObjects) {
-        LOG.info("Objects of udc statements in the expected output must also appear as objects of udc statements in the input");
-        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getStatement().isKindOfRelationship() && (!allOriginalUdcStatementObjects.contains(rUnderTest.getStatement().getObject().getSerialisedId()))){
-                erroneousExpectedUdcStatements.add(rUnderTest);
-            }
-        }
-        LOG.info("Number of udc statements in the expected output in violation of this : {}", erroneousExpectedUdcStatements.size());
-    }
-
-    private void checkIfAnyUdcStatementsAreNotPrimitiveStatements(
-            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput) {
-        Set<StatementForCompareWrapper> notCharacteristicType = new HashSet<StatementForCompareWrapper>();
-        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getStatement().isDefiningCharacteristic()){
-                notCharacteristicType.add(rUnderTest);
-            }
-        }
-        LOG.info("Number of udc statements that are not charateristic types: " + notCharacteristicType.size());
-    }
-
-    private void checkIfUdcStatementsExistsInPrimitiveParentConcept(
-            SetView<StatementForCompareWrapper> missingUdcFromGeneratedOutput) {
-        LOG.info("For all missing udc statements, check if udc exists in primitive parent concept");
-        Set<StatementForCompareWrapper> udcInPrimitiveParentConcept = new HashSet<StatementForCompareWrapper>();
-        for (StatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
-            if (!rUnderTest.getStatement().isKindOfRelationship()){
-                for (Concept parentConcept : rUnderTest.getStatement().getSubject().getAllKindOfPrimitiveConcepts(true)){
-                    for (Statement parentStatement : parentConcept.getSubjectOfStatements()){
-                        if (!parentStatement.isDefiningCharacteristic()){
-                            continue;
-                        }
-                        if ((parentStatement.getPredicate() == rUnderTest.getStatement().getPredicate()) &&
-                                parentStatement.getObject().equals(rUnderTest.getStatement().getObject())){
-                            udcInPrimitiveParentConcept.add(rUnderTest);
-                        }
-
-                    }
-                }
-            }
-        }
-        LOG.info("Found expected [{}] udc statements already defined in a primitive parent subject concept as a characteristic type", udcInPrimitiveParentConcept.size());
-    }
+//    private Set<StatementWrapperForAttributeCompare> wrapStatements(
+//            Set<Statement> incomingStatementsInGroup) {
+//        Set<StatementWrapperForAttributeCompare> wrappedIncomingStatementsInGroup = new HashSet<StatementWrapperForAttributeCompare>();
+//        for (Statement r : incomingStatementsInGroup){
+//            wrappedIncomingStatementsInGroup.add(new StatementWrapperForAttributeCompare(r));
+//        }
+//        return wrappedIncomingStatementsInGroup;
+//    }
+//
+//    private Set<Integer> findAllGroups(Concept concept) {
+//        Set<Integer> groups = new HashSet<Integer>();
+//        for (Statement s : concept.getSubjectOfRelationshipStatements()){
+//            groups.add(s.getGroup());
+//        }
+//        return groups;
+//    }
+//
+//    private class StatementWrapperForAttributeCompare{
+//        Statement statement;
+//        
+//        public StatementWrapperForAttributeCompare(Statement statement){
+//            this.statement = statement;
+//        }
+//        
+//        @Override
+//        public boolean equals(Object o){
+//            if (o instanceof StatementWrapperForAttributeCompare){
+//                StatementWrapperForAttributeCompare r = (StatementWrapperForAttributeCompare) o;            
+//                if (r.getRelationshipStatement().getPredicate().equals(this.getRelationshipStatement().getPredicate()) &&
+//                    r.getRelationshipStatement().getObject().equals(this.getRelationshipStatement().getObject()))
+//                {
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
+//        
+//        @Override
+//        public int hashCode(){
+//            return Longs.hashCode(getRelationshipStatement().getPredicate().getSerialisedId());
+//        }
+//        
+//        public String toString(){
+//            return "wrapped: " + statement.toString();
+//        }
+//        
+//        public Statement getRelationshipStatement(){
+//            return statement;
+//        }
+//        
+//    }
+//    
+//    private Set<Long> buildSerialisedIdIndexForOriginalUdcStatements(
+//            Ontology originalOntology) {
+//        Set<Long> allOriginalUdcStatementObjects = new HashSet<Long>();
+//        for (Statement r : originalOntology.getRelationshipStatements()){
+//            if (!r.isKindOfRelationship()) allOriginalUdcStatementObjects.add(r.getObject().getSerialisedId());
+//        }
+//        return allOriginalUdcStatementObjects;
+//    }
+//
+//    private Set<Long> buildSerialisedIdIndexForOriginalIsaStatements(
+//            Ontology originalOntology) {
+//        Set<Long> allOriginalIsAStatementObjects = new HashSet<Long>();
+//        for (Statement r : originalOntology.getRelationshipStatements()){
+//            if (r.isKindOfRelationship()) allOriginalIsAStatementObjects.add(r.getObject().getSerialisedId());
+//        }
+//        return allOriginalIsAStatementObjects;
+//    }
+//
+//    private void checkObjectsOfIsaStatementsMustAppearInOriginalStatementsAsObjects(
+//            SetView<RelationshipStatementForCompareWrapper> missingIsKindOfFromGeneratedOutput,
+//            Set<RelationshipStatementForCompareWrapper> erroneousExpectedIsaStatements,
+//            Set<Long> allOriginalIsAStatementObjects) {
+//        LOG.info("Objects of isA statements in the expected output must also appear as objects of isA statements in the input");
+//        for (RelationshipStatementForCompareWrapper rUnderTest : missingIsKindOfFromGeneratedOutput){
+//            if (rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalIsAStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
+//                erroneousExpectedIsaStatements.add(rUnderTest);
+//            }
+//        }
+//        LOG.info("Number of IsA statements in the expected output in violation of this : {}", erroneousExpectedIsaStatements.size());
+//    }
+//
+//    private void checkObjectsOfUdcStatementsMustAppearInOriginalStatementsAsObjects(
+//            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput,
+//            Set<RelationshipStatementForCompareWrapper> erroneousExpectedUdcStatements,
+//            Set<Long> allOriginalUdcStatementObjects) {
+//        LOG.info("Objects of udc statements in the expected output must also appear as objects of udc statements in the input");
+//        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+//            if (!rUnderTest.getRelationshipStatement().isKindOfRelationship() && (!allOriginalUdcStatementObjects.contains(rUnderTest.getRelationshipStatement().getObject().getSerialisedId()))){
+//                erroneousExpectedUdcStatements.add(rUnderTest);
+//            }
+//        }
+//        LOG.info("Number of udc statements in the expected output in violation of this : {}", erroneousExpectedUdcStatements.size());
+//    }
+//
+//    private void checkIfAnyUdcStatementsAreNotPrimitiveStatements(
+//            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
+//        Set<RelationshipStatementForCompareWrapper> notCharacteristicType = new HashSet<RelationshipStatementForCompareWrapper>();
+//        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+//            if (!rUnderTest.getRelationshipStatement().isDefiningCharacteristic()){
+//                notCharacteristicType.add(rUnderTest);
+//            }
+//        }
+//        LOG.info("Number of udc statements that are not charateristic types: " + notCharacteristicType.size());
+//    }
+//
+//    private void checkIfUdcStatementsExistsInPrimitiveParentConcept(
+//            SetView<RelationshipStatementForCompareWrapper> missingUdcFromGeneratedOutput) {
+//        LOG.info("For all missing udc statements, check if udc exists in primitive parent concept");
+//        Set<RelationshipStatementForCompareWrapper> udcInPrimitiveParentConcept = new HashSet<RelationshipStatementForCompareWrapper>();
+//        for (RelationshipStatementForCompareWrapper rUnderTest : missingUdcFromGeneratedOutput){
+//            if (!rUnderTest.getRelationshipStatement().isKindOfRelationship()){
+//                for (Concept parentConcept : rUnderTest.getRelationshipStatement().getSubject().getAllKindOfPrimitiveConcepts(true)){
+//                    for (Statement parentRelationshipStatement : parentConcept.getSubjectOfRelationshipStatements()){
+//                        if (!parentRelationshipStatement.isDefiningCharacteristic()){
+//                            continue;
+//                        }
+//                        if ((parentRelationshipStatement.getPredicate() == rUnderTest.getRelationshipStatement().getPredicate()) &&
+//                                parentRelationshipStatement.getObject().equals(rUnderTest.getRelationshipStatement().getObject())){
+//                            udcInPrimitiveParentConcept.add(rUnderTest);
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//        LOG.info("Found expected [{}] udc statements already defined in a primitive parent subject concept as a characteristic type", udcInPrimitiveParentConcept.size());
+//    }
 
     private void writeErrors(File file, SetView<StatementForCompareWrapper> isKindOfStatements, 
             SetView<StatementForCompareWrapper> udcfStatements) throws IOException 

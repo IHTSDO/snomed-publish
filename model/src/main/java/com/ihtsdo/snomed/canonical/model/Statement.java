@@ -89,7 +89,8 @@ public class Statement {
     @Override
     public int hashCode(){
         if (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED){
-            return Longs.hashCode(this.getSubject().getSerialisedId());
+            //HERE
+            return Longs.hashCode((this.getSubject() == null) ? -1 : this.getSubject().getSerialisedId());
         }
         return Longs.hashCode(getSerialisedId());
     }

@@ -27,8 +27,7 @@ public class CanonicalAlgorithm {
     	return runAlgorithm(concepts, showDetails, null);
     	
     }
-
-
+    
     public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds) {
         Stopwatch stopwatch = new Stopwatch().start();
         LOG.info("Running algorithm");

@@ -899,7 +899,7 @@ public class CanonicalAlgorithmTest {
         c3.addKindOf(c4);
         Statement s = new Statement(100, c1, cp1, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 1);
         new Statement(101, c2, cp2, cA, Statement.DEFINING_CHARACTERISTIC_TYPE, 2);
-                
+
         Set<Statement> foundStatements = algorithm.runAlgorithm(Arrays.asList(c1, c2, c3), false);
         assertEquals(6, foundStatements.size());
         assertTrue(foundStatements.contains(s));

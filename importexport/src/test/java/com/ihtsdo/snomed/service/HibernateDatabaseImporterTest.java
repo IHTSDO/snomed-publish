@@ -355,6 +355,7 @@ public class HibernateDatabaseImporterTest {
         importer.stringToBoolean("blah");
     }    
     
+//HERE
 //    @Test
 //    public void shouldSetKindOfPredicate() throws IOException{
 //        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),

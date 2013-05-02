@@ -165,7 +165,7 @@ public class Concept {
     /*
      * Generated Getters and Setters
      */
-
+   
     public long getId() {
         return id;
     }
