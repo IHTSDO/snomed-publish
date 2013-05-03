@@ -94,7 +94,7 @@ public class Concept {
         LOG.debug("Populating cache for concept " + getSerialisedId());
         cache = new HashSet<Concept>();
         
-        for (Concept kindOf : kindOfs){
+        for (Concept kindOf : getKindOfs()){
             if (kindOf.isPrimitive()){
                 cache.add(kindOf);
             }
@@ -104,11 +104,11 @@ public class Concept {
     }
 
     public boolean isKindOfPredicate(){
-        return serialisedId == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
+        return getSerialisedId() == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
     }
     
     public boolean isPredicate(){
-        return ((type != null) && (!type.isEmpty()) && type.equals(ATTRIBUTE));
+        return ((getType() != null) && (!getType().isEmpty()) && getType().equals(ATTRIBUTE));
     }
     
     @Override
@@ -208,25 +208,25 @@ public class Concept {
         this.parentOf = parentOf;
     }
     public void addKindOf(Concept concept){
-        this.kindOfs.add(concept);
+        getKindOfs().add(concept);
     }
     public void addParentOf(Concept concept){
-        this.parentOf.add(concept);
+        getParentOf().add(concept);
     }
     public Set<Statement> getSubjectOfStatements(){
         return subjectOfStatements;
     }
     public void addSubjectOfStatement(Statement statement){
-        subjectOfStatements.add(statement);
+        getSubjectOfStatements().add(statement);
     }    
     public void addPredicateOfStatement(Statement statement){
-        predicateOfStatements.add(statement);
+        getPredicateOfStatements().add(statement);
     }
     public Set<Statement> getPredicateOfStatements(){
         return predicateOfStatements;
     }
     public void addObjectOfStatement(Statement statement){
-        objectOStatements.add(statement);
+        getObjectOfStatements().add(statement);
     }
     public Set<Statement> getObjectOfStatements(){
         return objectOStatements;

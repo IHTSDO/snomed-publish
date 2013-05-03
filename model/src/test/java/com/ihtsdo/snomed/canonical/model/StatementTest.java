@@ -88,6 +88,116 @@ public class StatementTest {
         assertTrue(!st.isMemberOfGroup());
     } 
     
+    @Test
+    public void shouldReturnEqualStatementOnSerialisedId(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept o1 = new Concept(3);
+        Statement st1 = new Statement(1, s1, p1, o1);
+        
+        Concept s2 = new Concept(1);
+        Concept p2 = new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
+        Concept o2 = new Concept(3);
+        Statement st2 = new Statement(1, s2, p2, o2);
+        
+        assertEquals(st1, st2);
+    }
     
+    @Test
+    public void shouldReturnEqualStatementOnMissingSerialisedId(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept o1 = new Concept(3);
+        Statement st1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        Statement st2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        
+        assertEquals(st1, st2);
+    }    
+    
+    @Test
+    public void shouldReturnEqualStatementOnMissingSerialisedIdFail1(){
+        Concept s1 = new Concept(1);
+        Concept s2 = new Concept(2);
+        Concept p1 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        Statement st2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s2, p1, o1);
+        
+        assertNotEquals(st1, st2);
+    }      
+    
+    @Test
+    public void shouldReturnEqualStatementOnMissingSerialisedIdFail2(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept o1 = new Concept(3);
+        Concept o2 = new Concept(4);
+        Statement st1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        Statement st2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o2);
+        
+        assertNotEquals(st1, st2);
+    }    
+    
+    @Test
+    public void shouldReturnEqualStatementOnMissingSerialisedIdFail3(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept p2 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        Statement st2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p2, o1);
+        
+        assertNotEquals(st1, st2);
+    }    
+    
+    @Test
+    public void shouldHaveEqualHashCode1(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept p2 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(1, s1, p1, o1);
+        Statement st2 = new Statement(1, s1, p2, o1);
+        
+        assertEquals(st1.hashCode(), st2.hashCode());
+    }
+
+    @Test
+    public void shouldHaveEqualHashCode1Fail(){
+        Concept s1 = new Concept(1);
+        Concept s2 = new Concept(11);
+        Concept p1 = new Concept(2);
+        Concept p2 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(1, s1, p1, o1);
+        Statement st2 = new Statement(2, s2, p2, o1);
+        
+        assertNotEquals(st1.hashCode(), st2.hashCode());
+    }    
+    
+    @Test
+    public void shouldHaveEqualHashCode2(){
+        Concept s1 = new Concept(1);
+        Concept p1 = new Concept(2);
+        Concept p2 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p1, o1);
+        Statement st2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, s1, p2, o1);
+        
+        assertEquals(st1.hashCode(), st2.hashCode());
+    }  
+    
+    @Test
+    public void shouldHaveEqualHashCode2Fail(){
+        Concept s1 = new Concept(1);
+        Concept s2 = new Concept(11);
+        Concept p1 = new Concept(2);
+        Concept p2 = new Concept(3);
+        Concept o1 = new Concept(4);
+        Statement st1 = new Statement(1, s1, p1, o1);
+        Statement st2 = new Statement(2, s2, p2, o1);
+        
+        assertNotEquals(st1.hashCode(), st2.hashCode());
+    }    
     
 }

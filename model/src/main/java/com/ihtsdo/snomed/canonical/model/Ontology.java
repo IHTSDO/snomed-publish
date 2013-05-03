@@ -29,13 +29,13 @@ public class Ontology {
     private Set<Statement> statements;
 
     @OneToMany(mappedBy="ontology")
-    private Set<Concept> concepts;
+    private Set<Concept> concepts = new HashSet<Concept>();
     
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
                 add("id", getId()).
-                add("name", getId()).
+                add("name", getName()).
                 add("statements", getStatements() == null ? 0 : getStatements().size()).
                 add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
                 add("isA", (isKindOfPredicate == null) ? "not set" : "set").toString();
@@ -47,7 +47,7 @@ public class Ontology {
     
     public Concept getIsKindOfPredicate(){
         if (isKindOfPredicate == null){
-            for (Concept c : concepts){
+            for (Concept c : getConcepts()){
                 if (c.isKindOfPredicate()){
                     isKindOfPredicate = c;
                     return isKindOfPredicate;
@@ -97,8 +97,7 @@ public class Ontology {
     }
     
     public void addConcept(Concept c){
-        if (concepts == null) concepts = new HashSet<Concept>();
-        concepts.add(c);
+        getConcepts().add(c);
     }
 
     public void setConcepts(Set<Concept> concepts) {

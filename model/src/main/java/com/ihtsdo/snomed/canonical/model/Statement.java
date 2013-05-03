@@ -117,7 +117,7 @@ public class Statement {
         
     
     public boolean isMemberOfGroup(){
-        return (groupId != 0);
+        return (getGroupId() != 0);
     }    
 
     /*

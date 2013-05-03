@@ -98,7 +98,7 @@ public class GroupTest{
     }
     
     @Test
-    public void shouldEqualStatementWrapperForAttributeCompare2(){
+    public void shouldNotEqualStatementWrapperForAttributeCompare2(){
         Statement s1 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
         Statement s2 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED);
         s1.setObject(new Concept(3));

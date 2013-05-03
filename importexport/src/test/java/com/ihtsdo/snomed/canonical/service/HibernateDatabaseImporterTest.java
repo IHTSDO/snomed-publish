@@ -9,72 +9,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.canonical.model.Concept;
 import com.ihtsdo.snomed.canonical.model.Ontology;
 import com.ihtsdo.snomed.canonical.model.Statement;
-import com.ihtsdo.snomed.canonical.service.HibernateDbImporter;
 
-public class HibernateDatabaseImporterTest {
-    private static final Logger LOG = LoggerFactory.getLogger( HibernateDatabaseImporterTest.class );
-
-    protected static final String DEFAULT_ONTOLOGY_NAME = "Test";
-    protected static HibernateDbImporter importer;
-    
+public class HibernateDatabaseImporterTest extends DatabaseTest{
 
     protected static final String TEST_CONCEPTS = "test_concepts.txt";
     protected static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
     protected static final String TEST_RELATIONSHIPS_LONG_FORM = "test_relationships_longform.txt";
     protected static final String TEST_RELATIONSHIPS_LONG_FORM_WITH_PARSE_ERROR = "test_relationships_longform_with_parse_error.txt";
-
     protected static final String TEST_RELATIONSHIPS_SHORT_FORM = "test_relationships_shortform.txt";
-    //private static final String TEST_RELATIONSHIPS_SHORT_FORM_WITH_PARSE_ERROR = "test_relationships_shortform_with_parse_error.txt";
     protected static final String TEST_IS_KIND_OF_RELATIONSHIPS = "test_is_kind_of_relationships.txt";
     protected static final String TEST_IS_KIND_OF_CONCEPTS = "test_is_kind_of_concepts.txt";
-
-    protected static EntityManagerFactory emf = null;
-    protected static EntityManager em = null;
-    
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        importer = new HibernateDbImporter();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
-        em = emf.createEntityManager();
-        em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        LOG.info("Closing database");
-        em.getTransaction().rollback();
-        emf.close();
-    }
 
     @Test
     public void dbShouldHave5RelationshipsAfterShortFormImport() throws IOException{

@@ -360,15 +360,6 @@ public class ConceptTest {
         assertNotEquals(c1.hashCode(), c2.hashCode());
     }
     
-//    @Test(expected=InvalidInputException.class)
-//    public void shouldThrowInvalidInputException() throws InvalidInputException{
-//        Concept c = new Concept(123);
-//        Concept cs = new Concept(1234);
-//        Statement s = new Statement(999);
-//        s.setSubject(cs);
-//        c.getGroup(s);
-//    }
-    
     @Test
     public void shouldCreateGroupFromStatement() throws InvalidInputException{
         Concept c = new Concept(123);
