@@ -12,6 +12,9 @@
         <module>canonical</module>
         <module>canonical-main</module>
         <module>canonical-plugin</module>
+        <module>closure</module>
+        <module>closure-main</module>
+        <module>closure-plugin</module>
         <module>test</module>
         <module>web</module>
     </modules>

@@ -1,0 +1,18 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+    <persistence-unit name="testHibernatePersistenceUnit" transaction-type="RESOURCE_LOCAL">
+        <class>com.ihtsdo.snomed.model.Concept</class>
+        <class>com.ihtsdo.snomed.model.Statement</class>
+        <class>com.ihtsdo.snomed.model.Ontology</class>
+        <properties>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+<!--             <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/> -->
+            <property name="hibernate.connection.charSet" value="UTF-8"/> 
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
+<!--             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" /> -->
+
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.archive.autodetection" value="class, hbm"/>
+        </properties>
+    </persistence-unit>
+</persistence>

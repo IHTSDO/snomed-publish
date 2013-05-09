@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <!doctype html>
-<%@page import="com.ihtsdo.snomed.canonical.model.Statement"%>
+<%@page import="com.ihtsdo.snomed.model.Statement"%>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">
@@ -60,7 +60,7 @@ function changeOntology(value) {
       </tr>
       <c:set var="lastGroup" value="-1"/>
       <c:forEach var="r" items="${subjectOf}">
-        <tr class="group-<c:out value="${r.getGroup()}"/>">
+        <tr class="group-<c:out value="${r.getGroupId()}"/>">
           <td class="statement">
             <c:set var="showRelationship" value="${r}" />
             <%@include file="relationship.identifier.jsp"%>
@@ -76,9 +76,9 @@ function changeOntology(value) {
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
-            <c:if test="${r.getGroup() != lastGroup}" >
-              Group <c:out value="${r.getGroup()}"/>
-              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            <c:if test="${r.getGroupId() != lastGroup}" >
+              Group <c:out value="${r.getGroupId()}"/>
+              <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
         </tr>
@@ -98,7 +98,7 @@ function changeOntology(value) {
       </tr>
       <c:set var="lastGroup" value="-1"/>
       <c:forEach var="r" items="${objectOf}">
-        <tr class="group-<c:out value="${r.getGroup()}"/>">
+        <tr class="group-<c:out value="${r.getGroupId()}"/>">
           <td class="statement">
             <c:set var="showRelationship" value="${r}" />
             <%@include file="relationship.identifier.jsp"%>
@@ -114,9 +114,9 @@ function changeOntology(value) {
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
-            <c:if test="${r.getGroup() != lastGroup}" >
-              Group <c:out value="${r.getGroup()}"/>
-              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            <c:if test="${r.getGroupId() != lastGroup}" >
+              Group <c:out value="${r.getGroupId()}"/>
+              <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
         </tr>
@@ -136,7 +136,7 @@ function changeOntology(value) {
       </tr>
       <c:set var="lastGroup" value="-1"/>
       <c:forEach var="r" items="${predicateOf}">
-        <tr class="group-<c:out value="${r.getGroup()}"/>">
+        <tr class="group-<c:out value="${r.getGroupId()}"/>">
           <td class="statement">
             <c:set var="showRelationship" value="${r}" />
             <%@include file="relationship.identifier.jsp"%>
@@ -152,9 +152,9 @@ function changeOntology(value) {
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
-            <c:if test="${r.getGroup() != lastGroup}" >
-              Group <c:out value="${r.getGroup()}"/>
-              <c:set var="lastGroup" value="${r.getGroup()}"/>
+            <c:if test="${r.getGroupId() != lastGroup}" >
+              Group <c:out value="${r.getGroupId()}"/>
+              <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
         </tr>

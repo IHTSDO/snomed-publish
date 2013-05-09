@@ -8,10 +8,10 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.canonical.service.CanonicalOutputWriter;
 import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
+import com.ihtsdo.snomed.service.CanonicalSerialiser;
 
-public class CanonicalWrappedStatementWriter extends CanonicalOutputWriter {
+public class CanonicalWrappedStatementWriter extends CanonicalSerialiser {
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalWrappedStatementWriter.class );
 
     public void writeCompareStatements (Writer w, Collection<StatementForCompareWrapper> statements) throws IOException{
@@ -20,7 +20,7 @@ public class CanonicalWrappedStatementWriter extends CanonicalOutputWriter {
         int counter = 1;
         while (rIt.hasNext()){
             w.write("\r\n");
-            printRelationship(w, rIt.next().getStatement());
+            printStatement(w, rIt.next().getStatement());
             counter++;
         }
         LOG.info("Wrote " + counter + " lines");

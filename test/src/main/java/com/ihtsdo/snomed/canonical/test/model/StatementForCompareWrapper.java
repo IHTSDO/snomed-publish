@@ -1,7 +1,7 @@
 package com.ihtsdo.snomed.canonical.test.model;
 
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.canonical.model.Statement;
+import com.ihtsdo.snomed.model.Statement;
 
 
 public class StatementForCompareWrapper {

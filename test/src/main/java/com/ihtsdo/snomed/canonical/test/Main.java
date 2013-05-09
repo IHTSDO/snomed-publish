@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.service.HibernateDbImporter;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.HibernateDbImporter;
 
 public class Main{
     private static final Logger LOG = LoggerFactory.getLogger( Main.class );

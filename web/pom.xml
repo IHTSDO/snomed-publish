@@ -7,8 +7,8 @@
         <version>0.5</version>
     </parent>
     <packaging>war</packaging>
-    <artifactId>snomed</artifactId>
-    <name>snomed</name>
+    <artifactId>snomed-browser</artifactId>
+    <name>snomed-browser</name>
     <properties>
         <spring.version>3.2.2.RELEASE</spring.version>
         <jetty.version>9.0.0.v20130308</jetty.version>
@@ -39,10 +39,22 @@
 
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>importexport</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Apache Commons Upload -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3</version>
+        </dependency>
+                            
 
         <!-- Servlet -->
         <dependency>
@@ -78,13 +90,20 @@
             <artifactId>spring-xml</artifactId>
             <version>2.1.0.RELEASE</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+                            
+
         <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.1.4</version>
-        </dependency>       
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -177,13 +196,18 @@
             <artifactId>mchange-commons-java</artifactId>
             <version>0.2.2</version>
         </dependency>
-        
-        <!--  JSTL  -->
+
+        <!-- JSTL -->
         <dependency>
             <groupId>jstl</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
-        </dependency>        
-        
+        </dependency>
+        <dependency>
+            <groupId>taglibs</groupId>
+            <artifactId>standard</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
     </dependencies>
 </project>

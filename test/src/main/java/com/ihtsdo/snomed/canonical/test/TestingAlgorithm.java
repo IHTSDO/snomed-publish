@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-import com.ihtsdo.snomed.canonical.model.Ontology;
-import com.ihtsdo.snomed.canonical.model.Statement;
 import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.Statement;
 
 public class TestingAlgorithm {
     private static final Logger LOG = LoggerFactory.getLogger( TestingAlgorithm.class );
