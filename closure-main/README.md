@@ -1,24 +1,14 @@
 IHTSDO Snomed Publication Tools
 ===============================
 
-Canonical Form
---------------
+Transitive Closure 
+------------------
 
-This program takes as an input 2 text files:
+This program takes as an input a text file in RF2 format:
 
-1. Set of concepts of this form:
-
-        CONCEPTID  CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
-        280844000	0	Entire body of seventh thoracic vertebra (body structure)	Xa1Y9	T-11875	1
-        280845004	0	Entire body of eighth thoracic vertebra (body structure)	Xa1YA	T-11876	1
-        etc.
-
-2. Set of relationships of this form:
-
-        RELATIONSHIPID  CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP
-        100000028	280844000	116680003	71737002	0	0	0
-        100001029	280845004	116680003	280737002	0	0	0
-        etc.
+    id          effectiveTime	active  moduleId  sourceId   destinationId  relationshipGroup  typeId	  characteristicTypeId  modifierId
+    1000000021  20020731        0       9...008   255116009  367639000      0                  308489006  900000000000011006    9...002
+    100000028   20020131	1       9...008   280844000  71737002       0                  116680003  900000000000011006    9...002
     
 and produces an output file called 'canonical form' of this form:
 
