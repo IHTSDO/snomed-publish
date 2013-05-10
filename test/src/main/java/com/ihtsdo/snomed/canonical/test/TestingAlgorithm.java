@@ -23,8 +23,6 @@ import com.ihtsdo.snomed.model.Statement;
 public class TestingAlgorithm {
     private static final Logger LOG = LoggerFactory.getLogger( TestingAlgorithm.class );
 
-    private   CanonicalWrappedStatementWriter writer = new CanonicalWrappedStatementWriter();
-
     public void findDifference(EntityManager em, File extraFile, File missingFile, Ontology originalOntology, 
             Ontology expectedOntology, Ontology generatedOntology) throws IOException
     {
@@ -383,7 +381,7 @@ public class TestingAlgorithm {
             file.createNewFile();
         }            
         try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
-            writer.writeCompareStatements(bw, allStatements);
+            new CanonicalWrappedStatementWriter(bw).writeCompareStatements(allStatements);
         }
     }
 }

@@ -26,7 +26,7 @@
                             <transformers>
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ihtsdo.snomed.service.closure.ClosureMain</mainClass>
+                                    <mainClass>com.ihtsdo.snomed.client.closure.ClosureMain</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -34,7 +34,7 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>canonical</finalName>
+        <finalName>closure</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>        
     </build>
     <dependencies>

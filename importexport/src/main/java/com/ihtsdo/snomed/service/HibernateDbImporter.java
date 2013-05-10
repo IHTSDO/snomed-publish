@@ -40,23 +40,43 @@ public class HibernateDbImporter {
     private static final int DEFAULT_REFINABILITY = 0;
     private static final int DEFAULT_CHARACTERISTIC_TYPE = 0;
 
-    public Ontology populateDbFromLongForm(String ontologyName, InputStream conceptsStream, 
-            InputStream statementsStream, EntityManager em) throws IOException
+    public Ontology populateDbFromRf1Form(String ontologyName, InputStream conceptsStream, 
+            InputStream rf1StatementsStream, EntityManager em) throws IOException
     {
     	LOG.info("Importing ontology \"" + ontologyName + "\"");
     	Stopwatch stopwatch = new Stopwatch().start();
         
         Ontology ontology = createOntology(em, ontologyName);
         populateConcepts(conceptsStream, em, ontology);
-        populateLongFormStatements(statementsStream, em, ontology);
+        populateStatementsFromRf1(rf1StatementsStream, em, ontology);
         createIsKindOfHierarchy(em, ontology);
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
         
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
-        return em.find(Ontology.class, ontology.getId());
+        return o;
     }
+    
+    public Ontology populateDbFromRf1FormWithNoConcepts(String ontologyName, InputStream rf1StatementsStream, 
+            InputStream rf1StatementsStreamAgain, EntityManager em) throws IOException
+    {
+        LOG.info("Importing ontology \"" + ontologyName + "\"");
+        Stopwatch stopwatch = new Stopwatch().start();
+        
+        Ontology ontology = createOntology(em, ontologyName);
+        populateConceptsFromRf1(rf1StatementsStream, em, ontology);
+        populateStatementsFromRf1(rf1StatementsStreamAgain, em, ontology);
+        createIsKindOfHierarchy(em, ontology);
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
+        
+        stopwatch.stop();
+        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+        return o;
+    } 
 
-    public Ontology populateDbFromShortForm(String ontologyName, InputStream conceptsStream, 
+    public Ontology populateDbFromCanonicalForm(String ontologyName, InputStream conceptsStream, 
             InputStream statementsStream, EntityManager em) throws IOException
     {
         LOG.info("Importing ontology \"" + ontologyName + "\"");
@@ -64,28 +84,32 @@ public class HibernateDbImporter {
         
         Ontology ontology = createOntology(em, ontologyName);
         populateConcepts(conceptsStream, em, ontology);
-        populateShortFormStatements(statementsStream, em, ontology);        
+        populateStatementsFromCanonical(statementsStream, em, ontology);        
         createIsKindOfHierarchy(em, ontology);
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
         
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
-        return em.find(Ontology.class, ontology.getId());
+        return o;
     }
     
-    public Ontology populateDbFromRf2(String ontologyName, InputStream statementsStream, 
-            InputStream statementsStreamAgain, EntityManager em) throws IOException
+    public Ontology populateDbFromRf2FormWithNoConcepts(String ontologyName, InputStream rf2StatementsStream, 
+            InputStream rf2StatementsStreamAgain, EntityManager em) throws IOException
     {
         LOG.info("Importing ontology \"" + ontologyName + "\"");
         Stopwatch stopwatch = new Stopwatch().start();
         
         Ontology ontology = createOntology(em, ontologyName);
-        populateConceptsFromRf2(statementsStream, em, ontology);
-        populateStatementsFromRf2(statementsStreamAgain, em, ontology);        
+        populateConceptsFromRf2(rf2StatementsStream, em, ontology);
+        populateStatementsFromRf2(rf2StatementsStreamAgain, em, ontology);        
         createIsKindOfHierarchy(em, ontology);
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
         
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
-        return em.find(Ontology.class, ontology.getId());
+        return o;
     }  
 
     protected Ontology createOntology(EntityManager em, final String name) throws IOException {
@@ -155,14 +179,14 @@ public class HibernateDbImporter {
                                 ps.setLong(8, ontology.getId()); //ontologyid
                                 ps.addBatch();
                             } catch (NumberFormatException e) {
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             } catch (IllegalArgumentException e){
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             }
                             line = br.readLine();
                         }
                         ps.executeBatch();
-                        LOG.info("Populated [" + (currentLine - 1) + "] concepts");
+                        LOG.info("Populated " + (currentLine - 1) + " concepts");
                     }finally {
                         br.close();
                     }
@@ -202,16 +226,19 @@ public class HibernateDbImporter {
                             try {                            
                                 splitIt.next(); //id
                                 splitIt.next(); //effective time
-                                splitIt.next(); //active
+                                if (!stringToBoolean(splitIt.next())){ //active
+                                    line = br.readLine();
+                                    continue;
+                                }
                                 splitIt.next(); //moduleId
                                 concepts.add(new Concept(Long.parseLong(splitIt.next()))); //sourceId
                                 concepts.add(new Concept(Long.parseLong(splitIt.next()))); //destinationId
                                 splitIt.next(); //group
                                 concepts.add(new Concept(Long.parseLong(splitIt.next()))); //typeId
                             } catch (NumberFormatException e) {
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             } catch (IllegalArgumentException e){
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             }
                             line = br.readLine();
                         }
@@ -224,7 +251,7 @@ public class HibernateDbImporter {
                             
                         }
                         ps.executeBatch();
-                        LOG.info("Populated [" + (currentLine - 1) + "] concepts");
+                        LOG.info("Populated " + concepts.size() + " concepts");
                     }finally {
                         br.close();
                     }
@@ -235,7 +262,64 @@ public class HibernateDbImporter {
         });
         tx.commit();
         setKindOfPredicate(em, ontology);
-    }    
+    }
+    
+    protected void populateConceptsFromRf1(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
+        LOG.info("Populating concepts");
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, status) VALUES (?, ?, ?, ?)");
+                Set<Concept> concepts = new HashSet<Concept>();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
+                    int currentLine = 1;
+                    String line = null;
+                    try {
+                        line = br.readLine();
+                        //skip the headers
+                        line = br.readLine();
+                        while (line != null) {
+                            currentLine++;
+                            if (line.isEmpty()){
+                                line = br.readLine();
+                                continue;
+                            }
+                            Iterable<String> split = Splitter.on('\t').split(line);
+                            Iterator<String> splitIt = split.iterator();
+                            try {                            
+                                splitIt.next(); //id
+                                concepts.add(new Concept(Long.parseLong(splitIt.next()))); //CONCEPTID1
+                                concepts.add(new Concept(Long.parseLong(splitIt.next()))); //RELATIONSHIPTYPE
+                                concepts.add(new Concept(Long.parseLong(splitIt.next()))); //CONCEPTID2
+                            } catch (NumberFormatException e) {
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            } catch (IllegalArgumentException e){
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            }
+                            line = br.readLine();
+                        }
+                        for (Concept c : concepts){
+                            ps.setLong(1, c.getSerialisedId());
+                            ps.setLong(2, ontology.getId());
+                            ps.setBoolean(3, false); //otherwise mysql/jpa craps out when we retrieve concept
+                            ps.setInt(4, -1); //otherwise mysql/jpa craps out when we retrieve concept
+                            ps.addBatch();  
+                        }
+                        ps.executeBatch();
+                        LOG.info("Populated " + concepts.size() + " concepts");
+                    }finally {
+                        br.close();
+                    }
+                } catch (IOException e1) {
+                    LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
+                } 
+            }
+        });
+        tx.commit();
+        setKindOfPredicate(em, ontology);
+    }        
 
     protected void setKindOfPredicate(EntityManager em, Ontology o) throws IllegalStateException{
         try {
@@ -246,7 +330,7 @@ public class HibernateDbImporter {
         }
     }
 
-    protected void populateLongFormStatements(final InputStream stream, final EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateStatementsFromRf1(final InputStream stream, final EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating statements");
         final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -276,21 +360,21 @@ public class HibernateDbImporter {
                             {
                                 Long subject = new Long(splitIt.next());
                                 if (!map.containsKey(subject)){
-                                    throw new NotFoundException("Concept [" + subject + "] not found in concept definition for statements [" +serialisedId + "]");
+                                    throw new NotFoundException("Concept " + subject + " not found in concept definition for statement " +serialisedId );
                                 }
                                 psInsert.setLong(2, map.get(subject)); //subject
                             }
                             {
                                 Long predicate = new Long(splitIt.next());                               
                                 if (!map.containsKey(predicate)){
-                                    throw new NotFoundException("Concept [" + predicate + "] not found in concept definition for statements [" +serialisedId + "]" );
+                                    throw new NotFoundException("Concept " + predicate + " not found in concept definition for statement " +serialisedId);
                                 }
                                 psInsert.setLong(3, map.get(predicate)); //predicate
                             }
                             {
                                 Long object = new Long(splitIt.next());
                                 if (!map.containsKey(object)){
-                                    throw new NotFoundException("Concept [" + object + "] not found in concept definition for statements [" +serialisedId + "]" );
+                                    throw new NotFoundException("Concept " + object + " not found in concept definition for statements " +serialisedId );
                                 }
                                 psInsert.setLong(4, map.get(object)); //object
                             }
@@ -300,20 +384,20 @@ public class HibernateDbImporter {
                             psInsert.setLong(8, ontology.getId()); //ontology id
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         } catch (NullPointerException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
                             throw e;
                         } catch (NotFoundException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         }
                         line = br.readLine();
                         currentLine++;
                     }
                     psInsert.executeBatch();
-                    LOG.info("Populated [" + (currentLine - 1) + "] statements");
+                    LOG.info("Populated " + (currentLine - 1) + " statements");
                 } 
                 catch (IOException e1) {
                     LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
@@ -339,6 +423,7 @@ public class HibernateDbImporter {
                 
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
+                    int inactive = 0;
                     String line = null;
 
                     line = br.readLine();
@@ -355,19 +440,24 @@ public class HibernateDbImporter {
                             long serialisedId = Long.parseLong(splitIt.next());
                             psInsert.setLong(1, serialisedId); // serialised id
                             splitIt.next();//effectiveTime
-                            splitIt.next();//active
+                            if (!stringToBoolean(splitIt.next())){ //active
+                                line = br.readLine();
+                                currentLine++;
+                                inactive++;
+                                continue;
+                            }
                             splitIt.next();//moduleid
                             {
                                 Long subject = new Long(splitIt.next());
                                 if (!map.containsKey(subject)){
-                                    throw new NotFoundException("Concept [" + subject + "] not found in concept definition for statements [" +serialisedId + "]");
+                                    throw new NotFoundException("Concept " + subject + " not found in concept definition for statements " +serialisedId);
                                 }
                                 psInsert.setLong(2, map.get(subject)); //subject
                             }
                             {
                                 Long object = new Long(splitIt.next());
                                 if (!map.containsKey(object)){
-                                    throw new NotFoundException("Concept [" + object + "] not found in concept definition for statements [" +serialisedId + "]" );
+                                    throw new NotFoundException("Concept " + object + " not found in concept definition for statements [" +serialisedId);
                                 }
                                 psInsert.setLong(3, map.get(object)); //object
                             }
@@ -375,7 +465,7 @@ public class HibernateDbImporter {
                             {
                                 Long predicate = new Long(splitIt.next());                               
                                 if (!map.containsKey(predicate)){
-                                    throw new NotFoundException("Concept [" + predicate + "] not found in concept definition for statements [" +serialisedId + "]" );
+                                    throw new NotFoundException("Concept " + predicate + " not found in concept definition for statements [" +serialisedId);
                                 }
                                 psInsert.setLong(5, map.get(predicate)); //predicate
                             }
@@ -384,20 +474,20 @@ public class HibernateDbImporter {
                             psInsert.setLong(8, ontology.getId()); //ontology id
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         } catch (NullPointerException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
                             throw e;
                         } catch (NotFoundException e){
-                            LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                         }
                         line = br.readLine();
                         currentLine++;
                     }
                     psInsert.executeBatch();
-                    LOG.info("Populated [" + (currentLine - 1) + "] statements");
+                    LOG.info("Populated " + (currentLine - 1 - inactive) + " statements. There were " + inactive + " inacive statements, and " + (currentLine - 1) + " statements in total");
                 } 
                 catch (IOException e1) {
                     LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
@@ -407,7 +497,7 @@ public class HibernateDbImporter {
         tx.commit();
     }
 
-    protected void populateShortFormStatements(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateStatementsFromCanonical(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating statements");
         final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -443,14 +533,14 @@ public class HibernateDbImporter {
                                 ps.setLong(8, ontology.getId());
                                 ps.addBatch();
                             } catch (NumberFormatException e) {
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             } catch (IllegalArgumentException e){
-                                LOG.error("Unable to parse line number [" + currentLine + "]. Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                                LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
                             }
                             line = br.readLine();
                         }
                         ps.executeBatch();
-                        LOG.info("Populated [" + (currentLine - 1) + "] statements");
+                        LOG.info("Populated " + (currentLine - 1) + " statements");
                     }finally {
                         br.close();
                     }
@@ -493,16 +583,28 @@ public class HibernateDbImporter {
                 int counter = 1;
                 psStatements.setLong(1, o.getId());
                 ResultSet rs = psStatements.executeQuery();
+                Map<Long, Set<Long>> childParentMap = new HashMap<Long, Set<Long>>();
                 while (rs.next()){
                     if (rs.getLong(2) == o.getIsKindOfPredicate().getId()){
-                        psKindOf.setLong(1, rs.getLong(1));
-                        psKindOf.setLong(2, rs.getLong(3));
-                        psKindOf.addBatch();
-                        counter++;
+                        Set<Long> parents = childParentMap.get(rs.getLong(1));
+                        if (parents == null){
+                            parents = new HashSet<Long>();
+                            childParentMap.put(rs.getLong(1), parents);
+                        }
+                        parents.add(rs.getLong(3));
                     }
                 }
+                for (Long child : childParentMap.keySet()){
+                    for (Long parent : childParentMap.get(child)){
+                        psKindOf.setLong(1, child);
+                        psKindOf.setLong(2, parent);
+                        psKindOf.addBatch();
+                        counter++;                        
+                    }
+                    
+                }
                 psKindOf.executeBatch();
-                LOG.info("Created [" + counter + "] isA statements");
+                LOG.info("Created " + counter + " isA statements");
             }
         });
         tx.commit();

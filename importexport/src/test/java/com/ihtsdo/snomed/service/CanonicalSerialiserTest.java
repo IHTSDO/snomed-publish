@@ -14,8 +14,6 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.Serialiser;
-import com.ihtsdo.snomed.service.SerialiserFactory;
 import com.ihtsdo.snomed.service.SerialiserFactory.Form;
 
 public class CanonicalSerialiserTest {
@@ -23,10 +21,9 @@ public class CanonicalSerialiserTest {
     private static final String EXPECTED_RESULT =
             "CONCEPTID1\tRELATIONSHIPTYPE\tCONCEPTID2\tRELATIONSHIPGROUP\r\n" +
             "100523006\t116680003\t100523007\t0\r\n" +
-            "100523008\t116680004\t100523009\t1";
+            "100523008\t116680004\t100523009\t1\r\n";
     
     private Collection<Statement> statements = new HashSet<Statement>();
-    private Serialiser writer = SerialiserFactory.getSerialiser(Form.CANONICAL);
     
     @Before
     public void setUp() throws Exception {
@@ -49,7 +46,7 @@ public class CanonicalSerialiserTest {
     public void shouldPrintOntologyInSpecifiedFormat() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            writer.write(pw, statements);
+            SerialiserFactory.getSerialiser(Form.CANONICAL, pw).write(statements);
         }
         baos.flush();
         assertEquals(EXPECTED_RESULT, baos.toString());

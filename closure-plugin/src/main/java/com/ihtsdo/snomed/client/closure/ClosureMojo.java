@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
@@ -26,7 +25,6 @@ import org.slf4j.impl.StaticLoggerBinder;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.HibernateDbImporter;
 import com.ihtsdo.snomed.service.SerialiserFactory;
 import com.ihtsdo.snomed.service.SerialiserFactory.Form;
@@ -78,12 +76,19 @@ public class ClosureMojo extends AbstractMojo{
         testInputs();
         try{
             initDb();
-            Ontology o = importer.populateDbFromRf2(DEFAULT_ONTOLOGY_NAME, 
+            Ontology o = importer.populateDbFromRf2FormWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + o.getId(), Concept.class).getResultList();            
             
-            writeOut(outputFile, algorithm.runAlgorithm(concepts));
+            File outFile = new File(outputFile);
+            if (!outFile.exists()){
+                outFile.createNewFile();
+            }
+            
+            try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
+                algorithm.runAlgorithm(concepts, SerialiserFactory.getSerialiser(Form.CANONICAL, bw));
+            }
         } catch (FileNotFoundException e) {
             throw new MojoExecutionException("File not found: " + e.getMessage(), e);
         } catch (IOException e) {
@@ -94,19 +99,6 @@ public class ClosureMojo extends AbstractMojo{
         overAllstopwatch.stop();
         getLog().info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");        
     }  
-    
-    private void writeOut(String outputFile, Set<Statement> statements) throws IOException {
-        getLog().info("Writing results to " + outputFile);
-
-        File outFile = new File(outputFile);
-        if (!outFile.exists()){
-            outFile.createNewFile();
-        }
-        
-        try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-            SerialiserFactory.getSerialiser(Form.CHILD_PARENT).write(bw, statements);
-        }
-    }    
     
     private void testInputs() throws MojoExecutionException{
         if ((outputFile == null) || (inputFile == null) ||

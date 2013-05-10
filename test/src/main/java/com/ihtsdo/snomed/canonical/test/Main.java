@@ -56,11 +56,11 @@ public class Main{
         try{
             initDb(db);
             
-            Ontology originalOntology = importer.populateDbFromLongForm(ORIGINAL_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology originalOntology = importer.populateDbFromRf1Form(ORIGINAL_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(originalFile), em);
-            Ontology expectedOntology = importer.populateDbFromShortForm(EXPECTED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology expectedOntology = importer.populateDbFromCanonicalForm(EXPECTED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(expectedFile), em);
-            Ontology generatedOntology = importer.populateDbFromShortForm(GENERATED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology generatedOntology = importer.populateDbFromCanonicalForm(GENERATED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(generatedFile), em);
             
             tester.findDifference(em, new File(extraFile), new File(missingFile), 

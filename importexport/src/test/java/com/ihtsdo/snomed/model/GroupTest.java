@@ -15,7 +15,7 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Group;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.DatabaseTest;
-import com.ihtsdo.snomed.service.HibernateDatabaseImporterTest;
+import com.ihtsdo.snomed.service.HibernateDbImporterTest;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class GroupTest extends DatabaseTest{
@@ -25,12 +25,12 @@ public class GroupTest extends DatabaseTest{
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        HibernateDatabaseImporterTest.setUpBeforeClass();
+        HibernateDbImporterTest.setUpBeforeClass();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        HibernateDatabaseImporterTest.tearDownAfterClass();
+        HibernateDbImporterTest.tearDownAfterClass();
     }
 
     @Before
@@ -47,7 +47,7 @@ public class GroupTest extends DatabaseTest{
     @Test
     public void shouldReturnEqual() throws IOException {
         
-        importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, 
+        importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, 
                 ClassLoader.getSystemResourceAsStream(TEST_GROUP_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_GROUP_RELATIONSHIPS_LONG_FORM), em);       
         

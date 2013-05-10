@@ -69,7 +69,7 @@ public class CanonicalMain {
     protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException{
         try{
             initDb(db);  
-            Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, 
+            Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
 
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();
@@ -102,7 +102,7 @@ public class CanonicalMain {
         }
         
         try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-            SerialiserFactory.getSerialiser(Form.CANONICAL).write(bw, statements);
+            SerialiserFactory.getSerialiser(Form.CANONICAL, bw).write(statements);
         }
     }
 }

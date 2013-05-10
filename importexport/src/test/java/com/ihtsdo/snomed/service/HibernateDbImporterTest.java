@@ -20,11 +20,11 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 
-public class HibernateDatabaseImporterTest extends DatabaseTest{
+public class HibernateDbImporterTest extends DatabaseTest{
 
     protected static final String TEST_CONCEPTS = "test_concepts.txt";
     protected static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
-    protected static final String TEST_STATEMENTS_LONG_FORM = "test_statements_longform.txt";
+    protected static final String TEST_STATEMENTS_RF1 = "test_statements_longform.txt";
     protected static final String TEST_STATEMENTS_LONG_FORM_WITH_PARSE_ERROR = "test_statements_longform_with_parse_error.txt";
     protected static final String TEST_STATEMENTS_SHORT_FORM = "test_statements_shortform.txt";
     protected static final String TEST_IS_KIND_OF_STATEMENTS = "test_is_kind_of_statements.txt";
@@ -35,7 +35,7 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     public void dbShouldHave5StatementsAfterShortFormImport() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
-        importer.populateShortFormStatements(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_SHORT_FORM), em, o);
+        importer.populateStatementsFromCanonical(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_SHORT_FORM), em, o);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -49,7 +49,7 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     public void dbShouldHave5StatementsAfterLongFormImport() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
-        importer.populateLongFormStatements(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em, o);
+        importer.populateStatementsFromRf1(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em, o);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -100,12 +100,25 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
         assertEquals(13, result);
     }
     
+    @Test
+    public void dbShouldHave8ConceptsAfterConceptsFromRf1Import() throws IOException{
+        Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        importer.populateConceptsFromRf1(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em, o);
+
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
+
+        long result = em.createQuery(criteriaQuery).getSingleResult();
+        assertEquals(8, result);
+    } 
+    
 
     @Test
     public void dbShouldStoreAllDataPointsForRelationshipFromLongForm() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
-        importer.populateLongFormStatements(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em, o);
+        importer.populateStatementsFromRf1(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em, o);
 
         TypedQuery<Statement> query = em.createQuery(
                 "SELECT r FROM Statement r where r.ontology.id=1 AND r.serialisedId=" + 100000028, 
@@ -129,7 +142,7 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     public void dbShouldStoreAllDataPointsForRelationshipFromShortForm() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS), em, o);
-        importer.populateShortFormStatements(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_SHORT_FORM), em, o);
+        importer.populateStatementsFromCanonical(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_SHORT_FORM), em, o);
 
         TypedQuery<Statement> query = em.createQuery(
                 "SELECT r FROM Statement r where r.ontology.id=1 AND r.subject.serialisedId=280844000", 
@@ -169,9 +182,9 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     }
     
     @Test
-    public void shouldPopulateDbFromLongForm() throws IOException{
-        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em);
+    public void shouldPopulateDbFromRf1Form() throws IOException{
+        Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
         
         {//8 Concepts
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
@@ -201,8 +214,8 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     }
     
     @Test
-    public void shouldPopulateDbFromShortForm() throws IOException{
-        Ontology ontology = importer.populateDbFromShortForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+    public void shouldPopulateDbFromCanonicalForm() throws IOException{
+        Ontology ontology = importer.populateDbFromCanonicalForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_SHORT_FORM), em);
         
         {//8 Concepts
@@ -236,8 +249,8 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     }    
 
     @Test
-    public void shouldPopulateDbFromRf2() throws IOException{
-        Ontology ontology = importer.populateDbFromRf2(DEFAULT_ONTOLOGY_NAME, 
+    public void shouldPopulateDbFromRf2FormWithNoConcepts() throws IOException{
+        Ontology ontology = importer.populateDbFromRf2FormWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENT),
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENT), em);
         
@@ -266,12 +279,46 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
             Statement r = new Statement(1000000021);
             assertTrue(ontology.getStatements().contains(r));
         }
+    }
+    
+    @Test
+    public void shouldPopulateDbFromRf1FormWithNoConcept() throws IOException{
+        Ontology ontology = importer.populateDbFromRf1FormWithNoConcepts(
+                DEFAULT_ONTOLOGY_NAME, 
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
+        
+        {//8 Concepts
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+            criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
+    
+            long result = em.createQuery(criteriaQuery).getSingleResult();
+            assertEquals(8, result);
+        }
+        {//5 Statements
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+            criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Statement.class)));
+    
+            long result = em.createQuery(criteriaQuery).getSingleResult();
+            assertEquals(5, result);
+        }
+        {//1 ontology
+            assertNotNull(ontology);
+            assertEquals(5, ontology.getStatements().size());
+            assertEquals(8, ontology.getConcepts().size());
+            assertEquals(1, ontology.getId());
+            assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
+            Statement r = new Statement(100000028);
+            assertTrue(ontology.getStatements().contains(r));
+        }
     }    
     
     @Test
     public void shouldPopulateSubjectOfStatementBidirectionalField() throws IOException{
-        importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em);
+        importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
 
         Query query = em.createQuery("SELECT r FROM Statement r");
 
@@ -287,7 +334,7 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
 
     @Test
     public void shouldPopulateKindOfAndParentOfBidirectionalFieldsForIsAStatements() throws IOException{
-        importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_CONCEPTS),
+        importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_STATEMENTS), em);
 
         TypedQuery<Statement> query = em.createQuery("SELECT r FROM Statement r WHERE r.ontology.id=1", Statement.class);
@@ -320,7 +367,7 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     public void shouldSkipRowAndContinueDbPopulationAfterParseError() throws IOException{
         Ontology o = importer.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         importer.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS_WITH_PARSE_ERROR), em, o);
-        importer.populateLongFormStatements(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM_WITH_PARSE_ERROR), em, o);
+        importer.populateStatementsFromRf1(ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM_WITH_PARSE_ERROR), em, o);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> conceptCriteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -337,8 +384,8 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
 
     @Test
     public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
-        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em);
+        Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
 
         assertNotNull(ontology);
         assertEquals(5, ontology.getStatements().size());
@@ -351,8 +398,8 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     
     @Test
     public void shouldCreateConceptSerialisedIdMapToDatabaseIdForOntology() throws IOException{
-        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em);
+        Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
         Map<Long, Long> map = importer.createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
         
         assertEquals(8, map.keySet().size());
@@ -374,8 +421,8 @@ public class HibernateDatabaseImporterTest extends DatabaseTest{
     
     @Test
     public void shouldSetKindOfPredicate() throws IOException{
-        Ontology ontology = importer.populateDbFromLongForm(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_LONG_FORM), em);
+        Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
         
         assertNotNull(ontology.getIsKindOfPredicate());
         assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());

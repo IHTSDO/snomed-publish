@@ -10,34 +10,37 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Statement;
 
-public class CanonicalSerialiser implements Serialiser{
+public class CanonicalSerialiser extends OntologySerialiser{
+
+    public CanonicalSerialiser(Writer writer) throws IOException{
+        super(writer);
+    }
 
     protected static final char DELIMITER = '\t';
-    private static final Logger LOG = LoggerFactory.getLogger( Serialiser.class );
+    private static final Logger LOG = LoggerFactory.getLogger( OntologySerialiser.class );
     
-    public void write (Writer w, Collection<Statement> statements) throws IOException{
-        printHeading(w);
+    public void write (Collection<Statement> statements) throws IOException{
         Iterator<Statement> rIt = statements.iterator();
-        int counter = 2;
+        int counter = 1;
         while (rIt.hasNext()){
-            w.write("\r\n");
-            printStatement(w, rIt.next());
+            write(rIt.next());
             counter++;
         }
         LOG.info("Wrote " + counter + " lines");
     }
 
-    protected void printHeading(Writer w) throws IOException{
-        w.write("CONCEPTID1" + DELIMITER + "RELATIONSHIPTYPE" + DELIMITER +
-                "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP");
-    }
-
-    protected void printStatement(Writer w, Statement r) throws IOException{
-        w.write(Long.toString(r.getSubject().getSerialisedId())
+    public void write(Statement r) throws IOException{
+        writer.write(Long.toString(r.getSubject().getSerialisedId())
                 + DELIMITER + Long.toString(r.getPredicate().getSerialisedId())
                 + DELIMITER + Long.toString(r.getObject().getSerialisedId())
-                + DELIMITER + Integer.toString(r.getGroupId()));
+                + DELIMITER + Integer.toString(r.getGroupId()) + "\r\n");
     }
+
+    protected void writeHeader() throws IOException{
+        writer.write("CONCEPTID1" + DELIMITER + "RELATIONSHIPTYPE" + DELIMITER +
+                "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP\r\n");
+    }
+
     
 //    protected void printRelationship(Writer w, long serialisedId, long subjectId, long preicateId, long objectId) throws IOException{
 //        w.write(Long.toString(r.getSubject().getSerialisedId())

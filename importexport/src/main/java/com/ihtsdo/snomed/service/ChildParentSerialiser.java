@@ -15,30 +15,36 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Statement;
 
-public class ChildParentSerialiser implements Serialiser{
+public class ChildParentSerialiser extends OntologySerialiser{
     protected static final char DELIMITER = '\t';
     private static final Logger LOG = LoggerFactory.getLogger( ChildParentSerialiser.class );
     
-    public void write(Writer w, Collection<Statement> statements) throws IOException{
+    ChildParentSerialiser(Writer writer) throws IOException {
+        super(writer);
+    }
+    
+    public void write(Collection<Statement> statements) throws IOException{
         List<Statement> sortedList = new ArrayList<Statement>(statements);
         Collections.sort(sortedList, bySubjectAndObject);
-        
         Iterator<Statement> rIt = sortedList.iterator();
         int counter = 2;
         while (rIt.hasNext()){
-            printStatement(w, rIt.next());
-            w.write("\r\n");
+            write(rIt.next());
             counter++;
         }
         LOG.info("Wrote " + counter + " lines");
     }
 
-    protected void printStatement(Writer w, Statement r) throws IOException{
-        if (r.isKindOfStatement()){
-            w.write(Long.toString(r.getSubject().getSerialisedId())+ 
-                    DELIMITER + Long.toString(r.getObject().getSerialisedId()));            
+    public void write(Statement statement) throws IOException{
+        if (statement.isKindOfStatement()){
+            writer.write(Long.toString(statement.getSubject().getSerialisedId())+ 
+                    DELIMITER + Long.toString(statement.getObject().getSerialisedId()) + "\r\n");
         }
-    }    
+    }
+    
+    protected void writeHeader() throws IOException{
+        //no header
+    }
     
     private Ordering<Statement> bySubjectAndObject = new Ordering<Statement>() {
         @Override

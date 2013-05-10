@@ -11,18 +11,18 @@ import org.junit.Test;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.DatabaseTest;
-import com.ihtsdo.snomed.service.HibernateDatabaseImporterTest;
+import com.ihtsdo.snomed.service.HibernateDbImporterTest;
 
 public class OntologyTest extends DatabaseTest{
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        HibernateDatabaseImporterTest.setUpBeforeClass();
+        HibernateDbImporterTest.setUpBeforeClass();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        HibernateDatabaseImporterTest.tearDownAfterClass();
+        HibernateDbImporterTest.tearDownAfterClass();
     }
 
     @Before

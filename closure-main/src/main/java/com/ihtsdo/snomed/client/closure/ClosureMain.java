@@ -8,22 +8,23 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 import org.apache.commons.cli.ParseException;
+import org.hibernate.CacheMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.HibernateDbImporter;
+import com.ihtsdo.snomed.service.OntologySerialiser;
 import com.ihtsdo.snomed.service.SerialiserFactory;
 import com.ihtsdo.snomed.service.SerialiserFactory.Form;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
@@ -54,7 +55,6 @@ public class ClosureMain {
     }
 
     public void closeDb(){
-        LOG.info("Closing database");
         emf.close();
     }
 
@@ -69,27 +69,52 @@ public class ClosureMain {
     protected void runProgram(String inputFile, String outputFile, String dbFile) throws IOException{
         try{
             initDb(dbFile);  
-            Ontology o = importer.populateDbFromRf2(DEFAULT_ONTOLOGY_NAME, 
+            Ontology o = importer.populateDbFromRf2FormWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
-            List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + o.getId(), Concept.class).getResultList();            
+            File outFile = new File(outputFile);
+            if (!outFile.exists()){
+                outFile.createNewFile();
+            }
             
-            writeOut(outputFile, algorithm.runAlgorithm(concepts));
+            TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
+            query.setParameter("ontologyId", o.getId());
+            query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+            query.setHint("org.hibernate.readOnly", Boolean.TRUE);
+            query.setHint("org.hibernate.cacheMode", CacheMode.GET);
+            
+            //int pageSize = 250000;
+            //int firstResult = 0;
+            //int counter = 0;
+            //query.setFirstResult(firstResult);
+            //query.setMaxResults(pageSize);            
+            List<Concept> concepts = query.getResultList();
+            
+            //boolean done = false;
+            try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
+                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CANONICAL, bw);
+                Stopwatch stopwatch = new Stopwatch().start();
+                LOG.info("Running algorithm");
+                algorithm.runAlgorithm(concepts, serialiser);
+//                while (!done){
+//                    if (concepts.size() < pageSize) {
+//                        counter += concepts.size();
+//                        done = true;
+//                    }                    
+//                    algorithm.runAlgorithm(concepts, serialiser);
+//                    em.clear();
+//                    firstResult = firstResult + pageSize;
+//                    if (!done){
+//                        counter += pageSize;
+//                        query.setFirstResult(firstResult);
+//                        concepts = query.getResultList();
+//                    }
+//                }
+                stopwatch.stop();
+                LOG.info("Completed algorithm in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");// with [" + counter + "] statements");
+            }
         }finally{
             closeDb();
-        }
-    }
-
-    private void writeOut(String outputFile, Set<Statement> statements) throws IOException {
-        LOG.info("Writing results to " + outputFile);
-
-        File outFile = new File(outputFile);
-        if (!outFile.exists()){
-            outFile.createNewFile();
-        }
-        
-        try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-            SerialiserFactory.getSerialiser(Form.CANONICAL).write(bw, statements);
         }
     }
 }

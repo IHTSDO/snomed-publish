@@ -12,15 +12,17 @@ import com.ihtsdo.snomed.canonical.test.model.StatementForCompareWrapper;
 import com.ihtsdo.snomed.service.CanonicalSerialiser;
 
 public class CanonicalWrappedStatementWriter extends CanonicalSerialiser {
+    public CanonicalWrappedStatementWriter(Writer writer) throws IOException {
+        super(writer);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalWrappedStatementWriter.class );
 
-    public void writeCompareStatements (Writer w, Collection<StatementForCompareWrapper> statements) throws IOException{
-        printHeading(w);
+    public void writeCompareStatements (Collection<StatementForCompareWrapper> statements) throws IOException{
         Iterator<StatementForCompareWrapper> rIt = statements.iterator();
         int counter = 1;
         while (rIt.hasNext()){
-            w.write("\r\n");
-            printStatement(w, rIt.next().getStatement());
+            write(rIt.next().getStatement());
             counter++;
         }
         LOG.info("Wrote " + counter + " lines");

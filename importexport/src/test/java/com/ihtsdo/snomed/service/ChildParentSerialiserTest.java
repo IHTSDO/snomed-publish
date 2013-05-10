@@ -15,8 +15,6 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.Serialiser;
-import com.ihtsdo.snomed.service.SerialiserFactory;
 import com.ihtsdo.snomed.service.SerialiserFactory.Form;
 
 public class ChildParentSerialiserTest {
@@ -30,7 +28,6 @@ public class ChildParentSerialiserTest {
                     "3\t4\r\n";
     
     private Collection<Statement> statements = new HashSet<Statement>();
-    private Serialiser writer = SerialiserFactory.getSerialiser(Form.CHILD_PARENT);
     
     @Before
     public void setUp() throws Exception {
@@ -54,7 +51,7 @@ public class ChildParentSerialiserTest {
     public void shouldPrintOntologyInSpecifiedFormat() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            writer.write(pw, statements);
+            SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw).write(statements);
         }
         baos.flush();
         assertEquals(EXPECTED_RESULT, baos.toString());

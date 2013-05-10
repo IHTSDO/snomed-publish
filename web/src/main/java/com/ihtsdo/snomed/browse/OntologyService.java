@@ -47,7 +47,7 @@ public class OntologyService {
     
     @Transactional
     public void exportCanonical(Ontology ontology, Writer writer) throws IOException{
-        SerialiserFactory.getSerialiser(Form.CANONICAL).write(writer, ontology.getStatements());        
+        SerialiserFactory.getSerialiser(Form.CANONICAL, writer).write(ontology.getStatements());        
     }
     
     @Transactional
@@ -71,9 +71,9 @@ public class OntologyService {
         start = new String (bytes, "UTF-8");  
         try {
             if (start.trim().startsWith("RELATIONSHIPID\t")){
-                return importer.populateDbFromLongForm(name, conceptsInputstream, relationshipsInputstream, em);
+                return importer.populateDbFromRf1Form(name, conceptsInputstream, relationshipsInputstream, em);
             }else if (start.trim().startsWith("CONCEPTID1\t")){
-                return importer.populateDbFromShortForm(name, conceptsInputstream, relationshipsInputstream, em);
+                return importer.populateDbFromCanonicalForm(name, conceptsInputstream, relationshipsInputstream, em);
             }else{
                 throw new InvalidStatementsException("File format not recognised");
             }

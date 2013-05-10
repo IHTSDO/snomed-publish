@@ -16,7 +16,7 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Group;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.DatabaseTest;
-import com.ihtsdo.snomed.service.HibernateDatabaseImporterTest;
+import com.ihtsdo.snomed.service.HibernateDbImporterTest;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class ConceptTest  extends DatabaseTest{
@@ -51,12 +51,12 @@ public class ConceptTest  extends DatabaseTest{
     
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        HibernateDatabaseImporterTest.setUpBeforeClass();
+        HibernateDbImporterTest.setUpBeforeClass();
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        HibernateDatabaseImporterTest.tearDownAfterClass();
+        HibernateDbImporterTest.tearDownAfterClass();
     }
 
     @After
