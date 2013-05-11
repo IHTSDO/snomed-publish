@@ -3,6 +3,7 @@
         <class>com.ihtsdo.snomed.model.Concept</class>
         <class>com.ihtsdo.snomed.model.Statement</class>
         <class>com.ihtsdo.snomed.model.Ontology</class>
+        <class>com.ihtsdo.snomed.model.Description</class>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="create-drop" />
 <!--             <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/> -->

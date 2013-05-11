@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.service.serialiser;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +14,8 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
 public class CanonicalSerialiserTest {
 

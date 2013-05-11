@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ !  Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ !
+ !  Licensed under the Apache License, Version 2.0 (the "License");
+ !  you may not use this file except in compliance with the License.
+ !  You may obtain a copy of the License at
+ !
+ !      http://www.apache.org/licenses/LICENSE-2.0
+ !
+ !  Unless required by applicable law or agreed to in writing, software
+ !  distributed under the License is distributed on an "AS IS" BASIS,
+ !  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ !  See the License for the specific language governing permissions and
+ !  limitations under the License.
+ -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.ihtsdo</groupId>
+    <artifactId>ihtsdo</artifactId>
+    <version>1</version>
+  </parent>
+  <artifactId>ihtsdo-wb-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>1</version>
+  <name>IHTSDO Workbench Parent POM</name>
+  <description>
+    Parent POM for projects using the IHTSDO Workbench development infrastructure
+  </description>
+  <scm>
+    <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/pom/ihtsdo-wb-parent/tags/ihtsdo-wb-parent-1</connection>
+    <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/pom/ihtsdo-wb-parent/tags/ihtsdo-wb-parent-1</developerConnection>
+    <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/pom/ihtsdo-wb-parent/tags/?root=workbench&amp;system=exsy1002/ihtsdo-wb-parent-1</url>
+  </scm>
+  <issueManagement>
+    <system>Tracker</system>
+    <url>https://csfe.aceworkspace.net/sf/tracker/do/listTrackers/projects.ihtsdo_workbench/tracker</url>
+  </issueManagement>
+  <mailingLists>
+    <mailingList>
+      <name>announce</name>
+      <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.ihtsdo_workbench/discussion.announce</archive>
+      <post>announce-ihtsdo_workbench@csfe.aceworkspace.net</post>
+    </mailingList>
+    <mailingList>
+      <name>users</name>
+      <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.ihtsdo_workbench/discussion.users</archive>
+      <post>users-ihtsdo_workbench@csfe.aceworkspace.net</post>
+    </mailingList>
+    <mailingList>
+      <name>development</name>
+      <archive>https://csfe.aceworkspace.net/sf/discussion/do/listTopics/projects.ihtsdo_workbench/discussion.dev</archive>
+      <post>dev-ihtsdo_workbench@csfe.aceworkspace.net</post>
+    </mailingList>
+  </mailingLists>
+  <!--
+    All projects in the workbench repositories are Apache 2.0 licensed and deployed to the wb-* repositories
+     (distributionManagement is inherited from the parent)
+  -->
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>kec</id>
+      <name>Keith Campbell MD, PhD</name>
+      <email>campbell@informatics.com</email>
+      <url>http://www.informatics.com/bios/campbell.html</url>
+      <organization>Informatics, Inc.</organization>
+      <organizationUrl>http://www.informatics.com</organizationUrl>
+      <roles>
+        <role>Architect</role>
+        <role>Java Developer</role>
+      </roles>
+      <timezone>-8</timezone>
+      <properties />
+    </developer>
+    <developer>
+      <id>sc</id>
+      <name>Susan Castillo</name>
+      <email>castillo@informatics.com</email>
+      <url>http://www.informatics.com/bios/castillo.html</url>
+      <organization>Informatics, Inc.</organization>
+      <organizationUrl>http://www.informatics.com</organizationUrl>
+      <roles>
+        <role>Install Anywhere</role>
+        <role>Quality Assurance</role>
+      </roles>
+      <timezone>-8</timezone>
+      <properties />
+    </developer>
+  </developers>
+  <!--
+    Common settings and plugin versions. Subprojects are generally expected to be Java projects.
+
+      (Note: Several plugin definitions will be carried across other organisation's parent POMs. This would be an
+             excellent use of mixins if Maven had them in the future, but for now they should instead use this as a
+             base)
+  -->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.0.2</version>
+          <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <!-- Common reporting requirements. All sites generated are expected to be Java module sites for subprojects -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.1</version>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
+

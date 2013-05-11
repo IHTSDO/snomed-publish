@@ -19,7 +19,7 @@ import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 
 public class CanonicalAlgorithmTest {
 
-    //private static HibernateDbImporter importer;
+    //private static Rf1HibernateParser importer;
     //private static Main main;
     private static CanonicalAlgorithm algorithm;
     

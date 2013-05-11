@@ -1,7 +1,9 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
+
+import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class SerialiserFactory  {
 
@@ -11,14 +13,14 @@ public class SerialiserFactory  {
         CANONICAL, CHILD_PARENT;
     }
     
-    public static OntologySerialiser getSerialiser(Form form, Writer writer) throws IOException{
+    public static BaseOntologySerialiser getSerialiser(Form form, Writer writer) throws IOException{
         switch (form){
             case CANONICAL:
                 return new CanonicalSerialiser(writer);
             case CHILD_PARENT:
                 return new ChildParentSerialiser(writer);
             default:
-                throw new InvalidInputException("OntologySerialiser " + form + " not found");
+                throw new InvalidInputException("BaseOntologySerialiser " + form + " not found");
         }
     }
 }

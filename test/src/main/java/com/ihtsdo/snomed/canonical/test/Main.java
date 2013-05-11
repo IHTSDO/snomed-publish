@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class Main{
     private static final Logger LOG = LoggerFactory.getLogger( Main.class );
@@ -29,7 +31,7 @@ public class Main{
     
     private   EntityManagerFactory emf     = null;
     protected EntityManager em             = null;
-    private   HibernateDbImporter importer = new HibernateDbImporter();
+    private   HibernateParser parser       = HibernateParserFactory.getParser(Parser.CANONICAL);
     private   TestingAlgorithm tester      = new TestingAlgorithm();
     
     protected void initDb(String db){
@@ -56,11 +58,11 @@ public class Main{
         try{
             initDb(db);
             
-            Ontology originalOntology = importer.populateDbFromRf1Form(ORIGINAL_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology originalOntology = parser.populateDb(ORIGINAL_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(originalFile), em);
-            Ontology expectedOntology = importer.populateDbFromCanonicalForm(EXPECTED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology expectedOntology = parser.populateDb(EXPECTED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(expectedFile), em);
-            Ontology generatedOntology = importer.populateDbFromCanonicalForm(GENERATED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
+            Ontology generatedOntology = parser.populateDb(GENERATED_ONTOLOGY_NAME, new FileInputStream(conceptFile), 
                     new FileInputStream(generatedFile), em);
             
             tester.findDifference(em, new File(extraFile), new File(missingFile), 

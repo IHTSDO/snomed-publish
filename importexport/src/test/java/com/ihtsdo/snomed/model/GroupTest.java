@@ -6,33 +6,22 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Group;
-import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.DatabaseTest;
-import com.ihtsdo.snomed.service.HibernateDbImporterTest;
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.parser.DatabaseTest;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class GroupTest extends DatabaseTest{
     
     private static final String TEST_GROUP_RELATIONSHIPS_LONG_FORM = "group_statements_longform.txt";
     private static final String TEST_GROUP_CONCEPTS = "test_group_concepts.txt";
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        HibernateDbImporterTest.setUpBeforeClass();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        HibernateDbImporterTest.tearDownAfterClass();
-    }
-
+    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
+    
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -47,7 +36,7 @@ public class GroupTest extends DatabaseTest{
     @Test
     public void shouldReturnEqual() throws IOException {
         
-        importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, 
+        parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
                 ClassLoader.getSystemResourceAsStream(TEST_GROUP_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_GROUP_RELATIONSHIPS_LONG_FORM), em);       
         

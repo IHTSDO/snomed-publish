@@ -1,19 +1,32 @@
 package com.ihtsdo.snomed.model;
 
+import java.sql.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 @Entity
 public class Description {
+    
+    //SHARED
     @Id private long id;
-    private int status;
-    @OneToOne (optional=false)
-    private Concept concept;
     private String term;
-    private int initialCapitalStatus;
-    private int type;
+    @OneToOne(mappedBy="description") private Concept aboutConcept;
     private String langaugeCode;
+    
+    //RF1
+    private int status;
+    private int initialCapitalStatus;
+    private int typeId;
+
+    //RF2
+    @Column(nullable=true) private Date effectiveTime;
+    @Column(nullable=true, columnDefinition = "BIT", length = 1) private boolean active;
+    @OneToOne private Concept type;
+    @OneToOne private Concept caseSignificance;
+    @OneToOne private Concept module;
 
     @Override
     public String toString() {
@@ -39,12 +52,13 @@ public class Description {
         this.status = status;
     }
 
-    public Concept getConcept() {
-        return concept;
+
+    public Concept getAboutConcept() {
+        return aboutConcept;
     }
 
-    public void setConcept(Concept concept) {
-        this.concept = concept;
+    public void setAboutConcept(Concept aboutConcept) {
+        this.aboutConcept = aboutConcept;
     }
 
     public String getTerm() {
@@ -63,12 +77,12 @@ public class Description {
         this.initialCapitalStatus = initialCapitalStatus;
     }
 
-    public int getType() {
-        return type;
+    public int getTypeId() {
+        return typeId;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setTypeId(int typeId) {
+        this.typeId = typeId;
     }
 
     public String getLangaugeCode() {
@@ -77,6 +91,46 @@ public class Description {
 
     public void setLangaugeCode(String langaugeCode) {
         this.langaugeCode = langaugeCode;
+    }
+
+    public Date getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(Date effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Concept getType() {
+        return type;
+    }
+
+    public void setType(Concept type) {
+        this.type = type;
+    }
+
+    public Concept getCaseSignificance() {
+        return caseSignificance;
+    }
+
+    public void setCaseSignificance(Concept caseSignificance) {
+        this.caseSignificance = caseSignificance;
+    }
+
+    public Concept getModule() {
+        return module;
+    }
+
+    public void setModule(Concept module) {
+        this.module = module;
     }
 
 

@@ -1,0 +1,726 @@
+CREATE OR REPLACE PROCEDURE SDO_RELEASE.CT_CREATE_CANONICAL(
+
+--<parameters>
+RunId in INTEGER, -- <param required="yes" description="A unique identifier for the script execution (run)."/>
+TargetSchema IN VARCHAR2 -- <param required="yes" description="This is the name of the schema where the release will be created"/>
+) AS
+flag integer;
+ProcId integer;
+
+BEGIN
+ProcId := 12;
+
+INS_EXECUTION_LOG(RunId,ProcId,'Starting Canonical procedure',3,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping existing canonical table',3,'');
+
+BEGIN
+EXECUTE IMMEDIATE('DROP TABLE ' || TargetSchema || '.canonical');
+EXCEPTION  
+  WHEN OTHERS THEN
+  INS_EXECUTION_LOG(RunId,ProcId,'Drop failed, creating canonical as a new table',3,'');
+END;
+
+INS_EXECUTION_LOG(RunId,ProcId,'Completed dropping existing canonical table',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating new canonical table',3,'');
+
+BEGIN
+
+EXECUTE IMMEDIATE('CREATE TABLE ' || TargetSchema || '.CANONICAL
+   (	
+    CONCEPTID1 VARCHAR2(26 BYTE), 
+	RELATIONSHIPTYPE VARCHAR2(26 BYTE), 
+	CONCEPTID2 VARCHAR2(26 BYTE), 
+	RELATIONSHIPGROUP VARCHAR2(26 BYTE)
+   ) 
+');
+
+EXCEPTION  
+  WHEN OTHERS THEN
+  INS_EXECUTION_LOG(RunId,ProcId,'Create canonical failed',4,'');
+END;
+
+INS_EXECUTION_LOG(RunId,ProcId,'Completed creating canonical table ',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ISA',3,'');
+BEGIN
+select 1 into flag from user_tables where table_name='TMP_ISA';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ISA');
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ISA',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping TMP_ISA_PRIM',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ISA_PRIM';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ISA_PRIM'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ISA_PRIM',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_PRIM',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_PRIM';
+execute immediate ('drop table ' || TargetSchema || '.TMP_PRIM'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_PRIM',5,'');
+
+
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_TCLOS',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_TCLOS';
+execute immediate ('drop table ' || TargetSchema || '.TMP_TCLOS'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_TCLOS',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_PRIMSUBS',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_PRIMSUBS';
+execute immediate ('drop table ' || TargetSchema || '.TMP_PRIMSUBS'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_PRIMSUBS',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ROLES_P',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ROLES_P';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLES_P'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ROLES_P',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ROLES_P_CAN',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ROLES_P_CAN';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLES_P_CAN'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ROLES_P_CAN',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ROLEGROUPS',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ROLEGROUPS';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPS'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ROLEGROUPS',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ROLEGROUPID',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ROLEGROUPID';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPID'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ROLEGROUPID',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping table TMP_ROLEGROUPS_CAN',3,'');
+begin
+select 1 into flag from user_tables where table_name='TMP_ROLEGROUPS_CAN';
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPS_CAN'); 
+exception
+ when no_data_found then
+ null;
+ when others then
+  raise;
+end;
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ROLEGROUPS_CAN',5,'');
+
+
+/* all tables that need to be dropped have been dropped */
+
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ISA',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_isa AS
+SELECT DISTINCT conceptid1,conceptid2,isprimitive FROM ' || TargetSchema || '.relationships r 
+INNER JOIN ' || TargetSchema || '.concepts c ON c.conceptid=r.conceptid2 
+WHERE relationshiptype=''116680003'' ');
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped table TMP_ISA',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_ISA',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_isa_ix1 ON ' || TargetSchema || '.tmp_isa (conceptid1)');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_isa_ix2 ON ' || TargetSchema || '.tmp_isa (conceptid2)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indexes TMP_ISA',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ISA_PRIM',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_isa_prim AS
+SELECT DISTINCT connect_by_root conceptid1 as conceptid1,conceptid2 
+FROM ' || TargetSchema || '.tmp_isa  WHERE isprimitive=''1'' 
+START WITH isprimitive=''0'' CONNECT BY PRIOR conceptid2=conceptid1 AND
+PRIOR isprimitive!=''1''');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_ISA_PRIM',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_PRIM',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_prim AS
+SELECT conceptid1,conceptid2 
+FROM ' || TargetSchema || '.tmp_isa WHERE isprimitive=''1''
+UNION
+SELECT conceptid1,conceptid2 FROM ' || TargetSchema || '.tmp_isa_prim');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_PRIM',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_PRIM',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_primix1 ON ' || TargetSchema || '.tmp_prim (conceptid1)');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_primix2 ON ' || TargetSchema || '.tmp_prim (conceptid2)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_PRIM',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_TCLOS',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_tclos AS
+SELECT DISTINCT connect_by_root conceptid1 as conceptid1,conceptid2 
+FROM ' || TargetSchema || '.tmp_isa 
+WHERE isprimitive=''1'' 
+CONNECT BY PRIOR conceptid2=conceptid1');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_TCLOS',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_TCLOS',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_tclos_ix1 ON ' || TargetSchema || '.tmp_tclos (conceptid1)');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_tclos_ix2 ON ' || TargetSchema || '.tmp_tclos (conceptid2)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_TCLOS',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_PRIMSUBS',3,'');
+EXECUTE IMMEDIATE ('CREATE table ' || TargetSchema || '.tmp_primsubs as
+select tp1.conceptid1,tp1.conceptid2 from ' || TargetSchema || '.tmp_tclos tc 
+  inner join  ' || TargetSchema || '.tmp_prim tp2 on tp2.conceptid2=tc.conceptid1
+  inner join  ' || TargetSchema || '.tmp_prim tp1 on tp1.conceptid2=tc.conceptid2
+  and tp1.conceptid1=tp2.conceptid1');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_PRIMSUBS',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_PRIMSUBS',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_primsubs_ix1 ON ' || TargetSchema || '.tmp_primsubs (conceptid1,conceptid2)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_PRIMSUBS',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Deleting table TMP_PRIM where exists 0 from tmp_primsubs',3,'');
+EXECUTE IMMEDIATE ('delete ' || TargetSchema || '.tmp_prim where exists(
+select 0 from ' || TargetSchema || '.tmp_primsubs tp 
+where tp.conceptid1=tmp_prim.conceptid1 and tp.conceptid2=tmp_prim.conceptid2) ');
+INS_EXECUTION_LOG(RunId,ProcId,'Deleted table TMP_PRIM where exists 0 from tmp_primsubs',5,'');
+  
+
+
+COMMIT;
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ROLES',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_roles_p AS
+SELECT DISTINCT conceptid1,relationshiptype,conceptid2 FROM ' || TargetSchema || '.relationships
+WHERE relationshiptype!=''116680003'' AND characteristictype=''0'' AND Relationshipgroup=''0''');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_ROLES',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_ROLES',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_roles_p_ix1 ON ' || TargetSchema || '.tmp_roles_p (conceptid1)');
+EXECUTE IMMEDIATE ('CREATE INDEX tmp_roles_p_ix2 ON ' || TargetSchema || '.tmp_roles_p (conceptid1,relationshiptype,conceptid2)');																			
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_ROLES',5,'');
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ROLES_P_CAN',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_roles_p_can AS
+SELECT DISTINCT  r.* FROM ' || TargetSchema || '.tmp_roles_p r 
+	   WHERE NOT EXISTS(SELECT 0 FROM ' || TargetSchema || '.tmp_roles_p r2 
+	   INNER JOIN ' || TargetSchema || '.tmp_prim p 
+           on r2.conceptid1=p.conceptid2
+           where r2.relationshiptype=r.relationshiptype AND r2.conceptid2=r.conceptid2
+           and p.conceptid1=r.conceptid1)');
+ INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_ROLES_P_CAN',5,'');
+           
+
+	   
+--creo relationship ids para los rolegroups
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ROLEGROUPS',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_rolegroups AS 
+SELECT q.*,ROWNUM AS ord,CAST(0 AS NUMBER(1)) fir,CAST(0 AS NUMBER(1)) las FROM (
+SELECT c.* FROM ' || TargetSchema || '.relationships c WHERE relationshiptype!=''116680003'' AND characteristictype=''0'' AND c.RELATIONSHIPGROUP !=''0''   ORDER BY c.conceptid1,c.relationshipgroup,c.Relationshiptype,c.conceptid2) q  ');
+INS_EXECUTION_LOG(RunId,ProcId,'Created Table TMP_ROLEGROUPS',5,'');
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_ROLEGROUPS',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX ' || TargetSchema || '.tmp_rolegroups_INDEX1 ON ' || TargetSchema || '.tmp_rolegroups (CONCEPTID1,RELATIONSHIPGROUP,ORD) ');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_ROLEGROUPS',5,'');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Updating TMP_ROLEGROUPS',3,'');
+
+EXECUTE IMMEDIATE ('UPDATE ' || TargetSchema || '.tmp_rolegroups SET las=1 WHERE NOT EXISTS 
+(SELECT 0 FROM ' || TargetSchema || '.tmp_rolegroups t WHERE t.conceptid1=tmp_rolegroups.conceptid1 AND t.relationshipgroup=tmp_rolegroups.relationshipgroup AND t.ord>tmp_rolegroups.ord )');
+
+
+
+EXECUTE IMMEDIATE ('UPDATE ' || TargetSchema || '.tmp_rolegroups SET fir=1 WHERE NOT EXISTS 
+(SELECT 0 FROM ' || TargetSchema || '.tmp_rolegroups t WHERE t.conceptid1=tmp_rolegroups.conceptid1 AND t.relationshipgroup=tmp_rolegroups.relationshipgroup AND t.ord<tmp_rolegroups.ord)');
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Updated TMP_ROLEGROUPS',5,''); 
+COMMIT; 
+
+
+ 
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ROLEGROUPID',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.TMP_ROLEGROUPID AS
+SELECT conceptid1,relationshipgroup,SYS_CONNECT_BY_PATH( Relationshiptype || ''|'' ||  conceptid2, ''/'') GroupID
+FROM ' || TargetSchema || '.tmp_rolegroups WHERE las=1 START WITH fir=1 
+CONNECT BY PRIOR conceptid1=conceptid1 AND PRIOR relationshipgroup=relationshipgroup AND PRIOR ord=ord-1');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_ROLEGROUPS',5,''); 
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_ROLEGROUPID',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX ' || TargetSchema || '.tmp_roleg_1 ON ' || TargetSchema || '.TMP_ROLEGROUPID (CONCEPTID1,RELATIONSHIPGROUP)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_ROLEGROUPID',5,''); 
+ 
+INS_EXECUTION_LOG(RunId,ProcId,'Altering Table TMP_ROLEGROUPS',3,'');
+ EXECUTE IMMEDIATE ('ALTER TABLE ' || TargetSchema || '.tmp_rolegroups ADD groupid VARCHAR2(512)');
+INS_EXECUTION_LOG(RunId,ProcId,'Altered Table TMP_ROLEGROUPS',5,''); 
+ 
+INS_EXECUTION_LOG(RunId,ProcId,'Updating table TMP_ROLEGROUPS',3,'');
+ EXECUTE IMMEDIATE ('UPDATE  ' || TargetSchema || '.tmp_rolegroups SET groupid=(
+SELECT groupid FROM ' || TargetSchema || '.TMP_ROLEGROUPID 
+WHERE conceptid1= tmp_rolegroups.conceptid1 AND relationshipgroup= tmp_rolegroups.relationshipgroup)');
+INS_EXECUTION_LOG(RunId,ProcId,'Updated table TMP_ROLEGROUPS',5,''); 
+ 
+ COMMIT;
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating indeces TMP_ROLEGROUPS',3,'');
+EXECUTE IMMEDIATE ('CREATE INDEX ' || TargetSchema || '.tmp_rolegroups_INDEX2 ON ' || TargetSchema || '.tmp_rolegroups (CONCEPTID1,GROUPID) ');
+INS_EXECUTION_LOG(RunId,ProcId,'Created indeces TMP_ROLEGROUPS',5,''); 
+
+INS_EXECUTION_LOG(RunId,ProcId,'Creating table TMP_ROLEGROUPS_CAN',3,'');
+EXECUTE IMMEDIATE ('CREATE TABLE ' || TargetSchema || '.tmp_rolegroups_can AS
+SELECT DISTINCT  r.* FROM ' || TargetSchema || '.tmp_rolegroups r 
+	   WHERE NOT EXISTS(SELECT 0 FROM ' || TargetSchema || '.tmp_rolegroups r2 
+	   INNER JOIN ' || TargetSchema || '.tmp_prim p 
+           on r2.conceptid1=p.conceptid2 
+           where r2.groupid=r.groupid
+           and p.conceptid1=r.conceptid1)');
+INS_EXECUTION_LOG(RunId,ProcId,'Created table TMP_ROLEGROUPS_CAN',5,''); 
+
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Inserting into table Canonical',3,'');
+EXECUTE IMMEDIATE ('Insert into ' || TargetSchema || '.canonical(CONCEPTID1,RELATIONSHIPTYPE,CONCEPTID2,RELATIONSHIPGROUP)
+select  CONCEPTID1,''116680003'',CONCEPTID2,''0'' from ' || TargetSchema || '.TMP_PRIM');
+
+EXECUTE IMMEDIATE ('Insert into ' || TargetSchema || '.canonical(CONCEPTID1,RELATIONSHIPTYPE,CONCEPTID2,RELATIONSHIPGROUP)
+select CONCEPTID1,RELATIONSHIPTYPE,CONCEPTID2,''0'' from ' || TargetSchema || '.TMP_ROLES_P_CAN');
+
+EXECUTE IMMEDIATE ('Insert into ' || TargetSchema || '.canonical(CONCEPTID1,RELATIONSHIPTYPE,CONCEPTID2,RELATIONSHIPGROUP)
+select CONCEPTID1,RELATIONSHIPTYPE,CONCEPTID2,RELATIONSHIPGROUP from ' || TargetSchema || '.TMP_ROLEGROUPS_CAN');
+INS_EXECUTION_LOG(RunId,ProcId,'Inserted into table Canonical',5,''); 
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropping TMP Tables',3,'');
+
+execute immediate ('drop table ' || TargetSchema || '.TMP_ISA'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ISA_PRIM'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_PRIM'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_TCLOS'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_PRIMSUBS'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLES_P'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLES_P_CAN'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPS'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPID'); 
+execute immediate ('drop table ' || TargetSchema || '.TMP_ROLEGROUPS_CAN'); 
+
+INS_EXECUTION_LOG(RunId,ProcId,'Dropped TMP Tables',5,''); 
+
+
+INS_EXECUTION_LOG(RunId,ProcId,'Finished with Canonical Procedure',5,'');
+
+
+
+EXCEPTION  
+WHEN OTHERS THEN
+	INS_EXECUTION_LOG(RunId,ProcId,'Execution Error',4,SQLERRM);
+  raise_application_error(-20004,'Execution Error');
+
+END CT_CREATE_CANONICAL;
+ 
+4.2.2 RELEASE_QA_CANONICAL
+
+CREATE OR REPLACE PROCEDURE SDO_RELEASE.RELEASE_QA_CANONICAL ( 
+--<parameters> 
+RunId IN NUMBER  -- <param required="yes" description="This is the ID of the run"/> 
+, TargetSchema IN VARCHAR2 -- <param required="yes" description="This is the name of the schema where the release will be created"/> 
+, PreviousReleaseSchema IN VARCHAR2 -- <param required="yes" description="Name of the schema containing the previous release"/> 
+, ReferenceSchema IN VARCHAR2 -- <param required="yes" description="Name of the schema containing reference tables"/> 
+, ReleaseVersion IN VARCHAR2 -- <param required="yes" description="Date of the release in ANSI format (YYYYMMDD)"/> 
+--</parameters> 
+)AS 
+/*<summary> 
+This script executes the postconditions after the concepts step. 
+</summary>*/ 
+ban number; 
+InsCount  number; 
+strtmp varchar2(500); 
+step number; 
+BEGIN 
+step := 1; 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Beginning concepts postconditions execution','700'); 
+ 
+--<logic>Removes rows previously generated by this script</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Removing rows previously generated by this script',''); 
+ 
+EXECUTE IMMEDIATE ('delete from errors where rule_id like ''700.%'''); 
+ 
+--<logic>Checks for Null ConceptId1</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Null ConceptId1',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.01, ConceptId1, ConceptId1  
+FROM ' || TargetSchema || '.Canonical  
+WHERE ConceptId1 is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Null ConceptId1','700.01'); 
+ 
+ 
+--<logic>Checks for Null ConceptId2</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Null ConceptId2',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.02, ConceptId2, ConceptId2  
+FROM ' || TargetSchema || '.Canonical  
+WHERE ConceptId2 is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Null ConceptId2','700.02'); 
+ 
+ 
+--<logic>Checks for Null RelationshipType</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Null RelationshipType',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.03, RelationshipType, RelationshipType  
+FROM ' || TargetSchema || '.Canonical  
+WHERE RelationshipType is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Null RelationshipType','700.03'); 
+ 
+ 
+--<logic>Checks for Null RelationshipGroup</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Null RelationshipGroup',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.04, RelationshipGroup, RelationshipGroup  
+FROM ' || TargetSchema || '.Canonical  
+WHERE RelationshipGroup is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Null RelationshipGroup','700.04'); 
+ 
+ 
+--<logic>Checks for Incorrect ConceptId1 string length</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Incorrect ConceptId1 string length',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.05, ConceptId1, ConceptId1  
+FROM ' || TargetSchema || '.Canonical  
+WHERE LENGTH(ConceptId1) < 6 or LENGTH(ConceptId1) > 18'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Incorrect ConceptId1 string length','700.05'); 
+ 
+ 
+--<logic>Checks for Incorrect ConceptId2 string length</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Incorrect ConceptId2 string length',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.06, ConceptId2, ConceptId2  
+FROM ' || TargetSchema || '.Canonical  
+WHERE ConceptId2 is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Incorrect ConceptId2 string length','700.06'); 
+ 
+ 
+--<logic>Checks for Incorrect RelationshipType length</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Incorrect RelationshipType length',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)    
+SELECT 700.07, RelationshipType, RelationshipType    
+FROM ' || TargetSchema || '.Canonical    
+WHERE LENGTH(RelationshipType) < 6 OR LENGTH(RelationshipType) > 18'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Incorrect RelationshipType length','700.08'); 
+
+ 
+--<logic>Checks for Incorrect Relationshipgroup length</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Incorrect Relationshipgroup length',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.08, relationshipgroup, relationshipgroup  
+FROM ' || TargetSchema || '.Canonical  
+WHERE LENGTH(relationshipgroup) NOT BETWEEN 1 AND 2'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Incorrect Relationshipgroup length','700.09'); 
+ 
+ 
+--<logic>Checks for Invalid character in ConceptId1</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid character in ConceptId1',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId,ComponentId)    
+SELECT 700.09,ConceptId1,ConceptId1    
+FROM ' || TargetSchema || '.Canonical   
+WHERE TRANSLATE(ConceptId1, ''*0123456789'', ''*'') IS NOT NULL'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid character in ConceptId1','700.10'); 
+
+ 
+--<logic>Checks for Invalid character in ConceptId2</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid character in ConceptId2',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors  
+SELECT 700.10,ConceptId2,ConceptId2  
+FROM ' || TargetSchema || '.Canonical  
+WHERE TRANSLATE(ConceptId2, ''*0123456789'', ''*'') IS NOT NULL'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid character in ConceptId2','700.12'); 
+
+ 
+--<logic>Checks for Invalid character in RelationshipType</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid character in RelationshipType',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.11,RelationshipType, RelationshipType  
+FROM ' || TargetSchema || '.Canonical  
+WHERE TRANSLATE(RelationshipType, ''*1234567890'', ''*'') IS NOT NULL'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid character in RelationshipType','700.13'); 
+ 
+ 
+--<logic>Checks for Invalid RelationshipType</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid RelationshipType',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)   
+SELECT 700.12,RelationshipType,Conceptid   
+FROM ' || TargetSchema || '.Canonical r, ' || TargetSchema || '.Concepts c 
+WHERE r.RelationshipType=c.conceptid(+) and c.conceptid is null'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid RelationshipType','700.07'); 
+ 
+ 
+--<logic>Checks for Invalid RelationshipGroup</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid RelationshipGroup',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID,ConceptId,ComponentId)    
+SELECT 700.13,RelationshipGroup,RelationshipGroup    
+FROM ' || TargetSchema || '.Canonical    
+WHERE TRANSLATE(RelationshipGroup, ''*1234567890'', ''*'') IS NOT NULL');
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid RelationshipGroup','700.23'); 
+ 
+ 
+--<logic>Checks for Invalid ConceptId1 partition</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid ConceptId1 partition',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID,ConceptId, ComponentId)    
+SELECT 700.14,Conceptid1,Conceptid1    
+FROM ' || TargetSchema || '.Canonical    
+WHERE Conceptid1 not like ''%00_'''); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid ConceptId1 partition','700.14'); 
+ 
+ 
+--<logic>Checks for Invalid ConceptId2 partition</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Invalid ConceptId2 partition',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.15, Conceptid2, Conceptid2  
+FROM ' || TargetSchema || '.Canonical  
+WHERE Conceptid2 not like ''%00_'''); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Invalid ConceptId2 partition','700.15'); 
+ 
+ 
+--<logic>Checks for Relationshiptype with incorrect partitionid</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Relationshiptype with incorrect partitionid',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)    
+SELECT 700.16, Relationshiptype, Relationshiptype    
+FROM ' || TargetSchema || '.Canonical    
+WHERE relationshiptype not like ''%00_'''); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Relationshiptype with incorrect partitionid','700.16'); 
+ 
+ 
+--<logic>Checks for Duplicate Con1,RelType,Con2,RelGroup</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Duplicate Con1,RelType,Con2,RelGroup',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.17,ConceptId1, RelationshipType  
+FROM ' || TargetSchema || '.Canonical  
+GROUP BY ConceptId1,ConceptId2,RelationshipType,RelationshipGroup 
+HAVING COUNT(ConceptId1) > 1 and COUNT(RelationshipType) > 1 and COUNT(ConceptId2) > 1 and 
+COUNT(RelationshipGroup) > 1');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Duplicate Con1,RelType,Con2,RelGroup','700.17'); 
+
+ 
+--<logic>Checks for Single row in non-zero relationshipgroup</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for Single row in non-zero relationshipgroup',''); 
+ 
+EXECUTE IMMEDIATE ('CREATE TABLE tmp71 as 
+SELECT 
+ConceptId1,RelationshipGroup 
+FROM ' || TargetSchema || '.Canonical 
+WHERE 
+RelationshipGroup not like ''0'' 
+HAVING 
+count(RelationshipGroup) = 1 and COUNT(ConceptId1) = 1 
+GROUP BY 
+RelationshipGroup, ConceptId1');
+
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId) 
+SELECT 700.18,r.relationshipgroup,r.ConceptId1 
+FROM ' || TargetSchema || '.Canonical r, tmp71 t 
+WHERE t.conceptId1 = r.conceptId1 and 
+t.relationshipgroup = 
+r.relationshipgroup'); 
+
+EXECUTE IMMEDIATE ('DROP TABLE tmp71'); 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for Single row in non-zero relationshipgroup','700.18'); 
+
+ 
+--<logic>Checks for ConceptId1 equals ConceptId2</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for ConceptId1 equals ConceptId2',''); 
+ 
+EXECUTE IMMEDIATE ('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)  
+SELECT 700.19, ConceptId1, ConceptId1  
+FROM ' || TargetSchema || '.Canonical  
+WHERE ConceptId1 = ConceptId2');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for ConceptId1 equals ConceptId2','700.19'); 
+ 
+ 
+--<logic>Checks for ConceptId1 found in Concepts table</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for ConceptId1 found in Concepts table',''); 
+ 
+EXECUTE IMMEDIATE ('insert into errors        
+SELECT 700.20,c.conceptid1, c.conceptid1     
+FROM ' || TargetSchema || '.Canonical c   , ' || TargetSchema || '.concepts a  
+where c.conceptid1 = a.conceptid (+)
+and a.conceptid is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for ConceptId1 found in Concepts table','700.20'); 
+ 
+  
+--<logic>Checks for RelationshipType found in Relationships table</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for RelationshipType found in Relationships table',''); 
+ 
+EXECUTE IMMEDIATE ('insert into errors (rule_id,conceptid,componentid)        
+SELECT 700.22 ,c.RelationshipType, c.RelationshipType        
+FROM ' || TargetSchema || '.Canonical c    ,   ' || TargetSchema || '.Relationships d  
+where c.RelationshipType = d.RelationshipType (+)
+and d.RelationshipType is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for RelationshipType found in Relationships table','700.22');
+
+--<logic>Checks for ConceptId2 found in Concepts table</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for ConceptId2 found in Concepts table',''); 
+ 
+EXECUTE IMMEDIATE ('insert into errors (rule_id,conceptid,componentid)        
+SELECT 700.21 ,c.conceptid2, c.conceptid2        
+FROM ' || TargetSchema || '.Canonical c  , ' || TargetSchema || '.concepts a  
+where c.conceptid2 = a.conceptid (+)
+and a.conceptid is null');  
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for ConceptId2 found in Concepts table','700.21'); 
+  
+
+--<logic>Checks for RelationshipType found in Attributes table</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Starting check for RelationshipType found in Attributes table',''); 
+ 
+EXECUTE IMMEDIATE('create table tmp_attr as
+select conceptid as sctid, fullyspecifiedname 
+from concepts 
+where conceptid in (
+	select distinct conceptid1 from ' || TargetSchema || '.relationships
+	start with conceptid2=''246061005'' and relationshiptype = ''116680003''
+	connect by prior conceptid1=conceptid2
+	and conceptid2 != ''408739003'' and relationshiptype = ''116680003'')
+	'); 
+
+EXECUTE IMMEDIATE('INSERT INTO Errors (Rule_ID, ConceptId, ComponentId)    
+SELECT 700.25,r.RelationshipType, r.RelationshipType    
+FROM ' || TargetSchema || '.Canonical r, tmp_attr a    
+WHERE r.RelationshipType = a.sctid(+) and a.sctid is null');  
+
+EXECUTE IMMEDIATE('drop table tmp_attr');
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Check completed for RelationshipType found in Attributes table','700.25'); 
+ 
+ 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,5,'Finished concepts postconditions execution','700');  
+ 
+ 
+--<logic>Final summary</logic> 
+INS_POSTCONDITION_COUNT_LOG(RunId,Step,3,'Creating the final summary',''); 
+ 
+    select count(*) into ban from errors where rule_id like '700.%'; 
+    if ban>0 then 
+      INS_POSTCONDITION_COUNT_LOG(RunId,Step,4,'This process generated '||ban||' cases to review.',''); 
+      strtmp:='Errors has been found in post release control process.'; 
+      RAISE_APPLICATION_ERROR(-20201, strtmp) ;end if; 
+     
+END RELEASE_QA_CANONICAL;

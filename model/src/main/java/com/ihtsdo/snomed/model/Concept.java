@@ -1,6 +1,7 @@
 
 package com.ihtsdo.snomed.model;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,31 +35,56 @@ public class Concept {
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003l;
     
-    @XmlTransient @Transient private Set<Concept> allKindOfPrimitiveCache;
-    @XmlTransient @Transient private Set<Concept> allKindOfCache;
-    @XmlTransient @Transient private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
+    
+    //TRANSIENT
+    @XmlTransient @Transient 
+    private Set<Concept> allKindOfPrimitiveCache;
+    @XmlTransient @Transient 
+    private Set<Concept> allKindOfCache;
+    @XmlTransient @Transient 
+    private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
 
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private long id;    
-
+    
+    //SHARED
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) 
+    private long id;    
     private long serialisedId;
-    @Column(nullable=true) private int status = -1;
+    @XmlTransient @OneToOne 
+    private Ontology ontology;
+    
+    
+    //RF1
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
     private String type;
-    
-    @Column(nullable=true, columnDefinition = "BIT", length = 1) private boolean primitive = false;
-    @XmlTransient @OneToOne private Ontology ontology;
+    @Column(nullable=true, columnDefinition = "BIT", length = 1) 
+    private boolean primitive = false;
+    @Column(nullable=true) 
+    private int statusId = -1;
 
+    
+    //RF2
+    @Column(nullable=true) 
+    private Date effectiveTime;
+    @Column(nullable=true, columnDefinition = "BIT", length = 1) 
+    private boolean active;
+    @OneToOne 
+    private Description description;
+    @OneToOne 
+    private Concept status;
+    
+    
+    //STATEMENTS
     @XmlTransient @OneToMany(mappedBy="subject") 
     private Set<Statement> subjectOfStatements = new HashSet<Statement>();
-
     @XmlTransient @OneToMany(mappedBy="object")
-    private Set<Statement> objectOStatements = new HashSet<Statement>();    
-    
+    private Set<Statement> objectOfStatements = new HashSet<Statement>();    
     @XmlTransient @OneToMany(mappedBy="predicate")
     private Set<Statement> predicateOfStatements = new HashSet<Statement>();
-
+    
+    
+    //HIERARCHY
     @XmlTransient
     @ManyToMany
     @JoinTable(name = "KIND_OF", 
@@ -67,9 +93,10 @@ public class Concept {
         uniqueConstraints=@UniqueConstraint(columnNames={"parent_id", "child_id"}))
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> kindOfs = new HashSet<Concept>();
-
     @XmlTransient @ManyToMany(mappedBy="kindOfs")
     private Set<Concept> parentOf = new HashSet<Concept>();
+    
+    
     
     public Concept(){}
     
@@ -144,7 +171,7 @@ public class Concept {
                 .add("id", getId())
                 .add("internalId", getSerialisedId())
                 .add("ontology", getOntology() == null ? null : getOntology().getId())
-                .add("status", getStatus())
+                .add("statusId", getStatusId())
                 .add("fullySpecifiedName", getFullySpecifiedName())
                 .add("ctv3id", getCtv3id())
                 .add("snomedId", getSnomedId())
@@ -192,11 +219,11 @@ public class Concept {
     public void setId(long id) {
         this.id = id;
     }
-    public int getStatus() {
-        return status;
+    public int getStatusId() {
+        return statusId;
     }
-    public void setStatus(int status) {
-        this.status = status;
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
     }
     public String getFullySpecifiedName() {
         return fullySpecifiedName;
@@ -256,7 +283,7 @@ public class Concept {
         getObjectOfStatements().add(statement);
     }
     public Set<Statement> getObjectOfStatements(){
-        return objectOStatements;
+        return objectOfStatements;
     }
     public Ontology getOntology() {
         return ontology;
@@ -276,4 +303,44 @@ public class Concept {
     public long getSerialisedId() {
         return serialisedId;
     }
+    public Date getEffectiveTime() {
+        return effectiveTime;
+    }
+    public void setEffectiveTime(Date effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+    public boolean isActive() {
+        return active;
+    }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    public Description getDescription() {
+        return description;
+    }
+    public void setDescription(Description description) {
+        this.description = description;
+    }
+
+    public Concept getStatus() {
+        return status;
+    }
+
+    public void setStatus(Concept status) {
+        this.status = status;
+    }
+
+    public void setSubjectOfStatements(Set<Statement> subjectOfStatements) {
+        this.subjectOfStatements = subjectOfStatements;
+    }
+
+    public void setObjectOfStatements(Set<Statement> objectOfStatements) {
+        this.objectOfStatements = objectOfStatements;
+    }
+
+    public void setPredicateOfStatements(Set<Statement> predicateOfStatements) {
+        this.predicateOfStatements = predicateOfStatements;
+    }
+    
+    
 }

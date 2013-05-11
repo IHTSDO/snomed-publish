@@ -23,10 +23,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
-import com.ihtsdo.snomed.service.OntologySerialiser;
-import com.ihtsdo.snomed.service.SerialiserFactory;
-import com.ihtsdo.snomed.service.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.serialiser.BaseOntologySerialiser;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 
 public class ClosureMain {
@@ -34,10 +37,12 @@ public class ClosureMain {
     private static final Logger LOG = LoggerFactory.getLogger( ClosureMain.class );
     
     private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
+    public static final int DEFAULT_PAGE_SIZE = 300000;
+
     
     private   EntityManagerFactory emf              = null;
     private   EntityManager em                      = null;
-    private   HibernateDbImporter importer          = new HibernateDbImporter();
+    private   HibernateParser parser              = HibernateParserFactory.getParser(Parser.RF1);
     private   TransitiveClosureAlgorithm algorithm  = new TransitiveClosureAlgorithm();
 
     private void initDb(String db){
@@ -50,7 +55,7 @@ public class ClosureMain {
             LOG.info("Using an in-memory database");
         }
         LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 
@@ -66,10 +71,10 @@ public class ClosureMain {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    protected void runProgram(String inputFile, String outputFile, String dbFile) throws IOException{
+    protected void runProgram(String inputFile, String outputFile, String dbFile, int pageSize) throws IOException{
         try{
             initDb(dbFile);  
-            Ontology o = importer.populateDbFromRf2FormWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
+            Ontology o = parser.populateDbWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
             File outFile = new File(outputFile);
@@ -82,36 +87,38 @@ public class ClosureMain {
             query.setHint("org.hibernate.cacheable", Boolean.TRUE);
             query.setHint("org.hibernate.readOnly", Boolean.TRUE);
             query.setHint("org.hibernate.cacheMode", CacheMode.GET);
-            
-            //int pageSize = 250000;
-            //int firstResult = 0;
-            //int counter = 0;
-            //query.setFirstResult(firstResult);
-            //query.setMaxResults(pageSize);            
+
+            int firstResult = 0;
+            int counter = 0;
+            query.setFirstResult(firstResult);
+            query.setMaxResults(pageSize);            
             List<Concept> concepts = query.getResultList();
             
-            //boolean done = false;
             try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CANONICAL, bw);
+                BaseOntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
                 Stopwatch stopwatch = new Stopwatch().start();
                 LOG.info("Running algorithm");
-                algorithm.runAlgorithm(concepts, serialiser);
-//                while (!done){
-//                    if (concepts.size() < pageSize) {
-//                        counter += concepts.size();
-//                        done = true;
-//                    }                    
-//                    algorithm.runAlgorithm(concepts, serialiser);
-//                    em.clear();
-//                    firstResult = firstResult + pageSize;
-//                    if (!done){
-//                        counter += pageSize;
-//                        query.setFirstResult(firstResult);
-//                        concepts = query.getResultList();
-//                    }
-//                }
+                boolean done = false;
+                while (!done){
+                    LOG.info("Running concept batch with pagesize {}", pageSize);
+                    Stopwatch stopwatchBatch = new Stopwatch().start();
+                    if (concepts.size() < pageSize) {
+                        counter += concepts.size();
+                        done = true;
+                    }                    
+                    algorithm.runAlgorithm(concepts, serialiser);
+                    em.clear();
+                    firstResult = firstResult + pageSize;
+                    if (!done){
+                        counter += pageSize;
+                        query.setFirstResult(firstResult);
+                        concepts = query.getResultList();
+                    }
+                    stopwatchBatch.stop();
+                    LOG.info("Batch completed in {} seconds", stopwatch.elapsed(TimeUnit.SECONDS));
+                }
                 stopwatch.stop();
-                LOG.info("Completed algorithm in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");// with [" + counter + "] statements");
+                LOG.info("Completed algorithm in {} seconds with {} concepts", stopwatch.elapsed(TimeUnit.SECONDS), counter);
             }
         }finally{
             closeDb();

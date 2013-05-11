@@ -26,7 +26,7 @@
     <jpa:repositories base-package="com.ihtsdo.snomed.model" />
     
 <!--     <bean id="canonicalSerialiser" class="com.ihtsdo.snomed.service.CanonicalSerialiser"/> -->
-    <bean id="hibernateDbImporter" class="com.ihtsdo.snomed.service.HibernateDbImporter"/>
+<!--     <bean id="hibernateDbImporter" class="com.ihtsdo.snomed.service.Rf1HibernateParser"/> -->
     
     
     <!-- Configure the multipart resolver -->

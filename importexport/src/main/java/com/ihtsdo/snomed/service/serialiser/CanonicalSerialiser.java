@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -10,14 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Statement;
 
-public class CanonicalSerialiser extends OntologySerialiser{
-
-    public CanonicalSerialiser(Writer writer) throws IOException{
+public class CanonicalSerialiser extends BaseOntologySerialiser{
+    private static final Logger LOG = LoggerFactory.getLogger( BaseOntologySerialiser.class );
+    
+    CanonicalSerialiser(Writer writer) throws IOException{
         super(writer);
     }
-
-    protected static final char DELIMITER = '\t';
-    private static final Logger LOG = LoggerFactory.getLogger( OntologySerialiser.class );
     
     public void write (Collection<Statement> statements) throws IOException{
         Iterator<Statement> rIt = statements.iterator();

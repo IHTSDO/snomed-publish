@@ -25,9 +25,12 @@ import org.slf4j.impl.StaticLoggerBinder;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
-import com.ihtsdo.snomed.service.SerialiserFactory;
-import com.ihtsdo.snomed.service.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 
 @Mojo(name="generate-canonical")
@@ -46,7 +49,7 @@ public class ClosureMojo extends AbstractMojo{
     private   EntityManagerFactory emf             = null;
     private   EntityManager em                     = null;    
     private   TransitiveClosureAlgorithm algorithm = new TransitiveClosureAlgorithm();
-    private   HibernateDbImporter importer         = new HibernateDbImporter();
+    private   HibernateParser parser               = HibernateParserFactory.getParser(Parser.RF1);
     
     private void initDb(){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -58,7 +61,7 @@ public class ClosureMojo extends AbstractMojo{
             getLog().info("Using an in-memory database");
         }
         getLog().info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 
@@ -76,7 +79,7 @@ public class ClosureMojo extends AbstractMojo{
         testInputs();
         try{
             initDb();
-            Ontology o = importer.populateDbFromRf2FormWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
+            Ontology o = parser.populateDbWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + o.getId(), Concept.class).getResultList();            

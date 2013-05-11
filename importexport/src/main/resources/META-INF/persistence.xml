@@ -7,6 +7,7 @@
         <class>com.ihtsdo.snomed.model.Concept</class>
         <class>com.ihtsdo.snomed.model.Statement</class>
         <class>com.ihtsdo.snomed.model.Ontology</class>
+        <class>com.ihtsdo.snomed.model.Description</class>
         <shared-cache-mode>NONE</shared-cache-mode>
         <validation-mode>CALLBACK</validation-mode>
         <properties>

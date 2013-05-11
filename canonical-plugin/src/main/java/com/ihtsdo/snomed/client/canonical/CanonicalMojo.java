@@ -31,9 +31,12 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.CanonicalAlgorithm;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
-import com.ihtsdo.snomed.service.SerialiserFactory;
-import com.ihtsdo.snomed.service.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
 @Mojo(name="generate-canonical")
 public class CanonicalMojo extends AbstractMojo{
@@ -58,7 +61,7 @@ public class CanonicalMojo extends AbstractMojo{
     
     private   EntityManagerFactory emf           = null;
     private   EntityManager em                   = null;
-    private   HibernateDbImporter importer       = new HibernateDbImporter();
+    private   HibernateParser parser        = HibernateParserFactory.getParser(Parser.RF1);
     private   CanonicalAlgorithm algorithm       = new CanonicalAlgorithm();
      
     private void initDb(){
@@ -71,7 +74,7 @@ public class CanonicalMojo extends AbstractMojo{
             getLog().info("Using an in-memory database");
         }
         getLog().info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(HibernateDbImporter.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 
@@ -89,7 +92,7 @@ public class CanonicalMojo extends AbstractMojo{
         testInputs();
         try{
             initDb();  
-            Ontology ontology = importer.populateDbFromRf1Form(DEFAULT_ONTOLOGY_NAME, 
+            Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(conceptFile), new FileInputStream(relationshipFile), em);
 
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();

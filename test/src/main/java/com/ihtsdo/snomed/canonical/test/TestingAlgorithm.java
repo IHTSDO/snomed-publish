@@ -381,6 +381,7 @@ public class TestingAlgorithm {
             file.createNewFile();
         }            
         try(FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)){
+            
             new CanonicalWrappedStatementWriter(bw).writeCompareStatements(allStatements);
         }
     }

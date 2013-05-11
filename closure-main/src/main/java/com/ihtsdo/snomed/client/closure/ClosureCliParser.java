@@ -17,15 +17,18 @@ public class ClosureCliParser {
     
     public void parse(String[] args, ClosureMain callback) throws IOException, ParseException{
 
+        
+        
         //Create a parser using Commons CLI
         CommandLineParser parser = new BasicParser( );
         Options options = new Options( );
         options.addOption("h", "help", false, "Print this usage information");
         options.addOption("i", "input", true, "Input file in RF2 format");
         options.addOption("o", "output", true, "Destination file");
-        options.addOption("d", "database", true, "Database location");
+        options.addOption("p", "pagesize", true, "Optional. Size of database concept pagination");
+        options.addOption("d", "database", true, "Optional. Database location");
 
-        String helpString = "-i <input file> -o <output file> . Optionaly -d <database location>. Try -h for more help";
+        String helpString = "-i <input file> -o <output file> . Optionaly -d <database location> -p <page size>. Try -h for more help";
         
         // Parse the program arguments
         CommandLine commandLine = null;
@@ -40,19 +43,26 @@ public class ClosureCliParser {
         String output = commandLine.getOptionValue('o');
         String input = commandLine.getOptionValue('i');
         String db = commandLine.getOptionValue('d');
+        String pageSize = commandLine.getOptionValue('p');
 
-        testInputs(helpString, commandLine, output, input, db);
-        callback.runProgram(input, output, db);
+        testInputs(helpString, commandLine, output, input, db, pageSize);
+        
+        if ((pageSize != null) && (!pageSize.isEmpty())){
+            callback.runProgram(input, output, db, Integer.parseInt(pageSize));}
+        else{
+            callback.runProgram(input, output, db, ClosureMain.DEFAULT_PAGE_SIZE);
+        }
     }
     
     
     private static void testInputs(String helpString, CommandLine commandLine,
-            String output, String input, String db) {
+            String output, String input, String db, String pageSize) {
         if (commandLine.hasOption('h')) {
             System.out.println("-h, --help\t\tPrint this help menu\n" +
                     "-i. --input\t\tInput file in RF2 format, containing statements\n" +
                     "-o, --output\t\tDestination file to write the transitive closure results to, in simple child-parent format\n" +
-                    "-d, --database\t\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database\n"); 
+                    "-p, --pagesize\t\tNumber of concept records to handle in a single batch.\n\t\t\tA smaller page size requires less memory, but has poorer performance\n" +
+                    "-d, --database\t\tOptional. Specify location of database file. If not specified, defaults to an in-memory database\n\t\t\twith much smaller memory requirements, but with poorer performance and increased IO\n"); 
                     
             System.exit(0);
         }
@@ -82,5 +92,16 @@ public class ClosureCliParser {
                 System.exit(-1);
             }
         }
+
+        
+        if ((pageSize != null) && (!pageSize.isEmpty())){
+            try {
+                Integer.parseInt(pageSize);
+            } catch (NumberFormatException e) {
+                System.out.println("Unable to parse pagesize '" + pageSize +"'. pageSize must be an integer");
+                System.exit(-1);
+            }
+        }
+        
     }    
 }

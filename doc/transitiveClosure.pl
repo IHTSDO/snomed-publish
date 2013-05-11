@@ -69,8 +69,8 @@ sub readrels {
    while (<ISAS>) {
       chop;
       @values=split('\t',$_);
-      if (($values[2] eq "116680003") && ($values[4] eq "0")) { # rel.Type is "is-a", char.Type is "defining"
-         $$childhashref{$values[3]}{$values[1]} = 1; # a hash of hashes, where parent is 1st arg and child is 2nd.
+      if (($values[7] eq "116680003")) { # rel.Type is "is-a"
+         $$childhashref{$values[5]}{$values[4]} = 1; # a hash of hashes, where parent is 1st arg and child is 2nd.
       }
    }
    close(ISAS);

@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -6,11 +6,12 @@ import java.util.Collection;
 
 import com.ihtsdo.snomed.model.Statement;
 
-public abstract class OntologySerialiser {
+public abstract class BaseOntologySerialiser {
+    protected static final char DELIMITER = '\t';
     
     protected Writer writer;
     
-    public OntologySerialiser(Writer writer) throws IOException{
+    public BaseOntologySerialiser(Writer writer) throws IOException{
         this.writer = writer;
         writeHeader();
     }

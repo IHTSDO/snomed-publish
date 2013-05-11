@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -15,8 +15,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Statement;
 
-public class ChildParentSerialiser extends OntologySerialiser{
-    protected static final char DELIMITER = '\t';
+public class ChildParentSerialiser extends BaseOntologySerialiser{
     private static final Logger LOG = LoggerFactory.getLogger( ChildParentSerialiser.class );
     
     ChildParentSerialiser(Writer writer) throws IOException {

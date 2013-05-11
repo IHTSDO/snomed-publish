@@ -10,15 +10,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.HibernateDbImporter;
 import com.ihtsdo.snomed.service.InvalidInputException;
-import com.ihtsdo.snomed.service.SerialiserFactory;
-import com.ihtsdo.snomed.service.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
 @Service
 public class OntologyService {
@@ -26,8 +27,7 @@ public class OntologyService {
     @PersistenceContext
     EntityManager em;
     
-    @Autowired
-    HibernateDbImporter importer;
+    HibernateParser importer = HibernateParserFactory.getParser(Parser.RF1);
 
     @Transactional
     public Ontology deleteOntology(long ontologyId) throws OntologyNotFoundException{
@@ -71,9 +71,9 @@ public class OntologyService {
         start = new String (bytes, "UTF-8");  
         try {
             if (start.trim().startsWith("RELATIONSHIPID\t")){
-                return importer.populateDbFromRf1Form(name, conceptsInputstream, relationshipsInputstream, em);
+                return importer.populateDb(name, conceptsInputstream, relationshipsInputstream, em);
             }else if (start.trim().startsWith("CONCEPTID1\t")){
-                return importer.populateDbFromCanonicalForm(name, conceptsInputstream, relationshipsInputstream, em);
+                return importer.populateDb(name, conceptsInputstream, relationshipsInputstream, em);
             }else{
                 throw new InvalidStatementsException("File format not recognised");
             }

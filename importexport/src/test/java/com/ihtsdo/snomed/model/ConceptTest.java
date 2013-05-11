@@ -7,21 +7,20 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Group;
-import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.DatabaseTest;
-import com.ihtsdo.snomed.service.HibernateDbImporterTest;
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.parser.DatabaseTest;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class ConceptTest  extends DatabaseTest{
 
     Concept c1,c2,c3,c4;
+    
+    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
     
     @Before
     public void setUp() throws Exception {
@@ -49,15 +48,6 @@ public class ConceptTest  extends DatabaseTest{
         c4 = em.createQuery("SELECT c FROM Concept c where c.serialisedId=4", Concept.class).getSingleResult();
     }
     
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        HibernateDbImporterTest.setUpBeforeClass();
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        HibernateDbImporterTest.tearDownAfterClass();
-    }
 
     @After
     public void tearDown() throws Exception {
