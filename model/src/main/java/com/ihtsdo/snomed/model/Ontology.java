@@ -15,12 +15,12 @@ import com.google.common.base.Objects;
 
 @Entity(name="Ontology")
 public class Ontology {
-	
-    
     @Transient
-    @XmlTransient private Concept isKindOfPredicate;
+    @XmlTransient 
+    private Concept isKindOfPredicate;
     
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Id 
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
     
     private String name;
@@ -30,7 +30,10 @@ public class Ontology {
 
     @OneToMany(mappedBy="ontology")
     private Set<Concept> concepts = new HashSet<Concept>();
-    
+
+    @OneToMany(mappedBy="ontology")
+    private Set<Description> descriptions = new HashSet<Description>();
+
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
@@ -103,4 +106,12 @@ public class Ontology {
     public void setConcepts(Set<Concept> concepts) {
         this.concepts = concepts;
     }
+
+    public Set<Description> getDescriptions() {
+        return descriptions;
+    }
+
+    public void setDescriptions(Set<Description> descriptions) {
+        this.descriptions = descriptions;
+    }  
 }

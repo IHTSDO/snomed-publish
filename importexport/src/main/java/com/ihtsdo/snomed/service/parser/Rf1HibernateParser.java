@@ -37,6 +37,11 @@ public class Rf1HibernateParser extends HibernateParser{
         throw new InvalidInputException("RF1 Format does not specify active flag");
     }
     
+    protected void populateDescriptions(final InputStream stream, final EntityManager em, 
+            final Ontology ontology){
+        throw new InvalidInputException("Not implemented yet");
+    }
+    
     protected void populateConcepts(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -44,7 +49,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, statusId, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, statusId, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -75,7 +80,9 @@ public class Rf1HibernateParser extends HibernateParser{
                                 ps.setString(6, splitIt.next()); //snomedid
                                 ps.setBoolean(7, stringToBoolean(splitIt.next())); // primitive
                                 ps.setLong(8, ontology.getId()); //ontologyid
-                                ps.setBoolean(9, false); //otherwise mysql/jpa craps out when we retrieve concept
+                                ps.setBoolean(9, true); //active
+                                ps.setInt(10, 1); //version
+                                ps.setInt(11, -1); //effectiveTime
                                 ps.addBatch();
                             } catch (NumberFormatException e) {
                                 LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
@@ -105,7 +112,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active) VALUES (?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -137,9 +144,11 @@ public class Rf1HibernateParser extends HibernateParser{
                         for (Concept c : concepts){
                             ps.setLong(1, c.getSerialisedId());
                             ps.setLong(2, ontology.getId());
-                            ps.setBoolean(3, false); //otherwise mysql/jpa craps out when we retrieve concept
+                            ps.setBoolean(3, true); //primitive
                             ps.setInt(4, -1); //otherwise mysql/jpa craps out when we retrieve concept
-                            ps.setBoolean(5, false); //otherwise mysql/jpa craps out when we retrieve concept
+                            ps.setBoolean(5, true); //active
+                            ps.setInt(6, 1);//version
+                            ps.setInt(7, -1); //effectiveTime
                             ps.addBatch();  
                         }
                         ps.executeBatch();
@@ -158,14 +167,14 @@ public class Rf1HibernateParser extends HibernateParser{
 
     protected void populateStatements(final InputStream stream, final EntityManager em, final Ontology ontology) throws IOException {
         LOG.info("Populating statements");
-        final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
 
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristic_type, refinability, relationship_group, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristicTypeIdentifier, refinability, groupId, ontology_id, active, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -208,6 +217,8 @@ public class Rf1HibernateParser extends HibernateParser{
                             psInsert.setInt(6, Integer.parseInt(splitIt.next())); //refinability
                             psInsert.setInt(7, Integer.parseInt(splitIt.next())); // group
                             psInsert.setLong(8, ontology.getId()); //ontology id
+                            psInsert.setBoolean(9, true);//active
+                            psInsert.setInt(10, -1); //effectiveTime
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);

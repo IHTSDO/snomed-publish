@@ -40,16 +40,27 @@ public class TransitiveClosureAlgorithmTest {
         c3.addKindOf(c4);
         c4.addKindOf(c5);
 
-        s12 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c1, cp, c2);
-        s13 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c1, cp, c3);
-        s14 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c1, cp, c4);
-        s15 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c1, cp, c5);
-        s23 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c2, cp, c3);
-        s24 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c2, cp, c4);
-        s25 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c2, cp, c5);
-        s34 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c3, cp, c4);
-        s35 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c3, cp, c5);
-        s45 = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, c4, cp, c5);
+        s12 = new Statement(12, c1, cp, c2);
+        //s13 = new Statement(13, c1, cp, c3);
+        //s14 = new Statement(14, c1, cp, c4);
+        //s15 = new Statement(15, c1, cp, c5);
+        s23 = new Statement(23, c2, cp, c3);
+        //s24 = new Statement(24, c2, cp, c4);
+        //s25 = new Statement(25, c2, cp, c5);
+        s34 = new Statement(34, c3, cp, c4);
+        //s35 = new Statement(35, c3, cp, c5);
+        s45 = new Statement(45, c4, cp, c5);
+        
+        s12.setActive(true);
+        //s13.setActive(true);
+        //s14.setActive(true);
+        //s15.setActive(true);
+        s23.setActive(true);
+        //s24.setActive(true);
+        //s25.setActive(true);
+        s34.setActive(true);
+        //s35.setActive(true);
+        s45.setActive(true);
 
         concepts.addAll(Arrays.asList(c1,c2,c3,c4,c5,cp));
         algorithm = new TransitiveClosureAlgorithm();
@@ -143,4 +154,39 @@ public class TransitiveClosureAlgorithmTest {
                 "4\t5\r\n",
                 baos.toString());
     }
+    
+    @Test
+    public void shouldIgnoreInactiveStatements() throws IOException{
+        s23.setActive(false);
+        s23.setEffectiveTime(20121307);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
+            algorithm.runAlgorithm(Arrays.asList(c1), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+        }
+        baos.flush();
+        assertEquals("1\t2\r\n"
+                ,baos.toString());
+    }
+    
+//    @Test
+//    public void shouldHonourEffectiveTimeEqualityForInactiveStatementsAndInactiveConcepts() throws IOException{
+//        s23.setActive(false);
+//        s23.setEffectiveTime(20121307);
+//        c2.setActive(true);
+//        c2.setEffectiveTime(20121307);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
+//            algorithm.runAlgorithm(Arrays.asList(c1,c2), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+//        }
+//        baos.flush();
+//        assertEquals("1\t2\r\n" + 
+//                "1\t3\r\n" +
+//                "1\t4\r\n" +
+//                "1\t5\r\n" +
+//                "2\t3\r\n" +
+//                "2\t4\r\n" +
+//                "2\t5\r\n",
+//                baos.toString());
+//    }
+    
 }

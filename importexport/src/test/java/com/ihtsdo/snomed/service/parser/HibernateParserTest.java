@@ -21,15 +21,6 @@ import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class HibernateParserTest extends DatabaseTest{
 
-    protected static final String TEST_CONCEPTS = "test_concepts.txt";
-    protected static final String TEST_CONCEPTS_WITH_PARSE_ERROR = "test_concepts_with_parse_error.txt";
-    protected static final String TEST_STATEMENTS_RF1 = "test_statements_longform.txt";
-    protected static final String TEST_STATEMENTS_LONG_FORM_WITH_PARSE_ERROR = "test_statements_longform_with_parse_error.txt";
-    protected static final String TEST_STATEMENTS_SHORT_FORM = "test_statements_shortform.txt";
-    protected static final String TEST_IS_KIND_OF_STATEMENTS = "test_is_kind_of_statements.txt";
-    protected static final String TEST_IS_KIND_OF_CONCEPTS = "test_is_kind_of_concepts.txt";
-    protected static final String TEST_RF2_STATEMENT = "test_rf2_statements.txt";
-    
     private HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
 
     @Test
@@ -98,7 +89,7 @@ public class HibernateParserTest extends DatabaseTest{
     public void shouldCreateConceptSerialisedIdMapToDatabaseIdForOntology() throws IOException{
         Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
-        Map<Long, Long> map = parser.createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
+        Map<Long, Long> map = parser.createConceptSerialisedIdToDatabaseIdMap(ontology, em);
         
         assertEquals(8, map.keySet().size());
         for (Long value : map.values()){

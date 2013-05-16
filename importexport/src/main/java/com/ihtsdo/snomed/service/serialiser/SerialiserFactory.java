@@ -13,7 +13,7 @@ public class SerialiserFactory  {
         CANONICAL, CHILD_PARENT;
     }
     
-    public static BaseOntologySerialiser getSerialiser(Form form, Writer writer) throws IOException{
+    public static OntologySerialiser getSerialiser(Form form, Writer writer) throws IOException{
         switch (form){
             case CANONICAL:
                 return new CanonicalSerialiser(writer);

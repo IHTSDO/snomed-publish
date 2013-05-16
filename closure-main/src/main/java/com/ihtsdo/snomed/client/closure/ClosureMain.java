@@ -23,26 +23,26 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.BaseOntologySerialiser;
+import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
+import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
-import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 
 public class ClosureMain {
     
     private static final Logger LOG = LoggerFactory.getLogger( ClosureMain.class );
     
     private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
-    public static final int DEFAULT_PAGE_SIZE = 300000;
+    public static final int DEFAULT_PAGE_SIZE = 450000;
 
     
     private   EntityManagerFactory emf              = null;
     private   EntityManager em                      = null;
-    private   HibernateParser parser              = HibernateParserFactory.getParser(Parser.RF1);
     private   TransitiveClosureAlgorithm algorithm  = new TransitiveClosureAlgorithm();
 
     private void initDb(String db){
@@ -57,9 +57,26 @@ public class ClosureMain {
         LOG.info("Initialising database");
         emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
+        //em.getTransaction().begin();
     }
+    
+//    private void initMysqlDb(){
+//        Map<String, Object> overrides = new HashMap<String, Object>();
+//        
+//        overrides.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
+//        overrides.put("javax.persistence.jdbc.driver", "com.mysql.jdbc.Driver");
+//        overrides.put("javax.persistence.jdbc.url", "jdbc:mysql://localhost/snomed");
+//        overrides.put("javax.persistence.jdbc.user", "root");
+//        overrides.put("javax.persistence.jdbc.password", "");
+//        overrides.put("hibernate.hbm2ddl.auto", "update");
+//        
+//        LOG.info("Initialising database");
+//        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+//        em = emf.createEntityManager();
+//    }    
 
     public void closeDb(){
+        //em.getTransaction().commit();
         emf.close();
     }
 
@@ -71,15 +88,40 @@ public class ClosureMain {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    protected void runProgram(String inputFile, String outputFile, String dbFile, int pageSize) throws IOException{
-        try{
-            initDb(dbFile);  
-            Ontology o = parser.populateDbWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
-                    new FileInputStream(inputFile), new FileInputStream(inputFile), em);
+
+
+    public void runProgram(File conceptsFile, File triplesFile,
+            File descriptionsFile, Parser type, File outputFile,
+            int pageSize, String dbLocation) throws IOException 
+    {
+        try {
+            initDb(dbLocation);
             
-            File outFile = new File(outputFile);
-            if (!outFile.exists()){
-                outFile.createNewFile();
+            Ontology o = null;
+            HibernateParser hibParser = HibernateParserFactory.getParser(type);
+            if (descriptionsFile != null){
+                o = hibParser.populateDbWithDescriptions(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(conceptsFile), 
+                        new FileInputStream(triplesFile), 
+                        new FileInputStream(descriptionsFile), 
+                        em);
+            } else if (conceptsFile != null){
+                o = hibParser.populateDb(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(conceptsFile), 
+                        new FileInputStream(triplesFile), 
+                        em);                        
+            } else {
+                o = hibParser.populateDbWithNoConcepts(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(triplesFile), 
+                        new FileInputStream(triplesFile), 
+                        em);
+            }             
+            
+            if (o == null){
+                throw new InvalidInputException("Parsing failed");
             }
             
             TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
@@ -93,9 +135,9 @@ public class ClosureMain {
             query.setFirstResult(firstResult);
             query.setMaxResults(pageSize);            
             List<Concept> concepts = query.getResultList();
-            
-            try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-                BaseOntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
+
+            try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
+                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
                 Stopwatch stopwatch = new Stopwatch().start();
                 LOG.info("Running algorithm");
                 boolean done = false;
@@ -120,7 +162,7 @@ public class ClosureMain {
                 stopwatch.stop();
                 LOG.info("Completed algorithm in {} seconds with {} concepts", stopwatch.elapsed(TimeUnit.SECONDS), counter);
             }
-        }finally{
+        } finally{
             closeDb();
         }
     }

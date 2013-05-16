@@ -17,30 +17,68 @@ public class Statement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;
     public static final int DEFINING_CHARACTERISTIC_TYPE = 0;
-   
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Id private long id;
-
-    @OneToOne private Ontology ontology;
-    @OneToOne private Concept subject;
-    @OneToOne private Concept predicate;
-    @OneToOne private Concept object;
     
+    //SHARED  
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @Id 
+    private long id;
+    @OneToOne
+    private Ontology ontology;
+    @OneToOne 
+    private Concept subject;
+    @OneToOne 
+    private Concept predicate;
+    @OneToOne 
+    private Concept object;    
     private long serialisedId = SERIALISED_ID_NOT_DEFINED;
-    @Column(nullable=true, name="characteristic_type") private int characteristicType;
-    @Column(nullable=true) private int refinability;
-    @Column(name="relationship_group") private int groupId;
-
+    @Column(name="groupId") 
+    private int groupId;
+    
+    //RF1 
+    private int characteristicTypeIdentifier;
+    private int refinability;
+    
+    //RF2
+    @OneToOne
+    private Concept characteristicType;
+    @Column(columnDefinition = "BIT", length = 1)
+    private boolean active;
+    @OneToOne
+    private Concept module;
+    @OneToOne
+    private Concept modifier;
+    private int effectiveTime;
+    
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("id", getId())
+            .add("serialisedId", getSerialisedId())
+            .add("ontology", getOntology() == null ? null : getOntology().getId())
+            .add("subject", getSubject() == null ? null : getSubject().getSerialisedId())
+            .add("predicate", getPredicate() == null ? null : getPredicate().getSerialisedId())
+            .add("object", getObject() == null ? null : getObject().getSerialisedId())
+            .add("groupId", getGroupId())
+            .add("characteristicTypeIdentifier(rf1)", getCharacteristicTypeIdentifier())
+            .add("refinability(rf1)", getRefinability())
+            .add("characteristicType(rf2)", getCharacteristicType() == null ? null : getCharacteristicType().getSerialisedId())
+            .add("active(rf2)", isActive())
+            .add("module(rf2)", getModule() == null ? null : getModifier().getSerialisedId())
+            .add("modifier(rf2)", getModifier() == null ? null : getModifier().getSerialisedId())
+            .toString();
+    }
+     
     public Statement(){};
     public Statement(long serialisedId){this.serialisedId = serialisedId;}
     public Statement(long serialisedId, Concept subject, Concept predicate, 
-            Concept object, int characteristicType, int group)
+            Concept object, int characteristicTypeId, int group)
     {
         this.groupId = group;
         this.serialisedId = serialisedId;
         this.subject = subject;
         this.object = object;
         this.predicate = predicate;
-        this.characteristicType = characteristicType;
+        this.characteristicTypeIdentifier = characteristicTypeId;
         subject.addSubjectOfStatement(this);
         object.addObjectOfStatement(this);
         predicate.addPredicateOfStatement(this);
@@ -58,23 +96,8 @@ public class Statement {
         predicate.addPredicateOfStatement(this);
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-            .add("id", getId())
-            .add("internalId", getSerialisedId())
-            .add("ontology", getOntology() == null ? null : getOntology().getId())
-            .add("subject", getSubject() == null ? null : getSubject().getSerialisedId())
-            .add("predicate", getPredicate() == null ? null : getPredicate().getSerialisedId())
-            .add("object", getObject() == null ? null : getObject().getSerialisedId())
-            .add("characteristic", getCharacteristicType())
-            .add("refinability", getRefinability())
-            .add("group", getGroupId())
-            .toString();
-    }
-    
     public String shortToString(){
-        return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + ", T" + getCharacteristicType() + ", G" + getGroupId()+"]";
+        return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + ", T" + getCharacteristicTypeIdentifier() + ", G" + getGroupId()+"]";
     }
 
     @Override
@@ -102,7 +125,7 @@ public class Statement {
         }
         return false;
     }
-    
+
     public Group getGroup(){
         return getSubject().getGroup(this);
     }
@@ -112,7 +135,7 @@ public class Statement {
     }
     
     public boolean isDefiningCharacteristic(){
-        return getCharacteristicType() == DEFINING_CHARACTERISTIC_TYPE;
+        return getCharacteristicTypeIdentifier() == DEFINING_CHARACTERISTIC_TYPE;
     }
         
     
@@ -147,11 +170,11 @@ public class Statement {
     public void setObject(Concept object) {
         this.object = object;
     }
-    public int getCharacteristicType() {
-        return characteristicType;
+    public int getCharacteristicTypeIdentifier() {
+        return characteristicTypeIdentifier;
     }
-    public void setCharacteristicType(int characteristicType) {
-        this.characteristicType = characteristicType;
+    public void setCharacteristicTypeIdentifier(int characteristicTypeIdentifier) {
+        this.characteristicTypeIdentifier = characteristicTypeIdentifier;
     }
     public int getRefinability() {
         return refinability;
@@ -177,4 +200,35 @@ public class Statement {
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
     }
+    public Concept getCharacteristicType() {
+        return characteristicType;
+    }
+    public void setCharacteristicType(Concept characteristicType) {
+        this.characteristicType = characteristicType;
+    }
+    public boolean isActive() {
+        return active;
+    }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    public Concept getModule() {
+        return module;
+    }
+    public void setModule(Concept module) {
+        this.module = module;
+    }
+    public Concept getModifier() {
+        return modifier;
+    }
+    public void setModifier(Concept modifier) {
+        this.modifier = modifier;
+    }
+    public int getEffectiveTime() {
+        return effectiveTime;
+    }
+    public void setEffectiveTime(int effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+    
 }

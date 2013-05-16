@@ -17,7 +17,7 @@ import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class Rf1HibernateParserTest extends HibernateParserTest{
+public class Rf1HibernateParserTest extends DatabaseTest{
     
     HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
 
@@ -79,9 +79,9 @@ public class Rf1HibernateParserTest extends HibernateParserTest{
         assertNotNull(r.getObject());
         assertEquals (100000028l, r.getSerialisedId());
         assertEquals (280844000, r.getSubject().getSerialisedId());
-        assertEquals (116680003, r.getPredicate().getSerialisedId(), 116680003);
+        assertEquals (116680003, r.getPredicate().getSerialisedId());
         assertEquals (71737002, r.getObject().getSerialisedId());
-        assertEquals (0, r.getCharacteristicType());
+        assertEquals (0, r.getCharacteristicTypeIdentifier());
         assertEquals (0, r.getRefinability());
         assertEquals (0, r.getGroupId());
     }

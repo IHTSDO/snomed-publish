@@ -14,7 +14,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -30,8 +32,19 @@ import com.ihtsdo.snomed.model.Ontology;
 public abstract class HibernateParser {
     static final Logger LOG = LoggerFactory.getLogger(HibernateParser.class);
     public static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
+    protected EntityManagerFactory emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+
 
     protected boolean ignoreInactive = true;
+    protected Mode parseMode = Mode.FORGIVING;
+    
+    public enum Mode{
+        STRICT, FORGIVING
+    }
+
+    public void setParseMode(Mode parseMode){
+        this.parseMode = parseMode;
+    }
 
 
     protected abstract void populateConcepts(final InputStream stream, EntityManager em, 
@@ -41,25 +54,62 @@ public abstract class HibernateParser {
             final Ontology ontology) throws IOException;
 
     protected abstract void populateStatements(final InputStream stream, final EntityManager em, 
-            final Ontology ontology) throws IOException;    
+            final Ontology ontology) throws IOException;
+    
+    protected abstract void populateDescriptions(final InputStream stream, final EntityManager em, 
+            final Ontology ontology) throws IOException;
 
     public Ontology populateDb(String ontologyName, InputStream conceptsStream, 
             InputStream statementStream, EntityManager em) throws IOException
-            {
+    {
         LOG.info("Importing ontology \"" + ontologyName + "\"");
         Stopwatch stopwatch = new Stopwatch().start();
+
+        boolean doCommit = false;
+        if (!em.getTransaction().isActive()){
+            em.getTransaction().begin();
+            doCommit=true;
+        }
 
         Ontology ontology = createOntology(em, ontologyName);
         populateConcepts(conceptsStream, em, ontology);
         populateStatements(statementStream, em, ontology);
         createIsKindOfHierarchy(em, ontology);
+        if(doCommit){em.getTransaction().commit();}
+        
         em.clear();
         Ontology o = em.find(Ontology.class, ontology.getId());
 
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         return o;
-            }
+    }
+    
+    public Ontology populateDbWithDescriptions(String ontologyName, InputStream conceptsStream, 
+            InputStream statementStream, InputStream descriptionStream, EntityManager em) throws IOException
+    {
+        LOG.info("Importing ontology \"" + ontologyName + "\"");
+        Stopwatch stopwatch = new Stopwatch().start();
+
+        boolean doCommit = false;
+        if (!em.getTransaction().isActive()){
+            em.getTransaction().begin();
+            doCommit=true;
+        }
+        
+        Ontology ontology = createOntology(em, ontologyName);
+        populateConcepts(conceptsStream, em, ontology);
+        populateDescriptions(descriptionStream, em, ontology);
+        populateStatements(statementStream, em, ontology);
+        createIsKindOfHierarchy(em, ontology);        
+        if(doCommit){em.getTransaction().commit();}
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
+
+        stopwatch.stop();
+        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+        return o;
+    }    
 
     public Ontology populateDbWithNoConcepts(String ontologyName, InputStream statementStream, 
             InputStream statementStreamAgain, EntityManager em) throws IOException
@@ -67,17 +117,24 @@ public abstract class HibernateParser {
         LOG.info("Importing ontology \"" + ontologyName + "\"");
         Stopwatch stopwatch = new Stopwatch().start();
 
+        boolean doCommit = false;
+        if (!em.getTransaction().isActive()){
+            em.getTransaction().begin();
+            doCommit=true;
+        }
+        
         Ontology ontology = createOntology(em, ontologyName);
         populateConceptsFromStatements(statementStream, em, ontology);
         populateStatements(statementStreamAgain, em, ontology);
         createIsKindOfHierarchy(em, ontology);
+        if(doCommit){em.getTransaction().commit();}
         em.clear();
         Ontology o = em.find(Ontology.class, ontology.getId());
 
         stopwatch.stop();
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         return o;
-            } 
+    } 
 
 
     protected Ontology createOntology(EntityManager em, final String name) throws IOException {
@@ -156,7 +213,7 @@ public abstract class HibernateParser {
         }
     }
 
-    protected Map<Long, Long> createConceptSerialisedIdMapToDatabaseIdForOntology(
+    protected Map<Long, Long> createConceptSerialisedIdToDatabaseIdMap(
             final Ontology ontology, EntityManager em) {
         final HashMap<Long, Long> map = new HashMap<Long, Long>();
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -191,4 +248,6 @@ public abstract class HibernateParser {
     public void setIgnoreInactive(boolean ignore){
         ignoreInactive = ignore;
     }
+    
+
 }

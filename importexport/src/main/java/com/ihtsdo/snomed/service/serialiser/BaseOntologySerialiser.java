@@ -6,12 +6,12 @@ import java.util.Collection;
 
 import com.ihtsdo.snomed.model.Statement;
 
-public abstract class BaseOntologySerialiser {
+abstract class BaseOntologySerialiser implements OntologySerialiser{
     protected static final char DELIMITER = '\t';
     
     protected Writer writer;
     
-    public BaseOntologySerialiser(Writer writer) throws IOException{
+    BaseOntologySerialiser(Writer writer) throws IOException{
         this.writer = writer;
         writeHeader();
     }

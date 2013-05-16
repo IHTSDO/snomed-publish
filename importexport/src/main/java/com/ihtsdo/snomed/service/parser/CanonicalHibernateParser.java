@@ -21,8 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.InvalidInputException;
 
-public class CanonicalHibernateParser extends Rf1HibernateParser{
+public class CanonicalHibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalHibernateParser.class );
 
     private static final int DEFAULT_REFINABILITY = 0;
@@ -34,7 +35,7 @@ public class CanonicalHibernateParser extends Rf1HibernateParser{
             final Ontology ontology) throws IOException 
     {
         LOG.info("Populating statements");
-        final Map<Long, Long> map = createConceptSerialisedIdMapToDatabaseIdForOntology(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
@@ -85,5 +86,23 @@ public class CanonicalHibernateParser extends Rf1HibernateParser{
             }
         });
         tx.commit();
+    }
+
+    @Override
+    protected void populateConcepts(InputStream stream, EntityManager em,
+            Ontology ontology) throws IOException {
+        throw new InvalidInputException("Not implemented yet");
+    }
+
+    @Override
+    protected void populateConceptsFromStatements(InputStream stream,
+            EntityManager em, Ontology ontology) throws IOException {
+        throw new InvalidInputException("Not implemented yet");        
+    }
+
+    @Override
+    protected void populateDescriptions(InputStream stream, EntityManager em,
+            Ontology ontology) throws IOException {
+        throw new InvalidInputException("Not implemented yet");        
     }
 }

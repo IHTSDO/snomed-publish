@@ -1,36 +1,83 @@
 package com.ihtsdo.snomed.model;
 
-import java.sql.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlTransient;
+
+import com.google.common.base.Objects;
+import com.google.common.primitives.Longs;
 
 @Entity
 public class Description {
     
     //SHARED
-    @Id private long id;
+    @Id 
+    @GeneratedValue(strategy=GenerationType.IDENTITY) 
+    private long id;
+    private long serialisedId;
     private String term;
-    @OneToOne(mappedBy="description") private Concept aboutConcept;
-    private String langaugeCode;
+    @OneToOne 
+    private Concept about;
+    private String languageCode;
+    @XmlTransient
+    @OneToOne 
+    private Ontology ontology;
     
     //RF1
     private int status;
     private int initialCapitalStatus;
     private int typeId;
 
-    //RF2
-    @Column(nullable=true) private Date effectiveTime;
-    @Column(nullable=true, columnDefinition = "BIT", length = 1) private boolean active;
-    @OneToOne private Concept type;
-    @OneToOne private Concept caseSignificance;
-    @OneToOne private Concept module;
+    //RF2 
+    private int effectiveTime;
+    @Column(columnDefinition = "BIT", length = 1) 
+    private boolean active;
+    @OneToOne 
+    private Concept type;
+    @OneToOne 
+    private Concept caseSignificance;
+    @OneToOne 
+    private Concept module;
 
+    
     @Override
     public String toString() {
-        return "not implemented";
+        return Objects.toStringHelper(this)
+                .add("id", getId())
+                .add("internalId", getSerialisedId())
+                .add("ontology", getOntology() == null ? null : getOntology().getId())
+                .add("term", getTerm())
+                .add("about", getAbout() == null ? null : getAbout().getSerialisedId())
+                .add("languageCode", getLanguageCode())
+                .add("status(rf1)", getStatus())
+                .add("initialCapitalStatus(rf1)", getInitialCapitalStatus())
+                .add("typeId(rf1)", getTypeId())
+                .add("effectiveTime(rf2)", getEffectiveTime())
+                .add("active(rf2)", isActive())
+                .add("type(rf2)", getType() == null ? null : getType().getSerialisedId())
+                .add("caseSignificance(rf2)", getCaseSignificance())
+                .add("module(rf2)", getModule())
+                .toString();
+    }
+    
+    @Override
+    public int hashCode(){
+        return Longs.hashCode(getSerialisedId());
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof Description){
+            Description d = (Description) o;
+            if (d.getSerialisedId() == this.getSerialisedId()){
+                return true;
+            }
+        }
+        return false;
     }
 
     /*
@@ -53,12 +100,12 @@ public class Description {
     }
 
 
-    public Concept getAboutConcept() {
-        return aboutConcept;
+    public Concept getAbout() {
+        return about;
     }
 
-    public void setAboutConcept(Concept aboutConcept) {
-        this.aboutConcept = aboutConcept;
+    public void setAbout(Concept about) {
+        this.about = about;
     }
 
     public String getTerm() {
@@ -85,19 +132,19 @@ public class Description {
         this.typeId = typeId;
     }
 
-    public String getLangaugeCode() {
-        return langaugeCode;
+    public String getLanguageCode() {
+        return languageCode;
     }
 
-    public void setLangaugeCode(String langaugeCode) {
-        this.langaugeCode = langaugeCode;
+    public void setLanguageCode(String languageCode) {
+        this.languageCode = languageCode;
     }
 
-    public Date getEffectiveTime() {
+    public int getEffectiveTime() {
         return effectiveTime;
     }
 
-    public void setEffectiveTime(Date effectiveTime) {
+    public void setEffectiveTime(int effectiveTime) {
         this.effectiveTime = effectiveTime;
     }
 
@@ -131,6 +178,22 @@ public class Description {
 
     public void setModule(Concept module) {
         this.module = module;
+    }
+
+    public long getSerialisedId() {
+        return serialisedId;
+    }
+
+    public void setSerialisedId(long serialisedId) {
+        this.serialisedId = serialisedId;
+    }
+
+    public Ontology getOntology() {
+        return ontology;
+    }
+
+    public void setOntology(Ontology ontology) {
+        this.ontology = ontology;
     }
 
 

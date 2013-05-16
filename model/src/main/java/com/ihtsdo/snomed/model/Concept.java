@@ -1,7 +1,6 @@
 
 package com.ihtsdo.snomed.model;
 
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -28,6 +28,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
+/**
+ * @author henrikpettersen
+ *
+ */
 @XmlRootElement
 @Entity
 public class Concept {
@@ -35,52 +39,60 @@ public class Concept {
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
     public static final long IS_KIND_OF_RELATIONSHIP_TYPE_ID = 116680003l;
     
+    @Version
+    protected int version = 1;
     
     //TRANSIENT
     @XmlTransient @Transient 
     private Set<Concept> allKindOfPrimitiveCache;
     @XmlTransient @Transient 
     private Set<Concept> allKindOfCache;
+    @XmlTransient @Transient
+    private Set<Concept> allActiveKindOfCache;
     @XmlTransient @Transient 
     private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
 
     
     //SHARED
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) 
+    @Id 
+    @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private long id;    
     private long serialisedId;
-    @XmlTransient @OneToOne 
+    @XmlTransient
+    @OneToOne 
     private Ontology ontology;
-    
+    @OneToMany(mappedBy="about")  
+    private Set<Description> description;
     
     //RF1
     private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
     private String type;
-    @Column(nullable=true, columnDefinition = "BIT", length = 1) 
-    private boolean primitive = false;
-    @Column(nullable=true) 
+    @Column(columnDefinition = "BIT", length = 1) 
+    private boolean primitive = false; 
     private int statusId = -1;
 
     
-    //RF2
-    @Column(nullable=true) 
-    private Date effectiveTime;
-    @Column(nullable=true, columnDefinition = "BIT", length = 1) 
+    //RF2 
+    private long effectiveTime;
+    @Column(columnDefinition = "BIT", length = 1) 
     private boolean active;
     @OneToOne 
-    private Description description;
-    @OneToOne 
     private Concept status;
+    @OneToOne
+    private Concept module;
     
     
     //STATEMENTS
-    @XmlTransient @OneToMany(mappedBy="subject") 
+    @XmlTransient 
+    @OneToMany(mappedBy="subject") 
     private Set<Statement> subjectOfStatements = new HashSet<Statement>();
-    @XmlTransient @OneToMany(mappedBy="object")
+    @XmlTransient 
+    @OneToMany(mappedBy="object")
     private Set<Statement> objectOfStatements = new HashSet<Statement>();    
-    @XmlTransient @OneToMany(mappedBy="predicate")
+    @XmlTransient 
+    @OneToMany(mappedBy="predicate")
     private Set<Statement> predicateOfStatements = new HashSet<Statement>();
     
     
@@ -97,12 +109,46 @@ public class Concept {
     private Set<Concept> parentOf = new HashSet<Concept>();
     
     
-    
     public Concept(){}
     
     public Concept(long serialisedId){
         this.serialisedId = serialisedId;
     }
+    
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("id", getId())
+                .add("serialisedId", getSerialisedId())
+                .add("ontology", getOntology() == null ? null : getOntology().getId())
+                .add("description", getDescription())
+                .add("statusId(rf1)", getStatusId())
+                .add("fullySpecifiedName(rf1)", getFullySpecifiedName())
+                .add("ctv3id(rf1)", getCtv3id())
+                .add("snomedId(rf1)", getSnomedId())
+                .add("primitive(rf1)", isPrimitive())
+                .add("effectiveTime(rf2)", getEffectiveTime())
+                .add("active(rf2)", isActive())
+                .add("status(rf2)", getStatus() == null ? null : getStatus())
+                .add("module(rf2)", getModule() == null ? null : getModule())
+                .toString();
+    }
+    
+    @Override
+    public int hashCode(){
+        return Longs.hashCode(getSerialisedId());
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof Concept){
+            Concept c = (Concept) o;
+            if (c.getSerialisedId() == this.getSerialisedId()){
+                return true;
+            }
+        }
+        return false;
+    }    
     
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
         if (useCache && (allKindOfPrimitiveCache != null)){
@@ -156,6 +202,41 @@ public class Concept {
         return allKindOfCache;
     }
     
+    public Set<Concept> getAllActiveKindOfConcepts(boolean useCache){
+        if (useCache && (allActiveKindOfCache != null)){
+            if (LOG.isDebugEnabled()){
+                StringBuffer debugStringBuffer = new StringBuffer("Cache hit for concept " + this.getSerialisedId() + " with values {");
+                for (Concept c : allActiveKindOfCache){
+                    debugStringBuffer.append(c.getSerialisedId()+ ", ");
+                }
+                if (!allActiveKindOfCache.isEmpty()){
+                    debugStringBuffer.delete(debugStringBuffer.length() - 2, debugStringBuffer.length());
+                }
+                debugStringBuffer.append("}");
+                LOG.debug(debugStringBuffer.toString());
+            }
+            return allActiveKindOfCache;
+        }
+        LOG.debug("Populating allActiveKindOfCache for concept " + getSerialisedId());
+        allActiveKindOfCache = new HashSet<Concept>();
+
+        for (Statement s : getSubjectOfStatements()){
+//            if (s.isKindOfStatement()){
+//                if (s.isActive() ||
+//                        (s.getSubject().isActive() && s.getSubject().getEffectiveTime() == s.getEffectiveTime())){
+//                    allActiveKindOfCache.add(s.getObject());
+//                    allActiveKindOfCache.addAll(s.getObject().getAllActiveKindOfConcepts(useCache));
+//                }
+//                
+//            }
+            if (s.isKindOfStatement() && s.isActive()){
+                allActiveKindOfCache.add(s.getObject());
+                allActiveKindOfCache.addAll(s.getObject().getAllActiveKindOfConcepts(useCache));
+            }
+        }
+        
+        return allActiveKindOfCache;
+    }
 
     public boolean isKindOfPredicate(){
         return getSerialisedId() == IS_KIND_OF_RELATIONSHIP_TYPE_ID;
@@ -165,35 +246,7 @@ public class Concept {
         return ((getType() != null) && (!getType().isEmpty()) && getType().equals(ATTRIBUTE));
     }
     
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("id", getId())
-                .add("internalId", getSerialisedId())
-                .add("ontology", getOntology() == null ? null : getOntology().getId())
-                .add("statusId", getStatusId())
-                .add("fullySpecifiedName", getFullySpecifiedName())
-                .add("ctv3id", getCtv3id())
-                .add("snomedId", getSnomedId())
-                .add("primitive", isPrimitive())
-                .toString();
-    }
 
-    @Override
-    public int hashCode(){
-        return Longs.hashCode(getSerialisedId());
-    }
-
-    @Override
-    public boolean equals(Object o){
-        if (o instanceof Concept){
-            Concept c = (Concept) o;
-            if (c.getSerialisedId() == this.getSerialisedId()){
-                return true;
-            }
-        }
-        return false;
-    }
     
     /*package level*/ Group getGroup(Statement statement){
         Group group = groupMap.get(statement.getGroupId());
@@ -303,10 +356,10 @@ public class Concept {
     public long getSerialisedId() {
         return serialisedId;
     }
-    public Date getEffectiveTime() {
+    public long getEffectiveTime() {
         return effectiveTime;
     }
-    public void setEffectiveTime(Date effectiveTime) {
+    public void setEffectiveTime(long effectiveTime) {
         this.effectiveTime = effectiveTime;
     }
     public boolean isActive() {
@@ -315,10 +368,10 @@ public class Concept {
     public void setActive(boolean active) {
         this.active = active;
     }
-    public Description getDescription() {
+    public Set<Description> getDescription() {
         return description;
     }
-    public void setDescription(Description description) {
+    public void setDescription(Set<Description> description) {
         this.description = description;
     }
 
@@ -340,6 +393,22 @@ public class Concept {
 
     public void setPredicateOfStatements(Set<Statement> predicateOfStatements) {
         this.predicateOfStatements = predicateOfStatements;
+    }
+
+    public Concept getModule() {
+        return module;
+    }
+
+    public void setModule(Concept module) {
+        this.module = module;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
     
     
