@@ -29,23 +29,23 @@ Here is a description of these parameters
                        Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
 
 
-So this program takes as an input 2 text files:
+This program takes as an input 2 text files in the [RF1 format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/rf1-format):
 
-1. Set of concepts of this form ('conceptFile'):
+1. Set of concepts of this form:
 
-        CONCEPTID  CONCEPTSTATUS	FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
+        CONCEPTID  CONCEPTSTATUS    FULLYSPECIFIEDNAME	CTV3ID	SNOMEDID	ISPRIMITIVE
         280844000	0	Entire body of seventh thoracic vertebra (body structure)	Xa1Y9	T-11875	1
         280845004	0	Entire body of eighth thoracic vertebra (body structure)	Xa1YA	T-11876	1
         etc.
 
-2. Set of relationships of this form ('relationshipFile'):
+2. Set of relationships of this form:
 
         RELATIONSHIPID  CONCEPTID1	RELATIONSHIPTYPE	CONCEPTID2	CHARACTERISTICTYPE	REFINABILITY	RELATIONSHIPGROUP
         100000028	280844000	116680003	71737002	0	0	0
         100001029	280845004	116680003	280737002	0	0	0
         etc.
     
-and produces an output file called 'canonical form' of this form ('outputFile'):
+and produces an output in [Canonical format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/canonical-format):
 
     CONCEPTID1  RELATIONSHIPTYPE	CONCEPTID2	RELATIONSHIPGROUP
     280844000	116680003	71737002	0
