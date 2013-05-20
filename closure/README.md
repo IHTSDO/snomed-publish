@@ -8,7 +8,7 @@ This library provides an API for creating the transitive closure of an ontology'
 
 The API has a single method in class [TransitiveClosureAlgorithm](src/main/java/com/ihtsdo/snomed/service/TransitiveClosureAlgorithmm.java) with this signature:
 
-    public void runAlgorithm(Collection<Concept> concepts, OntologySerialiser serialiser, EntityManager em)
+    public void runAlgorithm(Collection<Concept> concepts, OntologySerialiser serialiser)
 
 This method will generate all transitive closures for all isA statements for a set of input concepts. 
 
@@ -17,12 +17,11 @@ The transitive closures are written out to an outputfile using an [OntologySeria
 Example usage (Java 7):
 
     try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
-        new TransitiveClosureAlgorithm().runAlgorithm(concepts, SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw, em);
+        new TransitiveClosureAlgorithm().runAlgorithm(concepts, SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
     }
 
-Please note that this implementation relies on a JPA 2 [EntityManager](http://docs.oracle.com/javaee/6/api/javax/persistence/EntityManager.html), in order to improve performance.
 
-The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm).
+Details for the transitive closure algorithm can be found on the [snomed wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure)
 
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
@@ -30,4 +29,4 @@ To build the distribution, enter the root project directory (one up from this fo
 
     mvn clean package
     
-The distribution jar file can be found at canonical/target/canonical.jar after this. This library can be distributed as this single file.
+The distribution jar file can be found at closure/target/closure.jar after this. This library can be distributed as this single file.
