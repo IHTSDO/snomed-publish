@@ -24,7 +24,6 @@ import com.ihtsdo.snomed.service.DiffAlgorithmFactory.DiffStrategy;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
@@ -43,7 +42,7 @@ public class DiffMain {
             LOG.info("Using an in-memory database");
         }
         LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
     
@@ -87,7 +86,7 @@ public class DiffMain {
                         new FileInputStream(baseTriplesFile), 
                         em);                        
             } else {
-                baseOntology = baseParser.populateDbWithNoConcepts(
+                baseOntology = baseParser.populateDbFromStatementsOnly(
                         "Base Ontology",
                         new FileInputStream(baseTriplesFile), 
                         new FileInputStream(baseTriplesFile), 
@@ -109,7 +108,7 @@ public class DiffMain {
                         new FileInputStream(compareTriplesFile), 
                         em);                        
             } else {
-                compareOntology = compareParser.populateDbWithNoConcepts(
+                compareOntology = compareParser.populateDbFromStatementsOnly(
                         "Compare-to Ontology",
                         new FileInputStream(compareTriplesFile), 
                         new FileInputStream(compareTriplesFile), 

@@ -15,11 +15,13 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
+import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class Rf2HibernateParserTest extends DatabaseTest{
 
-    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF2);
+    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF2).setParseMode(Mode.STRICT);
     
     @Test
     public void dbShouldHave28ConceptsAfterPopulateConcepts() throws IOException{
@@ -35,7 +37,7 @@ public class Rf2HibernateParserTest extends DatabaseTest{
     }
     
     @Test
-    public void dbShouldHave82DescriptionsAfterPopulateDescriptions() throws IOException{
+    public void dbShouldHave71DescriptionsAfterPopulateDescriptions() throws IOException{
         Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
         parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS), em, o);
         parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS), em, o);
@@ -45,7 +47,7 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Description.class)));
 
         long result = em.createQuery(criteriaQuery).getSingleResult();
-        assertEquals(82, result);
+        assertEquals(71, result);
     } 
     
     @Test
@@ -60,6 +62,22 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         long result = em.createQuery(criteriaQuery).getSingleResult();
         assertEquals(16, result);
     }
+    
+    @Test
+    public void dbShouldHave23ConceptsAfterPopulateConceptsFromStatementsAndDescriptions() throws IOException{
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConceptsFromStatementsAndDescriptions(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS),
+                em, o);
+
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
+
+        long result = em.createQuery(criteriaQuery).getSingleResult();
+        assertEquals(23, result);
+    }    
      
     
     @Test
@@ -96,7 +114,7 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         assertNotNull(r.getModifier());
         assertEquals (1000000021l, r.getSerialisedId());
         assertEquals (20020731, r.getEffectiveTime());
-        assertEquals (true, r.isActive());
+        assertEquals (HibernateParser.DEFAULT_STATEMENT_ACTIVE, r.isActive());
         assertEquals (900000000000207008l, r.getModule().getSerialisedId());
         assertEquals (255116009, r.getSubject().getSerialisedId());
         assertEquals (367639000, r.getObject().getSerialisedId());
@@ -104,8 +122,8 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         assertEquals (116680003, r.getPredicate().getSerialisedId());
         assertEquals (900000000000011006l, r.getCharacteristicType().getSerialisedId());
         assertEquals (900000000000451002l, r.getModifier().getSerialisedId());
-        assertEquals (-1, r.getCharacteristicTypeIdentifier());
-        assertEquals (-1, r.getRefinability()); 
+        assertEquals (HibernateParser.DEFAULT_STATEMENT_CHARACTERISTIC_TYPE_IDENTIFIER, r.getCharacteristicTypeIdentifier());
+        assertEquals (HibernateParser.DEFAULT_STATEMENT_REFINABILITY, r.getRefinability()); 
     }
     
 
@@ -123,12 +141,12 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         assertNotNull(c.getStatus());
         assertEquals(609555007, c.getSerialisedId());
         assertEquals(20130731, c.getEffectiveTime());
-        assertEquals(true, c.isActive());
+        assertEquals(HibernateParser.DEFAULT_CONCEPT_ACTIVE, c.isActive());
         assertEquals(900000000000207008l, c.getModule().getSerialisedId());
         assertEquals(900000000000074008l, c.getStatus().getSerialisedId());
-        assertEquals(1, c.getVersion());
-        assertEquals(false, c.isPrimitive());
-        assertEquals(-1, c.getStatusId());
+        assertEquals(HibernateParser.DEFAULT_VERSION, c.getVersion());
+        assertEquals(HibernateParser.DEFAULT_CONCEPT_PRIMITIVE, c.isPrimitive());
+        assertEquals(HibernateParser.DEFAULT_CONCEPT_STATUS_ID, c.getStatusId());
     }
 
     @Test
@@ -138,7 +156,7 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS), em, o);
         
         Description d = em.createQuery(
-                "SELECT d FROM Description d where d.ontology.id=1 AND d.serialisedId=" + 2967732019l, 
+                "SELECT d FROM Description d where d.ontology.id=1 AND d.serialisedId=" + 181114011, 
                 Description.class).getSingleResult();
         
         assertNotNull(d.getModule());
@@ -146,21 +164,21 @@ public class Rf2HibernateParserTest extends DatabaseTest{
         assertNotNull(d.getType());
         assertNotNull(d.getCaseSignificance());
         
-        assertEquals(2967732019l, d.getSerialisedId());
-        assertEquals(20130731, d.getEffectiveTime());
+        assertEquals(181114011, d.getSerialisedId());
+        assertEquals(20110131, d.getEffectiveTime());
         assertEquals(true, d.isActive());
-        assertEquals(900000000000207008l, d.getModule().getSerialisedId());
-        assertEquals(609555007l, d.getAbout().getSerialisedId());
+        assertEquals(900000000000012004l, d.getModule().getSerialisedId());
+        assertEquals(116680003, d.getAbout().getSerialisedId());
         assertEquals("en", d.getLanguageCode());
         assertEquals(900000000000013009l, d.getType().getSerialisedId());
-        assertEquals("Diastolic heart failure stage A", d.getTerm());
-        assertEquals(900000000000017005l, d.getCaseSignificance().getSerialisedId());
+        assertEquals("Is a", d.getTerm());
+        assertEquals(900000000000020002l, d.getCaseSignificance().getSerialisedId());
     }    
     
  
     @Test
-    public void shouldPopulateDbWithNoConcept() throws IOException{
-        Ontology ontology = parser.populateDbWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
+    public void shouldPopulateDbFromStatementsOnly() throws IOException{
+        Ontology ontology = parser.populateDbFromStatementsOnly(DEFAULT_ONTOLOGY_NAME, 
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS), em);
         
@@ -187,9 +205,55 @@ public class Rf2HibernateParserTest extends DatabaseTest{
             assertEquals(1, ontology.getId());
             assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
             Statement r = new Statement(1000000021);
+            assertTrue(ontology.getConcepts().contains(new Concept(255116009)));
             assertTrue(ontology.getStatements().contains(r));
         }
     }
+    
+    @Test
+    public void shouldPopulateDbFromStatementsAndDescriptionsOnly() throws IOException{
+        Ontology ontology = parser.populateDbFromStatementsAndDescriptionsOnly(DEFAULT_ONTOLOGY_NAME, 
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS),
+                em);
+        
+        {//16 Concepts
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+            criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Concept.class)));
+    
+            long result = em.createQuery(criteriaQuery).getSingleResult();
+            assertEquals(23, result);
+        }
+        {//5 Statements
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+            criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Statement.class)));
+    
+            long result = em.createQuery(criteriaQuery).getSingleResult();
+            assertEquals(5, result);
+        }
+        {//82 Descriptions
+            CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+            CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+            criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Description.class)));
+    
+            long result = em.createQuery(criteriaQuery).getSingleResult();
+            assertEquals(71, result);
+        }        
+        {//1 ontology
+            assertNotNull(ontology);
+            assertEquals(5, ontology.getStatements().size());
+            assertEquals(23, ontology.getConcepts().size());
+            assertEquals(1, ontology.getId());
+            assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
+            Statement r = new Statement(1000000021);
+            assertTrue(ontology.getConcepts().contains(new Concept(900000000000012004l)));
+            assertTrue(ontology.getStatements().contains(r));
+        }
+    }    
     
     @Test
     public void shouldPopulateDb() throws IOException{
@@ -245,28 +309,109 @@ public class Rf2HibernateParserTest extends DatabaseTest{
             long result = em.createQuery(criteriaQuery).getSingleResult();
             assertEquals(5, result);
         }
-        {//82 Descriptions
+        {//71 Descriptions
             CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
             CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
             criteriaQuery.select(criteriaBuilder.count(criteriaQuery.from(Description.class)));
     
             long result = em.createQuery(criteriaQuery).getSingleResult();
-            assertEquals(82, result);
+            assertEquals(71, result);
         }
         {//1 ontology
             assertNotNull(ontology);
             assertEquals(5, ontology.getStatements().size());
             assertEquals(28, ontology.getConcepts().size());
-            assertEquals(82, ontology.getDescriptions().size());
+            assertEquals(71, ontology.getDescriptions().size());
             assertEquals(1, ontology.getId());
             assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
-            Statement r = new Statement(1000000021);
-            assertTrue(ontology.getStatements().contains(r));
+            assertTrue(ontology.getStatements().contains(new Statement(1000000021)));
+            assertTrue(ontology.getDescriptions().contains(new Description(181114011)));
+            assertTrue(ontology.getConcepts().contains(new Concept(900000000000207008l)));
         }      
     }   
     
     @Test
-    public void shouldSkipRowAndContinueDbPopulationAfterParseError() throws IOException{
+    public void shouldSkipRowAndContinueDbPopulationAfterParseErrorWhenForgivingMode() throws IOException{
+        parser.setParseMode(Mode.FORGIVING);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        
+        parser.populateConcepts(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS_ERROR), 
+                em, o);
+        parser.populateStatements(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS_ERROR),
+                em, o);
+        parser.populateDescriptions(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS_ERROR),
+                em, o);
+        
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Long> conceptCriteriaQuery = criteriaBuilder.createQuery(Long.class);
+        conceptCriteriaQuery.select(criteriaBuilder.count(conceptCriteriaQuery.from(Concept.class)));
+        long conceptResult = em.createQuery(conceptCriteriaQuery).getSingleResult();
 
+        CriteriaQuery<Long> statementsCriteriaQuery = criteriaBuilder.createQuery(Long.class);
+        statementsCriteriaQuery.select(criteriaBuilder.count(statementsCriteriaQuery.from(Statement.class)));
+        long statementResult = em.createQuery(statementsCriteriaQuery).getSingleResult();
+
+        CriteriaQuery<Long> descriptionsCriteriaQuery = criteriaBuilder.createQuery(Long.class);
+        descriptionsCriteriaQuery.select(criteriaBuilder.count(descriptionsCriteriaQuery.from(Description.class)));
+        long descriptionResult = em.createQuery(descriptionsCriteriaQuery).getSingleResult();        
+        
+        assertEquals(25, conceptResult);
+        assertEquals(0, statementResult);
+        assertEquals(67, descriptionResult);
     }
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateConcepts() throws IOException{
+        parser.setParseMode(Mode.STRICT);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConcepts(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS_ERROR), 
+                em, o);
+    }
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateConceptsFromStatements() throws IOException{
+        parser.setParseMode(Mode.STRICT);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConceptsFromStatements(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS_ERROR), 
+                em, o);
+    }    
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateConceptsFromStatementsAndDescriptions() throws IOException{
+        parser.setParseMode(Mode.STRICT);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConceptsFromStatementsAndDescriptions(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS_ERROR),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS_ERROR),
+                em, o);
+    }        
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateStatements() throws IOException{
+        parser.setParseMode(Mode.STRICT);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConcepts(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS), 
+                em, o);
+        parser.populateStatements(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS_ERROR),
+                em, o);        
+    }
+    
+    @Test(expected=InvalidInputException.class)
+    public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateDescriptions() throws IOException{
+        parser.setParseMode(Mode.STRICT);
+        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.populateConcepts(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS), 
+                em, o);
+        parser.populateStatements(
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS_ERROR),
+                em, o);        
+    }      
 }

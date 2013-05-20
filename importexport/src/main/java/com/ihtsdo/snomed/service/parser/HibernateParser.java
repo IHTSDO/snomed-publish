@@ -31,33 +31,53 @@ import com.ihtsdo.snomed.model.Ontology;
 
 public abstract class HibernateParser {
     static final Logger LOG = LoggerFactory.getLogger(HibernateParser.class);
+    
     public static final String ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML = "persistenceManager";
-    protected EntityManagerFactory emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+    
+    protected static final int      DEFAULT_VERSION = 1;
+    protected static final boolean  DEFAULT_CONCEPT_ACTIVE = true;
+    protected static final boolean  DEFAULT_CONCEPT_PRIMITIVE = true;
+    protected static final int      DEFAULT_CONCEPT_EFFECTIVE_TIME = -1;
+    protected static final int      DEFAULT_CONCEPT_STATUS_ID = -1;
+    protected static final int      DEFAULT_DESCRIPTION_INITIAL_CAPITAL_STATUS = -1;
+    protected static final int      DEFAULT_DESCRIPTION_STATUS = -1;
+    protected static final int      DEFAULT_DESCRIPTION_TYPE_ID = -1;
+    protected static final int      DEFAULT_DESCRIPTION_EFFECTIVETIME = -1;
+    protected static final boolean  DEFAULT_DESCRIPTION_ACTIVE = true;
+    protected static final int      DEFAULT_STATEMENT_CHARACTERISTIC_TYPE_IDENTIFIER = -1;
+    protected static final int      DEFAULT_STATEMENT_REFINABILITY = -1;
+    protected static final int      DEFAULT_STATEMENT_EFFECTIVE_TIME = -1;
+    protected static final boolean  DEFAULT_STATEMENT_ACTIVE = true;
+    protected static final int      DEFAULT_STATEMENT_GROUP = 0;
+    
+    protected EntityManagerFactory emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
 
-
-    protected boolean ignoreInactive = true;
     protected Mode parseMode = Mode.FORGIVING;
     
     public enum Mode{
         STRICT, FORGIVING
     }
 
-    public void setParseMode(Mode parseMode){
+    public HibernateParser setParseMode(Mode parseMode){
         this.parseMode = parseMode;
+        return this;
     }
-
 
     protected abstract void populateConcepts(final InputStream stream, EntityManager em, 
             final Ontology ontology) throws IOException;
 
     protected abstract void populateConceptsFromStatements(final InputStream stream, EntityManager em, 
             final Ontology ontology) throws IOException;
+    
+    protected abstract void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, 
+            final InputStream descriptionsStream, EntityManager em, final Ontology ontology) throws IOException;
 
     protected abstract void populateStatements(final InputStream stream, final EntityManager em, 
             final Ontology ontology) throws IOException;
     
     protected abstract void populateDescriptions(final InputStream stream, final EntityManager em, 
             final Ontology ontology) throws IOException;
+    
 
     public Ontology populateDb(String ontologyName, InputStream conceptsStream, 
             InputStream statementStream, EntityManager em) throws IOException
@@ -111,7 +131,7 @@ public abstract class HibernateParser {
         return o;
     }    
 
-    public Ontology populateDbWithNoConcepts(String ontologyName, InputStream statementStream, 
+    public Ontology populateDbFromStatementsOnly(String ontologyName, InputStream statementStream, 
             InputStream statementStreamAgain, EntityManager em) throws IOException
             {
         LOG.info("Importing ontology \"" + ontologyName + "\"");
@@ -135,6 +155,33 @@ public abstract class HibernateParser {
         LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         return o;
     } 
+    
+    public Ontology populateDbFromStatementsAndDescriptionsOnly(String ontologyName, InputStream statementStream, 
+            InputStream statementStreamAgain, InputStream descriptionStream, InputStream descriptionStreamAgain,
+            EntityManager em) throws IOException
+    {
+        LOG.info("Importing ontology \"" + ontologyName + "\"");
+        Stopwatch stopwatch = new Stopwatch().start();
+
+        boolean doCommit = false;
+        if (!em.getTransaction().isActive()){
+            em.getTransaction().begin();
+            doCommit=true;
+        }
+        
+        Ontology ontology = createOntology(em, ontologyName);
+        populateConceptsFromStatementsAndDescriptions(statementStream, descriptionStream, em, ontology);
+        populateStatements(statementStreamAgain, em, ontology);
+        populateDescriptions(descriptionStreamAgain, em, ontology);
+        createIsKindOfHierarchy(em, ontology);
+        if(doCommit){em.getTransaction().commit();}
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
+
+        stopwatch.stop();
+        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+        return o;
+    }     
 
 
     protected Ontology createOntology(EntityManager em, final String name) throws IOException {
@@ -245,9 +292,4 @@ public abstract class HibernateParser {
             throw new IllegalArgumentException("Unable to convert value [" + string + "] to boolean value");
         }
     }
-    public void setIgnoreInactive(boolean ignore){
-        ignoreInactive = ignore;
-    }
-    
-
 }

@@ -30,7 +30,7 @@ public class Description {
     //RF1
     private int status;
     private int initialCapitalStatus;
-    private int typeId;
+    private int descriptionTypeId;
 
     //RF2 
     private int effectiveTime;
@@ -42,6 +42,9 @@ public class Description {
     private Concept caseSignificance;
     @OneToOne 
     private Concept module;
+    
+    public Description(){}
+    public Description(long serialisedId){this.serialisedId = serialisedId;}
 
     
     @Override
@@ -55,7 +58,7 @@ public class Description {
                 .add("languageCode", getLanguageCode())
                 .add("status(rf1)", getStatus())
                 .add("initialCapitalStatus(rf1)", getInitialCapitalStatus())
-                .add("typeId(rf1)", getTypeId())
+                .add("typeId(rf1)", getDescriptionTypeId())
                 .add("effectiveTime(rf2)", getEffectiveTime())
                 .add("active(rf2)", isActive())
                 .add("type(rf2)", getType() == null ? null : getType().getSerialisedId())
@@ -124,14 +127,13 @@ public class Description {
         this.initialCapitalStatus = initialCapitalStatus;
     }
 
-    public int getTypeId() {
-        return typeId;
-    }
 
-    public void setTypeId(int typeId) {
-        this.typeId = typeId;
+    public int getDescriptionTypeId() {
+        return descriptionTypeId;
     }
-
+    public void setDescriptionTypeId(int descriptionTypeId) {
+        this.descriptionTypeId = descriptionTypeId;
+    }
     public String getLanguageCode() {
         return languageCode;
     }

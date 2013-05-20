@@ -15,8 +15,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javassist.NotFoundException;
-
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
@@ -35,8 +33,12 @@ import com.ihtsdo.snomed.service.InvalidInputException;
 public class Rf2HibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( Rf2HibernateParser.class );
     
+    /**
+     * Use factory
+     */
     Rf2HibernateParser(){}
     
+    @Override
     protected void populateConcepts(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException{
         LOG.info("Populating concepts");
         Stopwatch stopwatch = new Stopwatch().start();
@@ -69,17 +71,17 @@ public class Rf2HibernateParser extends HibernateParser{
                             ps.setBoolean(3, stringToBoolean(splitIt.next())); // active
                             conceptIdToModuleIdMap.put(serialisedId, Long.parseLong(splitIt.next()));
                             conceptIdToDefinitionStatusIdMap.put(serialisedId, Long.parseLong(splitIt.next()));
-                            ps.setBoolean(4, false); //primitive, otherwise mysql/jpa craps out when we retrieve concept
-                            ps.setInt(5, -1); //status_id, otherwise mysql/jpa craps out when we retrieve concept
-                            ps.setInt(6, 1);//version
-                            ps.setLong(7, ontology.getId()); //ontologyid
+                            ps.setBoolean(4, DEFAULT_CONCEPT_PRIMITIVE);
+                            ps.setInt(5, DEFAULT_CONCEPT_STATUS_ID);
+                            ps.setInt(6, DEFAULT_VERSION);
+                            ps.setLong(7, ontology.getId());
                             ps.addBatch();
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         }
                         line = br.readLine();
                     }
@@ -117,7 +119,7 @@ public class Rf2HibernateParser extends HibernateParser{
                     }
                     catch (Exception e){
                         LOG.error("Problem populating module and definition status for description {}", serialisedId, e);
-                        if (parseMode.equals(Mode.STRICT)){throw e;}
+                        if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                     }
                 }
                 ps.executeBatch();
@@ -126,6 +128,7 @@ public class Rf2HibernateParser extends HibernateParser{
         tx.commit();
     }
     
+    @Override
     protected void populateDescriptions(final InputStream stream, final EntityManager em, 
             final Ontology ontology) throws IOException
     {
@@ -138,7 +141,7 @@ public class Rf2HibernateParser extends HibernateParser{
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO DESCRIPTION (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, typeid, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO DESCRIPTION (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, descriptionTypeId, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -157,55 +160,59 @@ public class Rf2HibernateParser extends HibernateParser{
                             psInsert.setInt(2, Integer.parseInt(splitIt.next())); //effectivetime
                             psInsert.setBoolean(3, stringToBoolean(splitIt.next())); //active
                             {
-                                Long conceptId = map.get(new Long(splitIt.next()));
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
                                 if (conceptId == null){
-                                    throw new NotFoundException("Concept " + conceptId + " not found for description " + serialisedId);
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for description " + serialisedId);
                                 }
                                 psInsert.setLong(4, conceptId);//module
                             }
                             {
-                                Long conceptId = map.get(new Long(splitIt.next()));
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
                                 if (conceptId == null){
-                                    throw new NotFoundException("Concept " + conceptId + " not found for description " + serialisedId);
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for description " + serialisedId);
                                 }
                                 psInsert.setLong(5, conceptId);//about,concept
                             }                            
                             psInsert.setString(6, splitIt.next()); //languagecode
                             {
-                                Long conceptId = map.get(new Long(splitIt.next()));
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
                                 if (conceptId == null){
-                                    throw new NotFoundException("Concept " + conceptId + " not found for description " + serialisedId);
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for description " + serialisedId);
                                 }
                                 psInsert.setLong(7, conceptId);//type
                             }
                             psInsert.setString(8, splitIt.next()); //term
                             {
-                                Long conceptId = map.get(new Long(splitIt.next()));
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
                                 if (conceptId == null){
-                                    throw new NotFoundException("Concept " + conceptId + " not found for description " + serialisedId);
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for description " + serialisedId);
                                 }
                                 psInsert.setLong(9, conceptId);//casesignificanceid
                             }
-                            psInsert.setInt(10, -1); //initialCapitalStatus, or mysql craps out
-                            psInsert.setInt(11, -1); //initialCapitalStatus, or mysql craps out
-                            psInsert.setInt(12, -1); //typeid, or mysql craps out
+                            psInsert.setInt(10, DEFAULT_DESCRIPTION_INITIAL_CAPITAL_STATUS);
+                            psInsert.setInt(11, DEFAULT_DESCRIPTION_STATUS);
+                            psInsert.setInt(12, DEFAULT_DESCRIPTION_TYPE_ID);
                             psInsert.setLong(13, ontology.getId());//ontologyid
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
-                        } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
-                        } catch (NullPointerException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
-                            throw e;
-                        } catch (NotFoundException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
                             if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (IllegalArgumentException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (NullPointerException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (InvalidInputException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw e;}
                         } catch (NoSuchElementException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
-                            throw new InvalidInputException(e);
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         } 
                         line = br.readLine();
                         currentLine++;
@@ -219,9 +226,10 @@ public class Rf2HibernateParser extends HibernateParser{
         });
         tx.commit(); 
         stopwatch.stop();
-        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");        
+        LOG.info("Completed descriptions import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");        
     }
 
+    @Override
     protected void populateConceptsFromStatements(final InputStream stream, EntityManager em, 
             final Ontology ontology) throws IOException 
     {
@@ -259,22 +267,22 @@ public class Rf2HibernateParser extends HibernateParser{
                             concepts.add(new Concept(Long.parseLong(splitIt.next()))); //characteristicType
                             concepts.add(new Concept(Long.parseLong(splitIt.next()))); //modifier
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         }
                         line = br.readLine();
                     }
                     for (Concept c : concepts){
                         ps.setLong(1, c.getSerialisedId());
                         ps.setLong(2, ontology.getId());
-                        ps.setBoolean(3, true); //primitive
-                        ps.setInt(4, -1); //otherwise mysql/jpa craps out when we retrieve concept
-                        ps.setBoolean(5, true); //active
-                        ps.setInt(6, -1);//effectivetime
-                        ps.setInt(7, 1);//version
+                        ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
+                        ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
+                        ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
+                        ps.setInt(6, DEFAULT_CONCEPT_EFFECTIVE_TIME);
+                        ps.setInt(7, DEFAULT_VERSION);
                         ps.addBatch();
                         
                     }
@@ -289,6 +297,111 @@ public class Rf2HibernateParser extends HibernateParser{
         setKindOfPredicate(em, ontology);
     }
     
+    protected void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, 
+            final InputStream descriptionsStream, EntityManager em, final Ontology ontology) throws IOException
+    {
+        LOG.info("Populating concepts");
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                Set<Concept> concepts = new HashSet<Concept>();
+                try (@SuppressWarnings("resource") BufferedReader brc = new BufferedReader(new InputStreamReader(statementsStream))){
+                    int currentLine = 1;
+                    String line = null;
+                    line = brc.readLine();
+                    //skip the headers
+                    line = brc.readLine();
+                    while (line != null) {
+                        currentLine++;
+                        if (line.isEmpty()){
+                            line = brc.readLine();
+                            continue;
+                        }
+                        Iterable<String> split = Splitter.on('\t').split(line);
+                        Iterator<String> splitIt = split.iterator();
+                        try {
+                            splitIt.next(); //id
+                            splitIt.next(); //effective time
+                            splitIt.next(); //active
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //moduleId
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //sourceId
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //destinationId
+                            splitIt.next(); //group
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //typeId
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //characteristicType
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //modifier
+                        } catch (NumberFormatException e) {
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (IllegalArgumentException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        }
+                        line = brc.readLine();
+                    }
+                }catch (IOException e1) {
+                    LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
+                } 
+                try (@SuppressWarnings("resource") BufferedReader brd = new BufferedReader(new InputStreamReader(descriptionsStream))){
+                    int currentLine = 1;
+                    String line = null;
+                    line = brd.readLine();
+                    //skip the headers
+                    line = brd.readLine();
+                    while (line != null) {
+                        currentLine++;
+                        if (line.isEmpty()){
+                            line = brd.readLine();
+                            continue;
+                        }
+                        Iterable<String> split = Splitter.on('\t').split(line);
+                        Iterator<String> splitIt = split.iterator();
+                        try {                            
+                            splitIt.next(); //id
+                            splitIt.next(); //effective time
+                            splitIt.next(); //active
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //module
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //about
+                            splitIt.next(); //languagecode
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //type
+                            splitIt.next(); //term
+                            concepts.add(new Concept(Long.parseLong(splitIt.next()))); //case significance
+                        } catch (NumberFormatException e) {
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (IllegalArgumentException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        }
+                        line = brd.readLine();
+                    }                    
+                } catch (IOException e1) {
+                    LOG.error("Unable to read from the input stream. Bailing out. Message is: " + e1.getMessage(), e1);
+                } 
+                for (Concept c : concepts){
+                    ps.setLong(1, c.getSerialisedId());
+                    ps.setLong(2, ontology.getId());
+                    ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
+                    ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
+                    ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
+                    ps.setInt(6, DEFAULT_CONCEPT_EFFECTIVE_TIME);
+                    ps.setInt(7, DEFAULT_VERSION);
+                    ps.addBatch();
+                    
+                }
+                ps.executeBatch();
+                LOG.info("Populated " + concepts.size() + " concepts");
+            }
+        });
+        tx.commit();
+        setKindOfPredicate(em, ontology);
+    }
+    
+    
+    @Override
     protected void populateStatements(final InputStream stream, final EntityManager em, 
             final Ontology ontology) throws IOException 
     {
@@ -301,7 +414,6 @@ public class Rf2HibernateParser extends HibernateParser{
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
                         "INSERT INTO STATEMENT (serialisedId, effectiveTime, active, module_id, subject_id, object_id, groupId, predicate_id, characteristicType_id, modifier_id, characteristicTypeIdentifier, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                                
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -322,61 +434,66 @@ public class Rf2HibernateParser extends HibernateParser{
                             {//module
                                 Long concept = map.get(Long.parseLong(splitIt.next()));
                                 if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                    throw new InvalidInputException("Concept " + concept + " not found for statement " +serialisedId);
                                 }
                                 psInsert.setLong(4, concept);
                             }
                             {//subject
-                                Long concept = map.get(Long.parseLong(splitIt.next()));
-                                if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
+                                if (conceptId == null){
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for statement " +serialisedId);
                                 }
-                                psInsert.setLong(5, concept);
+                                psInsert.setLong(5, conceptId);
                             }
                             {//object
-                                Long concept = map.get(Long.parseLong(splitIt.next()));
-                                if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
+                                if (conceptId == null){
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for statement " +serialisedId);
                                 }
-                                psInsert.setLong(6, concept);
+                                psInsert.setLong(6, conceptId);
                             }
                             psInsert.setInt(7, Integer.parseInt(splitIt.next()));//groupid
                             {//type
-                                Long concept = map.get(Long.parseLong(splitIt.next()));
-                                if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
+                                if (conceptId == null){
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for statement " +serialisedId);
                                 }
-                                psInsert.setLong(8, concept);
+                                psInsert.setLong(8, conceptId);
                             }
                             {//characteristicType
-                                Long concept = map.get(Long.parseLong(splitIt.next()));
-                                if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
+                                if (conceptId == null){
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for statement " +serialisedId);
                                 }
-                                psInsert.setLong(9, concept);
+                                psInsert.setLong(9, conceptId);
                             }
                             {//modifier
-                                Long concept = map.get(Long.parseLong(splitIt.next()));
-                                if (concept == null){
-                                    throw new NotFoundException("Concept " + concept + " not found for statement " +serialisedId);
+                                String conceptSerialisedId = splitIt.next();
+                                Long conceptId = map.get(new Long(conceptSerialisedId));
+                                if (conceptId == null){
+                                    throw new InvalidInputException("Concept " + conceptSerialisedId + " not found for statement " +serialisedId);
                                 }
-                                psInsert.setLong(10, concept);
+                                psInsert.setLong(10, conceptId);
                             }                            
-                            psInsert.setInt(11, -1); //characteristicTypeIdentifier
-                            psInsert.setInt(12, -1); //refinability
+                            psInsert.setInt(11, DEFAULT_STATEMENT_CHARACTERISTIC_TYPE_IDENTIFIER);
+                            psInsert.setInt(12, DEFAULT_STATEMENT_REFINABILITY);
                             psInsert.setLong(13, ontology.getId());
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         } catch (IllegalArgumentException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
-                            if (parseMode.equals(Mode.STRICT)){throw e;}
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         } catch (NullPointerException e){
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Unable to recover, bailing out", e);
-                            throw e;
-                        } catch (NotFoundException e){
-                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]. Skipping entry and continuing", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (InvalidInputException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
                             if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
                         }
                         line = br.readLine();

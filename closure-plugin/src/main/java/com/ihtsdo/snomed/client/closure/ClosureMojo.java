@@ -27,7 +27,6 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
@@ -61,7 +60,7 @@ public class ClosureMojo extends AbstractMojo{
             getLog().info("Using an in-memory database");
         }
         getLog().info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 
@@ -79,7 +78,7 @@ public class ClosureMojo extends AbstractMojo{
         testInputs();
         try{
             initDb();
-            Ontology o = parser.populateDbWithNoConcepts(DEFAULT_ONTOLOGY_NAME, 
+            Ontology o = parser.populateDbFromStatementsOnly(DEFAULT_ONTOLOGY_NAME, 
                     new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + o.getId(), Concept.class).getResultList();            

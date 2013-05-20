@@ -27,7 +27,6 @@ import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
@@ -52,7 +51,7 @@ public class CanonicalMain {
             LOG.info("Using an in-memory database");
         }
         LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
     }
 

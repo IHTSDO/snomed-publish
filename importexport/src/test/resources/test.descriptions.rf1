@@ -1,0 +1,24 @@
+DESCRIPTIONID	DESCRIPTIONSTATUS	CONCEPTID	TERM	INITIALCAPITALSTATUS	DESCRIPTIONTYPE	LANGUAGECODE
+418668015	0	280844000	T7 vertebral body	1	2	en
+418669011	0	280844000	Entire body of seventh thoracic vertebra	0	1	en
+674307017	0	280844000	Entire body of seventh thoracic vertebra (body structure)	0	3	en
+418670012	0	280845004	Entire body of eighth thoracic vertebra	0	1	en
+418671011	0	280845004	T8 vertebral body	1	2	en
+674308010	0	280845004	Entire body of eighth thoracic vertebra (body structure)	0	3	en
+418672016	0	280846003	T9 vertebral body	1	2	en
+418673014	0	280846003	Entire body of ninth thoracic vertebra	0	1	en
+674309019	0	280846003	Entire body of ninth thoracic vertebra (body structure)	0	3	en
+181114011	0	116680003	Is a	0	1	en
+680946014	0	116680003	Is a (attribute)	0	3	en
+119169017	0	71737002	Body of seventh thoracic vertebra	0	2	en
+501955017	0	71737002	Structure of body of seventh thoracic vertebra	0	1	en
+811936014	0	71737002	Structure of body of seventh thoracic vertebra (body structure)	0	3	en
+418460017	0	280737002	Thoracic vertebral body	0	2	en
+418461018	0	280737002	Entire body of thoracic vertebra	0	1	en
+674188017	0	280737002	Entire body of thoracic vertebra (body structure)	0	3	en
+128546015	0	77435000	Body of eighth thoracic vertebra	0	2	en
+503572013	0	77435000	Structure of body of eighth thoracic vertebra	0	1	en
+818265016	0	77435000	Structure of body of eighth thoracic vertebra (body structure)	0	3	en
+485628012	0	33766003	Structure of body of ninth thoracic vertebra	0	1	en
+56373011	0	33766003	Body of ninth thoracic vertebra	0	2	en
+765209014	0	33766003	Structure of body of ninth thoracic vertebra (body structure)	0	3	en

@@ -16,10 +16,7 @@ import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class GroupTest extends DatabaseTest{
-    
-    private static final String TEST_GROUP_RELATIONSHIPS_LONG_FORM = "group_statements_longform.txt";
-    private static final String TEST_GROUP_CONCEPTS = "test_group_concepts.txt";
-
+   
     HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
     
     @Before
@@ -37,8 +34,8 @@ public class GroupTest extends DatabaseTest{
     public void shouldReturnEqual() throws IOException {
         
         parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
-                ClassLoader.getSystemResourceAsStream(TEST_GROUP_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_GROUP_RELATIONSHIPS_LONG_FORM), em);       
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_GROUP_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_GROUP_STATEMENTS), em);       
         
         Concept c1 = em.createQuery("SELECT c FROM Concept c where c.ontology.id=1 AND c.serialisedId=1", Concept.class).getSingleResult();
         Concept c2 = em.createQuery("SELECT c FROM Concept c where c.ontology.id=1 AND c.serialisedId=2", Concept.class).getSingleResult();

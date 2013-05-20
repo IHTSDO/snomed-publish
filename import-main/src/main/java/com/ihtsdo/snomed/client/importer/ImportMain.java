@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 
 public class ImportMain {
     private static final Logger LOG = LoggerFactory.getLogger( ImportMain.class );
@@ -37,7 +36,7 @@ public class ImportMain {
         overrides.put("hibernate.hbm2ddl.auto", "update");
         
         LOG.info("Connecting to database " + properties.getProperty(ImportCliParser.URL_KEY));
-        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
@@ -77,7 +76,7 @@ public class ImportMain {
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
-                hibParser.populateDbWithNoConcepts(
+                hibParser.populateDbFromStatementsOnly(
                         name, 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 

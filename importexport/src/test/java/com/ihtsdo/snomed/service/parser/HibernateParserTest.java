@@ -25,8 +25,8 @@ public class HibernateParserTest extends DatabaseTest{
 
     @Test
     public void shouldPopulateSubjectOfStatementBidirectionalField() throws IOException{
-        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
+        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
 
         Query query = em.createQuery("SELECT r FROM Statement r");
 
@@ -42,8 +42,8 @@ public class HibernateParserTest extends DatabaseTest{
 
     @Test
     public void shouldPopulateKindOfAndParentOfBidirectionalFieldsForIsAStatements() throws IOException{
-        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_IS_KIND_OF_STATEMENTS), em);
+        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_IS_KIND_OF_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_IS_KIND_OF_STATEMENTS), em);
 
         TypedQuery<Statement> query = em.createQuery("SELECT r FROM Statement r WHERE r.ontology.id=1", Statement.class);
         List<Statement> statements = (List<Statement>) query.getResultList();
@@ -73,8 +73,8 @@ public class HibernateParserTest extends DatabaseTest{
 
     @Test
     public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
+        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
 
         assertNotNull(ontology);
         assertEquals(5, ontology.getStatements().size());
@@ -87,8 +87,8 @@ public class HibernateParserTest extends DatabaseTest{
     
     @Test
     public void shouldCreateConceptSerialisedIdMapToDatabaseIdForOntology() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
+        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
         Map<Long, Long> map = parser.createConceptSerialisedIdToDatabaseIdMap(ontology, em);
         
         assertEquals(8, map.keySet().size());
@@ -110,8 +110,8 @@ public class HibernateParserTest extends DatabaseTest{
     
     @Test
     public void shouldSetKindOfPredicate() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_CONCEPTS),
-                ClassLoader.getSystemResourceAsStream(TEST_STATEMENTS_RF1), em);
+        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
         
         assertNotNull(ontology.getIsKindOfPredicate());
         assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());

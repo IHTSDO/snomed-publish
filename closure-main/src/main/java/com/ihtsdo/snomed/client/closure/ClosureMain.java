@@ -28,7 +28,6 @@ import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.parser.Rf1HibernateParser;
 import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
@@ -55,7 +54,7 @@ public class ClosureMain {
             LOG.info("Using an in-memory database");
         }
         LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(Rf1HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML, overrides);
         em = emf.createEntityManager();
         //em.getTransaction().begin();
     }
@@ -113,7 +112,7 @@ public class ClosureMain {
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
-                o = hibParser.populateDbWithNoConcepts(
+                o = hibParser.populateDbFromStatementsOnly(
                         DEFAULT_ONTOLOGY_NAME, 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
