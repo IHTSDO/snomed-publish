@@ -20,7 +20,7 @@ This is the syntax:
 
 For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats).
 
-The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format).
+The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 
 
 When you run this program, you have the option of using either a disk based embedded database, or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. If you specify the --location parameter, a disk based database will be used, and the data will be stored in the file specified by this --location parameter. Not specifying the --location parameter forces the use of an in-memory database.
