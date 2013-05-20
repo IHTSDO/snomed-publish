@@ -15,40 +15,42 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.hibernate.CacheMode;
 import org.slf4j.impl.StaticLoggerBinder;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
-import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 
 @Mojo(name="generate-canonical")
 public class ClosureMojo extends AbstractMojo{
     private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
     
-    @Parameter
-    private String inputFile;
-    
-    @Parameter
-    private String outputFile;
-    
-    @Parameter
-    private String databaseLocation;
+    @Parameter String conceptsFile;
+    @Parameter String triplesFile;
+    @Parameter String descriptionsFile;
+    @Parameter String parserType;
+    @Parameter String outputFile;
+    @Parameter int pageSize;
+    @Parameter private String databaseLocation;
     
     private   EntityManagerFactory emf             = null;
     private   EntityManager em                     = null;    
     private   TransitiveClosureAlgorithm algorithm = new TransitiveClosureAlgorithm();
-    private   HibernateParser parser               = HibernateParserFactory.getParser(Parser.RF1);
     
     private void initDb(){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -76,25 +78,80 @@ public class ClosureMojo extends AbstractMojo{
         ((org.apache.maven.plugin.Mojo) StaticLoggerBinder.getSingleton()).setLog(getLog());        
         
         testInputs();
-        try{
+        try {
             initDb();
-            Ontology o = parser.populateDbFromStatementsOnly(DEFAULT_ONTOLOGY_NAME, 
-                    new FileInputStream(inputFile), new FileInputStream(inputFile), em);
             
-            List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + o.getId(), Concept.class).getResultList();            
+            Ontology o = null;
+            HibernateParser hibParser = HibernateParserFactory.getParser(Parser.valueOf(parserType));
+            if (descriptionsFile != null){
+                o = hibParser.populateDbWithDescriptions(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(conceptsFile), 
+                        new FileInputStream(triplesFile), 
+                        new FileInputStream(descriptionsFile), 
+                        em);
+            } else if (conceptsFile != null){
+                o = hibParser.populateDb(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(conceptsFile), 
+                        new FileInputStream(triplesFile), 
+                        em);                        
+            } else {
+                o = hibParser.populateDbFromStatementsOnly(
+                        DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(triplesFile), 
+                        new FileInputStream(triplesFile), 
+                        em);
+            }             
             
-            File outFile = new File(outputFile);
-            if (!outFile.exists()){
-                outFile.createNewFile();
+            if (o == null){
+                throw new InvalidInputException("Parsing failed");
             }
             
-            try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-                algorithm.runAlgorithm(concepts, SerialiserFactory.getSerialiser(Form.CANONICAL, bw));
+            TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
+            query.setParameter("ontologyId", o.getId());
+            query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+            query.setHint("org.hibernate.readOnly", Boolean.TRUE);
+            query.setHint("org.hibernate.cacheMode", CacheMode.GET);
+
+            int firstResult = 0;
+            int counter = 0;
+            query.setFirstResult(firstResult);
+            query.setMaxResults(pageSize);            
+            List<Concept> concepts = query.getResultList();
+
+            try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
+                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
+                Stopwatch stopwatch = new Stopwatch().start();
+                getLog().info("Running algorithm");
+                boolean done = false;
+                while (!done){
+                    getLog().info("Running concept batch with pagesize " + pageSize);
+                    Stopwatch stopwatchBatch = new Stopwatch().start();
+                    if (concepts.size() < pageSize) {
+                        counter += concepts.size();
+                        done = true;
+                    }                    
+                    algorithm.runAlgorithm(concepts, serialiser);
+                    em.clear();
+                    firstResult = firstResult + pageSize;
+                    if (!done){
+                        counter += pageSize;
+                        query.setFirstResult(firstResult);
+                        concepts = query.getResultList();
+                    }
+                    stopwatchBatch.stop();
+                    getLog().info("Batch completed in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+                }
+                stopwatch.stop();
+                getLog().info("Completed algorithm in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds with " + counter + " concepts");
             }
         } catch (FileNotFoundException e) {
-            throw new MojoExecutionException("File not found: " + e.getMessage(), e);
+            getLog().error("File not found: " + e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new MojoExecutionException("Unable to read/write file: " + e.getMessage(), e);
+            getLog().error("Unable to read/write file: " + e.getMessage());
+            throw new MojoExecutionException(e.getMessage(), e);
         } finally{
             closeDb();
         }
@@ -103,24 +160,58 @@ public class ClosureMojo extends AbstractMojo{
     }  
     
     private void testInputs() throws MojoExecutionException{
-        if ((outputFile == null) || (inputFile == null) ||
-                outputFile.isEmpty() || inputFile.isEmpty()){
-            throw new MojoExecutionException("Invalid parameter configuration");
+        if ((parserType == null) || parserType.isEmpty())
+        {
+            System.out.println("Parser type parameter not specified");
+            System.exit(-1);
+        }        
+        
+        try{
+            HibernateParserFactory.Parser.valueOf(parserType);            
+        }catch (IllegalArgumentException e){
+            System.out.println("Parser type '" + parserType + "' not supported. Use 'RF1', 'RF2', or 'CANONICAL'");
+            System.exit(-1);            
+        }        
+        
+        if ((triplesFile == null) || triplesFile.isEmpty())
+        {
+            System.out.println("Invalid triples file parameter configuration");
+            System.exit(-1);
         }
-        if (!new File(inputFile).isFile()){
-            throw new MojoExecutionException("Unable to locate concepts input file '" + inputFile + "'");
+        
+        if (!new File(triplesFile).isFile()){
+            System.out.println("Unable to locate triples input file '" + triplesFile + "'");
+            System.exit(-1);
         }
+        
+        if ((conceptsFile != null) && !conceptsFile.isEmpty() && !new File(conceptsFile).isFile()){
+            System.out.println("Unable to locate concepts input file '" + conceptsFile + "'");
+            System.exit(-1);
+        }
+        if ((descriptionsFile != null) && !descriptionsFile.isEmpty() && !new File(descriptionsFile).isFile()){
+            System.out.println("Unable to locate descriptions input file '" + descriptionsFile + "'");
+            System.exit(-1);
+        }        
+        
+        if ((outputFile == null) || outputFile.isEmpty()){
+            System.out.println("Invalid parameter configuration");
+            System.exit(-1);
+        }
+
         try {
             new FileOutputStream(new File(outputFile));
         } catch (IOException e) {
-            throw new MojoExecutionException("Unable to write to output file '" + outputFile +"'. Check your permissions and path.");
+            System.out.println("Unable to write to output file '" + outputFile +"'. Check your permissions and path.");
+            System.exit(-1);
         }
+        
         if ((databaseLocation != null) && (!databaseLocation.isEmpty())){
             try {
                 new FileOutputStream(new File(databaseLocation));
             } catch (IOException e) {
-                throw new MojoExecutionException("Unable to write to database file '" + databaseLocation +"'. Check your permissions and path.");
+                System.out.println("Unable to write to database file '" + databaseLocation +"'. Check your permissions and path.");
+                System.exit(-1);
             }
-        } 
+        }
     }        
 }

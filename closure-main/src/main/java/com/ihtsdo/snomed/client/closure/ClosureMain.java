@@ -75,6 +75,7 @@ public class ClosureMain {
 //    }    
 
     public void closeDb(){
+        LOG.info("Closing database");
         //em.getTransaction().commit();
         emf.close();
     }
