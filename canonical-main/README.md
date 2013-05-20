@@ -4,7 +4,7 @@ IHTSDO Snomed Publication Tools
 Canonical Form
 --------------
 
-This program takes as an input 2 text files:
+This program takes as an input 2 text files in the [RF1 format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/rf1-format):
 
 1. Set of concepts of this form:
 
@@ -20,7 +20,7 @@ This program takes as an input 2 text files:
         100001029	280845004	116680003	280737002	0	0	0
         etc.
     
-and produces an output file called 'canonical form' of this form:
+and produces an output in [Canonical format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/canonical-format):
 
     CONCEPTID1  RELATIONSHIPTYPE	CONCEPTID2	RELATIONSHIPGROUP
     280844000	116680003	71737002	0
