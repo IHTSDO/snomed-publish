@@ -1,23 +1,26 @@
 IHTSDO Snomed Publication Tools
 ===============================
 
-Canonical Form Library
-----------------------
+Transitive Closure Library
+--------------------------
 
-This library provides an API for creating the canonical form of an ontology.
+This library provides an API for creating the transitive closure of an ontology's isA statements
 
-The API has a single method in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/snomed/canonical/CanonicalAlgorithm.java) with this signature:
+The API has a single method in class [TransitiveClosureAlgorithm](src/main/java/com/ihtsdo/snomed/service/TransitiveClosureAlgorithmm.java) with this signature:
 
-    public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds)
+    public void runAlgorithm(Collection<Concept> concepts, OntologySerialiser serialiser, EntityManager em)
 
-This method will generate the set of canonical form statements for a set of input concepts. 
+This method will generate all transitive closures for all isA statements for a set of input concepts. 
 
-If showDetails is true, and showDetailsConceptIds is null or empty, the method will log to info detailed information about the reasoning for each concept. WARNING! This could be a lot of data, so use with care. If showDetails is true, and showDetailsConceptIds contains one or more concept ids, the method will log detailed reasoning information for these concepts only.
+The transitive closures are written out to an outputfile using an [OntologySerialiser](/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/OntologySerialiser.java)
 
-Example usage:
+Example usage (Java 7):
 
-    Set<Statement> resultStatements = new CanonicalAlgorithm().runAlgorithm(concepts, false, null);
+    try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
+        new TransitiveClosureAlgorithm().runAlgorithm(concepts, SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw, em);
+    }
 
+Please note that this implementation relies on a JPA 2 [EntityManager](http://docs.oracle.com/javaee/6/api/javax/persistence/EntityManager.html), in order to improve performance.
 
 The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm).
 
