@@ -6,7 +6,7 @@ Canonical Form Maven Mojo Plugin
 
 This plugin project is a wrapper for the [transitive closure library](/closure), and makes it available as a [Maven Plugin](http://maven.apache.org/guides/mini/guide-configuring-plugins.html).
 
-The goal for this plugin is called 'generate-transitive-closure'
+The goal for this plugin is called 'generate-transitive-closure'.
 
 The configuration for this plugin looks like this:
 
@@ -21,6 +21,6 @@ The configuration for this plugin looks like this:
 
 For a description of these parameters, have a look at the documentation for the [runnable jar project](/closure-main). 
 
-For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats)
+For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats).
 
-The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format)
+The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format).
