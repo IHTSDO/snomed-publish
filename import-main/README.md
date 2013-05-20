@@ -30,3 +30,18 @@ with this database.properties configuration:
 
 produces this output
 
+    Connecting to database jdbc:mysql://localhost/snomed
+    Importing ontology "testing"
+    Populating concepts
+    Populated 399086 concepts
+    Completed concepts import in 202 seconds
+    Populating descriptions
+    Populated 1187334 descriptions
+    Completed descriptions import in 277 seconds
+    Populating statements
+    Populated 2359102 statements
+    Creating isA hierarchy
+    Created 733421 isA statements
+    Completed import in 1309 seconds
+    Closing database
+    Overall program completion in 1312 seconds
