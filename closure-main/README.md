@@ -10,8 +10,7 @@ This is the syntax:
 
     -h, --help          Print this help menu
     -t. --triples       File containing relationships
-    -c, --concepts      File containing concepts
-    -d, --descriptions  File containing descriptions
+    -c, --concepts      Optional. File containing concepts
     -f, --format        File format of input files. One of 'RF1', 'RF2', or 'CANONICAL'
     -o, --output        Destination file to write the transitive closure results to, in simple child-parent format
     -p, --pagesize      Optional. Number of concept records to handle in a single batch.
@@ -63,5 +62,3 @@ The output from the console will look something like this:
     Overall program completion in 245 seconds
 
 and the results would be stored in results.cp.
-
-
