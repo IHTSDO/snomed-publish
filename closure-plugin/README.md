@@ -23,4 +23,4 @@ For a description of these parameters, have a look at the documentation for the 
 
 For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats).
 
-The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format), which is a two-column layout of concept identifiers, where the second column values are simply the parent concepts of the first column values. 
+The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 
