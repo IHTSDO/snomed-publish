@@ -4,17 +4,10 @@ IHTSDO Snomed Publication Tools
 Transitive Closure 
 ------------------
 
-This program takes as an input a text file in RF2 format:
+Computes the transitive closure for the given input files, and saves the results out in simple child-parent format to the specified output file. 
 
-    id          effectiveTime	active  moduleId  sourceId   destinationId  relationshipGroup  typeId	  characteristicTypeId  modifierId
-    1000000021  20020731        0       9...008   255116009  367639000      0                  308489006  900000000000011006    9...002
-    100000028   20020131	1       9...008   280844000  71737002       0                  116680003  900000000000011006    9...002
-    
-and produces an output file called 'canonical form' of this form:
 
-    CONCEPTID1  RELATIONSHIPTYPE	CONCEPTID2	RELATIONSHIPGROUP
-    280844000	116680003	71737002	0
-    280845004	116680003	280737002	0
+
 
 The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm)
 
