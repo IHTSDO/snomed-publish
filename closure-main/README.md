@@ -6,14 +6,25 @@ Transitive Closure
 
 Computes the transitive closure for the given input files, and saves the results out in simple child-parent format to the specified output file. 
 
+This is the syntax:
 
+    -h, --help          Print this help menu
+    -t. --triples       File containing relationships
+    -c, --concepts      File containing concepts
+    -d, --descriptions  File containing descriptions
+    -f, --format        File format of input files. One of 'RF1', 'RF2', or 'CANONICAL'
+    -o, --output        Destination file to write the transitive closure results to, in simple child-parent format
+    -p, --pagesize      Optional. Number of concept records to handle in a single batch.
+                        A smaller page size requires less memory, but has poorer performance. Default it 450,000
+    -l, --location      Optional. Specify location of database file. If not specified, defaults to an in-memory database
+                        with increased memory requirements, but much imnproved performance and lower IO latency
 
+More details on the transitive closure library and algorithm can be [found here](/closure).
 
-The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm)
+When you run this program, you have the option of using either a disk based embedded database, or an in-memory database.
+The disk based database is slower to use, but has a smaller memory footprint. If you specify the --location parameter, a disk based database will be used, and the data will be stored in the file specified by this --location parameter. Not specifying the --location parameter forces the use of an in-memory database.
 
-When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
-The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
-3Gb of heap space ('-Xmx3000m').
+If you are having problems with running out of memory, perhaps especially if you are using the in-memory database on a large dataset, you may optionally specify a pagesize. A smaller pagesize forces a smaller batch size when retriving the concepts from the database, clearing the memory between batches. Please note that because concepts are self-referential, there are performance implications of specifying a pageSize smaller than the total number of concepts: This will lead to some concepts being retrieved more than once, and their transitive closure also to be computed more than once. But peak memory usage will be greatly reduced.
 
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
@@ -21,114 +32,36 @@ To build the distribution, enter the root project directory (on up from this fol
 
     mvn clean package
     
-The distribution jar file can be found at canonical/target/canonical.jar after this. No other file is required in order to run the program,
-and can be distributed as this single file.
+The distribution jar file can be found at closure-main/target/closure.jar after this. No other file is required in order to run the program, and can be distributed as this single file.
 
 For help on how to run the program, type:
 
-    java -jar canonical.jar -h
+    java -jar closure.jar -h
     
-You will then see this output:
+You will have to specify the maximum heap size when you run this program. How much you can allocate depends on how much RAM is avaiable, but we recommend setting this value fairly high, if possible. If you are wondering about memory requirements for your particular inputs, launch [>jconsole](http://docs.oracle.com/javase/6/docs/technotes/guides/management/jconsole.html) on the command line, and attach to the running closure process for more information. Memory requirements can be further reduced by following the instructions above for pageSize and location.
 
-    -h, --help      Print this help menu
-    -t. --triples   File containing all the relationships that you want to process, aka 'Relationships_Core'
-    -c, --concepts  File containing all the concepts referenced in the relationships file, aka 'Concepts_Core'
-    -o, --output    Destination file to write the canonical output results to
-    -d, --database  Optional. Specify location of database file. If not specified, 
-                    defaults to an in-memory database (minimum 3Gb of heap space required)
-    -s, --show      Optional. Show reasoning details for concept(s). 
-                    Either 'all' or a set of concept ids like '{c1id,c2id,etc.}'
-
-For example, to launch with an in-memory database, use this command:
-
-    java -Xmx3000m -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt
-
-Don't forget the '-Xmx=3000m' option, or the program will not complete. 
-
-Or, to launch with a disk backed database, you can use this command, requiring only a minimum amount of heap space:
-
-    java -jar -t relationships.input.file.txt -c concepts.input.file.txt -o canonical.out.txt -d /tmp/canonical.tmp.db
+Example usage:
     
+    java -Xmx10000m -jar target/closure.jar -t sct2_Relationship_Snapshot_INT_20120731.txt -f RF2 -o results.cp
+
 The output from the console will look something like this:
 
     Using an in-memory database
     Initialising database
-    Populating database
-    Populating concepts for ontology [LongForm(1)]
-    Populated [396109] concepts
-    Populating relationships for ontology [LongForm(1)]
-    Populated [1446149] relationships
+    Importing ontology "Transitive Closure Input"
+    Populating concepts
+    Populated 344928 concepts
+    Populating statements
+    Populated 2331543 statements
     Creating isA hierarchy
-    Created [539711] isA relationships
-    Completed import in 28 seconds
+    Created 723099 isA statements
+    Completed import in 81 seconds
     Running algorithm
-    Calculating immidiate primitive concepts
-    Found [434197] immidiate primitive concepts
-    Calculating unshared defining characteristics
-    Found [272177] unshared defining characteristics
-    Completed algorithm in 106 seconds with [706374] statements
-    Writing results to canonical.out.txt
-    Wrote 706376 lines
-    Closing database
-    Overall program completion in 154 seconds
+    Running concept batch with pagesize 450000
+    Batch completed in 156 seconds
+    Completed algorithm in 156 seconds with 344928 concepts
+    Overall program completion in 245 seconds
 
-and the results would be stored in canonical.out.txt, as specified above.
-
-For determining the reasoning for why particular concept(s) exists in the canonical output, the program has an optional
-switch to display the reasoning behind that concept's inclusion/exclusion. By specifying
-    
-    -s {conceptid1, conceptid2, etc.}
-  
-the program will print detailed reasoning information like this
-
-    Using an in-memory database
-    Initialising database
-    Populating database
-    Populating concepts for ontology [LongForm(1)]
-    Populated [396109] concepts
-    Populating relationships for ontology [LongForm(1)]
-    Populated [1446149] relationships
-    Creating isA hierarchy
-    Created [539711] isA relationships
-    Completed import in 28 seconds
-    Running algorithm
-    Calculating immidiate primitive concepts
-    
-    Attempting to find all proximal primitive isKindOf concepts for concept 229395005
-    All primitive super concepts for concept 229395005 are {229392008, 243120004, 229373006, 229391001, 138875005, 229390000, 71388002}
-    Found that concept 229392008 isA concept 243120004
-    Since concept 229392008 isA concept 243120004, concept 243120004 is not an proximal isA for concept 229395005
-    Found that concept 229392008 isA concept 229373006
-    Since concept 229392008 isA concept 229373006, concept 229373006 is not an proximal isA for concept 229395005
-    ...
-    Found that concept 229395005 has proximal primitive isA concept(s) of {229392008}
-    
-    Found [434197] immidiate primitive concepts
-    Calculating unshared defining characteristics
-    
-    Attempting to find all unshared defining characteristics for concept [229395005]
-    Relationships for concept [229395005] are {[1467951023: 229395005(260870009)272125009 type:1], [3364178029: 229395005(260686004)129409008 type:0], [3364177023: 229395005(405813007)127863007 type:0], [100000000146834: 229395005(116680003)229392008 type:0], [39411024: 229395005(116680003)229392008 type:0]}
-    Testing for existence of relationship [3364178029] in parent primitive concepts
-    Concept [229395005] has a primitive parent concept of [229392008]
-    Found that parent concept [229392008] has relationship [100000000146831: 229392008(116680003)229391001 type:0]
-    Found that parent concept [229392008] has relationship [1467945029: 229392008(260870009)272125009 type:1]
-    Found that parent concept [229392008] has relationship [39405021: 229392008(116680003)229391001 type:0]
-    Found that parent concept [229392008] has relationship [3467953022: 229392008(260686004)129409008 type:0]
-    Found that relationship under test [3364178029: 229395005(260686004)129409008 type:0] is also defined in parent concept as [3467953022: 229392008(260686004)129409008 type:0]
-    Removing statement [[3364178029: 229395005(260686004)129409008 type:0]] from output because parent concept [229392008] has defined relationship [[3467953022: 229392008(260686004)129409008 type:0]]
-    ...
-    Found that concept 229395005 has defining characteristic relationships {[3364177023: 229395005(405813007)127863007 type:0], [100000000146834: 229395005(116680003)229392008 type:0], [39411024: 229395005(116680003)229392008 type:0]}
-    
-    Found [272177] unshared defining characteristics
-    Completed algorithm in 86 seconds with [706374] statements
-    Writing results to canonical.out.txt
-    Wrote 706376 lines
-    Closing database
+and the results would be stored in results.cp.
 
 
-Please note that there exists also a 'nuclear' option of where you can specify
-
-    -s all
-    
-**WARNING!** This option will print detailed reasoning information for each and every concept/triple in the inputs, 
-and dump about 8Gb (!) of text to your console. Please use carefully.
