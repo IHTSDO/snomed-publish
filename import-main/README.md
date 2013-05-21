@@ -6,6 +6,8 @@ Database Import
 
 Utility for importing an ontology to a database, e.g. for use with the web application.
 
+This is the syntax:
+
     -h, --help          Print this help menu
     -t. --triples       File containing relationships
     -c, --concepts      File containing concepts
@@ -13,6 +15,18 @@ Utility for importing an ontology to a database, e.g. for use with the web appli
     -f, --format        File format of input files. One of 'RF1', 'RF2', 'CANONICAL', or 'CHILD_PARENT'
     -n, --name          Ontology name
     -p, --properties    Properties file with database configuration
+    
+You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
+
+To build the distribution, enter the root project directory (on up from this folder) and type:
+
+    mvn clean package
+    
+The distribution jar file can be found at import-main/target/import.jar after this. No other file is required in order to run the program, and can be distributed as this single file.
+
+For help on how to run the program, type:
+
+    java -jar import.jar -h
     
 Sample configuration
     
