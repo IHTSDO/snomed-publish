@@ -16,9 +16,9 @@ Utility for importing an ontology to a database, e.g. for use with the web appli
     
 Sample configuration
     
-    java -Xmx6000m -jar target/import.jar -t sct2_Relationship_Snapshot_INT_20130731.txt 
-    -d sct2_Description_Snapshot-en_INT_20130731.txt -c sct2_Concept_Snapshot_INT_20130731.txt 
-    -f RF2 -n testing -p src/main/resources/database.properties
+    java -Xmx6000m -jar target/import.jar --triples sct2_Relationship_Snapshot_INT_20130731.txt 
+    --descriptions sct2_Description_Snapshot-en_INT_20130731.txt --concepts sct2_Concept_Snapshot_INT_20130731.txt 
+    --format RF2 --name testing --properties src/main/resources/database.properties
     
 with this database.properties configuration:
 
