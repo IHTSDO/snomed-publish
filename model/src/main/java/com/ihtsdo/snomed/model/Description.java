@@ -1,5 +1,9 @@
 package com.ihtsdo.snomed.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +18,10 @@ import com.google.common.primitives.Longs;
 @Entity
 public class Description {
     
+    private static final int RF1_PREFERRED_TERM_ID = 1;
+    private static final int RF1_UNSPECIFIED_ID = 0;
+    private static final int RF1_SYNONYM_ID = 2;
+    private static final int RF1_FULLY_SPECIFIED_NAME_ID = 3;
     //SHARED
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
@@ -46,6 +54,33 @@ public class Description {
     public Description(){}
     public Description(long serialisedId){this.serialisedId = serialisedId;}
 
+    public boolean isFullySpecifiedName(){
+        if (getOntology().isRf2()){
+            return CoreMetadataConcepts.isFullySpecifiedName(type);
+        }else{
+            return descriptionTypeId == RF1_FULLY_SPECIFIED_NAME_ID;
+        }
+    }
+    
+    public boolean isSynonym(){
+        if (getOntology().isRf2()){
+            return CoreMetadataConcepts.isSynonym(getType());
+        }else{
+            return getDescriptionTypeId() == RF1_SYNONYM_ID;
+        }
+    }
+    
+    public boolean isUnSpecified(){
+        return getDescriptionTypeId() == RF1_UNSPECIFIED_ID;
+    }
+    
+    public boolean isPreferredTerm(){
+        return getDescriptionTypeId() == RF1_PREFERRED_TERM_ID;
+    }
+    
+    public Date getParsedEffectiveTime() throws ParseException{
+        return new SimpleDateFormat("yyyymmdd").parse(Long.toString(effectiveTime));
+    }
     
     @Override
     public String toString() {
@@ -62,8 +97,8 @@ public class Description {
                 .add("effectiveTime(rf2)", getEffectiveTime())
                 .add("active(rf2)", isActive())
                 .add("type(rf2)", getType() == null ? null : getType().getSerialisedId())
-                .add("caseSignificance(rf2)", getCaseSignificance())
-                .add("module(rf2)", getModule())
+                .add("caseSignificance(rf2)", getCaseSignificance() == null ? null : getCaseSignificance().getSerialisedId())
+                .add("module(rf2)", getModule() == null ? null : getModule().getSerialisedId())
                 .toString();
     }
     

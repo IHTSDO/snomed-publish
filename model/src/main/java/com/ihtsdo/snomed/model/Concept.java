@@ -1,6 +1,9 @@
 
 package com.ihtsdo.snomed.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,6 +11,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.service.InconsistentOntologyException;
 
 /**
  * @author henrikpettersen
@@ -51,6 +56,14 @@ public class Concept {
     private Set<Concept> allActiveKindOfCache;
     @XmlTransient @Transient 
     private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
+    @Transient
+    private Description preferredTerm;
+    @Transient
+    private Set<Description> synonyms;
+    @Transient 
+    private Set<Description> unspecifiedDescriptions;
+    @Transient
+    private Set<Description> fullySpecifiedNameDescriptions;
 
     
     //SHARED
@@ -61,7 +74,7 @@ public class Concept {
     @XmlTransient
     @OneToOne 
     private Ontology ontology;
-    @OneToMany(mappedBy="about")  
+    @OneToMany(mappedBy="about", fetch=FetchType.EAGER)  
     private Set<Description> description;
     
     //RF1
@@ -74,7 +87,7 @@ public class Concept {
     private int statusId = -1;
 
     
-    //RF2 
+    //RF2
     private long effectiveTime;
     @Column(columnDefinition = "BIT", length = 1) 
     private boolean active;
@@ -121,7 +134,7 @@ public class Concept {
                 .add("id", getId())
                 .add("serialisedId", getSerialisedId())
                 .add("ontology", getOntology() == null ? null : getOntology().getId())
-                .add("description", getDescription())
+                .add("descriptions", getDescription() == null ? 0 : getDescription().size())
                 .add("statusId(rf1)", getStatusId())
                 .add("fullySpecifiedName(rf1)", getFullySpecifiedName())
                 .add("ctv3id(rf1)", getCtv3id())
@@ -129,8 +142,8 @@ public class Concept {
                 .add("primitive(rf1)", isPrimitive())
                 .add("effectiveTime(rf2)", getEffectiveTime())
                 .add("active(rf2)", isActive())
-                .add("status(rf2)", getStatus() == null ? null : getStatus())
-                .add("module(rf2)", getModule() == null ? null : getModule())
+                .add("status(rf2)", getStatus() == null ? null : getStatus().getSerialisedId())
+                .add("module(rf2)", getModule() == null ? null : getModule().getSerialisedId())
                 .toString();
     }
     
@@ -148,8 +161,119 @@ public class Concept {
             }
         }
         return false;
-    }    
+    }
     
+    @Transient
+    private String rf2DisplayNameCache; 
+    
+    public String getDisplayName(){
+        if (getOntology().isRf2()){
+            if (rf2DisplayNameCache == null){
+                Set<Description> activeFsns = new HashSet<>();
+                for (Description d : getDescription()){
+                    if (d.isFullySpecifiedName() && d.isActive()){
+                        activeFsns.add(d);
+                    }
+                }
+                if (activeFsns.size() > 1){
+                    throw new InconsistentOntologyException();
+                }
+                rf2DisplayNameCache = activeFsns.iterator().next().getTerm();
+
+            }
+            return rf2DisplayNameCache;
+        }
+        else{
+            return getFullySpecifiedName();
+        }
+    }
+    
+    @Transient
+    private String shortDisplayNameCache;
+    
+    public String getShortDisplayName(){
+        if (shortDisplayNameCache == null){
+            shortDisplayNameCache = getDisplayName().trim();
+            if (shortDisplayNameCache.contains("core metadata concept")){
+                shortDisplayNameCache = shortDisplayNameCache.substring(0, shortDisplayNameCache.lastIndexOf('('));
+            }
+            if (shortDisplayNameCache.contains(" concept definition status")){
+                shortDisplayNameCache = shortDisplayNameCache.substring(0, shortDisplayNameCache.indexOf(" concept definition status"));
+            }
+            if (shortDisplayNameCache.trim().endsWith(" module")){
+                shortDisplayNameCache = shortDisplayNameCache.substring(0, shortDisplayNameCache.indexOf(" module"));
+            }
+        }
+        return shortDisplayNameCache;
+    }
+    
+//    public Description getPreferredTerm(){
+//        if (preferredTerm == null){
+//            for (Description d : getDescription()){
+//                if (d.isPreferredTerm()){
+//                    preferredTerm = d;
+//                    break;
+//                }
+//            }
+//        }
+//        return preferredTerm;
+//    }
+//    
+//    public Set<Description> getSynonyms(){
+//        if (synonyms == null){
+//            synonyms = new HashSet<>();
+//            for (Description d : getDescription()){
+//                if (d.isSynonym()){
+//                    synonyms.add(d);
+//                }
+//            }
+//        }
+//        return synonyms;
+//    }
+//    
+//    public String getDisplayName(){
+//        if (getOntology().isRf2()){
+//            Set<Description> activeFullySpecifiedNames = new HashSet<>();
+//            for (Description d : getFullySpecifiedNameDescriptions()){
+//                
+//            }
+//            
+//            return (getFullySpecifiedNameDescriptions() == null) || getFullySpecifiedNameDescriptions().isEmpty() ? 
+//                    "fully specified name not found" : 
+//                    getFullySpecifiedNameDescriptions().iterator().next().getTerm();
+//        }else if (getPreferredTerm() == null){
+//            return getFullySpecifiedName();
+//        }
+//        else{
+//            return getPreferredTerm().getTerm();
+//        }
+//    }
+//
+//    
+//    public Set<Description> getUnspecifiedDescriptions(){
+//        if (unspecifiedDescriptions == null){
+//            unspecifiedDescriptions = new HashSet<>();
+//            for (Description d : getDescription()){
+//                if (d.isUnSpecified()){
+//                    unspecifiedDescriptions.add(d);
+//                }
+//            }
+//        }
+//        return unspecifiedDescriptions;
+//    }
+//
+//    public Set<Description> getFullySpecifiedNameDescriptions(){
+//        if (fullySpecifiedNameDescriptions == null){
+//            fullySpecifiedNameDescriptions = new HashSet<>();
+//            for (Description d : getDescription()){
+//                if (d.isFullySpecifiedName()){
+//                    fullySpecifiedNameDescriptions.add(d);
+//                }
+//            }
+//        }
+//        return fullySpecifiedNameDescriptions;
+//    }
+//    
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
         if (useCache && (allKindOfPrimitiveCache != null)){
             if (LOG.isDebugEnabled()){
@@ -260,7 +384,11 @@ public class Concept {
             }
         }
         return group; 
-    }    
+    }
+    
+    public Date getParsedEffectiveTime() throws ParseException{
+        return new SimpleDateFormat("yyyymmdd").parse(Long.toString(effectiveTime));
+    }
 
     /*
      * Generated Getters and Setters

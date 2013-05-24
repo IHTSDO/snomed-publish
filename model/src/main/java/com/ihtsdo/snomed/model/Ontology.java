@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,6 +16,12 @@ import com.google.common.base.Objects;
 
 @Entity(name="Ontology")
 public class Ontology {
+    
+    public enum Source{
+        RF1, RF2, CANONICAL, CHILD_PARENT, UNKNOWN;
+    }    
+
+    
     @Transient
     @XmlTransient 
     private Concept isKindOfPredicate;
@@ -25,6 +32,9 @@ public class Ontology {
     
     private String name;
 
+    @Enumerated
+    private Source source = Source.UNKNOWN;
+    
     @OneToMany(mappedBy="ontology")
     private Set<Statement> statements;
 
@@ -38,6 +48,7 @@ public class Ontology {
     public String toString() {
         return Objects.toStringHelper(this).
                 add("id", getId()).
+                add("source", getSource()).
                 add("name", getName()).
                 add("statements", getStatements() == null ? 0 : getStatements().size()).
                 add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
@@ -65,7 +76,15 @@ public class Ontology {
 
     public void setIsKindOfPredicate(Concept isKindOfPredicate) {
         this.isKindOfPredicate = isKindOfPredicate;
-    }    
+    } 
+    
+    public boolean isRf1(){
+        return source.equals(Source.RF1);
+    }
+    
+    public boolean isRf2(){
+        return source.equals(Source.RF2);
+    }        
 
     /*
      * Generated Getters and Setters
@@ -113,5 +132,13 @@ public class Ontology {
 
     public void setDescriptions(Set<Description> descriptions) {
         this.descriptions = descriptions;
+    }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
     }  
 }

@@ -11,13 +11,20 @@
         http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <!-- Declare a datasource that has pooling capabilities -->
+<!--     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" -->
+<!--         destroy-method="close" -->
+<!--         p:driverClass="org.h2.Driver" p:jdbcUrl="jdbc:h2:file:/tmp/snomed-db;DB_CLOSE_ON_EXIT=FALSE" -->
+<!--         p:user="sa" p:password="" -->
+<!--         p:acquireIncrement="5" p:idleConnectionTestPeriod="60" p:maxPoolSize="100" -->
+<!--         p:maxStatements="1000" p:maxStatementsPerConnection="100" p:minPoolSize="10" /> -->
+
+
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
         destroy-method="close"
-        p:driverClass="org.h2.Driver" p:jdbcUrl="jdbc:h2:file:/tmp/snomed-db;DB_CLOSE_ON_EXIT=FALSE"
-        p:user="sa" p:password=""
+        p:driverClass="com.mysql.jdbc.Driver" p:jdbcUrl="jdbc:mysql://localhost/snomed"
+        p:user="root" p:password=""
         p:acquireIncrement="5" p:idleConnectionTestPeriod="60" p:maxPoolSize="100"
         p:maxStatements="1000" p:maxStatementsPerConnection="100" p:minPoolSize="10" />
-
 
     <!-- Declare a JPA entityManagerFactory -->
     <bean id="entityManagerFactory"

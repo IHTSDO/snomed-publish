@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.browse;
 
 
+
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(locations={
 //        "classpath:applicationContext.xml", 
@@ -10,7 +11,7 @@ package com.ihtsdo.snomed.browse;
 public class MainControllerTest{
     
 //    @Autowired private MainController mainController;
-//    @PersistenceContext private EntityManager em;
+//    @PersistenceContext(unitName="testHibernatePersistenceUnit") private EntityManager em;
 //    private MockMvc mockMvc;
 //
 //    @Before
@@ -20,6 +21,17 @@ public class MainControllerTest{
     
 //    @Transactional
 //    @Test
+//    public void test(){
+//        Concept concept = em.createQuery("SELECT c FROM Concept c " + 
+//        //        "JOIN FETCH c.subjectOfStatements " + 
+//          //      "JOIN FETCH c.predicateOfStatements " + 
+//            //    "JOIN FETCH c.objectOfStatements " + 
+//                "WHERE c.serialisedId=" + 138875005 + 
+//                " AND c.ontology.id=" + 1, 
+//                Concept.class).getSingleResult();
+//        
+//        System.out.println(concept.toString());
+    }
 //    public void shouldDeleteOntology() throws Exception {
 //  
 //        Ontology o = new Ontology();
@@ -33,4 +45,4 @@ public class MainControllerTest{
 //        o = em.find(Ontology.class, 1l);
 //        assertNull(o);
 //    }
-}
+//}

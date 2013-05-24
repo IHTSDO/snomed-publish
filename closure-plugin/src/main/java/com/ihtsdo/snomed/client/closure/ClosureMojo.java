@@ -36,13 +36,12 @@ import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
 
-@Mojo(name="generate-canonical")
+@Mojo(name="generate-transitive-closure")
 public class ClosureMojo extends AbstractMojo{
     private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
     
     @Parameter String conceptsFile;
     @Parameter String triplesFile;
-    @Parameter String descriptionsFile;
     @Parameter String parserType;
     @Parameter String outputFile;
     @Parameter int pageSize;
@@ -83,14 +82,15 @@ public class ClosureMojo extends AbstractMojo{
             
             Ontology o = null;
             HibernateParser hibParser = HibernateParserFactory.getParser(Parser.valueOf(parserType));
-            if (descriptionsFile != null){
-                o = hibParser.populateDbWithDescriptions(
-                        DEFAULT_ONTOLOGY_NAME, 
-                        new FileInputStream(conceptsFile), 
-                        new FileInputStream(triplesFile), 
-                        new FileInputStream(descriptionsFile), 
-                        em);
-            } else if (conceptsFile != null){
+//            if (descriptionsFile != null){
+//                o = hibParser.populateDbWithDescriptions(
+//                        DEFAULT_ONTOLOGY_NAME, 
+//                        new FileInputStream(conceptsFile), 
+//                        new FileInputStream(triplesFile), 
+//                        new FileInputStream(descriptionsFile), 
+//                        em);
+//            } else 
+                if (conceptsFile != null){
                 o = hibParser.populateDb(
                         DEFAULT_ONTOLOGY_NAME, 
                         new FileInputStream(conceptsFile), 
@@ -188,11 +188,11 @@ public class ClosureMojo extends AbstractMojo{
             System.out.println("Unable to locate concepts input file '" + conceptsFile + "'");
             System.exit(-1);
         }
-        if ((descriptionsFile != null) && !descriptionsFile.isEmpty() && !new File(descriptionsFile).isFile()){
-            System.out.println("Unable to locate descriptions input file '" + descriptionsFile + "'");
-            System.exit(-1);
-        }        
-        
+//        if ((descriptionsFile != null) && !descriptionsFile.isEmpty() && !new File(descriptionsFile).isFile()){
+//            System.out.println("Unable to locate descriptions input file '" + descriptionsFile + "'");
+//            System.exit(-1);
+//        }        
+//        
         if ((outputFile == null) || outputFile.isEmpty()){
             System.out.println("Invalid parameter configuration");
             System.exit(-1);

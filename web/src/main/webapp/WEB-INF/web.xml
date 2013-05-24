@@ -31,26 +31,26 @@
     </listener>
 
 
-<!--     <filter> -->
-<!--         <filter-name>OpenEntityManagerInViewFilter</filter-name> -->
-<!--         <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class> -->
-<!--         <init-param> -->
-<!--             <param-name>singleSession</param-name> -->
-<!--             <param-value>true</param-value> -->
-<!--         </init-param> -->
-<!--         <init-param> -->
-<!--             <param-name>flushMode</param-name> -->
-<!--             <param-value>AUTO</param-value> -->
-<!--         </init-param> -->
-<!--         <init-param> -->
-<!--             <param-name>entityManagerFactoryBeanName</param-name> -->
-<!--             <param-value>entityManagerFactory</param-value> -->
-<!--         </init-param>         -->
-<!--     </filter> -->
-<!--     <filter-mapping> -->
-<!--         <filter-name>OpenEntityManagerInViewFilter</filter-name> -->
-<!--         <url-pattern>/browse/*</url-pattern> -->
-<!--     </filter-mapping> -->
+    <filter>
+        <filter-name>OpenEntityManagerInViewFilter</filter-name>
+        <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
+        <init-param>
+            <param-name>singleSession</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>flushMode</param-name>
+            <param-value>AUTO</param-value>
+        </init-param>
+        <init-param>
+            <param-name>entityManagerFactoryBeanName</param-name>
+            <param-value>entityManagerFactory</param-value>
+        </init-param>        
+    </filter>
+    <filter-mapping>
+        <filter-name>OpenEntityManagerInViewFilter</filter-name>
+        <url-pattern>/browse/*</url-pattern>
+    </filter-mapping>
 
     <!-- <security-constraint> -->
     <!-- <display-name>authorizedUsers</display-name> -->

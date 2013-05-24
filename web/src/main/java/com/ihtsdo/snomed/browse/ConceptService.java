@@ -3,9 +3,11 @@ package com.ihtsdo.snomed.browse;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +23,38 @@ public class ConceptService {
     @PersistenceContext
     EntityManager em;
     
+    //TypedQuery<Concept> getConceptQuery;
+    
+    @PostConstruct
+    public void init(){
+//        getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
+//                "LEFT JOIN FETCH c.subjectOfStatements " +
+//                "LEFT JOIN FETCH c.predicateOfStatements " + 
+//                "LEFT JOIN FETCH c.kindOfs " + 
+//                "LEFT JOIN FETCH c.objectOfStatements " + 
+//                "LEFT JOIN FETCH c.parentOf " +
+//                "LEFT JOIN FETCH c.description " +
+//                "WHERE c.serialisedId=:serialisedId AND c.ontology.id=:ontologyId", 
+//                Concept.class);
+    }
+    
     @Transactional
     public Concept getConcept(long serialisedId, long ontologyId) throws ConceptNotFoundException{
         try {
-            return em.createQuery("SELECT c FROM Concept c  JOIN FETCH c.subjectOfStatements, c.predicateOfStatements, c.objectOfStatements WHERE c.serialisedId=" + serialisedId + " AND c.ontology.id=" + ontologyId, Concept.class).getSingleResult();
+            TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
+                    "LEFT JOIN FETCH c.subjectOfStatements " +
+                    "LEFT JOIN FETCH c.predicateOfStatements " + 
+                    "LEFT JOIN FETCH c.objectOfStatements " +
+                    //"LEFT JOIN FETCH c.kindOfs " + 
+                    //"LEFT JOIN FETCH c.parentOf " +
+                    "LEFT JOIN FETCH c.description " +
+                    "WHERE c.serialisedId=:serialisedId AND c.ontology.id=:ontologyId", 
+                    Concept.class);
+            getConceptQuery.setParameter("serialisedId", serialisedId);
+            getConceptQuery.setParameter("ontologyId", ontologyId);
+            Concept c = getConceptQuery.getSingleResult();
+            c.getAllKindOfConcepts(true); //build the cache
+            return c;
         } catch (NoResultException e) {
             throw new ConceptNotFoundException(serialisedId, ontologyId);
         }
@@ -61,7 +91,7 @@ public class ConceptService {
         @Override
         public int compare(Statement r1, Statement r2) {
             if (r1.getGroupId() == r2.getGroupId()){
-                return r1.getSubject().getFullySpecifiedName().compareTo(r2.getSubject().getFullySpecifiedName());
+                return r1.getSubject().getDisplayName().compareTo(r2.getSubject().getDisplayName());
             }
             else{
                 return Ints.compare(r1.getGroupId(), r2.getGroupId());
@@ -73,7 +103,7 @@ public class ConceptService {
         @Override
         public int compare(Statement r1, Statement r2) {
             if (r1.getGroupId() == r2.getGroupId()){
-                return r1.getPredicate().getFullySpecifiedName().compareTo(r2.getPredicate().getFullySpecifiedName());
+                return r1.getPredicate().getDisplayName().compareTo(r2.getPredicate().getDisplayName());
             }
             else{
                 return Ints.compare(r1.getGroupId(), r2.getGroupId());

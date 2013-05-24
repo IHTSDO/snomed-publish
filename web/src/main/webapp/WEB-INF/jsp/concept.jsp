@@ -29,8 +29,7 @@ function changeOntology(value) {
 </script>
 </head>
 <body>
-  <div id="heading" class="clearfix">
-    <div id="ontology">
+    <div id="ontology" class="clearfix">
       <form>
         <select onchange="changeOntology(this.value)">
           <c:forEach var="o" items="${ontologies}">
@@ -39,23 +38,23 @@ function changeOntology(value) {
         </select>
       </form>
     </div>
-    <h2>${type}</h2>
-    <h1>${fullySpecifiedName}</h1>
+  <div id="heading" class="clearfix">
+    <h1>${displayName} <c:if test="${type!=null}"><span class="type">(${type})</span></c:if></h1>
     <div class="properties">
         <div class="ids">[${concept.getSerialisedId()}, ${concept.getCtv3id()}, ${concept.getSnomedId()}]</div>
         <span class="primitive"><c:out value="${concept.isPrimitive() ? 'Primitive' : 'Not primitive'}" /></span>, 
-        <span class="status">Status <c:out value="${concept.getStatus()}"/></span>
+        <span class="status">Status <c:out value="${concept.getStatusId()}"/></span>
     </div>
   </div>
   
-  <!-- SUBJECT OF -->
+  <!-- VALUE OF -->
   <c:if test="${!subjectOf.isEmpty()}">
-    <h3 class="top triples">Subject of</h3>  
+    <h3 class="top triples">Value of</h3>  
     <table class="triples">
       <tr>
-        <th>Statement</th>
-        <th>Role</th>
-        <th>Object</th>
+        <th>Triple</th>
+        <th>Attribute</th>
+        <th>Value</th>
         <th></th>
       </tr>
       <c:set var="lastGroup" value="-1"/>
@@ -67,17 +66,22 @@ function changeOntology(value) {
           </td>
           <td class="concept left">
             <c:set var="showConcept" value="${r.getPredicate()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="concept right">
             <c:set var="showConcept" value="${r.getObject()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
             <c:if test="${r.getGroupId() != lastGroup}" >
-              Group <c:out value="${r.getGroupId()}"/>
+              <c:choose>
+                  <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                <c:otherwise>
+                  Group <c:out value="${r.getGroupId()}"/>
+                </c:otherwise>
+              </c:choose>
               <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
@@ -91,9 +95,9 @@ function changeOntology(value) {
     <h3 class="triples">Object of</h3>  
     <table class="triples">
       <tr>
-        <th class="statement">Statement</th>
-        <th class="concept left">Subject</th>
-        <th class="concept right">Role</th>
+        <th class="statement">Triple</th>
+        <th class="concept left">Object</th>
+        <th class="concept right">Attribute</th>
         <th class="group"></th>
       </tr>
       <c:set var="lastGroup" value="-1"/>
@@ -105,17 +109,22 @@ function changeOntology(value) {
           </td>
           <td class="concept left">
             <c:set var="showConcept" value="${r.getSubject()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="concept right">
             <c:set var="showConcept" value="${r.getPredicate()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
             <c:if test="${r.getGroupId() != lastGroup}" >
-              Group <c:out value="${r.getGroupId()}"/>
+              <c:choose>
+                  <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                <c:otherwise>
+                  Group <c:out value="${r.getGroupId()}"/>
+                </c:otherwise>
+              </c:choose>
               <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
@@ -126,12 +135,12 @@ function changeOntology(value) {
     
   <!-- PREDICATE OF -->
   <c:if test="${!predicateOf.isEmpty()}">
-    <h3 class="triples">Predicate of</h3>  
+    <h3 class="triples">Attribute of</h3>  
     <table class="triples">
       <tr>
-        <th>Statement</th>
-        <th>Subject</th>
+        <th>Triple</th>
         <th>Object</th>
+        <th>Value</th>
         <th></th>
       </tr>
       <c:set var="lastGroup" value="-1"/>
@@ -143,17 +152,22 @@ function changeOntology(value) {
           </td>
           <td class="concept left">
             <c:set var="showConcept" value="${r.getSubject()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="concept right">
             <c:set var="showConcept" value="${r.getObject()}" />
-            <c:set var="name" value="${showConcept.getFullySpecifiedName()}"/>
+            <c:set var="name" value="${showConcept.getDisplayName()}"/>
             <%@include file="entity.jsp"%>          
           </td>
           <td class="group">
             <c:if test="${r.getGroupId() != lastGroup}" >
-              Group <c:out value="${r.getGroupId()}"/>
+              <c:choose>
+                  <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                <c:otherwise>
+                  Group <c:out value="${r.getGroupId()}"/>
+                </c:otherwise>
+              </c:choose>
               <c:set var="lastGroup" value="${r.getGroupId()}"/>
             </c:if>
           </td>
@@ -169,11 +183,11 @@ function changeOntology(value) {
         <div class="concept">
           <c:set var="showConcept" value="${c}" />
           <c:choose>
-            <c:when test="${c.getFullySpecifiedName().length() < 85}">
-              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            <c:when test="${c.getDisplayName().length() < 85}">
+              <c:set var="name" value="${c.getDisplayName()}"/>
             </c:when>
             <c:otherwise>
-              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+              <c:set var="name" value="${c.getDisplayName().substring(0,81).trim()}${'...'}"/>
             </c:otherwise>
           </c:choose>          
           <%@include file="entity.jsp"%>
@@ -189,11 +203,11 @@ function changeOntology(value) {
         <div class="concept">
           <c:set var="showConcept" value="${c}" />
           <c:choose>
-            <c:when test="${c.getFullySpecifiedName().length() < 85}">
-              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            <c:when test="${c.getDisplayName().length() < 85}">
+              <c:set var="name" value="${c.getDisplayName()}"/>
             </c:when>
             <c:otherwise>
-              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+              <c:set var="name" value="${c.getDisplayName().substring(0,81).trim()}${'...'}"/>
             </c:otherwise>
           </c:choose>
           <%@include file="entity.jsp"%>
@@ -210,11 +224,11 @@ function changeOntology(value) {
         <div class="concept">
           <c:set var="showConcept" value="${c}" />
           <c:choose>
-            <c:when test="${c.getFullySpecifiedName().length() < 85}">
-              <c:set var="name" value="${c.getFullySpecifiedName()}"/>
+            <c:when test="${c.getDisplayName().length() < 85}">
+              <c:set var="name" value="${c.getDisplayName()}"/>
             </c:when>
             <c:otherwise>
-              <c:set var="name" value="${c.getFullySpecifiedName().substring(0,81).trim()}${'...'}"/>
+              <c:set var="name" value="${c.getDisplayName().substring(0,81).trim()}${'...'}"/>
             </c:otherwise>
           </c:choose>          
           <%@include file="entity.jsp"%>

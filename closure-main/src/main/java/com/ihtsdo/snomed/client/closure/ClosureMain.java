@@ -38,7 +38,6 @@ public class ClosureMain {
     
     private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
     public static final int DEFAULT_PAGE_SIZE = 450000;
-
     
     private   EntityManagerFactory emf              = null;
     private   EntityManager em                      = null;
@@ -91,28 +90,35 @@ public class ClosureMain {
 
 
     public void runProgram(File conceptsFile, File triplesFile,
-            File descriptionsFile, Parser type, File outputFile,
+            //File descriptionsFile, 
+            Parser type, File outputFile,
             int pageSize, String dbLocation) throws IOException 
     {
         try {
             initDb(dbLocation);
-            
             Ontology o = null;
             HibernateParser hibParser = HibernateParserFactory.getParser(type);
-            if (descriptionsFile != null){
-                o = hibParser.populateDbWithDescriptions(
-                        DEFAULT_ONTOLOGY_NAME, 
-                        new FileInputStream(conceptsFile), 
-                        new FileInputStream(triplesFile), 
-                        new FileInputStream(descriptionsFile), 
-                        em);
-            } else if (conceptsFile != null){
+            
+           //statement + description: not implemented
+//            if (descriptionsFile != null){
+//                //statement + concept + description
+//                //not really required. Algorithm no longer need descriptions file
+//                o = hibParser.populateDbWithDescriptions(
+//                        DEFAULT_ONTOLOGY_NAME, 
+//                        new FileInputStream(conceptsFile), 
+//                        new FileInputStream(triplesFile), 
+//                        new FileInputStream(descriptionsFile), 
+//                        em);
+//            } else 
+            if (conceptsFile != null){
+                //statement + concept
                 o = hibParser.populateDb(
                         DEFAULT_ONTOLOGY_NAME, 
                         new FileInputStream(conceptsFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
+                //statement
                 o = hibParser.populateDbFromStatementsOnly(
                         DEFAULT_ONTOLOGY_NAME, 
                         new FileInputStream(triplesFile), 

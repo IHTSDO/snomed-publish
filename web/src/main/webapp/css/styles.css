@@ -9,19 +9,16 @@ h1,h2,h3{
 h1{
     margin: 0; 
     float: left;
-    width: 75%; 
     font-weight: normal;
     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
 }
-h2{
-    margin: 0 0 0.5em 0;
-    font-size: 1.25em;
-    font-weight: normal;
-    clear: both;
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
+
+h1 span.type {
+    font-size: 0.75em;
 }
+
 h3{
-   margin: 1em 0;
+   margin: 2em 0 1em;
 }
 
 .properties{
@@ -32,40 +29,101 @@ h3{
     width: 40em;
 }
 .concept .properties{
-    font-size: 0.8em;
-    margin: 0.25em 0 0;
+    font-size: 0.5em;
+    margin: 0.5em 0 0;
+}
+
+
+/*GLOBAL HEADING*/
+#global{
+    margin-top: 1em;
+}
+
+h2{
+    margin: 0;
+    float: left;
+    font-size: 1.5em;
+    color: lightgrey;
+    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
+}
+
+#ontology{
+    float: right;
 }
 
 /* HEADING */
 #heading{
-    padding-bottom: 2em;
+    padding: 1em 0;
 }
-#heading #ontology{
-    margin: 0 0 1em 0;
-    float: right;
-}
+
 #heading .properties{
-    text-align: right;
-    padding-top: 0.8em;
+    clear: both;
+    padding-top: 0.5em;
 }
 #heading .properties .ids{
     margin: 0 0 0.25em 0;
 }
 
+span.show-hide{
+    float: right;
+    font-size: 0.75em;
+    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
+}
+span.show-hide a{
+    text-decoration: none;
+    
+}
+
+table.descriptions{
+    display: block;
+}
+
+/* DESCRIPTIONS TABLE */
+table.descriptions td.isactive{
+    width: 2em;
+    padding-top: 0.2em
+}
+
+table.descriptions td.id{
+
+}
+
+table.descriptions td.type{
+    color: grey;
+    padding: 0 2em;
+}
+
+table.descriptions tr{
+    line-height: 1.5em;
+}
+
+table.descriptions td.id span.popup .line{
+    line-height: 1.75em;
+    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
+}
+
+table.descriptions td.id span.popup .title{
+    float: left;
+    width: 7em;
+    font-weight: bold;
+}
+table.descriptions td.id span.popup .value{
+    float: left;
+        
+}
 
 /* TRIPLES TABLE */
 table{
     width: 100%;
     border-collapse: collapse;
     float: left;
-    margin-bottom: 3em;
 }
 table th{
-    font-weight: normal;
+    font-weight: bold;
     text-align: left;
     padding: 0 0 0.5em 0.2em;
 }
-table td{
+table.triples td{
     vertical-align: top;
     padding: 0.25em;    
 }
@@ -156,6 +214,55 @@ table.triples tr.group-9 {background-color: #F2D649;}
    clear: both;
 }
 
+
+
+.tooltip {
+    outline:none; 
+}
+.tooltip strong {
+    line-height:30px;
+}
+.tooltip:hover {
+    text-decoration:none;
+} 
+.tooltip span {
+    z-index:10;
+    display:none; 
+    padding:7px 10px;
+    margin-top:-30px; 
+    margin-left:28px;
+    width:auto; 
+    line-height:16px;
+}
+.tooltip:hover span{
+    display:inline; 
+    position:absolute; 
+    color:#111;
+    border:1px solid #DCA; 
+    background:#fffAF0;
+}
+.callout {
+    z-index:20;
+    position:absolute;
+    top:30px;
+    border:0;
+    left:-12px;
+}
+.tooltip span
+{
+    border-radius:4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+        
+    -moz-box-shadow: 5px 5px 8px #CCC;
+    -webkit-box-shadow: 5px 5px 8px #CCC;
+    box-shadow: 5px 5px 8px #CCC;
+}
+
+
+
+
+
 /* MOUSEOVER TOOLTIP */
 a.tooltip {
     outline:none; 
@@ -220,4 +327,84 @@ body#notfound h1{
 body#notfound span{
     font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
     font-weight: bold;
+}
+.circle {
+    border-radius: 50% 50% 50% 50%;
+    display: inline-block;
+}
+
+.small{
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+}
+
+.large{
+    width: 15px;
+    height: 15px;
+    margin-right: 10px;
+    margin-top: 6px;
+    float: left;
+}
+
+.inactive {
+    background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, #FF6666 0%, red 100%, yellow 5%);
+    background-image: -webkit-radial-gradient(45px 45px, circle cover, #FF6666, red);
+    background-image: radial-gradient(45px 45px 45deg, circle cover, #FF6666 0%, red 100%, yellow 5%);
+    border: 1px solid red;
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+}
+
+.active {
+    background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, lightgreen 0%, green 100%, blue 5%);
+    background-image: -webkit-radial-gradient(45px 45px, circle cover, lightgreen, green);
+    background-image: radial-gradient(45px 45px 45deg, circle cover, lightgreen 0%, green 100%, blue 5%);
+    border: 1px solid green;
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+}
+
+.id{
+    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+}
+
+.description.popup .properties{
+    width: 100%;
+    clear: both;
+}
+
+.description.popup .properties .property{
+    float: left;
+    width: 100%;
+    clear: both;
+}
+
+.description.popup .properties .property .title{
+    float: left;
+    width: 10em;
+}
+
+.description.popup .properties .property .value{
+    float: left;
+}
+
+body#description-details .properties{
+    width: 100%;
+    clear: both;
+}
+
+body#description-details .properties .property{
+    float: left;
+    width: 100%;
+    clear: both;
+}
+
+body#description-details .properties .property .title{
+    float: left;
+    width: 10em;
+}
+
+body#description-details .properties .property .value{
+    float: left;
 }
