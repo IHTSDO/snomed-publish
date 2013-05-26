@@ -46,37 +46,51 @@ function changeOntology(value) {
 </script>
 </head>
 <body>
-  <div id="global" class="clearfix">
-    <h2>Concept</h2>
-    <div id="ontology">
-      <form>
-        <select onchange="changeOntology(this.value)">
-          <c:forEach var="o" items="${ontologies}">
-            <option ${o.getId()==ontologyId ? "selected=\"selected\"" : ""} value="<c:out value="${o.getId()}"/>"><c:out value="${o.getName()}"/></option>
-          </c:forEach>
-        </select>
-      </form>
+  <div id="company" class="clearfix">
+    <img class="logo" src="/img/logo.symbol.png"/>
+    <h1>IHTSDOs SNOMED Clinical Terms</h1>
+    <div id="global-navigation">
+      <div id="ontology">
+        <form>
+          <select onchange="changeOntology(this.value)">
+            <c:forEach var="o" items="${ontologies}">
+              <option ${o.getId()==ontologyId ? "selected=\"selected\"" : ""} value="<c:out value="${o.getId()}"/>"><c:out value="${o.getName()}"/></option>
+            </c:forEach>
+          </select>
+        </form>
+      </div>
+      <div id="find-concept">
+          <form onsubmit="location.href=document.getElementById('conceptid').value; return false;">
+              <button type="submit">Go</button>
+              <input type="text" id="conceptid" value="${concept.getSerialisedId()}"></input>
+          </form>          
+      </div>
     </div>
   </div>
+  <div id="global" class="clearfix">
+    <h2><a href="<c:url value="${concept.getModule().getSerialisedId()}"/>"><c:out value="${concept.getModule().getShortDisplayName()}"/></a></h2>
+  </div>
   <div id="heading" class="clearfix">
-    <c:choose>
-      <c:when test="${concept.isActive()}">
-        <div class="circle active large tooltip">
-          <span class="popup">Active</span>
-        </div>
-      </c:when>
-      <c:otherwise>
-        <div class="circle inactive large tooltip">
-          <span class="popup">Inactive</span>
-        </div>
-      </c:otherwise>
-    </c:choose>
-    <h1>${displayName} <c:if test="${type!=null}"><span class="type">(${type})</span></c:if></h1>
+    <div class="title">
+      <h1>${displayName} <c:if test="${type!=null}"><span class="type">(${type})</span></c:if></h1>
+      <c:choose>
+        <c:when test="${concept.isActive()}">
+            <div class="active tooltip left id">
+                <div class="number">${concept.getSerialisedId()}</div>
+                <span class="popup">Active</span>
+          </div>
+        </c:when>
+        <c:otherwise>
+            <div class="inactive tooltip left id">
+                <div class="number">${concept.getSerialisedId()}</div>
+                <span class="popup">Inactive</span>
+            </div>
+        </c:otherwise>
+      </c:choose> 
+    </div>
     <div class="properties">
-        <div class="ids">[${concept.getSerialisedId()}]</div> 
-        <div class="effectiveTime">Effective: <fmt:formatDate value="${concept.getParsedEffectiveTime()}" type="DATE" dateStyle="LONG" /></div> 
-        <span class="status" style="float:left;">Status: <a href="<c:url value="${concept.getStatus().getSerialisedId()}"/>"><c:out value="${concept.getStatus().getShortDisplayName()}"/></a></span>
-        <span class="module" style="float:left;clear:both;"/>Module: <a href="<c:url value="${concept.getModule().getSerialisedId()}"/>"><c:out value="${concept.getModule().getShortDisplayName()}"/></a></span>
+        <div class="status"><a href="<c:url value="${concept.getStatus().getSerialisedId()}"/>">(<c:out value="${concept.getStatus().getShortDisplayName()}"/>)</a></div>
+        <div class="effectiveTime"><fmt:formatDate value="${concept.getParsedEffectiveTime()}" type="DATE" dateStyle="LONG" /></div> 
     </div>
   </div>
   
@@ -105,7 +119,7 @@ function changeOntology(value) {
                   </c:otherwise>
                 </c:choose>
               </td>
-              <td class="id">
+              <td class="id" style="width: <c:choose><c:when test='${d.isStupidSerialisedId()}'>11</c:when><c:otherwise>6</c:otherwise></c:choose>em;">
                 <%@include file="description.identifier.rf2.jsp"%>
               </td>
               <td class="type">

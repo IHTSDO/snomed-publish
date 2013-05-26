@@ -53,6 +53,13 @@ public class Description {
     
     public Description(){}
     public Description(long serialisedId){this.serialisedId = serialisedId;}
+    
+    public boolean isStupidSerialisedId(){
+        if (getSerialisedId() > 900000000000000000l){
+            return true;
+        }
+        return false;
+    }
 
     public boolean isFullySpecifiedName(){
         if (getOntology().isRf2()){

@@ -3,6 +3,22 @@ body{
     padding: 0 2em;
     font-size: 0.8em;
 }
+
+#company{
+    padding: 1em 0;
+}
+
+#company h1{
+    float: left;
+    font-weight: bold;
+    padding: 0.6em 0 0 0.75em;
+}
+
+#company img.logo{
+    float: left;
+    height: 4em;
+}
+
 h1,h2,h3{
     font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;     
 }
@@ -17,6 +33,23 @@ h1 span.type {
     font-size: 0.75em;
 }
 
+.title .id{
+    float: right;    
+}
+
+.title .id .number{
+    font-size: 1.75em;
+    font-weight: bold;
+    padding-top: 0.25em;
+}
+
+.title .id.active .number{
+    color: green;
+}
+.title .id.inactive .number{
+    color: red;
+}
+
 h3{
    margin: 2em 0 1em;
 }
@@ -25,6 +58,7 @@ h3{
     font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
     font-weight: 100;
 }
+
 .concept{
     width: 40em;
 }
@@ -41,28 +75,61 @@ h3{
 
 h2{
     margin: 0;
-    float: left;
     font-size: 1.5em;
-    color: lightgrey;
     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
+    padding-bottom: 0.25em;
 }
 
-#ontology{
+h2 a{
+    text-decoration: none;
+    color: lightgrey;
+}
+
+#global-navigation{
     float: right;
 }
 
+#ontology{
+
+}
+
+#find-concept{
+    padding-top: 0.5em;
+}
+
+#find-concept input{
+    float: right;
+}
+
+#find-concept button{
+    float: right;
+    margin: 0.3em 0 0 0.5em;
+}
+
 /* HEADING */
-#heading{
-    padding: 1em 0;
+
+#heading h1{
+    
 }
 
 #heading .properties{
     clear: both;
-    padding-top: 0.5em;
+    padding-top: 0.25em;
 }
-#heading .properties .ids{
-    margin: 0 0 0.25em 0;
+
+#heading .properties .effectiveTime{
+    color: grey;
+    float: right;
 }
+
+#heading .properties .status{
+    float: left;
+}
+
+#heading .properties .status a{
+    text-decoration: none;
+}
+
 
 span.show-hide{
     float: right;
@@ -85,12 +152,14 @@ table.descriptions td.isactive{
 }
 
 table.descriptions td.id{
-
+ 
+    
 }
 
 table.descriptions td.type{
     color: grey;
     padding: 0 2em;
+    padding-left: 2em;
 }
 
 table.descriptions tr{
@@ -99,17 +168,15 @@ table.descriptions tr{
 
 table.descriptions td.id span.popup .line{
     line-height: 1.75em;
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
 }
 
 table.descriptions td.id span.popup .title{
     float: left;
-    width: 7em;
-    font-weight: bold;
+    width: 8em;
+    font-weight: bold;    
 }
 table.descriptions td.id span.popup .value{
     float: left;
-        
 }
 
 /* TRIPLES TABLE */
@@ -215,40 +282,55 @@ table.triples tr.group-9 {background-color: #F2D649;}
 }
 
 
-
-.tooltip {
+/* TOOLTIP */
+*.tooltip {
     outline:none; 
 }
-.tooltip strong {
+*.tooltip strong {
     line-height:30px;
 }
-.tooltip:hover {
+*.tooltip:hover {
     text-decoration:none;
 } 
-.tooltip span {
+*.tooltip span {
     z-index:10;
     display:none; 
-    padding:7px 10px;
+    padding:10px 15px;
     margin-top:-30px; 
     margin-left:28px;
     width:auto; 
     line-height:16px;
 }
-.tooltip:hover span{
+
+*.tooltip:hover span{
     display:inline; 
     position:absolute; 
     color:#111;
     border:1px solid #DCA; 
     background:#fffAF0;
 }
+
+*.tooltip.left span{
+    margin-top:-50px;
+}
+
+*.tooltip.left:hover span{
+    margin-left: -5.5em;
+    padding-top: -20em;
+}
+
+*.inactive.tooltip.left:hover span{
+    margin-left: -6em;
+}
+
 .callout {
     z-index:20;
-    position:absolute;
+    
     top:30px;
     border:0;
     left:-12px;
 }
-.tooltip span
+*.tooltip span
 {
     border-radius:4px;
     -moz-border-radius: 4px;
@@ -264,48 +346,48 @@ table.triples tr.group-9 {background-color: #F2D649;}
 
 
 /* MOUSEOVER TOOLTIP */
-a.tooltip {
-    outline:none; 
-}
-a.tooltip strong {
-    line-height:30px;
-}
-a.tooltip:hover {
-    text-decoration:none;
-} 
-a.tooltip span {
-    z-index:10;
-    display:none; 
-    padding:14px 20px;
-    margin-top:-30px; 
-    margin-left:28px;
-    width:auto; 
-    line-height:16px;
-}
-a.tooltip:hover span{
-    display:inline; 
-    position:absolute; 
-    color:#111;
-    border:1px solid #DCA; 
-    background:#fffAF0;
-}
-.callout {
-    z-index:20;
-    position:absolute;
-    top:30px;
-    border:0;
-    left:-12px;
-}
-a.tooltip span
-{
-    border-radius:4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
+/* a.tooltip { */
+/*     outline:none;  */
+/* } */
+/* a.tooltip strong { */
+/*     line-height:30px; */
+/* } */
+/* a.tooltip:hover { */
+/*     text-decoration:none; */
+/* }  */
+/* a.tooltip span { */
+/*     z-index:10; */
+/*     display:none;  */
+/*     padding:14px 20px; */
+/*     margin-top:-30px;  */
+/*     margin-left:28px; */
+/*     width:auto;  */
+/*     line-height:16px; */
+/* } */
+/* a.tooltip:hover span{ */
+/*     display:inline;  */
+/*     position:absolute;  */
+/*     color:#111; */
+/*     border:1px solid #DCA;  */
+/*     background:#fffAF0; */
+/* } */
+/* .callout { */
+/*     z-index:20; */
+/*     position:absolute; */
+/*     top:30px; */
+/*     border:0; */
+/*     left:-12px; */
+/* } */
+/* a.tooltip span */
+/* { */
+/*     border-radius:4px; */
+/*     -moz-border-radius: 4px; */
+/*     -webkit-border-radius: 4px; */
         
-    -moz-box-shadow: 5px 5px 8px #CCC;
-    -webkit-box-shadow: 5px 5px 8px #CCC;
-    box-shadow: 5px 5px 8px #CCC;
-}
+/*     -moz-box-shadow: 5px 5px 8px #CCC; */
+/*     -webkit-box-shadow: 5px 5px 8px #CCC; */
+/*     box-shadow: 5px 5px 8px #CCC; */
+/* } */
 
 body#notfound{
     padding: 0;
@@ -347,7 +429,7 @@ body#notfound span{
     float: left;
 }
 
-.inactive {
+.circle.inactive {
     background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, #FF6666 0%, red 100%, yellow 5%);
     background-image: -webkit-radial-gradient(45px 45px, circle cover, #FF6666, red);
     background-image: radial-gradient(45px 45px 45deg, circle cover, #FF6666 0%, red 100%, yellow 5%);
@@ -356,7 +438,7 @@ body#notfound span{
     box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
 }
 
-.active {
+.circle.active {
     background-image: -moz-radial-gradient(45px 45px 45deg, circle cover, lightgreen 0%, green 100%, blue 5%);
     background-image: -webkit-radial-gradient(45px 45px, circle cover, lightgreen, green);
     background-image: radial-gradient(45px 45px 45deg, circle cover, lightgreen 0%, green 100%, blue 5%);

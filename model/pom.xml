@@ -23,5 +23,11 @@
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <version>${hibernate-jpa-2.version}</version>
         </dependency>
+        <!-- Commons Lang -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>        
     </dependencies>
 </project>

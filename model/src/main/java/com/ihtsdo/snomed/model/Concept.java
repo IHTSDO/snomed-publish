@@ -26,6 +26,7 @@ import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,9 +201,15 @@ public class Concept {
             if (shortDisplayNameCache.contains(" concept definition status")){
                 shortDisplayNameCache = shortDisplayNameCache.substring(0, shortDisplayNameCache.indexOf(" concept definition status"));
             }
-            if (shortDisplayNameCache.trim().endsWith(" module")){
+            shortDisplayNameCache = shortDisplayNameCache.trim();
+            if (shortDisplayNameCache.endsWith(" module")){
                 shortDisplayNameCache = shortDisplayNameCache.substring(0, shortDisplayNameCache.indexOf(" module"));
             }
+            if (shortDisplayNameCache.startsWith("SNOMED CT ")){
+                shortDisplayNameCache = shortDisplayNameCache.substring(10, shortDisplayNameCache.length());
+                shortDisplayNameCache = WordUtils.capitalize(shortDisplayNameCache);
+            }
+            
         }
         return shortDisplayNameCache;
     }
