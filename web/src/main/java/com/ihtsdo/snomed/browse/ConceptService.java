@@ -62,36 +62,44 @@ public class ConceptService {
     
     @Transactional
     public void populateStatementsForView(Concept c, List<Statement> objectOf,
-            List<Statement> predicateOf, List<Statement> subjectOf) {
-        for (Statement r : c.getObjectOfStatements()){
-            if (!r.isKindOfStatement()){
-                objectOf.add(r);
-            }
-        }
-        Collections.sort(objectOf, byGroupAndSubjectFsn.nullsLast());
-        
-        
-        for (Statement r : c.getSubjectOfStatements()){
-            if (!r.isKindOfStatement()){
-                subjectOf.add(r);
-            }
-        }
-        Collections.sort(subjectOf, byGroupAndPredicateFsn.nullsLast());
-        
-
-        for (Statement r : c.getPredicateOfStatements()){
-            if (!r.isKindOfStatement()){
-                predicateOf.add(r);
-            }
-        }
-        Collections.sort(predicateOf, byGroupAndSubjectFsn.nullsLast());
+            List<Statement> predicateOf, List<Statement> subjectOf) 
+    {
+//        for (Statement r : c.getObjectOfStatements()){
+//            if (!r.isKindOfStatement()){
+//                objectOf.add(r);
+//            }
+//        }
+        objectOf.addAll(c.getObjectOfStatements());
+        Collections.sort(objectOf, byGroupActiveAndSubjectFsn.nullsLast());
+//        for (Statement r : c.getSubjectOfStatements()){
+//            if (!r.isKindOfStatement()){
+//                subjectOf.add(r);
+//            }
+//        }
+        subjectOf.addAll(c.getSubjectOfStatements());
+        Collections.sort(subjectOf, byGroupActiveAndPredicateFsn.nullsLast());
+//        for (Statement r : c.getPredicateOfStatements()){
+//            if (!r.isKindOfStatement()){
+//                predicateOf.add(r);
+//            }
+//        }
+        predicateOf.addAll(c.getPredicateOfStatements());
+        Collections.sort(predicateOf, byGroupActiveAndSubjectFsn.nullsLast());
     }  
     
-    private Ordering<Statement> byGroupAndSubjectFsn = new Ordering<Statement>() {
+
+    
+    private Ordering<Statement> byGroupActiveAndSubjectFsn = new Ordering<Statement>() {
         @Override
         public int compare(Statement r1, Statement r2) {
             if (r1.getGroupId() == r2.getGroupId()){
-                return r1.getSubject().getDisplayName().compareTo(r2.getSubject().getDisplayName());
+                if ((r1.isActive() && r2.isActive()) || (!r1.isActive() && !r2.isActive())){
+                    return r1.getSubject().getDisplayName().compareTo(r2.getSubject().getDisplayName());
+                }else if (r1.isActive()){
+                    return -1;
+                }else{
+                    return 1;
+                }
             }
             else{
                 return Ints.compare(r1.getGroupId(), r2.getGroupId());
@@ -99,11 +107,17 @@ public class ConceptService {
         }
     };
     
-    private Ordering<Statement> byGroupAndPredicateFsn = new Ordering<Statement>() {
+    private Ordering<Statement> byGroupActiveAndPredicateFsn = new Ordering<Statement>() {
         @Override
         public int compare(Statement r1, Statement r2) {
             if (r1.getGroupId() == r2.getGroupId()){
-                return r1.getPredicate().getDisplayName().compareTo(r2.getPredicate().getDisplayName());
+                if ((r1.isActive() && r2.isActive()) || (!r1.isActive() && !r2.isActive())){
+                    return r1.getPredicate().getDisplayName().compareTo(r2.getPredicate().getDisplayName());
+                }else if (r1.isActive()){
+                    return -1;
+                }else{
+                    return 1;
+                }
             }
             else{
                 return Ints.compare(r1.getGroupId(), r2.getGroupId());

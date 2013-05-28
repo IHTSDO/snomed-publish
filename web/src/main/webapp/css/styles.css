@@ -1,7 +1,8 @@
 body{
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
+    font-family: "proxima-nova-1","proxima-nova-2",sans-serif;
+  
     padding: 0 2em;
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
 
 #company{
@@ -10,8 +11,12 @@ body{
 
 #company h1{
     float: left;
-    font-weight: bold;
-    padding: 0.6em 0 0 0.75em;
+    font-weight: normal;
+    padding: 0.3em 0 0 0.75em;
+    font-size: 2em;
+/*     font-family: "cooper-black-std-1","cooper-black-std-2"; */
+  font-family: "click-clack-1","click-clack-2",serif;
+
 }
 
 #company img.logo{
@@ -21,17 +26,20 @@ body{
 
 h1,h2,h3{
     font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;     
+/*     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;   */
+
 }
 h1{
     margin: 0; 
     float: left;
     font-weight: normal;
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
+/*     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;   */
 }
 
 h1 span.type {
     font-size: 0.75em;
 }
+
 
 .title .id{
     float: right;    
@@ -40,7 +48,7 @@ h1 span.type {
 .title .id .number{
     font-size: 1.75em;
     font-weight: bold;
-    padding-top: 0.25em;
+    padding-top: 0.15em;
 }
 
 .title .id.active .number{
@@ -51,22 +59,47 @@ h1 span.type {
 }
 
 h3{
-   margin: 2em 0 1em;
+    margin: 2em 0 1em;
 }
 
+
+
+.triples h3{
+   margin-bottom: 0;
+   position: relative;
+   z-index: 8;
+}
+
+.triples .section{
+    position: relative;
+    top: -1.2em;
+}
+
+.section.bottom{
+    
+/*     position: absolute; */
+}
+
+
+
 .properties{
-    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+/*     font-family: "source-code-pro-1","source-code-pro-2",sans-serif; */
     font-weight: 100;
 }
 
 .concept{
-    width: 40em;
+    width: 35em;
 }
 .concept .properties{
-    font-size: 0.5em;
-    margin: 0.5em 0 0;
+    font-size: 0.8em;
+    margin: 0;
+    float: left;
+    clear: both;
 }
 
+a{
+    text-decoration: none;
+}
 
 /*GLOBAL HEADING*/
 #global{
@@ -76,7 +109,7 @@ h3{
 h2{
     margin: 0;
     font-size: 1.5em;
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;  
+/*     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;   */
     padding-bottom: 0.25em;
 }
 
@@ -94,11 +127,13 @@ h2 a{
 }
 
 #find-concept{
-    padding-top: 0.5em;
+    padding-top: 0.25em;
 }
 
 #find-concept input{
     float: right;
+    width: 11.5em;
+    text-align: right;
 }
 
 #find-concept button{
@@ -114,12 +149,14 @@ h2 a{
 
 #heading .properties{
     clear: both;
-    padding-top: 0.25em;
 }
 
 #heading .properties .effectiveTime{
     color: grey;
     float: right;
+/*       font-family: "anonymous-pro-1","anonymous-pro-2",sans-serif; */
+  font-family: "futura-pt-1","futura-pt-2",sans-serif;
+    
 }
 
 #heading .properties .status{
@@ -134,7 +171,7 @@ h2 a{
 span.show-hide{
     float: right;
     font-size: 0.75em;
-    font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;
+/*     font-family: "ff-tisa-web-pro-1","ff-tisa-web-pro-2", Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif; */
 }
 span.show-hide a{
     text-decoration: none;
@@ -158,109 +195,156 @@ table.descriptions td.id{
 
 table.descriptions td.type{
     color: grey;
-    padding: 0 2em;
-    padding-left: 2em;
+    width: 5.5em;
+    padding-left: 1.5em;
+}
+
+table.descriptions td.term{
+    
 }
 
 table.descriptions tr{
     line-height: 1.5em;
 }
 
-table.descriptions td.id span.popup .line{
-    line-height: 1.75em;
-}
 
-table.descriptions td.id span.popup .title{
-    float: left;
-    width: 8em;
-    font-weight: bold;    
-}
-table.descriptions td.id span.popup .value{
-    float: left;
-}
 
 /* TRIPLES TABLE */
 table{
     width: 100%;
-    border-collapse: collapse;
+    border-spacing: 0;
     float: left;
 }
 table th{
-    font-weight: bold;
+    font-weight: normal;
     text-align: left;
     padding: 0 0 0.5em 0.2em;
 }
-table.triples td{
+.triples table td{
     vertical-align: top;
     padding: 0.25em;    
 }
-table.triples td.statement{
-    font-size: 0.8em;
-    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+.triples table td.isactive{
+    width: 2em;
+    padding-top: 0.4em;
+}
+.triples table td.statement{
+    width: 4.5em;
+}
+.triples table td.statement .number{
+    font-size: 0.75em;
     font-weight: 200;
-    padding: 0.55em 0 0 0.5em;
+    float: left;
+}
+
+
+.triples table td.statement a{
+    float: left
+}
+
+
+.triples table td.statement span.popup .title{
+    float: left;
     width: 7em;
 }
-table.triples td.statement span.popup .title{
-    float: left;
-    width: 8em;
-}
-table.triples td.statement span.popup .value{
+.triples table td.statement span.popup .value{
     float: left;
 }
-table.triples td.group{
+.triples table td.group{
     text-align: right;
     font-size: 0.8em;
-    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+/*     font-family: "source-code-pro-1","source-code-pro-2",sans-serif; */
     font-weight: 200;
-    padding: 0.5em;
+    padding-right: 1em;
+    padding-top: 1em;
     width: 4em;
 }
+.triples table td.group.top{
+    padding-top: 0;
+}
 
-/* Adobe Kuler - Heirloom one */
-table.triples tr.group-0 {background-color: #C7B773;}
-table.triples tr.group-1 {background-color: #E3DB9A;}
-table.triples tr.group-2 {background-color: #F5FCD0;}
-table.triples tr.group-3 {background-color: #B1C2B3;}
-table.triples tr.group-4 {background-color: #778691;}
+.triples .circle{
+    margin-left: 1em; 
+}
+
+/* ROUNDED CORNERS */
+.triples table tr:first-child td:first-child{
+    border-top-left-radius: 12px;
+}
+.triples table tr:first-child td:last-child{
+    border-top-right-radius: 12px;
+}
+.triples table tr:last-child td:first-child{
+    border-bottom-left-radius: 12px;
+}
+.triples table tr:last-child td:last-child{
+    border-bottom-right-radius: 12px;
+}
+.triples table tr:first-child td{
+    padding-top: 1em;
+}
+.triples table tr:first-child td.statement{
+    padding-top: 1.2em;
+}
+.triples table tr:last-child td{
+    padding-bottom: 1em;
+}
+.triples table td.statement{
+    padding-top: 0.45em;    
+}
+.triples table tr:first-child td.isactive{
+    padding-top: 1.15em;
+}
+.triples table tr:first-child td.group{
+    padding-top: 1em;
+}
+
+/* COLORS */
+
+/*  Kuler - Heirloom one */
+.triples table tr.group-0 td {background-color: #C7B773;}
+.triples table tr.group-1 td {background-color: #E3DB9A;}
+.triples table tr.group-2 td {background-color: #F5FCD0;}
+.triples table tr.group-3 td {background-color: #B1C2B3;}
+.triples table tr.group-4 td {background-color: #778691;}
 
 /* Adobe Kuler - Hidden in the crowd */
-table.triples tr.group-5 {background-color: #7BB2A3;}
-table.triples tr.group-6 {background-color: #8EAD79;}
-table.triples tr.group-7 {background-color: #ADB064;}
-table.triples tr.group-8 {background-color: #E0D867;}
-table.triples tr.group-9 {background-color: #161616;}
+.triples table tr.group-5 td {background-color: #7BB2A3;}
+.triples table tr.group-6 td {background-color: #8EAD79;}
+.triples table tr.group-7 td {background-color: #ADB064;}
+.triples table tr.group-8 td {background-color: #E0D867;}
+.triples table tr.group-9 td {background-color: #161616;}
 
 /* and one extra */
-table.triples tr.group-9 {background-color: #F2D649;}
+.triples table tr.group-10 {background-color: #F2D649;}
 
 
 /* Adobe Kuler - Vintage beach  */
-/* .line.group-0 {background-color: #B89A7B;} */
-/* .line.group-1 {background-color: #9BBAAC;} */
-/* .line.group-2 {background-color: #F2D649;} */
-/* .line.group-3 {background-color: #D95D50;} */
-/* .line.group-4 {background-color: #DBDBDB;} */
+/* .triples table tr.group-0 {background-color: #B89A7B;} */
+/* .triples table tr.group-1 {background-color: #9BBAAC;} */
+/* .triples table tr.group-2 {background-color: #F2D649;} */
+/* .triples table tr.group-3 {background-color: #D95D50;} */
+/* .triples table tr.group-4 {background-color: #DBDBDB;} */
 
 /* Adobe Kuler - Pleasant  */
-/* .line.group-0 {background-color: #8C7F56;} */
-/* .line.group-1 {background-color: #CCAB72;} */
-/* .line.group-2 {background-color: #D3DBA7;} */
-/* .line.group-3 {background-color: #D8F5BD;} */
-/* .line.group-4 {background-color: #FFF9F1;} */
+/* .triples table tr.group-0 {background-color: #8C7F56;} */
+/* .triples table tr.group-1 {background-color: #CCAB72;} */
+/* .triples table tr.group-2 {background-color: #D3DBA7;} */
+/* .triples table tr.group-3 {background-color: #D8F5BD;} */
+/* .triples table tr.group-4 {background-color: #FFF9F1;} */
 
 /* My original one */
-/* .line.group-0 {background-color: #C4FFD7;} */
-/* .line.group-1 {background-color: #FEFFEB;} */
-/* .line.group-2 {background-color: #F0EBFF;} */
-/* .line.group-3 {background-color: #FFE0E0;} */
-/* .line.group-4 {background-color: #7979FC;} */
-/* .line.group-5 {background-color: #FF4845;} */
-/* .line.group-6 {background-color: #5445FF;} */
-/* .line.group-7 {background-color: #45FF54;} */
-/* .line.group-8 {background-color: #FF45E9;} */
-/* .line.group-9 {background-color: #45FFFF;} */
-/* .line.group-10 {background-color: #F9FF45;} */
+/* .triples table tr.group-0 {background-color: #C4FFD7;} */
+/* .triples table tr.group-1 {background-color: #FEFFEB;} */
+/* .triples table tr.group-2 {background-color: #F0EBFF;} */
+/* .triples table tr.group-3 {background-color: #FFE0E0;} */
+/* .triples table tr.group-4 {background-color: #7979FC;} */
+/* .triples table tr.group-5 {background-color: #FF4845;} */
+/* .triples table tr.group-6 {background-color: #5445FF;} */
+/* .triples table tr.group-7 {background-color: #45FF54;} */
+/* .triples table tr.group-8 {background-color: #FF45E9;} */
+/* .triples table tr.group-9 {background-color: #45FFFF;} */
+/* .triples table tr.group-10 {background-color: #F9FF45;} */
 
 /* HIERARCHY */
 .hierarchy .concept{
@@ -272,6 +356,14 @@ table.triples tr.group-9 {background-color: #F2D649;}
     overflow: hidden;
 }
 
+.hierarchy .concept.inactive{
+    color:red;
+}
+
+/* .hierarchy .concept.inactive a{ */
+/*     color:red; */
+/* } */
+
 /* CLEARFIX */
 .clearfix:after { 
    content: "."; 
@@ -281,11 +373,80 @@ table.triples tr.group-9 {background-color: #F2D649;}
    clear: both;
 }
 
-
 /* TOOLTIP */
+
+/* .description.popup .properties{ */
+/*     width: 100%; */
+/*     clear: both; */
+/* } */
+
+/* .description.popup .properties .property{ */
+/*     float: left; */
+/*     width: 100%; */
+/*     clear: both; */
+/* } */
+
+/* .description.popup .properties .property .title{ */
+/*     float: left; */
+/*     width: 10em; */
+/* } */
+
+/* .description.popup .properties .property .value{ */
+/*     float: left; */
+/* } */
+
+span.popup .line{
+    line-height: 1.75em;
+    clear: both;
+}
+
+span.popup .title{
+    float: left;
+    width: 6em;
+    font-weight: bold;    
+}
+.concept span.popup .line .title{
+    width: 5em;
+}
+
+.concept span.popup .line .value{
+    width: auto;
+}
+
+.statement span.popup .line .title{
+    width: 4.5em;
+}
+
+.statement span.popup .line .value{
+    width: auto;
+}
+
+.descriptions a{
+    text-decoration: none;
+}
+
+.concept *.tooltip span, .statement *.tooltip span {
+
+}
+
+.tooltip .circle{
+    bottom: 5px;
+    float: right;
+    left: 10px;
+    position: relative;
+}
+
+span.popup .value{
+    float: left;
+}
+
 *.tooltip {
     outline:none; 
 }
+.tooltip a{
+    float: left;
+}
+
 *.tooltip strong {
     line-height:30px;
 }
@@ -295,11 +456,33 @@ table.triples tr.group-9 {background-color: #F2D649;}
 *.tooltip span {
     z-index:10;
     display:none; 
-    padding:10px 15px;
-    margin-top:-30px; 
-    margin-left:28px;
+    padding:12px 18px;
+    margin-top:-38px; 
+    margin-left:20px;
     width:auto; 
     line-height:16px;
+    font-family: "futura-pt-1","futura-pt-2",sans-serif;
+    font-size: 0.9em;
+}
+
+.descriptions *.tooltip span{
+    margin-top: -36px;
+}
+
+.isactive .tooltip span{
+    padding:4px 10px 5px;
+    font-family: "futura-pt-1","futura-pt-2",sans-serif;
+    margin-left: 18px;
+    margin-top: -32px;
+}
+
+.statement .tooltip span{
+    margin-top: -50px;
+    margin-left: 17px;    
+}
+
+#heading .isactive .tooltip span{
+    right: 175px;
 }
 
 *.tooltip:hover span{
@@ -308,10 +491,13 @@ table.triples tr.group-9 {background-color: #F2D649;}
     color:#111;
     border:1px solid #DCA; 
     background:#fffAF0;
+    border-radius: 10px 10px 10px 10px;
 }
 
+
+
 *.tooltip.left span{
-    margin-top:-50px;
+    margin-top:-54px;
 }
 
 *.tooltip.left:hover span{
@@ -325,25 +511,47 @@ table.triples tr.group-9 {background-color: #F2D649;}
 
 .callout {
     z-index:20;
-    
     top:30px;
     border:0;
     left:-12px;
 }
 *.tooltip span
 {
-    border-radius:4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-        
     -moz-box-shadow: 5px 5px 8px #CCC;
     -webkit-box-shadow: 5px 5px 8px #CCC;
     box-shadow: 5px 5px 8px #CCC;
 }
 
+.tooltip.arrow span:after, .tooltip.arrow span:before {
+    right: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.tooltip.arrow span:after {
+    border-color: rgba(255, 250, 240, 0);
+    border-right-color: #fffAF0;
+    border-width: 10px;
+    top: 50%;
+    margin-top: -10px;
+}
+.tooltip.arrow span:before {
+    border-color: rgba(221, 204, 170, 0);
+    border-right-color: #DCA;
+    border-width: 11px;
+    top: 50%;
+    margin-top: -11px;
+}
 
 
 
+/* table tr:nth-child(2) td, table tr:last-child td{ */
+/*     height: 0.25em; */
+/* } */
 
 /* MOUSEOVER TOOLTIP */
 /* a.tooltip { */
@@ -407,7 +615,7 @@ body#notfound h1{
     font-size: 2em;
 }
 body#notfound span{
-    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
+/*     font-family: "source-code-pro-1","source-code-pro-2",sans-serif; */
     font-weight: bold;
 }
 .circle {
@@ -420,6 +628,11 @@ body#notfound span{
     height: 10px;
     margin-right: 10px;
 }
+
+.triples .small, .hierarchy .small{
+    margin-right: 0px;
+}
+
 
 .large{
     width: 15px;
@@ -448,27 +661,9 @@ body#notfound span{
 }
 
 .id{
-    font-family: "source-code-pro-1","source-code-pro-2",sans-serif;
-}
+/*     font-family: "source-code-pro-1","source-code-pro-2",sans-serif; */
+  font-family: "futura-pt-1","futura-pt-2",sans-serif;
 
-.description.popup .properties{
-    width: 100%;
-    clear: both;
-}
-
-.description.popup .properties .property{
-    float: left;
-    width: 100%;
-    clear: both;
-}
-
-.description.popup .properties .property .title{
-    float: left;
-    width: 10em;
-}
-
-.description.popup .properties .property .value{
-    float: left;
 }
 
 body#description-details .properties{
@@ -490,3 +685,4 @@ body#description-details .properties .property .title{
 body#description-details .properties .property .value{
     float: left;
 }
+

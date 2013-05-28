@@ -1,5 +1,9 @@
 package com.ihtsdo.snomed.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -99,7 +103,11 @@ public class Statement {
     public String shortToString(){
         return "[" + getSerialisedId() + ": " + getSubject().getSerialisedId() + "(" + getPredicate().getSerialisedId() + ")" + getObject().getSerialisedId() + ", T" + getCharacteristicTypeIdentifier() + ", G" + getGroupId()+"]";
     }
-
+    
+    public Date getParsedEffectiveTime() throws ParseException{
+        return new SimpleDateFormat("yyyymmdd").parse(Long.toString(effectiveTime));
+    }
+    
     @Override
     public int hashCode(){
         if (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED){

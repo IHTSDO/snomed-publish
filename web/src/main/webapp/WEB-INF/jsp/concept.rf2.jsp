@@ -48,7 +48,7 @@ function changeOntology(value) {
 <body>
   <div id="company" class="clearfix">
     <img class="logo" src="/img/logo.symbol.png"/>
-    <h1>IHTSDOs SNOMED Clinical Terms</h1>
+    <h1>SNOMED Clinical Terms</h1>
     <div id="global-navigation">
       <div id="ontology">
         <form>
@@ -59,7 +59,7 @@ function changeOntology(value) {
           </select>
         </form>
       </div>
-      <div id="find-concept">
+      <div id="find-concept" class="clearfix">
           <form onsubmit="location.href=document.getElementById('conceptid').value; return false;">
               <button type="submit">Go</button>
               <input type="text" id="conceptid" value="${concept.getSerialisedId()}"></input>
@@ -73,23 +73,25 @@ function changeOntology(value) {
   <div id="heading" class="clearfix">
     <div class="title">
       <h1>${displayName} <c:if test="${type!=null}"><span class="type">(${type})</span></c:if></h1>
-      <c:choose>
-        <c:when test="${concept.isActive()}">
-            <div class="active tooltip left id">
-                <div class="number">${concept.getSerialisedId()}</div>
-                <span class="popup">Active</span>
-          </div>
-        </c:when>
-        <c:otherwise>
-            <div class="inactive tooltip left id">
-                <div class="number">${concept.getSerialisedId()}</div>
-                <span class="popup">Inactive</span>
+      <div class="isactive">
+        <c:choose>
+          <c:when test="${concept.isActive()}">
+              <div class="active tooltip left id">
+                  <div class="number">${concept.getSerialisedId()}</div>
+                  <span class="popup">Active</span>
             </div>
-        </c:otherwise>
-      </c:choose> 
+          </c:when>
+          <c:otherwise>
+              <div class="inactive tooltip left id">
+                  <div class="number">${concept.getSerialisedId()}</div>
+                  <span class="popup">Inactive</span>
+              </div>
+          </c:otherwise>
+        </c:choose> 
+      </div>
     </div>
     <div class="properties">
-        <div class="status"><a href="<c:url value="${concept.getStatus().getSerialisedId()}"/>">(<c:out value="${concept.getStatus().getShortDisplayName()}"/>)</a></div>
+        <div class="status"><a href="<c:url value="${concept.getStatus().getSerialisedId()}"/>"><c:out value="${concept.getStatus().getShortDisplayName()}"/></a></div>
         <div class="effectiveTime"><fmt:formatDate value="${concept.getParsedEffectiveTime()}" type="DATE" dateStyle="LONG" /></div> 
     </div>
   </div>
@@ -119,7 +121,7 @@ function changeOntology(value) {
                   </c:otherwise>
                 </c:choose>
               </td>
-              <td class="id" style="width: <c:choose><c:when test='${d.isStupidSerialisedId()}'>11</c:when><c:otherwise>6</c:otherwise></c:choose>em;">
+              <td class="id">
                 <%@include file="description.identifier.rf2.jsp"%>
               </td>
               <td class="type">
@@ -129,159 +131,219 @@ function changeOntology(value) {
                 </c:choose>
               </td>
               <td class="term"><c:out value="${d.getTerm().trim()}"/></td>
-              
           </tr>
       </c:forEach>
     </table>
   </div>
   
-  <!-- VALUE OF -->
+  <!-- OBJECT OF -->
   <c:if test="${!subjectOf.isEmpty()}">
-    <h3 class="top triples">Value of
-      <span class="show-hide">
-        <a id="hide-valueof" style="display:block" href="#" onclick="toggle_visibility('valueof');toggle_visibility('hide-valueof');toggle_visibility('show-valueof');">Hide</a>
-        <a id="show-valueof" style="display:none" href="#" onclick="toggle_visibility('valueof');toggle_visibility('hide-valueof');toggle_visibility('show-valueof');">Show</a>  
-      </span>    
-    </h3>
-    <div id="valueof" class="clearfix section" style="display:block">
-      <table class="triples">
-        <tr>
-          <th>Triple</th>
-          <th>Attribute</th>
-          <th>Value</th>
-          <th></th>
-        </tr>
-        <c:set var="lastGroup" value="-1"/>
-        <c:forEach var="r" items="${subjectOf}">
-          <tr class="group-<c:out value="${r.getGroupId()}"/>">
-            <td class="statement">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.rf2.jsp"%>
-            </td>
-            <td class="concept left">
-              <c:set var="showConcept" value="${r.getPredicate()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="concept right">
-              <c:set var="showConcept" value="${r.getObject()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="group">
-              <c:if test="${r.getGroupId() != lastGroup}" >
-                <c:choose>
-                    <c:when test="${r.getGroupId() == 0}">No group</c:when>
-                  <c:otherwise>
-                    Group <c:out value="${r.getGroupId()}"/>
-                  </c:otherwise>
-                </c:choose>
-                <c:set var="lastGroup" value="${r.getGroupId()}"/>
-              </c:if>
-            </td>
-          </tr>
-        </c:forEach>
-      </table>
+    <div class="triples">
+      <h3>Object of
+        <span class="show-hide">
+          <a id="hide-valueof" style="display:block" href="#" onclick="toggle_visibility('valueof');toggle_visibility('hide-valueof');toggle_visibility('show-valueof');">Hide</a>
+          <a id="show-valueof" style="display:none" href="#" onclick="toggle_visibility('valueof');toggle_visibility('hide-valueof');toggle_visibility('show-valueof');">Show</a>  
+        </span>    
+      </h3>
+      <div id="valueof" class="clearfix section" style="display:block">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th>Attribute</th>
+              <th>Value</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:set var="lastGroup" value="-1"/>
+            <c:forEach var="r" items="${subjectOf}">
+              <tr class="group-<c:out value="${r.getGroupId()}"/>">
+                <td class="isactive">
+                  <c:choose>
+                    <c:when test="${r.isActive()}">
+                      <div class="circle active small tooltip">
+                        <span class="popup">Active</span>
+                      </div>
+                    </c:when>
+                    <c:otherwise>
+                      <div class="circle inactive small tooltip">
+                        <span class="popup">Inactive</span>
+                      </div>
+                    </c:otherwise>
+                  </c:choose>
+                </td>        
+                <td class="statement id">
+                  <c:set var="showRelationship" value="${r}" />
+                  <%@include file="relationship.identifier.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getPredicate()}" />
+                <td class="concept left <c:choose><c:when test='${showConcept.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                    <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                    <%@include file="entity.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getObject()}" />
+                <td class="concept right <c:choose><c:when test='${showConcept.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                    <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                    <%@include file="entity.rf2.jsp"%>
+                </td>
+                <td class="group <c:if test='${lastGroup==-1}'>top</c:if>">
+                  <c:if test="${r.getGroupId() != lastGroup}" >
+                    <c:choose>
+                        <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                      <c:otherwise>
+                        Group <c:out value="${r.getGroupId()}"/>
+                      </c:otherwise>
+                    </c:choose>
+                    <c:set var="lastGroup" value="${r.getGroupId()}"/>
+                  </c:if>
+                </td>            
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
     </div>
   </c:if>
-  
-  <!-- OBJECT OF -->
+
+  <!-- VALUE OF -->
   <c:if test="${!objectOf.isEmpty()}">
-    <h3 class="triples">Object of
-      <span class="show-hide">
-        <a id="hide-objectOf" style="display:block" href="#" onclick="toggle_visibility('objectOf');toggle_visibility('hide-objectOf');toggle_visibility('show-objectOf');">Hide</a>
-        <a id="show-objectOf" style="display:none" href="#" onclick="toggle_visibility('objectOf');toggle_visibility('hide-objectOf');toggle_visibility('show-objectOf');">Show</a>  
-      </span>     
-    </h3>
-    <div id="objectOf" class="clearfix section" style="display:block">    
-      <table class="triples">
-        <tr>
-          <th class="statement">Triple</th>
-          <th class="concept left">Object</th>
-          <th class="concept right">Attribute</th>
-          <th class="group"></th>
-        </tr>
-        <c:set var="lastGroup" value="-1"/>
-        <c:forEach var="r" items="${objectOf}">
-          <tr class="group-<c:out value="${r.getGroupId()}"/>">
-            <td class="statement">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.rf2.jsp"%>
-            </td>
-            <td class="concept left">
-              <c:set var="showConcept" value="${r.getSubject()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="concept right">
-              <c:set var="showConcept" value="${r.getPredicate()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="group">
-              <c:if test="${r.getGroupId() != lastGroup}" >
-                <c:choose>
-                    <c:when test="${r.getGroupId() == 0}">No group</c:when>
-                  <c:otherwise>
-                    Group <c:out value="${r.getGroupId()}"/>
-                  </c:otherwise>
-                </c:choose>
-                <c:set var="lastGroup" value="${r.getGroupId()}"/>
-              </c:if>
-            </td>
-          </tr>
-        </c:forEach>
-      </table>
+    <div class="triples">
+      <h3>Value of
+        <span class="show-hide">
+          <a id="hide-objectOf" style="display:block" href="#" onclick="toggle_visibility('objectOf');toggle_visibility('hide-objectOf');toggle_visibility('show-objectOf');">Hide</a>
+          <a id="show-objectOf" style="display:none" href="#" onclick="toggle_visibility('objectOf');toggle_visibility('hide-objectOf');toggle_visibility('show-objectOf');">Show</a>  
+        </span>     
+      </h3>
+      <div id="objectOf" class="clearfix section" style="display:block">    
+        <table>
+          <thead>
+            <th></th>
+            <th></th>
+            <th>Object</th>
+            <th>Attribute</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <c:set var="lastGroup" value="-1"/>
+            <c:forEach var="r" items="${objectOf}">
+              <tr class="group-<c:out value="${r.getGroupId()}"/>">
+                <td class="isactive">
+                  <c:choose>
+                    <c:when test="${r.isActive()}">
+                      <div class="circle active small tooltip">
+                        <span class="popup">Active</span>
+                      </div>
+                    </c:when>
+                    <c:otherwise>
+                      <div class="circle inactive small tooltip">
+                        <span class="popup">Inactive</span>
+                      </div>
+                    </c:otherwise>
+                  </c:choose>
+                </td>          
+                <td class="statement">
+                  <c:set var="showRelationship" value="${r}" />
+                  <%@include file="relationship.identifier.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getSubject()}" />
+                <td class="concept left <c:choose><c:when test='${c.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                    <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                    <%@include file="entity.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getPredicate()}" />
+                <td class="concept right <c:choose><c:when test='${showConcept.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                  <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                  <%@include file="entity.rf2.jsp"%>
+                </td>
+                <td class="group <c:if test='${lastGroup==-1}'>top</c:if>">
+                  <c:if test="${r.getGroupId() != lastGroup}" >
+                    <c:choose>
+                        <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                      <c:otherwise>
+                        Group <c:out value="${r.getGroupId()}"/>
+                      </c:otherwise>
+                    </c:choose>
+                    <c:set var="lastGroup" value="${r.getGroupId()}"/>
+                  </c:if>
+                </td>
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
     </div>
   </c:if>
     
-  <!-- PREDICATE OF -->
+  <!-- ATTRIBUTE OF -->
   <c:if test="${!predicateOf.isEmpty()}">
-    <h3 class="triples">Attribute of
-      <span class="show-hide">
-        <a id="hide-predicateOf" style="display:block" href="#" onclick="toggle_visibility('predicateOf');toggle_visibility('hide-predicateOf');toggle_visibility('show-predicateOf');">Hide</a>
-        <a id="show-predicateOf" style="display:none" href="#" onclick="toggle_visibility('predicateOf');toggle_visibility('hide-predicateOf');toggle_visibility('show-predicateOf');">Show</a>  
-      </span>     
-    </h3> 
-    <div id="predicateOf" class="clearfix section" style="display:block"> 
-      <table class="triples">
-        <tr>
-          <th>Triple</th>
-          <th>Object</th>
-          <th>Value</th>
-          <th></th>
-        </tr>
-        <c:set var="lastGroup" value="-1"/>
-        <c:forEach var="r" items="${predicateOf}">
-          <tr class="group-<c:out value="${r.getGroupId()}"/>">
-            <td class="statement">
-              <c:set var="showRelationship" value="${r}" />
-              <%@include file="relationship.identifier.rf2.jsp"%>
-            </td>
-            <td class="concept left">
-              <c:set var="showConcept" value="${r.getSubject()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="concept right">
-              <c:set var="showConcept" value="${r.getObject()}" />
-              <c:set var="name" value="${showConcept.getDisplayName()}"/>
-              <%@include file="entity.rf2.jsp"%>          
-            </td>
-            <td class="group">
-              <c:if test="${r.getGroupId() != lastGroup}" >
-                <c:choose>
-                    <c:when test="${r.getGroupId() == 0}">No group</c:when>
-                  <c:otherwise>
-                    Group <c:out value="${r.getGroupId()}"/>
-                  </c:otherwise>
-                </c:choose>
-                <c:set var="lastGroup" value="${r.getGroupId()}"/>
-              </c:if>
-            </td>
-          </tr>
-        </c:forEach>
-      </table>
+    <div class="triples">
+      <h3>Attribute of
+        <span class="show-hide">
+          <a id="hide-predicateOf" style="display:block" href="#" onclick="toggle_visibility('predicateOf');toggle_visibility('hide-predicateOf');toggle_visibility('show-predicateOf');">Hide</a>
+          <a id="show-predicateOf" style="display:none" href="#" onclick="toggle_visibility('predicateOf');toggle_visibility('hide-predicateOf');toggle_visibility('show-predicateOf');">Show</a>  
+        </span>     
+      </h3> 
+      <div id="predicateOf" class="clearfix section" style="display:block"> 
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th></th>
+              <th>Object</th>
+              <th>Value</th>
+              <th></th>
+            </tr>
+          </thead>
+          <c:set var="lastGroup" value="-1"/>
+          <tbody>
+            <c:forEach var="r" items="${predicateOf}">
+              <tr class="group-<c:out value="${r.getGroupId()}"/>">
+                <td class="isactive">
+                  <c:choose>
+                    <c:when test="${r.isActive()}">
+                      <div class="circle active small tooltip">
+                        <span class="popup">Active</span>
+                      </div>
+                    </c:when>
+                    <c:otherwise>
+                      <div class="circle inactive small tooltip">
+                        <span class="popup">Inactive</span>
+                      </div>
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+                <td class="statement">
+                  <c:set var="showRelationship" value="${r}" />
+                  <%@include file="relationship.identifier.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getSubject()}" />
+                <td class="concept left <c:choose><c:when test='${showConcept.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                  <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                  <%@include file="entity.rf2.jsp"%>
+                </td>
+                <c:set var="showConcept" value="${r.getObject()}" />
+                <td class="concept right <c:choose><c:when test='${showConcept.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
+                  <c:set var="name" value="${showConcept.getDisplayName()}"/>
+                  <%@include file="entity.rf2.jsp"%>
+                </td>
+                <td class="group <c:if test='${lastGroup==-1}'>top</c:if>">
+                  <c:if test="${r.getGroupId() != lastGroup}" >
+                    <c:choose>
+                        <c:when test="${r.getGroupId() == 0}">No group</c:when>
+                      <c:otherwise>
+                        Group <c:out value="${r.getGroupId()}"/>
+                      </c:otherwise>
+                    </c:choose>
+                    <c:set var="lastGroup" value="${r.getGroupId()}"/>
+                  </c:if>
+                </td>
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
     </div>
   </c:if>  
   
@@ -294,8 +356,8 @@ function changeOntology(value) {
     </h3>
     <div id="parents" class="clearfix section" style="display:block">    
       <div class="hierarchy clearfix">
-        <c:forEach var="c" items="${concept.getKindOfs()}">
-          <div class="concept">
+        <c:forEach var="c" items="${kindOfs}">
+          <div class="concept <c:choose><c:when test='${c.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
             <c:set var="showConcept" value="${c}" />
             <c:choose>
               <c:when test="${c.getDisplayName().length() < 85}">
@@ -321,8 +383,8 @@ function changeOntology(value) {
     </h3>
     <div id="children" class="clearfix section" style="display:block">
       <div class="hierarchy clearfix">
-        <c:forEach var="c" items="${concept.getParentOf()}">
-          <div class="concept">
+        <c:forEach var="c" items="${parentOf}">
+          <div class="concept <c:choose><c:when test='${c.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
             <c:set var="showConcept" value="${c}" />
             <c:choose>
               <c:when test="${c.getDisplayName().length() < 85}">
@@ -347,8 +409,8 @@ function changeOntology(value) {
   </h3>
   <div id="allPrimitiveParents" class="clearfix section"  style="display:block">
     <div class="hierarchy clearfix">
-      <c:forEach var="c" items="${concept.getAllKindOfPrimitiveConcepts(true)}">
-        <div class="concept">
+      <c:forEach var="c" items="${allPrimitiveSupertypes}">
+        <div class="concept <c:choose><c:when test='${c.isActive()}'>active</c:when><c:otherwise>inactive</c:otherwise></c:choose>">
           <c:set var="showConcept" value="${c}" />
           <c:choose>
             <c:when test="${c.getDisplayName().length() < 85}">

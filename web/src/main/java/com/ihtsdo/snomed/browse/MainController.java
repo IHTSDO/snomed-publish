@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
-import com.google.common.primitives.Ints;
 import com.ihtsdo.snomed.browse.ConceptService.ConceptNotFoundException;
 import com.ihtsdo.snomed.browse.OntologyService.OntologyNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
@@ -77,13 +75,26 @@ public class MainController {
         List<Statement> predicateOf = new ArrayList<Statement>();
         List<Statement> subjectOf = new ArrayList<Statement>();
         List<Description> descriptions = new ArrayList<>(c.getDescription());
+        List<Concept> kindOfs = new ArrayList<>();
+        List<Concept> parentOf = new ArrayList<>();
+        List<Concept> allPrimitiveSupertypes = new ArrayList<>();
         conceptService.populateStatementsForView(c, objectOf, predicateOf, subjectOf);
         Collections.sort(descriptions, byTypeActiveAndTerm.nullsLast());
 
         
+        kindOfs.addAll(c.getKindOfs());
+        Collections.sort(kindOfs, byActiveAndName.nullsLast());
+        parentOf.addAll(c.getParentOf());
+        Collections.sort(parentOf, byActiveAndName.nullsLast());
+        allPrimitiveSupertypes.addAll(c.getAllKindOfPrimitiveConcepts(true));
+        Collections.sort(allPrimitiveSupertypes, byActiveAndName.nullsLast());        
+        
         model.addAttribute("objectOf", objectOf);
         model.addAttribute("predicateOf", predicateOf);
         model.addAttribute("subjectOf", subjectOf);
+        model.addAttribute("kindOfs", kindOfs);
+        model.addAttribute("parentOf", parentOf);
+        model.addAttribute("allPrimitiveSupertypes", allPrimitiveSupertypes);
         model.addAttribute("descriptions", descriptions);
         model.addAttribute("concept", c);
         model.addAttribute("servletPath", request.getServletPath());
@@ -144,7 +155,37 @@ public class MainController {
         }else {
             throw new InvalidInputException("Only RF2 ontologies supports this view");
         }
-    }    
+    }
+    
+    @RequestMapping(value="/ontology/{ontologyId}/triple/{serialisedId}", method = RequestMethod.GET)
+    public ModelAndView tripleDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
+            HttpServletRequest request) throws DescriptionNotFoundException
+    {            
+        Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
+                .setParameter("oid", ontologyId)
+                .getSingleResult();
+        TypedQuery<Statement> getStatementQuery = em.createQuery(
+                "SELECT s from Statement s " + 
+                "LEFT JOIN FETCH s.characteristicType " +
+                "LEFT JOIN FETCH s.module " +
+                "LEFT JOIN FETCH s.modifier " +
+                "LEFT JOIN FETCH s.subject " +
+                "LEFT JOIN FETCH s.predicate " +
+                "LEFT JOIN FETCH s.object " +
+                "where s.ontology.id=:oid AND s.serialisedId=:serialisedId", Statement.class);
+        getStatementQuery.setParameter("oid", ontologyId);
+        getStatementQuery.setParameter("serialisedId", serialisedId);
+        Statement s = getStatementQuery.getSingleResult();
+        model.addAttribute("statement", s);
+        model.addAttribute("servletPath", request.getServletPath());
+        model.addAttribute("ontologies", ontologyService.getAll());
+        model.addAttribute("ontologyId", ontologyId);
+        if (o.getSource().equals(Source.RF2)){
+            return new ModelAndView("statement.rf2");
+        }else {
+            throw new InvalidInputException("Only RF2 ontologies supports this view");
+        }
+    }       
 
     @ExceptionHandler(ConceptNotFoundException.class)
     public ModelAndView handleConceptNotFoundException(HttpServletRequest request, ConceptNotFoundException exception){
@@ -194,7 +235,41 @@ public class MainController {
         public long getOntologyId() {
             return ontologyId;
         }
-    }    
+    }  
+    
+    public static class StatementNotFoundException extends Exception{
+        private static final long serialVersionUID = 1L;
+        private long statementId;
+        private long ontologyId;
+        
+        public StatementNotFoundException(long statementId, long ontologyId){
+            this.statementId = statementId;
+            this.ontologyId = ontologyId;
+        }
+
+        public long getDescriptionId() {
+            return statementId;
+        }
+
+        public long getOntologyId() {
+            return ontologyId;
+        }
+    }     
+    
+    private Ordering<Concept> byActiveAndName = new Ordering<Concept>() {
+        @Override
+        public int compare(Concept c1, Concept c2){
+            if ((c1.isActive() && c2.isActive()) || !c1.isActive() && !c2.isActive()){
+                return c1.getDisplayName().compareTo(c2.getDisplayName());   
+            }
+            else if (c1.isActive()){
+                return -1;
+            }
+            else{
+                return 1;
+            }
+        }
+    };    
    
     private Ordering<Description> byTypeActiveAndTerm = new Ordering<Description>() {
         @Override
