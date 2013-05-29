@@ -16,7 +16,6 @@ import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @Entity(name="Statement")
-@Table(name="STATEMENT")
 public class Statement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;

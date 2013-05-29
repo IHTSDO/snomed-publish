@@ -113,7 +113,7 @@ public class Concept {
     //HIERARCHY
     @XmlTransient
     @ManyToMany
-    @JoinTable(name = "KIND_OF", 
+    @JoinTable(
         joinColumns = @JoinColumn(name="child_id"),
         inverseJoinColumns = @JoinColumn(name="parent_id"),
         uniqueConstraints=@UniqueConstraint(columnNames={"parent_id", "child_id"}))

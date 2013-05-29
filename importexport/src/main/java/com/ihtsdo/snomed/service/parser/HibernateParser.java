@@ -218,8 +218,8 @@ public abstract class HibernateParser {
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement psKindOf = connection.prepareStatement("INSERT INTO KIND_OF (child_id, parent_id) VALUES (?, ?)");
-                PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, predicate_id, object_id FROM STATEMENT WHERE ontology_id = ?");
+                PreparedStatement psKindOf = connection.prepareStatement("INSERT INTO Concept_Concept (child_id, parent_id) VALUES (?, ?)");
+                PreparedStatement psStatements = connection.prepareStatement("SELECT subject_id, predicate_id, object_id FROM Statement WHERE ontology_id = ?");
                 int counter = 1;
                 psStatements.setLong(1, o.getId());
                 ResultSet rs = psStatements.executeQuery();
@@ -268,7 +268,7 @@ public abstract class HibernateParser {
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("SELECT id, serialisedId FROM concept WHERE ontology_id = ?"); 
+                PreparedStatement ps = connection.prepareStatement("SELECT id, serialisedId FROM Concept WHERE ontology_id = ?"); 
                 ps.setLong(1, ontology.getId());
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()){

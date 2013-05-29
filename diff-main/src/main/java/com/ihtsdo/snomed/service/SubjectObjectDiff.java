@@ -82,7 +82,7 @@ class SubjectObjectDiff implements DiffAlgorithm{
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement(
-                        "SELECT c1.serialisedId, c2.serialisedId FROM STATEMENT s " + 
+                        "SELECT c1.serialisedId, c2.serialisedId FROM Statement s " + 
                                 "JOIN Concept c1 ON s.subject_id = c1.id "+
                                 "JOIN Concept c2 ON s.object_id = c2.id " +
                         "WHERE s.ontology_id=?");

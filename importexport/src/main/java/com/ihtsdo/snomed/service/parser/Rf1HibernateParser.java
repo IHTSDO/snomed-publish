@@ -122,7 +122,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, statusId, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, statusId, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -183,7 +183,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -247,7 +247,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO STATEMENT (serialisedId, subject_id, predicate_id, object_id, characteristicTypeIdentifier, refinability, groupId, ontology_id, active, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO Statement (serialisedId, subject_id, predicate_id, object_id, characteristicTypeIdentifier, refinability, groupId, ontology_id, active, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;

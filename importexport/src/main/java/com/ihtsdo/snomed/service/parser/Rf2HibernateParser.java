@@ -49,7 +49,7 @@ public class Rf2HibernateParser extends HibernateParser{
         final Map<Long, Long> conceptIdToDefinitionStatusIdMap = new HashMap<Long, Long>();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, effectiveTime, active, primitive, statusId, version, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, effectiveTime, active, primitive, statusId, version, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -108,7 +108,7 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("UPDATE CONCEPT SET module_id=?, status_id=? WHERE id=? AND ontology_id=?");
+                PreparedStatement ps = connection.prepareStatement("UPDATE Concept SET module_id=?, status_id=? WHERE id=? AND ontology_id=?");
                 for (long serialisedId : map.keySet()){
                     try{
                         ps.setLong(1, map.get(conceptIdToModuleIdMap.get(serialisedId)));
@@ -239,7 +239,7 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -306,7 +306,7 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO CONCEPT (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader brc = new BufferedReader(new InputStreamReader(statementsStream))){
                     int currentLine = 1;
