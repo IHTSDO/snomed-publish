@@ -193,7 +193,7 @@ public abstract class HibernateParser {
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement statement = connection.prepareStatement(
-                        "INSERT INTO ONTOLOGY (NAME) values (?)", Statement.RETURN_GENERATED_KEYS);
+                        "INSERT INTO Ontology (NAME) values (?)", Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, name);
                 int affectedRows = statement.executeUpdate();
                 if (affectedRows == 0) {
