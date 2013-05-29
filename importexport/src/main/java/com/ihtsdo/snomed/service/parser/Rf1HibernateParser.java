@@ -50,7 +50,7 @@ public class Rf1HibernateParser extends HibernateParser{
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO DESCRIPTION (serialisedId, status, about_id, term, initialCapitalStatus, descriptionTypeId, languageCode, effectiveTime, active, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO Description (serialisedId, status, about_id, term, initialCapitalStatus, descriptionTypeId, languageCode, effectiveTime, active, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();

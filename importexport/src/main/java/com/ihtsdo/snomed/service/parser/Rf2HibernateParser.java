@@ -141,7 +141,7 @@ public class Rf2HibernateParser extends HibernateParser{
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO DESCRIPTION (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, descriptionTypeId, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO Description (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, descriptionTypeId, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
