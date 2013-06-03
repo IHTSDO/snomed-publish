@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.CoreMetadataConcepts;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.Ontology.Source;
 
 public abstract class HibernateParser {
     static final Logger LOG = LoggerFactory.getLogger(HibernateParser.class);
@@ -78,6 +80,7 @@ public abstract class HibernateParser {
     protected abstract void populateDescriptions(final InputStream stream, final EntityManager em, 
             final Ontology ontology) throws IOException;
     
+    protected abstract Source getSource();
 
     public Ontology populateDb(String ontologyName, InputStream conceptsStream, 
             InputStream statementStream, EntityManager em) throws IOException
@@ -121,7 +124,8 @@ public abstract class HibernateParser {
         populateConcepts(conceptsStream, em, ontology);
         populateDescriptions(descriptionStream, em, ontology);
         populateStatements(statementStream, em, ontology);
-        createIsKindOfHierarchy(em, ontology);        
+        createIsKindOfHierarchy(em, ontology);
+        populateDisplaynameCache(em, ontology);
         if(doCommit){em.getTransaction().commit();}
         em.clear();
         Ontology o = em.find(Ontology.class, ontology.getId());
@@ -193,8 +197,9 @@ public abstract class HibernateParser {
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement statement = connection.prepareStatement(
-                        "INSERT INTO Ontology (NAME) values (?)", Statement.RETURN_GENERATED_KEYS);
+                        "INSERT INTO Ontology (NAME, SOURCE) values (?, ?)", Statement.RETURN_GENERATED_KEYS);
                 statement.setString(1, name);
+                statement.setInt(2, getSource().ordinal());
                 int affectedRows = statement.executeUpdate();
                 if (affectedRows == 0) {
                     throw new SQLException("Creating ontology failed, no rows affected.");
@@ -210,6 +215,32 @@ public abstract class HibernateParser {
         tx.commit();
         return ontology;
     }
+    
+    protected void populateDisplaynameCache(EntityManager em, final Ontology o) {
+        LOG.info("Populating display name cache");
+        HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement psUpdate = connection.prepareStatement("UPDATE Concept SET fullyspecifiedname=? WHERE id=?");
+                PreparedStatement psSelect = connection.prepareStatement("SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and d.ontology_id=?;");
+                int counter = 1;
+                psSelect.setLong(1, CoreMetadataConcepts.DESCRIPTION_TYPE_FULLY_SPECIFIED_NAME);
+                psSelect.setLong(2, o.getId());
+                ResultSet rs = psSelect.executeQuery();
+                while (rs.next()){
+                    psUpdate.setString(1, rs.getString(2));
+                    psUpdate.setLong(2, rs.getLong(1));
+                    psUpdate.addBatch();
+                }
+                psUpdate.executeBatch();
+                LOG.info("Updated " + counter + " display names");
+            }
+        });
+        tx.commit();
+    }
+
 
     protected void createIsKindOfHierarchy(EntityManager em, final Ontology o) {
         LOG.info("Creating isA hierarchy");

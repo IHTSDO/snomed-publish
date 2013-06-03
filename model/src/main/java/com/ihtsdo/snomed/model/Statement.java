@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,11 +28,11 @@ public class Statement {
     private long id;
     @OneToOne
     private Ontology ontology;
-    @OneToOne 
+    @OneToOne(fetch=FetchType.LAZY)
     private Concept subject;
-    @OneToOne 
+    @OneToOne(fetch=FetchType.LAZY)
     private Concept predicate;
-    @OneToOne 
+    @OneToOne(fetch=FetchType.LAZY) 
     private Concept object;    
     private long serialisedId = SERIALISED_ID_NOT_DEFINED;
     @Column(name="groupId") 
@@ -46,9 +47,9 @@ public class Statement {
     private Concept characteristicType;
     @Column(columnDefinition = "BIT", length = 1)
     private boolean active;
-    @OneToOne
+    @OneToOne(fetch=FetchType.EAGER)
     private Concept module;
-    @OneToOne
+    @OneToOne(fetch=FetchType.EAGER)
     private Concept modifier;
     private int effectiveTime;
     

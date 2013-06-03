@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.service.InconsistentOntologyException;
 
 /**
  * @author henrikpettersen
@@ -75,7 +73,7 @@ public class Concept {
     @XmlTransient
     @OneToOne 
     private Ontology ontology;
-    @OneToMany(mappedBy="about", fetch=FetchType.EAGER)  
+    @OneToMany(mappedBy="about")  
     private Set<Description> description;
     
     //RF1
@@ -164,29 +162,9 @@ public class Concept {
         return false;
     }
     
-    @Transient
-    private String rf2DisplayNameCache; 
     
     public String getDisplayName(){
-        if (getOntology().isRf2()){
-            if (rf2DisplayNameCache == null){
-                Set<Description> activeFsns = new HashSet<>();
-                for (Description d : getDescription()){
-                    if (d.isFullySpecifiedName() && d.isActive()){
-                        activeFsns.add(d);
-                    }
-                }
-                if (activeFsns.size() > 1){
-                    throw new InconsistentOntologyException();
-                }
-                rf2DisplayNameCache = activeFsns.iterator().next().getTerm();
-
-            }
-            return rf2DisplayNameCache;
-        }
-        else{
-            return getFullySpecifiedName();
-        }
+        return getFullySpecifiedName();
     }
     
     @Transient
@@ -214,73 +192,6 @@ public class Concept {
         return shortDisplayNameCache;
     }
     
-//    public Description getPreferredTerm(){
-//        if (preferredTerm == null){
-//            for (Description d : getDescription()){
-//                if (d.isPreferredTerm()){
-//                    preferredTerm = d;
-//                    break;
-//                }
-//            }
-//        }
-//        return preferredTerm;
-//    }
-//    
-//    public Set<Description> getSynonyms(){
-//        if (synonyms == null){
-//            synonyms = new HashSet<>();
-//            for (Description d : getDescription()){
-//                if (d.isSynonym()){
-//                    synonyms.add(d);
-//                }
-//            }
-//        }
-//        return synonyms;
-//    }
-//    
-//    public String getDisplayName(){
-//        if (getOntology().isRf2()){
-//            Set<Description> activeFullySpecifiedNames = new HashSet<>();
-//            for (Description d : getFullySpecifiedNameDescriptions()){
-//                
-//            }
-//            
-//            return (getFullySpecifiedNameDescriptions() == null) || getFullySpecifiedNameDescriptions().isEmpty() ? 
-//                    "fully specified name not found" : 
-//                    getFullySpecifiedNameDescriptions().iterator().next().getTerm();
-//        }else if (getPreferredTerm() == null){
-//            return getFullySpecifiedName();
-//        }
-//        else{
-//            return getPreferredTerm().getTerm();
-//        }
-//    }
-//
-//    
-//    public Set<Description> getUnspecifiedDescriptions(){
-//        if (unspecifiedDescriptions == null){
-//            unspecifiedDescriptions = new HashSet<>();
-//            for (Description d : getDescription()){
-//                if (d.isUnSpecified()){
-//                    unspecifiedDescriptions.add(d);
-//                }
-//            }
-//        }
-//        return unspecifiedDescriptions;
-//    }
-//
-//    public Set<Description> getFullySpecifiedNameDescriptions(){
-//        if (fullySpecifiedNameDescriptions == null){
-//            fullySpecifiedNameDescriptions = new HashSet<>();
-//            for (Description d : getDescription()){
-//                if (d.isFullySpecifiedName()){
-//                    fullySpecifiedNameDescriptions.add(d);
-//                }
-//            }
-//        }
-//        return fullySpecifiedNameDescriptions;
-//    }
-//    
     public Set<Concept> getAllKindOfPrimitiveConcepts(boolean useCache){
         if (useCache && (allKindOfPrimitiveCache != null)){
             if (LOG.isDebugEnabled()){

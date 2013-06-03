@@ -27,6 +27,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class Rf1HibernateParser extends HibernateParser{
@@ -36,6 +37,10 @@ public class Rf1HibernateParser extends HibernateParser{
      * Use the factory
      */
     Rf1HibernateParser(){}
+    
+    protected Source getSource(){
+        return Source.RF1;
+    }
     
     @Override
     protected void populateDescriptions(final InputStream stream, final EntityManager em, 

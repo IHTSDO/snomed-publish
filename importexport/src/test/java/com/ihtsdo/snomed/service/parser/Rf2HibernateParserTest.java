@@ -328,7 +328,26 @@ public class Rf2HibernateParserTest extends DatabaseTest{
             assertTrue(ontology.getDescriptions().contains(new Description(181114011)));
             assertTrue(ontology.getConcepts().contains(new Concept(900000000000207008l)));
         }      
-    }   
+    }
+    
+    @Test
+    public void shouldSetDisplaynameCache() throws IOException{
+        Ontology ontology = parser.populateDbWithDescriptions(DEFAULT_ONTOLOGY_NAME, 
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
+                ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS), em);
+        
+        Concept c = ontology.getConcepts().iterator().next();
+        Description fsnDescription = null;
+        for (Description d : c.getDescription()){
+            if (d.isFullySpecifiedName()){
+                fsnDescription = d;
+                break;
+            }
+        }
+        assertNotNull(fsnDescription);
+        assertEquals(c.getFullySpecifiedName(), fsnDescription.getTerm());
+    }    
     
     @Test
     public void shouldSkipRowAndContinueDbPopulationAfterParseErrorWhenForgivingMode() throws IOException{

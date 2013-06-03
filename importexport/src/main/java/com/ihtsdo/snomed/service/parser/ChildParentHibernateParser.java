@@ -24,12 +24,17 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class ChildParentHibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( ChildParentHibernateParser.class );
 
     ChildParentHibernateParser(){}
+    
+    protected Source getSource(){
+        return Source.CHILD_PARENT;
+    }
     
     protected void populateStatements(final InputStream stream, EntityManager em, 
             final Ontology ontology) throws IOException 

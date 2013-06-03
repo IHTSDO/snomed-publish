@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class CanonicalHibernateParser extends HibernateParser{
@@ -33,6 +34,10 @@ public class CanonicalHibernateParser extends HibernateParser{
      * Use the factory
      */
     CanonicalHibernateParser(){}
+    
+    protected Source getSource(){
+        return Source.CANONICAL;
+    }
     
     @Override
     protected void populateStatements(final InputStream stream, EntityManager em, 

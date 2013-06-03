@@ -1,15 +1,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!doctype html>
-<%@page import="com.ihtsdo.snomed.model.Statement, java.text.DateFormat, java.text.SimpleDateFormat"%>
+<%@page import="com.ihtsdo.snomed.model.Statement, 
+    java.text.DateFormat, 
+    java.text.SimpleDateFormat, 
+    java.text.DecimalFormat"%>
+
+<%!
+    DecimalFormat decimalFormat = new DecimalFormat("###,###.###");
+%>
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta charset="utf-8">
-<script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
-<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-
-
 <script type="text/javascript">
 <!--
     function toggle_visibility(id) {
@@ -33,16 +36,6 @@ function changeOntology(value) {
     redirect = "/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
     document.location.href = redirect;
 }
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
-  ga('send', 'pageview');
-
 </script>
 </head>
 <body>
@@ -137,7 +130,7 @@ function changeOntology(value) {
   </div>
   
   <!-- OBJECT OF -->
-  <c:if test="${!subjectOf.isEmpty()}">
+  <c:if test="${!objectOf.isEmpty()}">
     <div class="triples">
       <h3>Object of
         <span class="show-hide">
@@ -158,7 +151,7 @@ function changeOntology(value) {
           </thead>
           <tbody>
             <c:set var="lastGroup" value="-1"/>
-            <c:forEach var="r" items="${subjectOf}">
+            <c:forEach var="r" items="${objectOf}">
               <tr class="group-<c:out value="${r.getGroupId()}"/>">
                 <td class="isactive">
                   <c:choose>
@@ -203,12 +196,25 @@ function changeOntology(value) {
             </c:forEach>
           </tbody>
         </table>
+        <c:if test="${objectOfCount < objectOfTotal}">
+          <div class="pagination">
+            <div class="navigation left">
+                <a class="start" href="${concept.getSerialisedId()}${objectOfFirstParams}">&lt;&lt;</a>
+                <a class="previous" href="${concept.getSerialisedId()}${objectOfPreviousParams}">&lt;</a>
+            </div>
+            <div class="text">Displaying triples <fmt:formatNumber value="${objectOfStartIndex + 1}" type="NUMBER"/> through <fmt:formatNumber value="${objectOfTotal < objectOfCount + objectOfStartIndex ? objectOfTotal : objectOfStartIndex + objectOfCount}" type="NUMBER"/> out of <fmt:formatNumber value="${objectOfTotal}" type="NUMBER"/></div> total            
+            <div class="navigation right">
+                <a class="next" href="${concept.getSerialisedId()}${objectOfNextParams}">&gt;</a>
+                <a class="last" href="${concept.getSerialisedId()}${objectOfLastParams}">&gt;&gt;</a>        
+            </div>
+          </div>  
+        </c:if>
       </div>
     </div>
   </c:if>
 
   <!-- VALUE OF -->
-  <c:if test="${!objectOf.isEmpty()}">
+  <c:if test="${!valueOf.isEmpty()}">
     <div class="triples">
       <h3>Value of
         <span class="show-hide">
@@ -227,7 +233,7 @@ function changeOntology(value) {
           </thead>
           <tbody>
             <c:set var="lastGroup" value="-1"/>
-            <c:forEach var="r" items="${objectOf}">
+            <c:forEach var="r" items="${valueOf}">
               <tr class="group-<c:out value="${r.getGroupId()}"/>">
                 <td class="isactive">
                   <c:choose>
@@ -272,12 +278,25 @@ function changeOntology(value) {
             </c:forEach>
           </tbody>
         </table>
-      </div>
+        <c:if test="${valueOfCount < valueOfTotal}">
+          <div class="pagination">
+            <div class="navigation left">
+                <a class="start" href="${concept.getSerialisedId()}${valueOfFirstParams}">&lt;&lt;</a>
+                <a class="previous" href="${concept.getSerialisedId()}${valueOfPreviousParams}">&lt;</a>
+            </div>
+            <div class="text">Displaying triples <fmt:formatNumber value="${valueOfStartIndex + 1}" type="NUMBER"/> through <fmt:formatNumber value="${valueOfTotal < valueOfCount + valueOfStartIndex ? valueOfTotal : valueOfStartIndex + valueOfCount}" type="NUMBER"/> out of <fmt:formatNumber value="${valueOfTotal}" type="NUMBER"/></div> total
+            <div class="navigation right">
+                <a class="next" href="${concept.getSerialisedId()}${valueOfNextParams}">&gt;</a>
+                <a class="last" href="${concept.getSerialisedId()}${valueOfLastParams}">&gt;&gt;</a>        
+            </div>
+          </div>  
+        </c:if>
+      </div>    
     </div>
   </c:if>
     
   <!-- ATTRIBUTE OF -->
-  <c:if test="${!predicateOf.isEmpty()}">
+  <c:if test="${!attributeOf.isEmpty()}">
     <div class="triples">
       <h3>Attribute of
         <span class="show-hide">
@@ -298,7 +317,7 @@ function changeOntology(value) {
           </thead>
           <c:set var="lastGroup" value="-1"/>
           <tbody>
-            <c:forEach var="r" items="${predicateOf}">
+            <c:forEach var="r" items="${attributeOf}">
               <tr class="group-<c:out value="${r.getGroupId()}"/>">
                 <td class="isactive">
                   <c:choose>
@@ -343,7 +362,20 @@ function changeOntology(value) {
             </c:forEach>
           </tbody>
         </table>
-      </div>
+        <c:if test="${attributeOfCount < attributeOfTotal}">
+          <div class="pagination">
+            <div class="navigation left">
+                <a class="start" href="${concept.getSerialisedId()}${attributeOfFirstParams}">&lt;&lt;</a>
+                <a class="previous" href="${concept.getSerialisedId()}${attributeOfPreviousParams}">&lt;</a>
+            </div>
+            <div class="text">Displaying triples <fmt:formatNumber value="${attributeOfStartIndex + 1}" type="NUMBER"/> through <fmt:formatNumber value="${attributeOfTotal < attributeOfCount + attributeOfStartIndex ? attributeOfTotal : attributeOfStartIndex + attributeOfCount}" type="NUMBER"/> out of <fmt:formatNumber value="${attributeOfTotal}" type="NUMBER"/></div> total
+            <div class="navigation right">
+                <a class="next" href="${concept.getSerialisedId()}${attributeOfNextParams}">&gt;</a>
+                <a class="last" href="${concept.getSerialisedId()}${attributeOfLastParams}">&gt;&gt;</a>        
+            </div>
+          </div>  
+        </c:if>      
+      </div>      
     </div>
   </c:if>  
   
@@ -426,4 +458,15 @@ function changeOntology(value) {
     </div>
   </div>
 </body>
+<script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
+  ga('send', 'pageview');
+</script>
 </html>

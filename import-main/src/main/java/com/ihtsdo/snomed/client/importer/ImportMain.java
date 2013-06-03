@@ -85,7 +85,7 @@ public class ImportMain {
                         new FileInputStream(triplesFile), 
                         em);
             } 
-            o.setSource(Source.valueOf(parser.toString()));
+//            o.setSource(Source.valueOf(parser.toString()));
             em.merge(o);
         }finally{
             closeDb();

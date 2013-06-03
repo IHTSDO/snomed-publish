@@ -116,4 +116,6 @@ public class HibernateParserTest extends DatabaseTest{
         assertNotNull(ontology.getIsKindOfPredicate());
         assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());
     }
+    
+
 }
