@@ -77,7 +77,10 @@ public class ManifestCliParser {
             String descriptions, String concepts, String root, String format)
     {
         if (commandLine.hasOption('h')) {
-            System.out.println("\n-h, --help\t\tPrint this help menu\n" +
+            System.out.println(
+                    "\nYou need to specify mimetype.properties location as a system property like this:\n" +
+                    "  java -Dmimetype.properties=mimetype.properties -Xmx2000m -jar manifest.jar ...\n\n" +
+                    "-h, --help\t\tPrint this help menu\n" +
                     "-c, --concepts\t\tFile containing concepts\n" +
                     "-d, --descriptions\tFile containing descriptions\n" +
                     "-f, --format\t\tFile format of input files. One of 'RF1', 'RF2', 'CANONICAL', or 'CHILD_PARENT'\n" +
