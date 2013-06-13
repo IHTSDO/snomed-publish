@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.ihtsdo.snomed</groupId>
+        <artifactId>snomed-publish</artifactId>
+        <version>0.5</version>
+    </parent>
+    <artifactId>manifest</artifactId>
+    <packaging>jar</packaging>
+    <name>manifest</name>
+    <description>Application for creating the manifest file to go with the release</description>
+    <build>
+        <finalName>manifest</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>        
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.ihtsdo.snomed</groupId>
+            <artifactId>importexport</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+        
+        <!-- Better (?) JAXB implementation by Moxy. See jaxb.properties -->
+        <dependency>
+           <groupId>org.eclipse.persistence</groupId>
+           <artifactId>org.eclipse.persistence.moxy</artifactId>
+           <version>2.5.0</version>
+        </dependency>        
+
+        <!-- Spring for JUnit JPA and IoC -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>1.3.2.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+        
+<!--         <dependency> -->
+<!--             <groupId>org.springframework</groupId> -->
+<!--             <artifactId>spring-jpa</artifactId> -->
+<!--             <version>2.0.8</version> -->
+<!--         </dependency>         -->
+        
+<!--         <dependency> -->
+<!--             <groupId>org.springframework</groupId> -->
+<!--             <artifactId>spring-core</artifactId> -->
+<!--             <version>${spring.version}</version> -->
+<!--             <scope>test</scope> -->
+<!--         </dependency> -->
+
+        <!-- Spring ORM -->
+<!--         <dependency> -->
+<!--             <groupId>org.springframework</groupId> -->
+<!--             <artifactId>spring-jdbc</artifactId> -->
+<!--             <version>${spring.version}</version> -->
+<!--             <scope>test</scope> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.springframework</groupId> -->
+<!--             <artifactId>spring-orm</artifactId> -->
+<!--             <version>${spring.version}</version> -->
+<!--             <scope>test</scope> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--             <groupId>org.springframework</groupId> -->
+<!--             <artifactId>spring-tx</artifactId> -->
+<!--             <version>${spring.version}</version> -->
+<!--             <scope>test</scope> -->
+<!--         </dependency>         -->
+    </dependencies>
+</project>

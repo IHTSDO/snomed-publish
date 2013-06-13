@@ -121,6 +121,10 @@ public class Ontology {
     public void addConcept(Concept c){
         getConcepts().add(c);
     }
+    
+    public void addDescription(Description d){
+        getDescriptions().add(d);
+    }
 
     public void setConcepts(Set<Concept> concepts) {
         this.concepts = concepts;

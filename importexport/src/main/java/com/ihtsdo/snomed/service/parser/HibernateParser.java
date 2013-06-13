@@ -108,6 +108,33 @@ public abstract class HibernateParser {
         return o;
     }
     
+    public Ontology populateConceptAndDescriptions(String ontologyName, InputStream conceptsStream, 
+            InputStream descriptionStream, EntityManager em) throws IOException
+    {
+        LOG.info("Importing ontology \"" + ontologyName + "\"");
+        Stopwatch stopwatch = new Stopwatch().start();
+
+        boolean doCommit = false;
+        if (!em.getTransaction().isActive()){
+            em.getTransaction().begin();
+            doCommit=true;
+        }
+
+        Ontology ontology = createOntology(em, ontologyName);
+        populateConcepts(conceptsStream, em, ontology);
+        populateDescriptions(descriptionStream, em, ontology);
+        //createIsKindOfHierarchy(em, ontology);
+        populateDisplaynameCache(em, ontology);
+        if(doCommit){em.getTransaction().commit();}
+        
+        em.clear();
+        Ontology o = em.find(Ontology.class, ontology.getId());
+
+        stopwatch.stop();
+        LOG.info("Completed import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
+        return o;
+    }    
+    
     public Ontology populateDbWithDescriptions(String ontologyName, InputStream conceptsStream, 
             InputStream statementStream, InputStream descriptionStream, EntityManager em) throws IOException
     {
@@ -224,7 +251,7 @@ public abstract class HibernateParser {
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psUpdate = connection.prepareStatement("UPDATE Concept SET fullyspecifiedname=? WHERE id=?");
-                PreparedStatement psSelect = connection.prepareStatement("SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and d.ontology_id=?;");
+                PreparedStatement psSelect = connection.prepareStatement("SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and d.ontology_id=? and d.active != 0;");
                 int counter = 1;
                 psSelect.setLong(1, CoreMetadataConcepts.DESCRIPTION_TYPE_FULLY_SPECIFIED_NAME);
                 psSelect.setLong(2, o.getId());

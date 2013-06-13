@@ -81,6 +81,7 @@
             <version>${h2.version}</version>
         </dependency>   
         
+        <!-- MYSQL Database -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
