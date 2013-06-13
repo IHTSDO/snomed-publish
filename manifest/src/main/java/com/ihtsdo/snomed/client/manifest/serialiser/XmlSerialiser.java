@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.client.manifest.serialiser;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import javax.inject.Named;
@@ -13,8 +14,9 @@ import com.ihtsdo.snomed.service.ProgrammingException;
 @Named
 public class XmlSerialiser {
 
-    public void serialise(OutputStreamWriter oStream, Manifest manifest){
+    public void serialise(OutputStreamWriter oStream, Manifest manifest) throws IOException{
         try {
+            oStream.write("<?xml version='1.0'?>\n");
             JAXBContext jaxbContext = JAXBContext.newInstance(Manifest.class);
             Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
             jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);

@@ -42,10 +42,9 @@ public class XmlSerialiserTest {
     
     private static final String EXPECTED_SERIALISATION = 
             "<?xml version='1.0'?>\n" +
-                    "<?xml-stylesheet type=\"text/xsl\" href=\"\">\n" +
                     "<sn:manifest xmlns:sn=\"http://ihtsdo.org/snomed/schema/manifest/v1\" sn:name=\"testManifest\">\n" +
                     "   <sn:folder sn:name=\"refset\">\n" +
-                    "      <sn:file sn:mimetype=\"application/vnd.ihtsdo.snomed.rf2.refset.language+txt\" sn:name=\"der2_cRefset_LanguageDelta-en_INT_20120731.txt\" sn:size=\"0\" sn:type=\"refset\">\n" +
+                    "      <sn:file sn:mimetype=\"application/vnd.ihtsdo.snomed.refset.language+txt\" sn:name=\"der2_cRefset_LanguageDelta-en_INT_20120731.txt\" sn:size=\"0\" sn:type=\"refset\">\n" +
                     "         <sn:module sn:name=\"refsetModule1\" sn:sid=\"10\">\n" +
                     "            <sn:refset sn:name=\"refset11\" sn:sid=\"11\"/>\n" +
                     "            <sn:refset sn:name=\"refset12\" sn:sid=\"12\"/>\n" +
@@ -53,7 +52,7 @@ public class XmlSerialiserTest {
                     "            <sn:refset sn:name=\"refset14\" sn:sid=\"14\"/>\n" +
                     "         </sn:module>\n" +
                     "      </sn:file>\n" +
-                    "      <sn:file sn:mimetype=\"application/vnd.ihtsdo.snomed.rf2.refset.crossmap.simple+txt\" sn:name=\"der2_sRefset_SimpleMapDelta_INT_20120731.txt\" sn:size=\"0\" sn:type=\"refset\">\n" +
+                    "      <sn:file sn:mimetype=\"application/vnd.ihtsdo.snomed.refset.crossmap.simple+txt\" sn:name=\"der2_sRefset_SimpleMapDelta_INT_20120731.txt\" sn:size=\"0\" sn:type=\"refset\">\n" +
                     "         <sn:module sn:name=\"refsetModule2\" sn:sid=\"20\">\n" +
                     "            <sn:refset sn:name=\"refset21\" sn:sid=\"21\"/>\n" +
                     "            <sn:refset sn:name=\"refset23\" sn:sid=\"23\"/>\n" +

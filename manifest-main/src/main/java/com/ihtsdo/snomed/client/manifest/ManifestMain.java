@@ -131,7 +131,6 @@ public class ManifestMain {
             Manifest manifest = fsParser.parse(releaseFolder, o, em);
             File targetXmlFile = new File(releaseFolder.getAbsolutePath(), TARGET_XML);
             try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(targetXmlFile))){
-                outputStreamWriter.write("<?xml version='1.0'?>\n");
 //                outputStreamWriter.write("<?xml-stylesheet type=\"text/xsl\" href=\"manifest/manifest.xsl\">\n");
                 xmlSerialiser.serialise(outputStreamWriter, manifest);
             }
