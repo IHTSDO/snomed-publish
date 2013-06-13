@@ -120,12 +120,12 @@ public class FileSystemParserTest {
     public void shouldCreateRefsetManifestFilesForRefsets(){
         parser.setParsemode(Mode.STRICT);
         manifest = parser.parse(root, ontology, em);
-        assertEquals("application/vnd.ihtsdo.snomed.rf2.refset.language+txt", 
+        assertEquals("application/vnd.ihtsdo.snomed.refset.language+txt", 
                 manifest.getManifestFolder("refset")
                 .getManifestFile(DER2_C_REFSET_LANGUAGE_SNAPSHOT_EN_INT_20120731_TXT)
                 .getMimetype());
         
-        assertEquals("application/vnd.ihtsdo.snomed.rf2.refset.crossmap.full+txt", 
+        assertEquals("application/vnd.ihtsdo.snomed.refset.crossmap.full+txt", 
                 manifest.getManifestFolder("refset")
                 .getManifestFile(DER2_IISSSC_REFSET_COMPLEX_MAP_SNAPSHOT_INT_20120731_TXT)
                 .getMimetype());        
