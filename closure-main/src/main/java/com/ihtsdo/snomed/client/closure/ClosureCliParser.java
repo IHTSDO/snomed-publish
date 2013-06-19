@@ -23,7 +23,7 @@ public class ClosureCliParser {
         Options options = new Options( );
         options.addOption("h", "help", false, "Print this usage information");
         options.addOption("t", "triples", true, "Triples input file");
-        options.addOption("c", "concepts", true, "Concepts input file");
+        options.addOption("c", "concepts", true, "Optional. Concepts input file");
         //options.addOption("d", "descriptions", true, "Descriptions input file");
         options.addOption("f", "format", true, "Input format");
         options.addOption("o", "output", true, "Destination file");

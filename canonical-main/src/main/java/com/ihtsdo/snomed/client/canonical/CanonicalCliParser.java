@@ -27,7 +27,7 @@ public class CanonicalCliParser {
         Options options = new Options( );
         options.addOption("h", "help", false, "Print this usage information");
         options.addOption("t", "triples", true, "Triples input file");
-        options.addOption("c", "concepts", true, "Concepts input file");
+        options.addOption("c", "concepts", true, "Optional. Concepts input file");
         options.addOption("o", "output", true, "Destination file");
         options.addOption("d", "database", true, "Database location");
         options.addOption("s", "show", true, "Show reasoning details for concept(s)");
@@ -68,7 +68,7 @@ public class CanonicalCliParser {
         if (commandLine.hasOption('h')) {
             System.out.println("-h, --help\t\tPrint this help menu\n" +
                     "-t. --triples\t\tFile containing all the relationships that you want to process, aka 'Relationships_Core'\n" +
-                    "-c, --concepts\t\tFile containing all the concepts referenced in the relationships file, aka 'Concepts_Core'\n" +
+                    "-c, --concepts\t\tOptional. File containing all the concepts referenced in the relationships file, aka 'Concepts_Core'\n" +
                     "-o, --output\t\tDestination file to write the canonical output results to\n" +
                     "-d, --database\t\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database (minimum 3Gb of heap space required)\n" + 
                     "-s, --show\t\tOptional. Show reasoning details for concept(s). \n\t\t\tEither 'all' or a set of concept ids like '{c1id,c2id,etc.}'");
@@ -76,13 +76,13 @@ public class CanonicalCliParser {
             System.exit(0);
         }
         
-        if ((output == null) || (concepts == null) || (triples == null) ||
-                (output.isEmpty()) || (concepts.isEmpty()) || triples.isEmpty()){
+        if ((output == null) || (triples == null) ||
+                (output.isEmpty()) || triples.isEmpty()){
             System.out.println("Invalid parameter configuration. Usage is: " + helpString);
             System.exit(-1);
         }
         
-        if (!new File(concepts).isFile()){
+        if (((concepts != null) && !concepts.isEmpty()) && !new File(concepts).isFile()){
             System.out.println("Unable to locate concepts input file '" + concepts + "'");
             System.exit(-1);
         }

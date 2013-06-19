@@ -71,9 +71,15 @@ public class CanonicalMain {
     protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException{
         try{
             initDb(db);  
-            Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
-                    new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
-
+            Ontology ontology = null;
+            if (conceptFile != null){
+                ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
+            }else{
+                ontology = parser.populateDbFromStatementsOnly(DEFAULT_ONTOLOGY_NAME, 
+                        new FileInputStream(triplesFile), new FileInputStream(triplesFile), em);
+            }
+                
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();
 
             writeOut(outputFile, runAlgorithm(show, concepts));
