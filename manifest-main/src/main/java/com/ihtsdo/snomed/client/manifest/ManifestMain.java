@@ -41,7 +41,7 @@ public class ManifestMain {
     private EntityManagerFactory emf  = null;
     private EntityManager em          = null;
     
-    public static final String TARGET_FOLDER = "manifest";
+    public static final String TARGET_FOLDER = "Manifest";
     public static final String TARGET_XML = "manifest.xml";
     public static final String TARGET_HTML = "manifest.html";
     public static final String TARGET_CSS = "screen.css";
