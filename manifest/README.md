@@ -4,7 +4,15 @@ IHTSDO Snomed Publication Tools
 Manifest generator
 ------------------
 
-Utility for creating a manifest file to go with a release bundle
+Utility for creating a manifest file to go with a release bundle. 
+
+At the end, this program will create a new folder called 'Manifest' and 4 new manifest files in the root of the distribution folder (specified by -r in the inputs, see below):
+
+    manifest.html        A human readable HTML version of the manifest. Transient artefact that can be generated using 
+                         'manifest.xml' and 'Manifest/manifest.xsl'. References 'Manifest/screen.css'.
+    manifest.xml         A machine-readable XML form of the manifest. Non-transient authority.
+    Manifest/screen.css  Stylesheet referenced by manifest.html
+    Manifest/screen.xsl  XML Stylesheet for generating manifest.html from manifest.xml
 
 This is the syntax:
 
