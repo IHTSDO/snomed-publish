@@ -18,6 +18,7 @@
         <module>closure-main</module>
         <module>closure-plugin</module>
         <module>import-main</module>
+        <module>jenaimport-main</module>
         <module>diff-main</module>
 	<module>test</module>
         <module>web</module>
