@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 
@@ -63,29 +62,29 @@ public class ImportMain {
         try{
             initDb(properties);
             HibernateParser hibParser = HibernateParserFactory.getParser(parser);
-            Ontology o = null;
+//            Ontology o = null;
             if (descriptionFile != null){
-                o = hibParser.populateDbWithDescriptions(
+                hibParser.populateDbWithDescriptions(
                         name, 
                         new FileInputStream(conceptFile), 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(descriptionFile), 
                         em);
             } else if (conceptFile != null){
-                o = hibParser.populateDb(
+                hibParser.populateDb(
                         name, 
                         new FileInputStream(conceptFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
-                o = hibParser.populateDbFromStatementsOnly(
+                hibParser.populateDbFromStatementsOnly(
                         name, 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
                         em);
             } 
 //            o.setSource(Source.valueOf(parser.toString()));
-            em.merge(o);
+//            em.merge(o);
         }finally{
             closeDb();
         }

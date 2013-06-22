@@ -150,7 +150,7 @@ public class ConceptTest  extends DatabaseTest{
     @Test
     public void shouldReturnTrueForIsPredicate(){
         Concept c = new Concept(123);
-        c.setType(Concept.ATTRIBUTE);
+//        c.setType(Concept.ATTRIBUTE);
         em.persist(c);
         em.flush();
         em.clear();

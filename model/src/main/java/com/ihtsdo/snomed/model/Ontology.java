@@ -36,7 +36,7 @@ public class Ontology {
     private Source source = Source.UNKNOWN;
     
     @OneToMany(mappedBy="ontology")
-    private Set<Statement> statements;
+    private Set<Statement> statements = new HashSet<>();
 
     @OneToMany(mappedBy="ontology")
     private Set<Concept> concepts = new HashSet<Concept>();

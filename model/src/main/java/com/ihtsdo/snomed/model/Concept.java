@@ -22,8 +22,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.WordUtils;
 import org.slf4j.Logger;
@@ -36,7 +34,6 @@ import com.google.common.primitives.Longs;
  * @author henrikpettersen
  *
  */
-@XmlRootElement
 @Entity
 public class Concept {
     protected static final String ATTRIBUTE = "attribute";
@@ -46,14 +43,13 @@ public class Concept {
     @Version
     protected int version = 1;
     
-    //TRANSIENT
-    @XmlTransient @Transient 
+    @Transient 
     private Set<Concept> allKindOfPrimitiveCache;
-    @XmlTransient @Transient 
+    @Transient 
     private Set<Concept> allKindOfCache;
-    @XmlTransient @Transient
+    @Transient
     private Set<Concept> allActiveKindOfCache;
-    @XmlTransient @Transient 
+    @Transient 
     private Map<Integer, Group> groupMap = new HashMap<Integer, Group>();
     @Transient
     private Description preferredTerm;
@@ -70,17 +66,16 @@ public class Concept {
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private long id;    
     private long serialisedId;
-    @XmlTransient
     @OneToOne 
     private Ontology ontology;
     @OneToMany(mappedBy="about")  
     private Set<Description> description;
+    private String fullySpecifiedName;
     
     //RF1
-    private String fullySpecifiedName;
     private String ctv3id;
     private String snomedId;
-    private String type;
+    //private String type;
     @Column(columnDefinition = "BIT", length = 1) 
     private boolean primitive = false; 
     private int statusId = -1;
@@ -97,19 +92,15 @@ public class Concept {
     
     
     //STATEMENTS
-    @XmlTransient 
     @OneToMany(mappedBy="subject") 
-    private Set<Statement> subjectOfStatements = new HashSet<Statement>();
-    @XmlTransient 
+    private Set<Statement> subjectOfStatements = new HashSet<Statement>(); 
     @OneToMany(mappedBy="object")
     private Set<Statement> objectOfStatements = new HashSet<Statement>();    
-    @XmlTransient 
     @OneToMany(mappedBy="predicate")
     private Set<Statement> predicateOfStatements = new HashSet<Statement>();
     
     
     //HIERARCHY
-    @XmlTransient
     @ManyToMany
     @JoinTable(
         joinColumns = @JoinColumn(name="child_id"),
@@ -117,7 +108,7 @@ public class Concept {
         uniqueConstraints=@UniqueConstraint(columnNames={"parent_id", "child_id"}))
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> kindOfs = new HashSet<Concept>();
-    @XmlTransient @ManyToMany(mappedBy="kindOfs")
+    @ManyToMany(mappedBy="kindOfs")
     private Set<Concept> parentOf = new HashSet<Concept>();
     
     
@@ -285,7 +276,10 @@ public class Concept {
     }
     
     public boolean isPredicate(){
-        return ((getType() != null) && (!getType().isEmpty()) && getType().equals(ATTRIBUTE));
+        if (!getPredicateOfStatements().isEmpty()){
+            return true;
+        }
+        return false;
     }
     
 
@@ -390,12 +384,12 @@ public class Concept {
     public void setOntology(Ontology ontology) {
         this.ontology = ontology;
     }
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
+//    public String getType() {
+//        return type;
+//    }
+//    public void setType(String type) {
+//        this.type = type;
+//    }
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
     }        
