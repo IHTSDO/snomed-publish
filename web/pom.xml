@@ -41,6 +41,26 @@
             <artifactId>model</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.ihtsdo.snomed</groupId>
+            <artifactId>rdf</artifactId>
+            <version>${project.version}</version>
+        </dependency>  
+        
+        <!-- JSR-330 Javax inject annotations -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>${javax.inject.version}</version>
+        </dependency>     
+        
+        <!-- Better (?) JAXB implementation by Moxy. See jaxb.properties -->
+        <dependency>
+           <groupId>org.eclipse.persistence</groupId>
+           <artifactId>org.eclipse.persistence.moxy</artifactId>
+           <version>2.5.0</version>
+        </dependency>         
 
         <!-- Apache Commons Upload -->
         <dependency>
