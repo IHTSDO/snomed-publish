@@ -127,7 +127,7 @@ public class Rf1HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, statusId, fullySpecifiedName, type, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, statusId, fullySpecifiedName, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -144,21 +144,23 @@ public class Rf1HibernateParser extends HibernateParser{
                         try {
                             ps.setLong(1, Long.parseLong(splitIt.next())); //serialisedid
                             ps.setInt(2, Integer.parseInt(splitIt.next())); //status
-                            String fsn = splitIt.next();
-                            if (fsn.lastIndexOf(')') == -1){
-                                ps.setString(3, fsn); //fsn
-                                ps.setString(4, ""); //type
-                            }else{
-                                ps.setString(3, fsn.substring(0, fsn.lastIndexOf('(') - 1)); //fsn
-                                ps.setString(4, fsn.trim().substring(fsn.trim().lastIndexOf('(') + 1, fsn.trim().length() - 1)); //type
-                            }
-                            ps.setString(5, splitIt.next()); //ctv3id
-                            ps.setString(6, splitIt.next()); //snomedid
-                            ps.setBoolean(7, stringToBoolean(splitIt.next())); // primitive
-                            ps.setLong(8, ontology.getId()); //ontologyid
-                            ps.setBoolean(9, DEFAULT_CONCEPT_ACTIVE);
-                            ps.setInt(10, DEFAULT_VERSION);
-                            ps.setInt(11, DEFAULT_CONCEPT_EFFECTIVE_TIME);
+                            
+                            ps.setString(3, splitIt.next()); //fsn
+                            //String fsn = splitIt.next();
+//                            if (fsn.lastIndexOf(')') == -1){
+//                                ps.setString(3, fsn); //fsn
+                                //ps.setString(4, ""); //type
+//                            }else{
+//                                ps.setString(3, fsn.substring(0, fsn.lastIndexOf('(') - 1)); //fsn
+                                //ps.setString(4, fsn.trim().substring(fsn.trim().lastIndexOf('(') + 1, fsn.trim().length() - 1)); //type
+//                            }
+                            ps.setString(4, splitIt.next()); //ctv3id
+                            ps.setString(5, splitIt.next()); //snomedid
+                            ps.setBoolean(6, stringToBoolean(splitIt.next())); // primitive
+                            ps.setLong(7, ontology.getId()); //ontologyid
+                            ps.setBoolean(8, DEFAULT_CONCEPT_ACTIVE);
+                            ps.setInt(9, DEFAULT_VERSION);
+                            ps.setInt(10, DEFAULT_CONCEPT_EFFECTIVE_TIME);
                             ps.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
@@ -166,7 +168,7 @@ public class Rf1HibernateParser extends HibernateParser{
                         } catch (IllegalArgumentException e){
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
                             if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
-                        }
+                        } 
                         line = br.readLine();
                     }
                     ps.executeBatch();
