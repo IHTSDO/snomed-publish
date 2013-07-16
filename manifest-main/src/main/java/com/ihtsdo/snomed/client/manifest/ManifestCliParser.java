@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.client.manifest;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
@@ -32,7 +33,7 @@ public class ManifestCliParser {
         options.addOption("c", "concepts", true, "Concepts input file");
         options.addOption("d", "descriptions", true, "Descriptions input file");
         options.addOption("f", "format", true, "Input format");
-        options.addOption("r", "root", true, "Input format"); 
+        options.addOption("r", "root", true, "Release folder"); 
 //        options.addOption("o", "output", true, "Input format"); //optional
         options.addOption("db", "database", true, "Database location"); //optional    
 
@@ -55,7 +56,7 @@ public class ManifestCliParser {
         //String output = commandLine.getOptionValue('o');
         String db = commandLine.getOptionValue("db");
 
-        testInputs(helpString, commandLine, descriptions, concepts, root, format);
+        testInputs(helpString, commandLine, descriptions, concepts, root, format, db);
         
         
         
@@ -74,7 +75,7 @@ public class ManifestCliParser {
     }
     
     private static void testInputs(String helpString, CommandLine commandLine,
-            String descriptions, String concepts, String root, String format)
+            String descriptions, String concepts, String root, String format, String db)
     {
         if (commandLine.hasOption('h')) {
             System.out.println(
@@ -129,6 +130,15 @@ public class ManifestCliParser {
             System.out.println("You need to specify location of mimetype.properties, like this -Dmimetypes=mimetype.properties");
             System.exit(-1);
         }
+        
+        if ((db != null) && (!db.isEmpty())){
+            try {
+                new FileOutputStream(new File(db));
+            } catch (IOException e) {
+                System.out.println("Unable to write to database file '" + db +"'. Check your permissions and path.");
+                System.exit(-1);
+            }
+        }        
 
 //        if ((output != null) && (!output.isEmpty())){
 //            new File(output).delete();
