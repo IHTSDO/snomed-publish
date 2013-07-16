@@ -18,7 +18,8 @@
         <module>closure-main</module>
         <module>closure-plugin</module>
         <module>import-main</module>
-        <module>jenaimport-main</module>
+        <module>rdfs-export-main</module>
+        <module>rdf</module>
         <module>diff-main</module>
 	<module>test</module>
         <module>web</module>
@@ -38,6 +39,7 @@
         <spring.version>3.2.2.RELEASE</spring.version>
 <!--         <c3p0.version>0.9.1.2</c3p0.version> -->
 <!--         <mchange.commons.version>0.2.3.3</mchange.commons.version> -->
+        <javax.inject.version>1</javax.inject.version>
     </properties>
     <build>
         <plugins>
