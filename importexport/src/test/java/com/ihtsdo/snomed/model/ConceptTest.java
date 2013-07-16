@@ -151,7 +151,13 @@ public class ConceptTest  extends DatabaseTest{
     public void shouldReturnTrueForIsPredicate(){
         Concept c = new Concept(123);
 //        c.setType(Concept.ATTRIBUTE);
+        Concept subject = new Concept(1000);
+        Concept object = new Concept(1001);
+        Statement s = new Statement(Statement.SERIALISED_ID_NOT_DEFINED, subject, c, object);
         em.persist(c);
+        em.persist(subject);
+        em.persist(object);
+        em.persist(s);
         em.flush();
         em.clear();
         c = em.createQuery("SELECT c FROM Concept c where c.serialisedId=123", Concept.class).getSingleResult();

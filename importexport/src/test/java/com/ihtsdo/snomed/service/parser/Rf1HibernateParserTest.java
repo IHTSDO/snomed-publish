@@ -126,7 +126,7 @@ public class Rf1HibernateParserTest extends DatabaseTest{
         assertNotNull(c);
         assertEquals (280844000, c.getSerialisedId());
         assertEquals (0, c.getStatusId());
-        assertEquals ("Entire body of seventh thoracic vertebra", c.getFullySpecifiedName());
+        assertEquals ("Entire body of seventh thoracic vertebra (body structure)", c.getFullySpecifiedName());
 //        assertEquals ("body structure", c.getType());
         assertEquals ("Xa1Y9", c.getCtv3id());
         assertEquals ("T-11875", c.getSnomedId());

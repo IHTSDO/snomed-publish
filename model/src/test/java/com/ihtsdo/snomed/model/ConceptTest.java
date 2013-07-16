@@ -598,7 +598,7 @@ public class ConceptTest {
     @Test
     public void shouldReturnTrueForIsPredicate(){
         Concept c = new Concept(123);
-//        c.setType(Concept.ATTRIBUTE);
+        c.addPredicateOfStatement(new Statement(Statement.SERIALISED_ID_NOT_DEFINED));
         assertTrue(c.isPredicate());
     }
     
