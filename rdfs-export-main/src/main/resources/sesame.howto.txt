@@ -1,0 +1,6 @@
+sudo killall 4s-httpd
+sudo 4s-backend-destroy snomed
+sudo 4s-backend-setup snomed
+sudo 4s-backend snomed
+sudo 4s-import -v snomed results.rdfs
+sudo 4s-httpd -p 8000 snomed
