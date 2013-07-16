@@ -43,6 +43,11 @@ function changeOntology(value) {
     <img class="logo" src="/img/logo.symbol.png"/>
     <h1>SNOMED Clinical Terms</h1>
     <div id="global-navigation">
+      <div id="formats">
+        <span class="format"><a target="_blank" href="xml/${concept.getSerialisedId()}">XML</a></span> 
+        / <span class="format"><a target="_blank" href="json/${concept.getSerialisedId()}">JSON</a></span> 
+        / <span class="format"><a target="_blank" href="rdfs/${concept.getSerialisedId()}">RDF Schema</a></span>
+      </div>    
       <div id="ontology">
         <form>
           <select onchange="changeOntology(this.value)">
