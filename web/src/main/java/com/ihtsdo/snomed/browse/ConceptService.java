@@ -11,6 +11,7 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ihtsdo.snomed.browse.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
 
@@ -66,23 +67,5 @@ public class ConceptService {
     
 
   
-    
-    public static class ConceptNotFoundException extends Exception{
-        private static final long serialVersionUID = 1L;
-        private long conceptId;
-        private long ontologyId;
-        
-        public ConceptNotFoundException(long conceptId, long ontologyId){
-            this.conceptId = conceptId;
-            this.ontologyId = ontologyId;
-        }
 
-        public long getConceptId() {
-            return conceptId;
-        }
-
-        public long getOntologyId() {
-            return ontologyId;
-        }
-    }
 }

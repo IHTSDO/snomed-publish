@@ -21,6 +21,10 @@ public class Ontology {
         RF1, RF2, CANONICAL, CHILD_PARENT, UNKNOWN;
     }    
 
+    public Ontology(){}
+    public Ontology(long id){
+        this.id = id;
+    }
     
     @Transient
     @XmlTransient 
