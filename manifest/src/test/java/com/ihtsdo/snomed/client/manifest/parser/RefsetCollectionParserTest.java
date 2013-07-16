@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.client.manifest.model.BaseRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFileFactory;
 import com.ihtsdo.snomed.client.manifest.model.MimetypeProperties;
 import com.ihtsdo.snomed.client.manifest.model.RefsetCollectionFactory;
 import com.ihtsdo.snomed.model.Concept;
@@ -33,7 +32,7 @@ public class RefsetCollectionParserTest {
 
     @Inject private RefsetCollectionParser refsetCollectionParser;
     @Inject private RefsetCollectionFactory refsetCollectionFactory;
-    @Inject private ManifestFileFactory manifestFileFactory;
+    //@Inject private ManifestFileFactory manifestFileFactory;
     @Inject private MimetypeProperties mimetypeProperties;
     @PersistenceContext private EntityManager em;
     
