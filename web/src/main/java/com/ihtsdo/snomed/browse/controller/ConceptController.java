@@ -1,11 +1,13 @@
-package com.ihtsdo.snomed.browse;
+package com.ihtsdo.snomed.browse.controller;
 
-import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -19,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -28,31 +30,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.Ordering;
-import com.ihtsdo.snomed.browse.ConceptService.ConceptNotFoundException;
-import com.ihtsdo.snomed.browse.OntologyService.OntologyNotFoundException;
+import com.ihtsdo.snomed.browse.ConceptService;
+import com.ihtsdo.snomed.browse.OntologyService;
+import com.ihtsdo.snomed.browse.RdfService;
+import com.ihtsdo.snomed.browse.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.model.xml.XmlConcept;
 import com.ihtsdo.snomed.service.ProgrammingException;
 
 @Controller
 @RequestMapping("/")
-public class MainController {    
+public class ConceptController {    
     private static final int INDEX_NOT_SPECIFIED = -1;
     private static final String INDEX_NOT_SPECIFIED_STRING = "-1";
     private static final int MAX_STATEMENT_RESULTS = 1000;
 
-    
-    private static final Logger LOG = LoggerFactory.getLogger( MainController.class );
+    private static final Logger LOG = LoggerFactory.getLogger( ConceptController.class );
 
-    @Autowired OntologyService ontologyService;
-    @Autowired ConceptService conceptService;
+    @Inject OntologyService ontologyService;
+    @Inject ConceptService conceptService;
+    @Inject RdfService rdfService;
 
     @PersistenceContext
     EntityManager em;
@@ -109,24 +114,6 @@ public class MainController {
             .where(builder.equal(valueOfRoot.get("object").get("id"), cid));
     }
     
-    @RequestMapping(value="/", method = RequestMethod.GET)
-    public void landingPage(HttpServletResponse response, HttpServletRequest request) throws IOException{
-        response.sendRedirect("ontologies");
-    }
-    
-    @RequestMapping(value="/ontology/{ontologyId}", method = RequestMethod.GET)
-    public ModelAndView ontologyDetails(@PathVariable long ontologyId, ModelMap model, HttpServletRequest request){            
-        return new ModelAndView("redirect:" + ontologyId + "/concept/138875005");
- 
-    }  
-    
-    @RequestMapping(value="/ontologies", method = RequestMethod.GET)
-    public ModelAndView getOntologies(ModelMap map, HttpServletRequest request){
-        ModelAndView mv = new ModelAndView("ontologies");
-        map.put("ontologies", ontologyService.getAll());
-        return mv;
-    }
-    
     @Transactional
     @RequestMapping(value="/ontology/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
     public ModelAndView conceptDetails(
@@ -147,19 +134,7 @@ public class MainController {
                 .setParameter("oid", ontologyId)
                 .getSingleResult();
         
-        Concept c = null;
-        try {
-            TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
-                    "LEFT JOIN FETCH c.description " +
-                    "WHERE c.serialisedId=:serialisedId AND c.ontology.id=:ontologyId", 
-                    Concept.class);
-            getConceptQuery.setParameter("serialisedId", serialisedId);
-            getConceptQuery.setParameter("ontologyId", ontologyId);
-            c = getConceptQuery.getSingleResult();
-            c.getAllKindOfConcepts(true); //build the cache
-        } catch (NoResultException e) {
-            throw new ConceptNotFoundException(serialisedId, ontologyId);
-        }
+        Concept c = getConcept(ontologyId, serialisedId);
         
         String disambiguationType = null;
         String parsedDisplayName = null;
@@ -414,65 +389,25 @@ public class MainController {
             return new ModelAndView("concept");
         } 
     }
-    
-    @RequestMapping(value="/ontology/{ontologyId}/description/{serialisedId}", method = RequestMethod.GET)
-    public ModelAndView descriptionDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
-            HttpServletRequest request) throws DescriptionNotFoundException
-    {            
-        Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
-                .setParameter("oid", ontologyId)
-                .getSingleResult();
-        TypedQuery<Description> getDescriptionQuery = em.createQuery(
-                "SELECT d from Description d " + 
-                "LEFT JOIN FETCH d.about " +
-                "LEFT JOIN FETCH d.module " +
-                "LEFT JOIN FETCH d.type " +
-                "LEFT JOIN FETCH d.caseSignificance " +
-                "where d.ontology.id=:oid AND d.serialisedId=:serialisedId", Description.class);
-        getDescriptionQuery.setParameter("oid", ontologyId);
-        getDescriptionQuery.setParameter("serialisedId", serialisedId);
-        Description d = getDescriptionQuery.getSingleResult();
-        model.addAttribute("description", d);
-        model.addAttribute("servletPath", request.getServletPath());
-        model.addAttribute("ontologies", ontologyService.getAll());
-        model.addAttribute("ontologyId", ontologyId);
-        if (o.getSource().equals(Source.RF2)){
-            return new ModelAndView("description.rf2");
-        }else {
-            throw new InvalidInputException("Only RF2 ontologies supports this view");
-        }
-    }
-    
-    @RequestMapping(value="/ontology/{ontologyId}/triple/{serialisedId}", method = RequestMethod.GET)
-    public ModelAndView tripleDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
-            HttpServletRequest request) throws DescriptionNotFoundException
-    {            
-        Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
-                .setParameter("oid", ontologyId)
-                .getSingleResult();
-        TypedQuery<Statement> getStatementQuery = em.createQuery(
-                "SELECT s from Statement s " + 
-                "LEFT JOIN FETCH s.characteristicType " +
-                "LEFT JOIN FETCH s.module " +
-                "LEFT JOIN FETCH s.modifier " +
-                "LEFT JOIN FETCH s.subject " +
-                "LEFT JOIN FETCH s.predicate " +
-                "LEFT JOIN FETCH s.object " +
-                "where s.ontology.id=:oid AND s.serialisedId=:serialisedId", Statement.class);
-        getStatementQuery.setParameter("oid", ontologyId);
-        getStatementQuery.setParameter("serialisedId", serialisedId);
-        Statement s = getStatementQuery.getSingleResult();
-        model.addAttribute("statement", s);
-        model.addAttribute("servletPath", request.getServletPath());
-        model.addAttribute("ontologies", ontologyService.getAll());
-        model.addAttribute("ontologyId", ontologyId);
-        if (o.getSource().equals(Source.RF2)){
-            return new ModelAndView("statement.rf2");
-        }else {
-            throw new InvalidInputException("Only RF2 ontologies supports this view");
-        }
-    }       
 
+    private Concept getConcept(long ontologyId, long serialisedId)
+            throws ConceptNotFoundException {
+        Concept c = null;
+        try {
+            TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
+                    "LEFT JOIN FETCH c.description " +
+                    "WHERE c.serialisedId=:serialisedId AND c.ontology.id=:ontologyId", 
+                    Concept.class);
+            getConceptQuery.setParameter("serialisedId", serialisedId);
+            getConceptQuery.setParameter("ontologyId", ontologyId);
+            c = getConceptQuery.getSingleResult();
+            c.getAllKindOfConcepts(true); //build the cache
+        } catch (NoResultException e) {
+            throw new ConceptNotFoundException(serialisedId, ontologyId);
+        }
+        return c;
+    }
+  
     @ExceptionHandler(ConceptNotFoundException.class)
     public ModelAndView handleConceptNotFoundException(HttpServletRequest request, ConceptNotFoundException exception){
         ModelAndView modelAndView = new ModelAndView("concept.not.found");
@@ -480,23 +415,6 @@ public class MainController {
         modelAndView.addObject("ontologyId", exception.getOntologyId());
         return modelAndView;
     }
-
-    @ExceptionHandler(DescriptionNotFoundException.class)
-    public ModelAndView handleDescriptionNotFoundException(HttpServletRequest request, DescriptionNotFoundException exception){
-        ModelAndView modelAndView = new ModelAndView("description.not.found");
-        modelAndView.addObject("id", exception.getDescriptionId());
-        modelAndView.addObject("ontologyId", exception.getOntologyId());
-        return modelAndView;
-    }
-        
-    
-    @ExceptionHandler(OntologyNotFoundException.class)
-    public ModelAndView handleConceptNotFoundException(HttpServletRequest request, OntologyNotFoundException exception){
-        LOG.error("Redirecting to error page", exception);
-        ModelAndView modelAndView = new ModelAndView("ontology.not.found");
-        modelAndView.addObject("id", exception.getOntologyId());
-        return modelAndView;
-    }    
     
     @ExceptionHandler(Exception.class)
     public ModelAndView handleErrors(Exception exception){
@@ -505,45 +423,7 @@ public class MainController {
         modelAndView.addObject("message", exception.getMessage());
         return modelAndView;
     }
-    
-    public static class DescriptionNotFoundException extends Exception{
-        private static final long serialVersionUID = 1L;
-        private long descriptionId;
-        private long ontologyId;
-        
-        public DescriptionNotFoundException(long descriptionId, long ontologyId){
-            this.descriptionId = descriptionId;
-            this.ontologyId = ontologyId;
-        }
 
-        public long getDescriptionId() {
-            return descriptionId;
-        }
-
-        public long getOntologyId() {
-            return ontologyId;
-        }
-    }  
-    
-    public static class StatementNotFoundException extends Exception{
-        private static final long serialVersionUID = 1L;
-        private long statementId;
-        private long ontologyId;
-        
-        public StatementNotFoundException(long statementId, long ontologyId){
-            this.statementId = statementId;
-            this.ontologyId = ontologyId;
-        }
-
-        public long getDescriptionId() {
-            return statementId;
-        }
-
-        public long getOntologyId() {
-            return ontologyId;
-        }
-    }     
-    
     private Ordering<Concept> byActiveAndName = new Ordering<Concept>() {
         @Override
         public int compare(Concept c1, Concept c2){
@@ -583,6 +463,46 @@ public class MainController {
         }
     }; 
     
+    @Transactional
+    @RequestMapping(value = "/ontology/{ontologyId}/concept/json/{serialisedId}", 
+            method = RequestMethod.GET, 
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public XmlConcept getConceptJson(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
+        System.out.println("JSON!!");
+        Concept c = getConcept(ontologyId, serialisedId);
+        XmlConcept xc = new XmlConcept(c);
+        return xc;
+    }
+    
+    @Transactional
+    @RequestMapping(value = "/ontology/{ontologyId}/concept/xml/{serialisedId}", 
+            method = RequestMethod.GET, 
+            produces=MediaType.APPLICATION_XML_VALUE)
+    @ResponseBody
+    public XmlConcept getConceptXml(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
+        System.out.println("XML!!");
+        Concept c = getConcept(ontologyId, serialisedId);
+        XmlConcept xc = new XmlConcept(c);
+        return xc;
+    }    
+
+    @Transactional
+    @RequestMapping(value = "/ontology/{ontologyId}/concept/rdfs/{serialisedId}", 
+            method = RequestMethod.GET, 
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public void getConceptRdfsXml(@PathVariable long ontologyId, @PathVariable long serialisedId, 
+            HttpServletResponse response, OutputStream os) 
+                    throws Exception 
+    {
+        System.out.println("RDFS!!");
+        Concept c = getConcept(ontologyId, serialisedId);
+        response.setContentType("application/rdf+xml");
+        try (OutputStreamWriter ow = new OutputStreamWriter(os)){
+            rdfService.writeConcept(c, ow, new Ontology(ontologyId));
+        }
+    }        
+    
     
 //    private Ordering<Statement> byGroupActiveAndSubjectFsn = new Ordering<Statement>() {
 //        @Override
@@ -620,28 +540,7 @@ public class MainController {
 //        }
 //    };          
     
-//  @Transactional
-//  @RequestMapping(value = "/ontology/{ontologyId}/concept/{serialisedId}/json", 
-//          method = RequestMethod.GET, 
-//          produces=MediaType.APPLICATION_JSON_VALUE)
-//  @ResponseBody
-//  public Concept getConceptJson(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
-//      System.out.println("JSON!!");
-//      Concept c = getConcept(ontologyId, serialisedId);
-//      return c;
-//  }
-//  
-//  @Transactional
-//  @RequestMapping(value = "/ontology/{ontologyId}/concept/{serialisedId}/xml", 
-//          method = RequestMethod.GET, 
-//          produces=MediaType.APPLICATION_XML_VALUE)
-//  @ResponseBody
-//  public Concept getConceptXml(@PathVariable long ontologyId, @PathVariable long serialisedId) throws Exception {
-//      System.out.println("XML!!");
-//      Concept c = getConcept(ontologyId, serialisedId);
-//      return c;
-//  }    
-//
+
     
     /*
     <form:form name="createCustomer" action="/practicemvc/customers/create/" method="POST" modelAttribute="fileUpload">
