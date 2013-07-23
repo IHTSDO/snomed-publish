@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ihtsdo.snomed.browse.OntologyService;
-import com.ihtsdo.snomed.browse.RdfService;
 import com.ihtsdo.snomed.browse.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.browse.exception.DescriptionNotFoundException;
 import com.ihtsdo.snomed.browse.exception.StatementNotFoundException;
+import com.ihtsdo.snomed.browse.service.OntologyService;
+import com.ihtsdo.snomed.browse.service.RdfService;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.Statement;
@@ -41,13 +41,14 @@ import com.ihtsdo.snomed.service.InvalidInputException;
 
 @Controller
 @RequestMapping("/ontology/{ontologyId}/triple")
+@Transactional (value = "transactionManager", readOnly = true)
 public class StatementController {
     private static final Logger LOG = LoggerFactory.getLogger( StatementController.class );
 
     @Autowired OntologyService ontologyService;
     @Inject RdfService rdfService;
 
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
     
     CriteriaBuilder builder;

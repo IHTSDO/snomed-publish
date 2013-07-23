@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ihtsdo.snomed.browse.OntologyService;
-import com.ihtsdo.snomed.browse.RdfService;
 import com.ihtsdo.snomed.browse.exception.DescriptionNotFoundException;
+import com.ihtsdo.snomed.browse.service.OntologyService;
+import com.ihtsdo.snomed.browse.service.RdfService;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
@@ -35,6 +35,7 @@ import com.ihtsdo.snomed.service.InvalidInputException;
 
 @Controller
 @RequestMapping("/ontology/{ontologyId}/description")
+@Transactional (value = "transactionManager", readOnly = true)
 public class DescriptionController {    
 
     private static final Logger LOG = LoggerFactory.getLogger( DescriptionController.class );
@@ -42,7 +43,7 @@ public class DescriptionController {
     @Inject OntologyService ontologyService;
     @Inject RdfService rdfService;
 
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;    
     
     @PostConstruct

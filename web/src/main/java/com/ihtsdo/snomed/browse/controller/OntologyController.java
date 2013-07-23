@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,12 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ihtsdo.snomed.browse.ConceptService;
-import com.ihtsdo.snomed.browse.OntologyService;
-import com.ihtsdo.snomed.browse.OntologyService.OntologyNotFoundException;
+import com.ihtsdo.snomed.browse.service.ConceptService;
+import com.ihtsdo.snomed.browse.service.OntologyService;
+import com.ihtsdo.snomed.browse.service.OntologyService.OntologyNotFoundException;
 
 @Controller
 @RequestMapping("/")
+@Transactional (value = "transactionManager", readOnly = true)
 public class OntologyController {    
 
     private static final Logger LOG = LoggerFactory.getLogger( OntologyController.class );
@@ -29,7 +31,7 @@ public class OntologyController {
     @Autowired OntologyService ontologyService;
     @Autowired ConceptService conceptService;
 
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;    
     
     @PostConstruct

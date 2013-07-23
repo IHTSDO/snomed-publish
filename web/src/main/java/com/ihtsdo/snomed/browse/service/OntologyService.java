@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.browse;
+package com.ihtsdo.snomed.browse.service;
 
 import java.util.List;
 
@@ -13,9 +13,10 @@ import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 @Service
+@Transactional (value = "transactionManager", readOnly = true)
 public class OntologyService {
     
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
     
 //    HibernateParser importer = HibernateParserFactory.getParser(Parser.RF1);

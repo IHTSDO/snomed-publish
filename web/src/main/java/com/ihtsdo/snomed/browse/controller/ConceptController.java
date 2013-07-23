@@ -34,10 +34,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.Ordering;
-import com.ihtsdo.snomed.browse.ConceptService;
-import com.ihtsdo.snomed.browse.OntologyService;
-import com.ihtsdo.snomed.browse.RdfService;
 import com.ihtsdo.snomed.browse.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.browse.service.ConceptService;
+import com.ihtsdo.snomed.browse.service.OntologyService;
+import com.ihtsdo.snomed.browse.service.RdfService;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
@@ -48,6 +48,7 @@ import com.ihtsdo.snomed.service.ProgrammingException;
 
 @Controller
 @RequestMapping("/")
+@Transactional (value = "transactionManager", readOnly = true)
 public class ConceptController {    
     private static final int INDEX_NOT_SPECIFIED = -1;
     private static final String INDEX_NOT_SPECIFIED_STRING = "-1";
@@ -58,8 +59,8 @@ public class ConceptController {
     @Inject OntologyService ontologyService;
     @Inject ConceptService conceptService;
     @Inject RdfService rdfService;
-
-    @PersistenceContext
+    
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
     
     CriteriaBuilder builder;

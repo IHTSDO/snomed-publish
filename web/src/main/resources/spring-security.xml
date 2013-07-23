@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+             xmlns:security="http://www.springframework.org/schema/security" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                    http://www.springframework.org/schema/security 
+                    http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+    
+    <!-- This is where we configure Spring-Security  -->
+    <security:http auto-config="true" use-expressions="true" access-denied-page="/browse/auth/denied" >
+    
+        <security:intercept-url pattern="/browse/auth/login" access="permitAll"/>
+<!--         <security:intercept-url pattern="/browse/main/admin" access="hasRole('ROLE_ADMIN')"/> -->
+        <security:intercept-url pattern="/browse/**" access="hasRole('ROLE_USER')"/>
+        
+        <security:openid-login
+                login-page="/browse/auth/login" 
+                authentication-failure-url="/browse/auth/login?error=true" 
+                default-target-url="/browse/ontologies">
+        
+          <security:attribute-exchange>
+            <security:openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true"/>
+            <security:openid-attribute name="firstname" type="http://openid.net/schema/namePerson/first" required="true"/>
+            <security:openid-attribute name="lastname" type="http://openid.net/schema/namePerson/last" required="true"/>
+            <security:openid-attribute name="middlename" type="http://openid.net/schema/namePerson/middle" required="true"/>
+            <security:openid-attribute name="prefix" type="http://openid.net/schema/namePerson/prefix" required="true"/>
+          </security:attribute-exchange>
+                
+        </security:openid-login>
+            
+        <security:logout 
+                invalidate-session="true" 
+                logout-success-url="/browse/auth/login" 
+                logout-url="/browse/auth/logout"/>
+    
+    </security:http>
+    
+    <!-- Declare an authentication-manager to use a custom userDetailsService -->
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="openIdUserDetailsService">
+            <security:password-encoder ref="passwordEncoder" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+    
+    <!-- Use a Md5 encoder since the user's passwords are stored as Md5 in the database -->
+    <bean class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" id="passwordEncoder" />
+    
+<!--     <bean class="com.ihtsdo.snomed.browse.auth.OpenIdUserDetailsService" id="userDetailsService"/> -->
+    
+    <!-- An in-memory list of users. No need to access an external database layer. See Spring Security 3.1 Reference 5.2.1 In-Memory Authentication -->
+<!--     <security:user-service id="userDetailsService"> -->
+<!--         user name is based on the returned OpenID identifier from Google -->
+<!--         <security:user name="https://www.google.com/accounts/o8/id?id=AItOawlWQzDpP5rlIgg9Z68WAj18dPs3vPPJ444" password="" authorities="ROLE_USER, ROLE_ADMIN" /> -->
+<!--     </security:user-service> -->
+    
+    <!-- An in-memory list of users. No need to access an external database layer. See Spring Security 3.1 Reference 5.2.1 In-Memory Authentication -->
+    <!-- john's password is admin, while jane;s password is user -->
+<!--     <security:user-service id="userDetailsService"> -->
+<!--         <security:user name="john" password="21232f297a57a5a743894a0e4a801fc3" authorities="ROLE_USER, ROLE_ADMIN" /> -->
+<!--         <security:user name="jane" password="ee11cbb19052e40b07aac0ca060c23ee" authorities="ROLE_USER" /> -->
+<!--     </security:user-service> -->
+</beans>

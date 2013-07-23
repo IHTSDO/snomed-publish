@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.browse;
+package com.ihtsdo.snomed.browse.service;
 
 import java.util.List;
 
@@ -16,9 +16,10 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
 
 @Service
+@Transactional (value = "transactionManager", readOnly = true)
 public class ConceptService {
     
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
     
     //TypedQuery<Concept> getConceptQuery;

@@ -1,10 +1,12 @@
-package com.ihtsdo.snomed.browse;
+package com.ihtsdo.snomed.browse.service;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
@@ -13,6 +15,7 @@ import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.jena.RdfSchemaSerialiser;
 
 @Named
+@Transactional (value = "transactionManager", readOnly = true)
 public class RdfService {
 
     @Inject

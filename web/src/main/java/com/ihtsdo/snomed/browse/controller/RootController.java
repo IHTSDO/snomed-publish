@@ -10,14 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ihtsdo.snomed.browse.ConceptService;
-import com.ihtsdo.snomed.browse.OntologyService;
+import com.ihtsdo.snomed.browse.service.ConceptService;
+import com.ihtsdo.snomed.browse.service.OntologyService;
 
 @Controller
 @RequestMapping("/")
+@Transactional (value = "transactionManager", readOnly = true)
 public class RootController {    
 
     //private static final Logger LOG = LoggerFactory.getLogger( RootController.class );
@@ -25,7 +27,7 @@ public class RootController {
     @Autowired OntologyService ontologyService;
     @Autowired ConceptService conceptService;
 
-    @PersistenceContext
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;    
     
     @PostConstruct
