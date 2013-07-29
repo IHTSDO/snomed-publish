@@ -17,7 +17,7 @@
         <security:openid-login
                 login-page="/browse/auth/login" 
                 authentication-failure-url="/browse/auth/login?error=true" 
-                default-target-url="/browse/ontologies">
+                default-target-url="/browse/">
         
           <security:attribute-exchange>
             <security:openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true"/>

@@ -37,6 +37,6 @@ public class RootController {
     
     @RequestMapping(value="/", method = RequestMethod.GET)
     public void landingPage(HttpServletResponse response, HttpServletRequest request) throws IOException{
-        response.sendRedirect("ontologies");
+        response.sendRedirect("/browse/ontology/1/sparql");
     }
 }
