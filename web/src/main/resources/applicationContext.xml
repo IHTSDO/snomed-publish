@@ -29,7 +29,7 @@
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
 
-    <mvc:resources location="/" mapping="/static/**"/>
+    <mvc:resources location="/static/" mapping="/static/**"/>
 
     <!-- allows for root context: http://goo.gl/5gAJg -->
     <mvc:default-servlet-handler/>
