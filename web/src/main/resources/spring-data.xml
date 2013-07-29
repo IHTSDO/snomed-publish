@@ -63,12 +63,20 @@
         p:packagesToScan="com.ihtsdo.snomed.browse.model"
         p:dataSource-ref="dataSourceAuthentication"
         p:jpaVendorAdapter-ref="hibernateVendor"
-        p:jpaPropertyMap-ref="jpaPropertyMap"
+        p:jpaPropertyMap-ref="jpaPropertyMapAuthentication"
         p:persistenceUnitName="hibernatePersistenceUnitAuthentication" />
     
     <!-- Properties from persistence.xml -->
     <util:map id="jpaPropertyMap">        
         <entry  key="hibernate.hbm2ddl.auto" value="validate"/>
+        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+        <entry key="hibernate.connection.charSet" value="UTF-8"/>
+        <entry key="hibernate.format_sql" value="true"/>
+        <entry key="hibernate.show_sql" value="true"/>
+    </util:map>
+
+    <util:map id="jpaPropertyMapAuthentication">
+        <entry  key="hibernate.hbm2ddl.auto" value="update"/>
         <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
         <entry key="hibernate.connection.charSet" value="UTF-8"/>
         <entry key="hibernate.format_sql" value="true"/>
