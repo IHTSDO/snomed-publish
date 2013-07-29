@@ -1,0 +1,1 @@
+alter table concept add index serialisedIdIndex (serialisedId, ontology_id)

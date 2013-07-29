@@ -23,8 +23,12 @@
         http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
         http://www.springframework.org/schema/tx 
         http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
-
     
+    <context:property-placeholder 
+        location="classpath:spring.properties" 
+        system-properties-mode="OVERRIDE" 
+        ignore-unresolvable="true"/>
+
     <!-- Configures the annotation-driven Spring MVC Controller programming model.
          Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
     <mvc:annotation-driven/>
@@ -43,6 +47,7 @@
     
 <!--     <bean id="canonicalSerialiser" class="com.ihtsdo.snomed.service.CanonicalSerialiser"/> -->
 <!--     <bean id="hibernateDbImporter" class="com.ihtsdo.snomed.service.Rf1HibernateParser"/> -->
+    
     
     
     <!-- Configure the multipart resolver -->
@@ -86,5 +91,32 @@
         <property name="unmarshaller" ref="jaxb2Marshaller" />
         <property name="supportedMediaTypes" value="application/xml"/>
     </bean>    
+    
+    <!-- HTTP CLIENT -->
+   <bean id="httpClient" class="org.apache.http.impl.client.DefaultHttpClient">
+        <constructor-arg>
+            <bean class="org.apache.http.impl.conn.PoolingClientConnectionManager"/>
+        </constructor-arg>
+    </bean>
+    
+    
+    <bean id="sparqlTemplate" class="org.springframework.web.client.RestTemplate">
+<!--         <property name="messageConverters" ref="mappingJacksonHttpMessageConverter"/> -->
+<!--         <property name="messageConverters"> -->
+<!--             <list> -->
+<!--                 <bean class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter"> -->
+<!--                     <property name="marshaller" ref="jaxbMarshaller"/> -->
+<!--                     <property name="unmarshaller" ref="jaxbMarshaller"/> -->
+<!--                 </bean> -->
+<!--                 <bean class="org.springframework.http.converter.FormHttpMessageConverter"/> -->
+<!--                 <bean class="org.springframework.http.converter.StringHttpMessageConverter"/> -->
+<!--             </list> -->
+<!--         </property> -->
+        <constructor-arg>
+            <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+                <constructor-arg ref="httpClient"/>
+            </bean>
+        </constructor-arg>
+    </bean>
 
 </beans>

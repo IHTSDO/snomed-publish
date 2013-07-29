@@ -10,12 +10,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @Entity
+@Table(uniqueConstraints={
+        @UniqueConstraint(name="uniqueSerialisedId", columnNames={
+                "serialisedId", "ontology_id"
+        })
+    })
 public class Description {
     
     private static final int RF1_PREFERRED_TERM_ID = 1;

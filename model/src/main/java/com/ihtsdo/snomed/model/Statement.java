@@ -11,11 +11,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @Entity(name="Statement")
+@Table(uniqueConstraints={
+        @UniqueConstraint(name="uniqueSerialisedId", columnNames={
+            "serialisedId", "ontology_id"
+        })
+    })
 public class Statement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;
@@ -46,9 +53,11 @@ public class Statement {
     private Concept characteristicType;
     @Column(columnDefinition = "BIT", length = 1)
     private boolean active;
-    @OneToOne(fetch=FetchType.EAGER)
+//    @OneToOne(fetch=FetchType.EAGER)
+    @OneToOne(fetch=FetchType.LAZY)
     private Concept module;
-    @OneToOne(fetch=FetchType.EAGER)
+    //@OneToOne(fetch=FetchType.EAGER)
+    @OneToOne(fetch=FetchType.LAZY)
     private Concept modifier;
     private int effectiveTime;
     

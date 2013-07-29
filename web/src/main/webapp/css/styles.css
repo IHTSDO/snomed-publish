@@ -742,3 +742,91 @@ body#description-details .properties .property .value{
     float: left;
 }
 
+
+
+/** QUERY **/
+
+body#sparql .binding{
+    float: left;
+    
+}
+
+body#sparql .binding a{
+    
+}
+
+body#sparql .binding.concept{
+    width: 100%;
+}
+
+body#sparql table.results tr.result{
+    height: 1.5em;
+    text-align: top;
+}
+
+body#sparql table td{
+    height: 1.25em;
+}
+
+body#sparql .submit{
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+body#sparql .binding a{
+    float: left;
+}
+
+body#sparql .binding .id{
+    float: left;
+    padding-left: 0.75em;
+    font-size: 0.8em;
+    padding-top: 0.05em;
+    
+}
+
+body#sparql .input textarea{
+    font-size: 1em;
+}
+
+body#sparql h1{
+    width:100%;
+    padding-bottom: 0.5em;
+    padding-top: 2em;
+    color: green;
+}
+
+body#sparql .prefixes{
+    float: left;
+    
+}
+
+body#sparql .prefixes{
+    float: left;
+    padding-left: 1em;
+    padding-top: 0.5em;
+        font-size: 0.8em;
+}
+
+body#sparql .prefixes h3{
+    margin-top: 0em;
+    margin-bottom: 0.5em;
+    }
+
+body#sparql .prefixes table tr td:first-child{
+    width: 3em;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+body#sparql .prefixes table tr td:nth-child(2){
+    color: grey;
+}
+
+body#sparql .input{
+    float: left;
+}
+
+body#sparql .submit{
+    clear: both;
+}

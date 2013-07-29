@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.browse;
+package com.ihtsdo.snomed.browse.controller;
 
 
 

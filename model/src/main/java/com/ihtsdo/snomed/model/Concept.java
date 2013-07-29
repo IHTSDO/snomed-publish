@@ -19,6 +19,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -35,6 +36,11 @@ import com.google.common.primitives.Longs;
  *
  */
 @Entity
+@Table(uniqueConstraints={
+        @UniqueConstraint(name="uniqueSerialisedId", columnNames={
+            "serialisedId", "ontology_id"
+        })
+    })
 public class Concept {
     protected static final String ATTRIBUTE = "attribute";
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
@@ -64,7 +70,9 @@ public class Concept {
     //SHARED
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
-    private long id;    
+    private long id;
+    
+    
     private long serialisedId;
     @OneToOne 
     private Ontology ontology;

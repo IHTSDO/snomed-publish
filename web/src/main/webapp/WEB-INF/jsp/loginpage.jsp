@@ -10,7 +10,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Login to Snomed Browser</title>
 </head>
-<body>
+<body style="background-image: url('/img/village.jpg')'">
+<div style="background-image: url('/img/village.jpg')'; background-repeat: repeat; background-position: left top;">
 <c:url var="openIDLoginUrl" value="/j_spring_openid_security_check" />
 <h1 style="padding-bottom: 1em">Snomed Browser</h1>
 <h3>Please login using your Google / @ihtsdo.org account:</h3>
@@ -18,7 +19,7 @@
     <input name="openid_identifier" type="hidden" value="https://www.google.com/accounts/o8/id"/>
     <input type="image" width="200px" src="/img/signin.with.google.png"/>
 </form>
-
+</div>
 </body>
 </html>
 

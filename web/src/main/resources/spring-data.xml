@@ -26,12 +26,9 @@
         http://www.springframework.org/schema/tx 
         http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-    <context:property-placeholder 
-        location="classpath:database.properties" 
-        system-properties-mode="OVERRIDE" 
-        ignore-unresolvable="true"/>
 
-    <!-- Declare a datasource that has pooling capabilities -->
+
+    <!-- Declare a snomed datasource that has pooling capabilities -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
         destroy-method="close"
         p:driverClass="${database.driver}" p:jdbcUrl="${database.url}"
@@ -51,7 +48,7 @@
     <!-- http://stackoverflow.com/questions/1780341/do-i-need-class-elements-in-persistence-xml -->
     <!-- So we get rid of persistence.xml alltogether. Good riddance, what a shitty spec! -->
 
-    <!-- Declare a JPA entityManagerFactory -->
+    <!-- Declare a JPA entityManagerFactory for snomed -->
     <!-- New in Spring 3.1, we can get rid of persistence.xml -->
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
         p:packagesToScan="com.ihtsdo.snomed.model"
@@ -74,18 +71,18 @@
         <entry  key="hibernate.hbm2ddl.auto" value="validate"/>
         <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
         <entry key="hibernate.connection.charSet" value="UTF-8"/>
-        <entry key="hibernate.format_sql" value="false"/>
-        <entry key="hibernate.show_sql" value="false"/>
+        <entry key="hibernate.format_sql" value="true"/>
+        <entry key="hibernate.show_sql" value="true"/>
     </util:map>
 
     <!-- Properties from persistence.xml -->
-    <util:map id="jpaPropertyMap">        
-        <entry  key="hibernate.hbm2ddl.auto" value="update"/>
-        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
-        <entry key="hibernate.connection.charSet" value="UTF-8"/>
-        <entry key="hibernate.format_sql" value="false"/>
-        <entry key="hibernate.show_sql" value="false"/>
-    </util:map>
+<!--     <util:map id="jpaPropertyMap">         -->
+<!--         <entry  key="hibernate.hbm2ddl.auto" value="update"/> -->
+<!--         <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/> -->
+<!--         <entry key="hibernate.connection.charSet" value="UTF-8"/> -->
+<!--         <entry key="hibernate.format_sql" value="false"/> -->
+<!--         <entry key="hibernate.show_sql" value="false"/> -->
+<!--     </util:map> -->
 
     <bean id="hibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
         p:showSql="false"/>
