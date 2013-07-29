@@ -29,6 +29,11 @@
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
 
+    <mvc:resources location="/" mapping="/static/**"/>
+
+    <!-- allows for root context: http://goo.gl/5gAJg -->
+    <mvc:default-servlet-handler/>
+
     <!-- Configures the annotation-driven Spring MVC Controller programming model.
          Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
     <mvc:annotation-driven/>
@@ -37,6 +42,12 @@
     <tx:annotation-driven/>
     
     <context:component-scan base-package="com.ihtsdo.snomed" />
+    
+    
+    
+<!--     <mvc:resources location="/css/" mapping="/css/**"/> -->
+<!--     <mvc:resources location="/js/" mapping="/js/**"/> -->
+<!--     <mvc:resources location="/img/" mapping="/img/**"/> -->
     
     <!-- Imports logging configuration -->
 <!--     <import resource="trace-context.xml"/> -->

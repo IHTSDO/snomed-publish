@@ -12,7 +12,7 @@
   <title>Snomed SPARQL query</title>
   <meta name="description" content="Snomed browser">
   <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-  <link rel="stylesheet" href="/css/styles.css?v=1.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=1.0">
   <script type="text/javascript">
   function changeOntology(value) {
       var redirect;
@@ -38,29 +38,65 @@
       <div class="input"><form:textarea path="query" rows="10" cols="100"/></div>
       <div class="prefixes">
       <h3>Prefixes</h3>
-      <table>
-        <tr>
-            <td>rdf</td>
-            <td>http://www.w3.org/1999/02/22-rdf-syntax-ns#</td>
-        </tr>
-        <tr>
-            <td>rdfs</td>
-            <td>http://www.w3.org/2000/01/rdf-schema#</td>
-        </tr>
-        <tr>
-            <td>c</td>
-            <td>http://snomed.sparklingideas.co.uk/ontology/1/concept/</td>
-        </tr>
-        <tr>
-            <td>d</td>
-            <td>http://snomed.sparklingideas.co.uk/ontology/1/description/</td>
-        </tr>
-        <tr>
-            <td>s</td>
-            <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/</td>
-        </tr>
-      </table>
-      </div>      
+        <table>
+          <tr>
+              <td>rdf</td>
+              <td>http://www.w3.org/1999/02/22-rdf-syntax-ns#</td>
+          </tr>
+          <tr>
+              <td>rdfs</td>
+              <td>http://www.w3.org/2000/01/rdf-schema#</td>
+          </tr>
+          <tr>
+              <td>c</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/concept/</td>
+          </tr>
+          <tr>
+              <td>d</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/description/</td>
+          </tr>
+          <tr>
+              <td>s</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/</td>
+          </tr>
+        </table>
+      </div>
+      <div class="attributes">
+        <div class="rdf-reference"><a href="http://www.w3schools.com/rdf/rdf_reference.asp" target="_blank">RDF Reference</a></div>      
+        <h4>Concept</h4>
+        <ul>
+            <li>rdf:type</li>
+            <li>rdfs:label</li>
+            <li>sn:description</li>
+            <li>sn:module</li>
+            <li>sn:status</li>
+            <li>sn:active</li>
+            <li>sn:effectiveTime</li>
+        </ul>
+        <h4>Triple (<a href="http://goo.gl/sEb4nB" target="_blank">reification</a>)</h4>
+        <ul>
+            <li>rdf:type</li>
+            <li>rdf:subject</li>
+            <li>rdf:predicate</li>
+            <li>rdf:object</li>
+            <li>sn:modifier</li>
+            <li>sn:module</li>
+            <li>sn:characteristictype</li>
+            <li>sn:group</li>
+            <li>sn:active</li>
+            <li>sn:effectiveTime</li>
+        </ul>
+        <h4>Description</h4>
+        <ul>
+            <li>rdf:type</li>
+            <li>rdfs:label</li>
+            <li>sn:module</li>
+            <li>sn:type</li>
+            <li>sn:casesignificance</li>
+            <li>sn:active</li>
+            <li>sn:effectiveTime</li>
+        </ul>
+      </div>
     </div> 
     <div class="submit"><input type="submit" value="Run Query"/></div>
   </form:form>

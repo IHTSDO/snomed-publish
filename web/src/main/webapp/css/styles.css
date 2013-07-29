@@ -805,7 +805,7 @@ body#sparql .prefixes{
     float: left;
     padding-left: 1em;
     padding-top: 0.5em;
-        font-size: 0.8em;
+    font-size: 0.9em;
 }
 
 body#sparql .prefixes h3{
@@ -816,7 +816,6 @@ body#sparql .prefixes h3{
 body#sparql .prefixes table tr td:first-child{
     width: 3em;
     font-weight: bold;
-    font-size: 1.2em;
 }
 
 body#sparql .prefixes table tr td:nth-child(2){
@@ -828,5 +827,32 @@ body#sparql .input{
 }
 
 body#sparql .submit{
-    clear: both;
+    clear: left;
+}
+
+body#sparql .attributes{
+    float: right;
+    font-size: 0.9em;
+}
+
+body#sparql .attributes h4{
+    margin: 0.75em 0 0.5em;
+}
+
+body#sparql .attributes ul{
+    list-style-type: none;
+    list-style-position: outside;
+    padding-left: 0.5em;
+    margin-top: 0em;
+    color: grey;
+}
+
+body#sparql .attributes li{
+    padding: 0.2em 0;
+}
+
+body#sparql .attributes .rdf-reference{
+    font-size: 1.2em;
+    margin-bottom: 0.75em;
+}
 }

@@ -17,7 +17,7 @@
 <h3>Please login using your Google / @ihtsdo.org account:</h3>
 <form action="${openIDLoginUrl}" method="post">
     <input name="openid_identifier" type="hidden" value="https://www.google.com/accounts/o8/id"/>
-    <input type="image" width="200px" src="/img/signin.with.google.png"/>
+    <input type="image" width="200px" src="/static/img/signin.with.google.png"/>
 </form>
 </div>
 </body>

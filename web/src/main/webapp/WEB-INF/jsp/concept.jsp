@@ -9,7 +9,7 @@
 <title>Snomed ${concept.getSerialisedId()}</title>
 <meta name="description" content="Snomed browser">
 <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-<link rel="stylesheet" href="/css/styles.css?v=1.0">
+<link rel="stylesheet" href="/static/css/styles.css?v=1.0">
 <script type="text/javascript">
 function changeOntology(value) {
     var redirect;
