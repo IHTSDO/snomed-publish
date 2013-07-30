@@ -72,10 +72,10 @@ public class SparqlService {
     @Inject
     protected HttpClient httpClient;
     
-    protected MultiValueMap<String, String> map;
-    protected HttpEntity<String> request;
-    protected HttpHeaders headers;
-    
+//    protected MultiValueMap<String, String> map;
+//    protected HttpEntity<String> request;
+//    protected HttpHeaders headers;
+//    
     public static class AcceptHeaderHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private long contentLength;
@@ -88,7 +88,7 @@ public class SparqlService {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                 ClientHttpRequestExecution execution) throws IOException 
         {
-            System.out.println("In the interceptor!");
+            //System.out.println("In the interceptor!");
             HttpRequestWrapper requestWrapper = new HttpRequestWrapper(request);
             requestWrapper.getHeaders().setAccept(Arrays.asList(MediaType.APPLICATION_XML));
             requestWrapper.getHeaders().setContentType(MediaType.parseMediaType("application/x-www-form-urlencoded"));
@@ -105,8 +105,8 @@ public class SparqlService {
         //headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
         //request = new HttpEntity<String>(headers);
         
-        map = new LinkedMultiValueMap<String, String>();
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        //map = new LinkedMultiValueMap<String, String>();
+        //HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(map, headers);
         
     }
     
@@ -115,7 +115,9 @@ public class SparqlService {
     private XPathExpression variableNameXpe;
     private XPathExpression resultListXpe;
     private XPathExpression bindingXpe;
-    private XPathExpression bindingValueXpe;
+    private XPathExpression bindingValueClassXpe;
+    private XPathExpression bindingValueLiteralXpe;
+    private XPathExpression bindingValueLiteralDatatypeXpe;
     private XPathExpression bindingVariableXpe;
     //private XPathExpression resultBindingXpe;
     private XPath xpath;
@@ -129,15 +131,17 @@ public class SparqlService {
         variableNameXpe = xpath.compile("@name");
         resultListXpe   = xpath.compile("/sp:sparql/sp:results/sp:result");
         bindingXpe = xpath.compile("sp:binding");
-        bindingValueXpe = xpath.compile("sp:uri");
+        bindingValueClassXpe = xpath.compile("sp:uri");
+        bindingValueLiteralXpe = xpath.compile("sp:literal");
+        bindingValueLiteralDatatypeXpe = xpath.compile("sp:literal/@datatype");
         bindingVariableXpe = xpath.compile("@name");
     }
     
     public SparqlResults runQuery(String query, long ontologyId) throws RestClientException, URISyntaxException, XPathExpressionException, ParserConfigurationException, SAXException, IOException{
-        LOG.info("Running query [{}] on ontology {}", query, ontologyId);
+        LOG.info("Running query [\n{}\n] on ontology {}", query, ontologyId);
         SparqlResults results = new SparqlResults();
 
-//        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
         map.add("query", query);
         //headers.setContentLength(query.length());
         restTemplate.setInterceptors(Arrays.asList((ClientHttpRequestInterceptor)
@@ -159,10 +163,22 @@ public class SparqlService {
             Map<String, Binding> resultMap = new HashMap<>();
             NodeList bindings = (NodeList) bindingXpe.evaluate(resultNodes.item(i), XPathConstants.NODESET);
             for (int j = 0; j < bindings.getLength(); j++){
-                URL url = new URL((String)bindingValueXpe.evaluate(bindings.item(j), XPathConstants.STRING));
-                resultMap.put(
-                        (String)bindingVariableXpe.evaluate(bindings.item(j), XPathConstants.STRING),
-                        new Binding(url, getObjectForUrl(url, ontologyId)));
+                
+                String bindingVariable = (String)bindingVariableXpe.evaluate(bindings.item(j), XPathConstants.STRING);
+                String bindingValue = (String)bindingValueClassXpe.evaluate(bindings.item(j), XPathConstants.STRING);
+                Binding binding;
+                
+                if ((bindingValue == null) || (bindingValue.isEmpty())){
+                    bindingValue = (String)bindingValueLiteralXpe.evaluate(bindings.item(j), XPathConstants.STRING);
+                    String datatype = (String)bindingValueLiteralDatatypeXpe.evaluate(bindings.item(j), XPathConstants.STRING);
+                    binding = new Binding(new URL(datatype), bindingValue);
+                }else{
+                    URL url = new URL(bindingValue);
+                    binding = new Binding(url, getObjectForUrl(url, ontologyId)); 
+                }
+                resultMap.put(bindingVariable, binding);
+                
+
             }
             results.getResults().add(resultMap);
         }
@@ -213,7 +229,7 @@ public class SparqlService {
             }
         } finally{
             overAllstopwatch.stop();
-            LOG.info("Object retrieved from db in " + overAllstopwatch.elapsed(TimeUnit.MILLISECONDS) + " miliseconds");
+            LOG.debug("Object retrieved from db in " + overAllstopwatch.elapsed(TimeUnit.MILLISECONDS) + " miliseconds");
         }
     }
 

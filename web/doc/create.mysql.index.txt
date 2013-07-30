@@ -1,1 +1,3 @@
-alter table concept add index serialisedIdIndex (serialisedId, ontology_id)
+alter table Concept add index serialisedIdIndex (serialisedId, ontology_id)
+alter table Statement add index serialisedIdIndex (serialisedId, ontology_id)
+alter table Description add index serialisedIdIndex (serialisedId, ontology_id)

@@ -59,10 +59,20 @@
               <td>s</td>
               <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/</td>
           </tr>
+          <tr>
+            <td>sn</td>
+            <td>http://snomed.sparklingideas.co.uk/term/</td>
+          </tr>
+          <tr>
+            <td>xsd</td>
+            <td>http://www.w3.org/2001/XMLSchema#</td>
+          </tr>
         </table>
       </div>
       <div class="attributes">
-        <div class="rdf-reference"><a href="http://www.w3schools.com/rdf/rdf_reference.asp" target="_blank">RDF Reference</a></div>      
+      
+        <div class="reference"><a href="http://www.w3.org/TR/rdf-sparql-query/" target="_blank">SPARQL Reference</a></div>
+        <div class="reference"><a href="http://www.w3schools.com/rdf/rdf_reference.asp" target="_blank">RDF Reference</a></div>      
         <h4>Concept</h4>
         <ul>
             <li>rdf:type</li>
@@ -118,15 +128,21 @@
                       </div>
                     </c:when>
                     <c:when test="${b.isStatement()}">
-                      <div class="statement  binding">
+                      <div class="statement concept binding">
                         <a href="statement/<c:url value="${o.getSerialisedId()}"/>">Statement</a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isDescription()}">
-                      <div class="description  binding">
-                        <a href="description/<c:url value="${o.getSerialisedId()}"/>"></a><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                      <div class="description concept binding">
+                        <a href="description/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                      </div>
+                    </c:when>
+                    <c:when test="${b.isDatatype()}">
+                      <div class="datatype binding">
+                        <c:out value='${o}'/> (<c:out value='${b.getSource().toString().replaceAll("http://www.w3.org/2001/XMLSchema#", "xsd:")}'/>)                        
                       </div>
                     </c:when>                                    
+
                     <c:otherwise>
                       <div class="rdf"><c:out value='${o.toString().replaceAll("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "rdf:").replaceAll("http://www.w3.org/2000/01/rdf-schema#", "rdfs:")}'/></div>                      
                     </c:otherwise>

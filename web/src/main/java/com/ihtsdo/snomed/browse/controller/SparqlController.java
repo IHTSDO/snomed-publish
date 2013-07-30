@@ -48,7 +48,7 @@ public class SparqlController {
                     throws ConceptNotFoundException, RestClientException, XPathExpressionException, 
                     URISyntaxException, ParserConfigurationException, SAXException, IOException
     {   
-        LOG.info("Executing query:\n {}", query.getQuery());
+        //LOG.info("Executing query:\n {}", query.getQuery());
         Stopwatch overAllstopwatch = new Stopwatch().start();
         SparqlResults results = sparql.runQuery(paddQueryWithPrefixes(query.getQuery(), ontologyId), ontologyId);
         model.put("results", results);
@@ -63,7 +63,9 @@ public class SparqlController {
               "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
               "PREFIX c: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/concept/>\n" +
               "PREFIX d: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/description/>\n" +
-              "PREFIX s: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/>\n\n" +
+              "PREFIX s: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/>\n" +
+              "PREFIX sn: <http://snomed.sparklingideas.co.uk/term/>\n" +
+              "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
               query; 
     }
     

@@ -47,7 +47,15 @@ public class SparqlResults {
         }
         public boolean isDescription(){
             return sourceBackedObject instanceof Description;
-        }        
+        }
+        public boolean isDatatype(){
+            if ((sourceBackedObject instanceof String) && 
+                (!((String)sourceBackedObject).startsWith("http"))){
+                return true;
+            }
+            return false;
+        }
+        
         
         public Binding(){}
         

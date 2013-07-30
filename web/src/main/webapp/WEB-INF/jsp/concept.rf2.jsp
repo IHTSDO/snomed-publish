@@ -29,7 +29,7 @@
 <title>${displayName}</title>
 <meta name="description" content="Snomed browser">
 <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-<link rel="stylesheet" href="/css/styles.css?v=1.0">
+<link rel="stylesheet" href="/static/css/styles.css?v=1.0">
 <script type="text/javascript">
 function changeOntology(value) {
     var redirect;
@@ -40,7 +40,7 @@ function changeOntology(value) {
 </head>
 <body>
   <div id="company" class="clearfix">
-    <img class="logo" src="/img/logo.symbol.png"/>
+    <img class="logo" src="/static/img/logo.symbol.png"/>
     <h1>SNOMED Clinical Terms</h1>
     <div id="global-navigation">
       <div id="formats">
