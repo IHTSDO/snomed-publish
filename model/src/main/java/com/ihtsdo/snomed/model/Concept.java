@@ -19,12 +19,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 import org.apache.commons.lang.WordUtils;
+import org.hibernate.annotations.Index;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +35,17 @@ import com.google.common.primitives.Longs;
  * @author henrikpettersen
  *
  */
+
+//uniqueConstraints={
+//@UniqueConstraint(name="uniqueSerialisedId", columnNames={
+//  "serialisedId", "ontology_id"
+//}),
+
+
 @Entity
-@Table(uniqueConstraints={
-        @UniqueConstraint(name="uniqueSerialisedId", columnNames={
-            "serialisedId", "ontology_id"
-        })
-    })
+@org.hibernate.annotations.Table(appliesTo = "Concept",
+        indexes={@Index(name="conceptSerialisedIdIndex", columnNames={"serialisedId"}),
+                 @Index(name="conceptSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontology_id"})})
 public class Concept {
     protected static final String ATTRIBUTE = "attribute";
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
@@ -72,7 +77,7 @@ public class Concept {
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private long id;
     
-    
+    @Index(name="conceptSerialisedIdIndex")
     private long serialisedId;
     @OneToOne 
     private Ontology ontology;

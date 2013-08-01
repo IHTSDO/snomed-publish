@@ -11,18 +11,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Index;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @Entity(name="Statement")
-@Table(uniqueConstraints={
-        @UniqueConstraint(name="uniqueSerialisedId", columnNames={
-            "serialisedId", "ontology_id"
-        })
-    })
+@org.hibernate.annotations.Table(appliesTo = "Statement",
+indexes={@Index(name="statementSerialisedIdIndex", columnNames={"serialisedId"}),
+         @Index(name="statementSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontology_id"})})
 public class Statement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;
@@ -39,7 +37,9 @@ public class Statement {
     @OneToOne(fetch=FetchType.LAZY)
     private Concept predicate;
     @OneToOne(fetch=FetchType.LAZY) 
-    private Concept object;    
+    private Concept object; 
+    
+    @Index(name="statementSerialisedIdIndex")
     private long serialisedId = SERIALISED_ID_NOT_DEFINED;
     @Column(name="groupId") 
     private int groupId;
