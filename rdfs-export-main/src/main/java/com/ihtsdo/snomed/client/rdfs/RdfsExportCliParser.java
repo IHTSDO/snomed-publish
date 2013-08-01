@@ -47,7 +47,7 @@ public class RdfsExportCliParser {
     public static final String USER_KEY                 = "username";
     public static final String HIBERNATE_DIALECT_KEY    = "hibernate.dialect";
     
-    public void parse(String[] args, RdfsExportMain callback) throws IOException, ParseException{
+    public void parse(String[] args, RdfsExportMain callback) throws IOException, ParseException, java.text.ParseException{
         //Create a parser using Commons CLI
         CommandLineParser parser = new BasicParser( );
         Options options = new Options( );

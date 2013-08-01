@@ -56,7 +56,7 @@ public class RdfsExportMain {
         emf.close();
     }
 
-    public static void main(String[] args) throws IOException, ParseException{
+    public static void main(String[] args) throws IOException, ParseException, java.text.ParseException{
         Stopwatch overAllstopwatch = new Stopwatch().start();
         RdfsExportCliParser cli = new RdfsExportCliParser();
         cli.parse(args, new RdfsExportMain()); 
@@ -65,7 +65,7 @@ public class RdfsExportMain {
     }    
 
     public void runProgram(File conceptsFile, File triplesFile, File descriptionsFile, Parser inputFormat, 
-            File tdbFolder, RdfsExportCliParser.RdfFormat outputFormat, File outputFile, String db) throws IOException
+            File tdbFolder, RdfsExportCliParser.RdfFormat outputFormat, File outputFile, String db) throws IOException, java.text.ParseException
     {
         try{
             initDb(db);

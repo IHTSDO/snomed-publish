@@ -6,6 +6,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -76,7 +77,7 @@ public class JenaImporterTest {
     }
     
     @Test
-    public void shouldWriteRdfXml() throws IOException{
+    public void shouldWriteRdfXml() throws IOException, ParseException{
         Ontology ontology = parser.populateDbWithDescriptions("Jena Test", 
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
