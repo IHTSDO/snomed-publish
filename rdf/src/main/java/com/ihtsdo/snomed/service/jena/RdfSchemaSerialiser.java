@@ -2,6 +2,8 @@ package com.ihtsdo.snomed.service.jena;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -27,8 +29,11 @@ public class RdfSchemaSerialiser{
     private final String NS_CONCEPT = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
     private final String NS_TRIPLE = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
     private final String NS_DESCRIPTION = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
+    
+    private SimpleDateFormat longTimeParser = new SimpleDateFormat("yyyyMMdd");
+    private SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
-    public void exportToRdfXml(Ontology o, EntityManager em, OutputStreamWriter ow) throws IOException{
+    public void exportToRdfXml(Ontology o, EntityManager em, OutputStreamWriter ow) throws IOException, ParseException{
         LOG.info("Exporting ontology '{}' to RDF/XML", o.getName());
         Stopwatch stopwatch = new Stopwatch().start();
         printHeader(ow);
@@ -115,7 +120,7 @@ public class RdfSchemaSerialiser{
         ow.write("</rdf:Description>\n");
     }
 
-    public void printBody(OutputStreamWriter ow, EntityManager em, Ontology o) throws IOException{
+    public void printBody(OutputStreamWriter ow, EntityManager em, Ontology o) throws IOException, ParseException{
         LOG.info("Loading concepts");
         Stopwatch stopwatch = new Stopwatch().start();
         TypedQuery<Concept> conceptsQuery = em.createQuery("SELECT c FROM Concept c " +
@@ -155,7 +160,7 @@ public class RdfSchemaSerialiser{
     }
 
     public void writeConcept(OutputStreamWriter ow, Ontology o, Concept c)
-            throws IOException {
+            throws IOException, ParseException {
         ow.write("<rdf:Description rdf:about=\"" + getConceptName(c.getSerialisedId(), o) + "\">\n");
         if (c.isPredicate()){
             ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
@@ -167,27 +172,44 @@ public class RdfSchemaSerialiser{
         ow.write("<sn:module rdf:resource=\"" + getConceptName(c.getModule().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:status rdf:resource=\"" + getConceptName(c.getStatus().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">" + c.isActive() + "</sn:active>\n");
-        ow.write("<sn:effectiveTime rdf:datatype=\"http://www.w3.org/2001/XMLSchema#long\">" + c.getEffectiveTime() + "</sn:effectiveTime>\n");
+                
+        ow.write("<sn:effectiveTime rdf:datatype=\"xsd:date\">" + 
+            dateTimeFormatter.format(longTimeParser.parse(String.valueOf(c.getEffectiveTime()))) + 
+            "</sn:effectiveTime>\n");
+        
         for (Description d : c.getDescription()){
             ow.write("<sn:description rdf:resource=\"" + getDescriptionName(d.getSerialisedId(), o) + "\"/>\n");
+        }
+        if (c.isPredicate()){
+            for (Concept p : c.getKindOfs()){
+                ow.write("<rdfs:subPropertyOf rdf:resource=\"" + getConceptName(p.getSerialisedId(), o) + "\" />\n");
+            }
+        }else{
+            for (Concept p : c.getKindOfs()){
+                ow.write("<rdfs:subClassOf rdf:resource=\"" + getConceptName(p.getSerialisedId(), o) + "\" />\n");
+            }            
         }
         ow.write("</rdf:Description>\n");
     }
 
     public void writeDescription(OutputStreamWriter ow, Ontology o, 
-            Description d) throws IOException {
+            Description d) throws IOException, ParseException {
         ow.write("<rdf:Description rdf:about=\"" + getDescriptionName(d.getSerialisedId(), o) + "\">\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n");
         ow.write("<sn:module rdf:resource=\"" + getConceptName(d.getModule().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:type rdf:resource=\"" + getConceptName(d.getType().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:casesignificance rdf:resource=\"" + getConceptName(d.getCaseSignificance().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">" + d.isActive() + "</sn:active>\n");
-        ow.write("<sn:effectiveTime rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">" + d.getEffectiveTime() + "</sn:effectiveTime>\n");
+        
+        ow.write("<sn:effectiveTime rdf:datatype=\"xsd:date\">" + 
+                dateTimeFormatter.format(longTimeParser.parse(String.valueOf(d.getEffectiveTime()))) + 
+                "</sn:effectiveTime>\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">" + StringEscapeUtils.escapeXml(d.getTerm()) + "</rdfs:label>\n");
+        
         ow.write("</rdf:Description>\n");
     }
 
-    public void writeStatement(OutputStreamWriter ow, Ontology o, Statement s) throws IOException {
+    public void writeStatement(OutputStreamWriter ow, Ontology o, Statement s) throws IOException, ParseException {
         ow.write("<rdf:Description rdf:about=\"" + getTripleName(s.getSerialisedId(), o) + "\">\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\"/>\n");
         ow.write("<rdf:subject rdf:resource=\"" + getConceptName(s.getSubject().getSerialisedId(), o) + "\"/>\n");
@@ -198,7 +220,11 @@ public class RdfSchemaSerialiser{
         ow.write("<sn:characteristictype rdf:resource=\"" + getConceptName(s.getCharacteristicType().getSerialisedId(), o) + "\"/>\n");
         ow.write("<sn:group rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">" + s.getGroupId() + "</sn:group>\n");
         ow.write("<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">" + s.isActive() + "</sn:active>\n");
-        ow.write("<sn:effectiveTime rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">" + s.getEffectiveTime() + "</sn:effectiveTime>\n");
+        
+        ow.write("<sn:effectiveTime rdf:datatype=\"xsd:date\">" + 
+                dateTimeFormatter.format(longTimeParser.parse(String.valueOf(s.getEffectiveTime()))) + 
+                "</sn:effectiveTime>\n");
+        
         ow.write("</rdf:Description>\n");
     }
         
