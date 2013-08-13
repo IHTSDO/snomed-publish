@@ -8,6 +8,8 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ import com.ihtsdo.snomed.browse.service.OntologyService;
 @Transactional (value = "transactionManager", readOnly = true)
 public class RootController {    
 
-    //private static final Logger LOG = LoggerFactory.getLogger( RootController.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RootController.class );
 
     @Autowired OntologyService ontologyService;
     @Autowired ConceptService conceptService;
@@ -37,6 +39,7 @@ public class RootController {
     
     @RequestMapping(value="/", method = RequestMethod.GET)
     public void landingPage(HttpServletResponse response, HttpServletRequest request) throws IOException{
+        LOG.debug("Redirecting root to '/ontology/1/sparql'");
         response.sendRedirect("/ontology/1/sparql");
     }
 }

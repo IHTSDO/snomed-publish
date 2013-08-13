@@ -802,12 +802,24 @@ body#sparql .input textarea{
     width: 100%;
 }
 
-body#sparql h1{
+body#sparql h2{
     width:100%;
     padding-bottom: 0.5em;
-    padding-top: 2em;
+    padding-top: 1em;
     color: green;
+    font-size: 175%;
+    
 }
+
+body#sparql #navigation{
+    float: right;    
+}
+
+body#sparql #logout{
+    float: right;
+    padding: 0 0.25em 0.25em 0;
+}
+
 
 body#sparql .prefixes{
     float: left;

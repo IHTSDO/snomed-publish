@@ -30,12 +30,39 @@
     ga('send', 'pageview');
   
   </script>
+  <script type="text/javascript">
+  function changeOntology(value) {
+      var redirect;
+      redirect = "/ontology/" + value + "/sparql";
+      document.location.href = redirect;
+  }
+  </script>  
 </head>
 <body id="sparql">
-  <form:form method="post" action="sparql" modelAttribute="sparql">
-    <div>
-      <h1><form:label path="query">Enter SPARQL Query</form:label></h1>
+  <div id="company" class="clearfix">
+    <img class="logo" src="/static/img/logo.symbol.png"/>
+    <h1>SNOMED Clinical Terms</h1>
+    <div id="navigation">
+      <div id="logout">
+        You are logged in as <a href="<c:url value="/auth/logout" />" ><c:out value="${user.getPrefix()}"/>  <c:out value="${user.getFirstname()}"/>  <c:out value="${user.getLastname()}"/></a>
+      </div>
+      <div id="ontology">
+        <form>
+          <select onchange="changeOntology(this.value)">
+            <c:forEach var="o" items="${ontologies}">
+              <option ${o.getId()==ontologyId ? "selected=\"selected\"" : ""} value="<c:out value="${o.getId()}"/>"><c:out value="${o.getName()}"/></option>
+            </c:forEach>
+          </select>
+        </form>
+      </div>
+    </div>
+  </div>
+
+    
+    <form:form method="post" action="sparql" modelAttribute="sparql">
+      <h2><form:label path="query">Enter SPARQL Query</form:label></h2>
       <div class="input"><form:textarea path="query" rows="10" cols="100"/></div>
+      
       <div class="prefixes">
       <h3>Prefixes</h3>
         <table>
@@ -49,15 +76,15 @@
           </tr>
           <tr>
               <td>c</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/concept/</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/concept/rdfs/</td>
           </tr>
           <tr>
               <td>d</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/description/</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/description/rdfs/</td>
           </tr>
           <tr>
               <td>s</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/</td>
+              <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/rdfs/</td>
           </tr>
           <tr>
             <td>sn</td>
@@ -70,7 +97,6 @@
         </table>
       </div>
       <div class="attributes">
-      
         <div class="reference"><a href="http://www.w3.org/TR/rdf-sparql-query/" target="_blank">SPARQL Reference</a></div>
         <div class="reference"><a href="http://www.w3schools.com/rdf/rdf_reference.asp" target="_blank">RDF Reference</a></div>      
         <h4>Concept</h4>
@@ -106,10 +132,9 @@
             <li>sn:active</li>
             <li>sn:effectiveTime</li>
         </ul>
-      </div>
-    </div> 
-    <div class="submit"><input type="submit" value="Run Query"/></div>
-  </form:form>
+      </div> 
+      <div class="submit"><input type="submit" value="Run Query"/></div>
+    </form:form>
   <c:if test="${results!=null}">
 <!--     <div id="results" style="float: left;"> -->
       <table class="results">

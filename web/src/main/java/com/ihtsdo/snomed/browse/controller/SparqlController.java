@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.browse.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.openid.OpenIDAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -27,6 +29,8 @@ import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.browse.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.browse.model.SparqlQueryFormObject;
 import com.ihtsdo.snomed.browse.model.SparqlResults;
+import com.ihtsdo.snomed.browse.model.User;
+import com.ihtsdo.snomed.browse.service.OntologyService;
 import com.ihtsdo.snomed.browse.service.SparqlService;
 
 @Controller
@@ -37,21 +41,29 @@ public class SparqlController {
     private static final Logger LOG = LoggerFactory.getLogger( SparqlController.class );
 
     @Inject SparqlService sparql;
+    @Inject OntologyService ontologyService;
     
     @PostConstruct
     public void init(){}
     
     @RequestMapping(value="/ontology/{ontologyId}/sparql", method = RequestMethod.POST)
     public ModelAndView runSparqlQuery(ModelMap model, HttpServletRequest request, 
-            @PathVariable long ontologyId, 
+            @PathVariable long ontologyId, Principal principal,
             @ModelAttribute("sparql") SparqlQueryFormObject query) 
                     throws ConceptNotFoundException, RestClientException, XPathExpressionException, 
                     URISyntaxException, ParserConfigurationException, SAXException, IOException
+                    
     {   
         //LOG.info("Executing query:\n {}", query.getQuery());
         Stopwatch overAllstopwatch = new Stopwatch().start();
         SparqlResults results = sparql.runQuery(paddQueryWithPrefixes(query.getQuery(), ontologyId), ontologyId);
         model.put("results", results);
+        
+        model.addAttribute("ontologies", ontologyService.getAll()); 
+        model.addAttribute("ontologyId", ontologyId);
+        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
+        
+        
         overAllstopwatch.stop();
         LOG.info("Query completed in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         return new ModelAndView("sparql", model);
@@ -61,9 +73,9 @@ public class SparqlController {
         return 
               "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
               "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-              "PREFIX c: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/concept/>\n" +
-              "PREFIX d: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/description/>\n" +
-              "PREFIX s: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/>\n" +
+              "PREFIX c: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/concept/rdfs/ >\n" +
+              "PREFIX d: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/description/rdfs >\n" +
+              "PREFIX s: <http://snomed.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/rdfs/ >\n" +
               "PREFIX sn: <http://snomed.sparklingideas.co.uk/term/>\n" +
               "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
               query; 
@@ -71,9 +83,14 @@ public class SparqlController {
     
     @RequestMapping(value="/ontology/{ontologyId}/sparql", method = RequestMethod.GET)
     public ModelAndView displaySparqlQueryDialogue(ModelMap model, HttpServletRequest request, 
-            @PathVariable long ontologyId) throws ConceptNotFoundException
+            @PathVariable long ontologyId, Principal principal) throws ConceptNotFoundException
     {
-        System.out.println("Rendering query page for ontology [" + ontologyId + "]"); 
+        //System.out.println("Rendering query page for ontology [" + ontologyId + "]");
+        
+        model.addAttribute("ontologies", ontologyService.getAll()); 
+        model.addAttribute("ontologyId", ontologyId);
+        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
+        
         SparqlQueryFormObject formObject = new SparqlQueryFormObject();
         formObject.setQuery(
 //                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
