@@ -244,7 +244,7 @@ public class RefsetControllerTest {
     public void shouldCreateNewRefset() throws Exception{
         when(refsetServiceMock.create(any(RefsetDto.class))).thenReturn(r1);
 
-        mockMvc.perform(post("/refset")
+        mockMvc.perform(post("/refset/new")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
@@ -281,7 +281,7 @@ public class RefsetControllerTest {
                 .param("description", "description2")
             )
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets"))
+            .andExpect(view().name("redirect:/refset/" + r2.getPublicId()))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Updated refset pub2: title2")));
         
