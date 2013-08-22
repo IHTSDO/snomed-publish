@@ -1,0 +1,8 @@
+#set ($title = "#springMessage('page.title.new.refset')")
+<div id="refset-edit">
+  <div class="return"><a href='#springUrl("/refsets")'>Return</a></div>
+  <form method="post" action='#springUrl("/refset/new")'>
+        #parse('refset.edit.inputs.vm')
+    <input type="submit" value="create"/>
+  </form>
+</div>

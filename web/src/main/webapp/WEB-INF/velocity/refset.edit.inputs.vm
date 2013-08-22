@@ -1,0 +1,47 @@
+#springFormHiddenInput("refset.id")
+<table>
+  <tr id="title">
+    <td><label path="title">Title</label></td>
+    <td>
+      #springBind("refset.title")
+      <input type="text" name="${status.expression}" value="$!{status.value}"/>
+        <div class="errors">
+          #foreach($error in $status.errorMessages)
+            <div class="error">$error</div>
+          #end
+        </div>
+    </td>
+  </tr>
+  <tr id="description">
+    <td><label path="description">Description</label></td>
+    <td>
+      #springBind("refset.description")
+      <textarea name="${status.expression}">$!status.value</textarea>
+      #if(${status.error})
+        <div class="errors">
+          #foreach($error in $status.errorMessages)
+            <div class="error">$error</div>
+          #end
+        </div>
+      #end
+    </td>
+  </tr>
+  <tr id="publicId">
+    <td><label path="publicId">Public ID (URL)</label></td>
+    <td>
+      #springBind("refset.publicId")
+      <input type="text" name="${status.expression}" value="$!{status.value}"/>
+        <div class="errors">
+          #foreach($error in $status.errorMessages)
+            <div class="error">$error</div>
+          #end
+        </div>
+    </td>
+  </tr>
+</table>
+<div class="error">
+#springBind("refset.*")
+  #if(${status.error})
+    <b>Please fix all errors!</b>
+  #end
+</div>

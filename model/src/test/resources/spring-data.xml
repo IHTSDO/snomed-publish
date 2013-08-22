@@ -33,12 +33,15 @@
         <property name="password" value="" />
     </bean>
     
-    <bean id="dataSourceAuthentication" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.h2.Driver" />
-        <property name="url" value="jdbc:h2:mem:testing-model" />
-        <property name="username" value="sa" />
-        <property name="password" value="" />
-    </bean>
+    <bean id="jpaVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" p:showSql="false"/>
+  
+    <!-- Declare a JPA entityManagerFactory for snomed -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+        p:packagesToScan="com.ihtsdo.snomed.model"
+        p:dataSource-ref="dataSource"
+        p:jpaVendorAdapter-ref="jpaVendor"
+        p:persistenceUnitName="testdb"
+        p:jpaPropertyMap-ref="jpaPropertyMap" />
     
     <!-- Properties from persistence.xml -->
     <util:map id="jpaPropertyMap">        
@@ -48,13 +51,11 @@
         <entry key="hibernate.format_sql" value="false"/>
         <entry key="hibernate.show_sql" value="false"/>
     </util:map>
-    
-    <util:map id="jpaPropertyMapAuthentication">
-        <entry  key="hibernate.hbm2ddl.auto" value="update"/>
-        <entry key="hibernate.dialect" value="org.hibernate.dialect.H2Dialect"/>
-        <entry key="hibernate.connection.charSet" value="UTF-8"/>
-        <entry key="hibernate.format_sql" value="true"/>
-        <entry key="hibernate.show_sql" value="true"/>
-    </util:map>
-    
+
+
+    <!-- Declare a transaction manager -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+
 </beans>

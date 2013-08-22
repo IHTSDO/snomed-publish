@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
     xmlns:cache="http://www.springframework.org/schema/cache"
-    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
-    xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
-    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
         http://www.springframework.org/schema/context 
@@ -19,53 +23,27 @@
         http://www.springframework.org/schema/task/spring-task-3.1.xsd
         http://www.springframework.org/schema/util 
         http://www.springframework.org/schema/util/spring-util-3.1.xsd
-        http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
-        http://www.springframework.org/schema/tx 
-        http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+        http://www.springframework.org/schema/data/jpa
+        http://www.springframework.org/schema/data/jpa/spring-jpa-1.0.xsd">
     
     <context:property-placeholder 
         location="classpath:spring.properties" 
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
-
-    <mvc:resources location="/static/" mapping="/static/**"/>
-
-    <!-- allows for root context: http://goo.gl/5gAJg -->
-    <mvc:default-servlet-handler/>
-
-    <!-- Configures the annotation-driven Spring MVC Controller programming model.
-         Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
-    <mvc:annotation-driven/>
-    
-    <!-- Annotation driven transactions -->
-    <tx:annotation-driven/>
     
     <context:component-scan base-package="com.ihtsdo.snomed" />
     
+    <jpa:repositories base-package="com.ihtsdo.snomed.browse.repository" entity-manager-factory-ref="entityManagerFactory" />
     
     
-<!--     <mvc:resources location="/css/" mapping="/css/**"/> -->
-<!--     <mvc:resources location="/js/" mapping="/js/**"/> -->
-<!--     <mvc:resources location="/img/" mapping="/img/**"/> -->
-    
-    <!-- Imports logging configuration -->
+    <!-- VALIDATOR -->
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+
+    <!-- TRACE -->
 <!--     <import resource="trace-context.xml"/> -->
 
     <!-- Imports datasource configurations -->
-    <import resource="spring-data.xml" />
-
-    
-<!--     <bean id="canonicalSerialiser" class="com.ihtsdo.snomed.service.CanonicalSerialiser"/> -->
-<!--     <bean id="hibernateDbImporter" class="com.ihtsdo.snomed.service.Rf1HibernateParser"/> -->
-    
-    
-    
-    <!-- Configure the multipart resolver -->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- one of the properties available; the maximum file size in bytes -->
-        <property name="maxUploadSize" value="100000"/>
-    </bean> 
+<!--     <import resource="spring-data.xml" /> -->
     
     <!-- ****************** -->
     <!-- JAXB and JACKSON   -->
@@ -110,6 +88,81 @@
         </constructor-arg>
     </bean>
     
+        
+    <!-- Configure the multipart resolver -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <property name="maxUploadSize" value="100000"/>
+    </bean> 
+ 
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="order" value="2"/>
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath" value="/WEB-INF/velocity/"/>
+    </bean>
+    
+<!--     <bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver"> -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
+      <property name="order" value="1"/>
+      <property name="cache" value="false"/>
+      <property name="prefix" value=""/>
+      <property name="suffix" value=".vm"/>
+<!--       <property name="layoutUrl" value="layout.vm"/>       -->
+    </bean>
+    
+    <!-- ################### SPRING Support Internationalization ################### -->
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+        <property name="defaultLocale" value="en_GB" />
+    </bean>
+        
+    <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+        <property name="paramName" value="language" />
+    </bean>    
+    
+    <!-- 
+        1.welcome.htm?language=en – Get the message from English properties file.
+        2.welcome.htm?language=zh_CN – Get the message from Chinese properties file.
+     -->
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" >
+        <property name="interceptors">
+           <list>
+            <ref bean="localeChangeInterceptor" />
+           </list>
+        </property>
+    </bean>    
+    
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="basenames">
+            <list>
+                <value>WEB-INF/i18n/message</value>
+            </list>
+        </property>
+    </bean>    
+    
+<!--     <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" /> -->
+    
+<!--     Exception Resolvers -->
+<!--     <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> -->
+<!--         <property name="exceptionMappings"> -->
+<!--             <props> -->
+<!--                 <prop key="java.lang.Exception">error</prop> -->
+<!--                 <prop key="java.lang.RuntimeException">error</prop> -->
+<!--             </props> -->
+<!--         </property> -->
+<!--         <property name="statusCodes"> -->
+<!--             <props> -->
+<!--                 <prop key="error">404</prop> -->
+<!--                 <prop key="error">500</prop> -->
+<!--             </props> -->
+<!--         </property> -->
+<!--     </bean>     -->
+    
     
     <bean id="sparqlTemplate" class="org.springframework.web.client.RestTemplate">
 <!--         <property name="messageConverters" ref="mappingJacksonHttpMessageConverter"/> -->
@@ -129,5 +182,7 @@
             </bean>
         </constructor-arg>
     </bean>
+    
+<!--     <bean id="refsetController" class="com.ihtsdo.snomed.browse.controller.RefsetController" autowire="byType"/> -->
 
 </beans>

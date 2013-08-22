@@ -815,7 +815,7 @@ body#sparql #navigation{
     float: right;    
 }
 
-body#sparql #logout{
+#logout{
     float: right;
     padding: 0 0.25em 0.25em 0;
 }

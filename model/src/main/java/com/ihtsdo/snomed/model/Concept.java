@@ -77,7 +77,7 @@ public class Concept {
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private long id;
     
-    @Index(name="conceptSerialisedIdIndex")
+    //@Index(name="conceptSerialisedIdIndex")
     private long serialisedId;
     @OneToOne 
     private Ontology ontology;

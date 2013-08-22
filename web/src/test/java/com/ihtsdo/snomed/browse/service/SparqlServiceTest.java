@@ -45,9 +45,12 @@ import com.ihtsdo.snomed.model.Statement;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={
-      "classpath:applicationContext.xml", 
-      "classpath:test-applicationContext.xml", 
-      "file:src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml"})
+        "classpath:applicationContext.xml", 
+        "classpath:spring-mvc.xml",
+        "classpath:spring-security.xml",
+        "classpath:spring-data.xml",
+        "classpath:test-applicationContext.xml",
+        "classpath:test-spring-data.xml"})
 @Transactional
 public class SparqlServiceTest {
     
