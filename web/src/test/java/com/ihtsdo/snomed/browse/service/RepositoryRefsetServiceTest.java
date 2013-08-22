@@ -147,17 +147,21 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void update() throws RefsetNotFoundException {
-        RefsetDto updated = RefsetTestUtil.createDto(REFSET_ID, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
-        Refset refset = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
+        RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
+        Refset updatedRefset = Refset.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED).build();
+        updatedRefset.setId(REFSET_ID);
+        Refset refsetOriginal = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
         
-        when(repoMock.findOne(updated.getId())).thenReturn(refset);
+        when(repoMock.findOne(updatedDto.getId())).thenReturn(refsetOriginal);
+        when(repoMock.save(any(Refset.class))).thenReturn(updatedRefset);
         
-        Refset returned = refsetService.update(updated);
+        Refset returned = refsetService.update(updatedDto);
         
-        verify(repoMock, times(1)).findOne(updated.getId());
+        verify(repoMock, times(1)).findOne(updatedDto.getId());
+        verify(repoMock, times(1)).save(any(Refset.class));
         verifyNoMoreInteractions(repoMock);
         
-        assertRefset(updated, returned);
+        assertRefset(updatedDto, returned);
     }
     
     @Test(expected = RefsetNotFoundException.class)
