@@ -269,7 +269,7 @@ public class RefsetControllerTest {
     public void shouldUpdateRefset() throws Exception{
         when(refsetServiceMock.update(any(RefsetDto.class))).thenReturn(r2);
 
-        mockMvc.perform(post("/refset/pub1")
+        mockMvc.perform(post("/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
