@@ -1,4 +1,5 @@
 #set ($title = "#springMessage('page.title.refsets')")
+#parse('alert.vm')
 <h2>Refsets</h2>
 <div id="refsets">
   #foreach($refset in $refsets)

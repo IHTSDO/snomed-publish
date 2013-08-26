@@ -5,6 +5,7 @@ import java.util.List;
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Refset;
+import com.ihtsdo.snomed.service.InvalidInputException;
 
 /**
  * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
@@ -20,9 +21,9 @@ public interface RefsetService {
     public abstract Refset findByPublicId(String publicId);
 
     public abstract Refset update(RefsetDto updated)
-            throws RefsetNotFoundException;
+            throws RefsetNotFoundException, InvalidInputException;
 
-    public abstract Refset create(RefsetDto created);
+    public abstract Refset create(RefsetDto created) throws InvalidInputException;
 
     public abstract Refset delete(Long refsetId) throws RefsetNotFoundException;
 

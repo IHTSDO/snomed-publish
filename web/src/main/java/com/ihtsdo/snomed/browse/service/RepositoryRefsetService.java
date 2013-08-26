@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import com.ihtsdo.snomed.browse.dto.RefsetDto;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.browse.repository.RefsetRepository;
 import com.ihtsdo.snomed.model.Refset;
+import com.ihtsdo.snomed.service.InvalidInputException;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 //@Transactional (value = "transactionManager", readOnly = true)
@@ -83,7 +85,7 @@ public class RepositoryRefsetService implements RefsetService {
      */
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException {
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, InvalidInputException {
         LOG.debug("Updating refset with information: " + updated);
         Refset refset = refsetRepository.findOne(updated.getId());
         if (refset == null) {
@@ -91,7 +93,11 @@ public class RepositoryRefsetService implements RefsetService {
             throw new RefsetNotFoundException();
         }
         refset.update(updated.getPublicId(), updated.getTitle(), updated.getDescription());
-        return refsetRepository.save(refset);
+        try {
+            return refsetRepository.save(refset);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidInputException(e.getMessage(), e);
+        }
     }    
 
     
@@ -100,10 +106,14 @@ public class RepositoryRefsetService implements RefsetService {
      */
     @Override
     @Transactional
-    public Refset create(RefsetDto created){
+    public Refset create(RefsetDto created) throws InvalidInputException{
         LOG.debug("Creating new refset [{}]", created.toString());
         Refset refset = Refset.getBuilder(created.getPublicId(), created.getTitle(), created.getDescription()).build();
-        return refsetRepository.save(refset);
+        try {
+            return refsetRepository.save(refset);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidInputException(e.getMessage(), e);
+        }
     }
     
     /* (non-Javadoc)

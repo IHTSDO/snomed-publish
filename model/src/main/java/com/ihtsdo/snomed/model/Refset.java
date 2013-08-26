@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -26,6 +28,8 @@ import com.google.common.primitives.Longs;
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Refset",
         indexes={@Index(name="refsetPublicIdIndex", columnNames={"publicId"})})
+@Table(name = "Refset", 
+uniqueConstraints = @UniqueConstraint(columnNames = {"publicId"}))
 public class Refset {
     
     @Id 
@@ -35,7 +39,10 @@ public class Refset {
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
-    @Column(unique = true)
+
+    //For some reason, declaring uniqueness on columns like this, does not seem t work,
+    //at least not for hibernate implementation of JPA 2. Moved to @Table level instead.
+    //@Column(name="publicId", unique = true, nullable=false, length=30)
     private String publicId;
     
     @NotNull

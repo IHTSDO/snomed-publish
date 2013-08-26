@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.browse.model;
+package com.ihtsdo.snomed.browse.testing;
 
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
 import com.ihtsdo.snomed.model.Refset;

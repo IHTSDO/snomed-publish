@@ -52,7 +52,7 @@ import com.ihtsdo.snomed.browse.testing.SpringProxyUtil;
 import com.ihtsdo.snomed.model.Refset;
 
 /**
- * @author Henrik Pettersen @ Sparkling Ideas (henrik@sparklingideas.co.uk)
+ * @author Henrik Pettersen @ http://sparklingideas.co.uk
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration

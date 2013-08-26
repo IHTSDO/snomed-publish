@@ -5,6 +5,8 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.google.common.base.Objects;
+import com.ihtsdo.snomed.browse.validator.Unique;
+import com.ihtsdo.snomed.model.Refset;
 
 public class RefsetDto {
     
@@ -13,6 +15,7 @@ public class RefsetDto {
     @NotNull
     @Size(min=2, max=20, message="validation.refset.publicid.size")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="validation.refset.publicid.charactermix")
+    @Unique(entity=Refset.class, property="publicId")
     private String publicId;
     
     @NotNull

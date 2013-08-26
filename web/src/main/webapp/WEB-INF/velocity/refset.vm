@@ -1,4 +1,5 @@
 #set ($title = "#springMessageText('page.title.refset' [$refset.title])")
+#parse('alert.vm')
 <div id="refset">
   <ol class="breadcrumb">
     <li><a href='#springUrl("/refsets")'>Refsets</a></li>

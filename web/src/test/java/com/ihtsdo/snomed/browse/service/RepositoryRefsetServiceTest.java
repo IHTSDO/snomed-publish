@@ -31,8 +31,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.ihtsdo.snomed.browse.controller.RefsetControllerTest;
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
-import com.ihtsdo.snomed.browse.model.RefsetTestUtil;
 import com.ihtsdo.snomed.browse.repository.RefsetRepository;
+import com.ihtsdo.snomed.browse.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.browse.testing.SpringProxyUtil;
 import com.ihtsdo.snomed.model.Refset;
 
