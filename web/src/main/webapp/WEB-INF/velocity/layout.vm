@@ -1,19 +1,6 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8">
-    <title>$title</title>
-    <meta name="description" content="IHTSDO Snomed Refset Builder">
-    <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
-  
-      <link rel="stylesheet" href="/static/css/refsets.css">
-  
-  
+    #parse('head.vm')
   </head>
   <body>
     <div class="container">

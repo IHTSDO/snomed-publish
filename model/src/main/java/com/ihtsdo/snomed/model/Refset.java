@@ -33,7 +33,7 @@ public class Refset {
     private long id;
     
     @NotNull
-    @Size(min=2, max=50, message="Public ID must be between 2 and 50 characters")
+    @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
     @Column(unique = true)
     private String publicId;

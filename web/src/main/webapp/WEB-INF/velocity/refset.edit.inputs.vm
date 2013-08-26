@@ -6,11 +6,11 @@
   #set ($state="has-error")
 #end
 <div class="form-group $state">
-  <label for="title">Title</label>
-  <input type="text" class="form-control" id="title" placeholder="Enter title" name="${status.expression}" value="$!{status.value}">
+  <label for="title">#springMessage('label.field.refset.title')</label>
+  <input type="text" class="form-control" id="title" placeholder="#springMessage('input.field.refset.title')" name="${status.expression}" value="$!{status.value}">
   <div class="errors">
     #foreach($error in $status.errorMessages)
-      <p class="text-danger">$error</p>
+      <p class="text-danger">#springMessage("$error")</p>
     #end
   </div>
 </div>
@@ -21,11 +21,11 @@
   #set ($state="has-error")
 #end
 <div class="form-group $state">
-  <label for="description">Description</label>
-  <textarea id="description" class="form-control" rows="3" placeholder="Enter Description" name="${status.expression}">$!status.value</textarea>  
+  <label for="description">#springMessage('label.field.refset.description')</label>
+  <textarea id="description" class="form-control" rows="3" placeholder="#springMessage('input.field.refset.description')" name="${status.expression}">$!status.value</textarea>  
   <div class="errors">
     #foreach($error in $status.errorMessages)
-      <p class="text-danger">$error</p>
+      <p class="text-danger">#springMessage("$error")</p>
     #end
   </div>
 </div>
@@ -36,11 +36,11 @@
   #set ($state="has-error")
 #end
 <div class="form-group $state">
-  <label for="pubid">Public Id</label>
-  <input type="text" class="form-control" id="pubid" placeholder="Enter Public ID" name="${status.expression}" value="$!{status.value}">
+  <label for="pubid">#springMessage('label.field.refset.publicid')</label>
+  <input type="text" class="form-control" id="pubid" placeholder="#springMessage('input.field.refset.publicid')" name="${status.expression}" value="$!{status.value}">
   <div class="errors">
     #foreach($error in $status.errorMessages)
-      <p class="text-danger">$error</p>
+      <p class="text-danger">#springMessage("$error")</p>
     #end
   </div>
 </div>

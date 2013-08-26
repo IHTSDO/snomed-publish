@@ -11,16 +11,16 @@ public class RefsetDto {
     private Long id;
 
     @NotNull
-    @Size(min=2, max=50, message="Public ID must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="public ID may contain characters, numbers, and underscores only")
+    @Size(min=2, max=20, message="validation.refset.publicid.size")
+    @Pattern(regexp="[a-zA-Z0-9_]+", message="validation.refset.publicid.charactermix")
     private String publicId;
     
     @NotNull
-    @Size(min=4, max=50, message="Title must be between 4 and 50 characters")
+    @Size(min=4, max=50, message="validation.refset.title.size")
     private String title;
     
     @NotNull
-    @Size(min=4, message="Description must be longer than 4 characters")
+    @Size(min=4, message="validation.refset.description.size")
     private String description;
     
     public RefsetDto(){}
