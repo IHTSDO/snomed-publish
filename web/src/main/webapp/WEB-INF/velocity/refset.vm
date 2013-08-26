@@ -1,23 +1,61 @@
 #set ($title = "#springMessageText('page.title.refset' [$refset.title])")
 <div id="refset">
- <div class="return">
-    <a href='#springUrl("/refsets")'>Return</a>
+  <ol class="breadcrumb">
+    <li><a href='#springUrl("/refsets")'>Refsets</a></li>
+    <li class="active">Refset</li>
+  </ol>
+  
+  <div class="row">
+      <div class="col-lg-3">
+        <label>Title</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.title</span>
+      </div>        
   </div>
-  <table>
-    <tr>
-        <td class="heading">Title:</td>
-        <td>$refset.title</td>
-    </tr>
-    <tr>
-        <td class="description">Description:</td>
-        <td>$refset.description</td>
-    </tr>
-   <tr>
-        <td class="publicid">Public Id:</td>
-        <td>$refset.publicId</td>
-    </tr>
-  </table>
-  <div class="edit">
-    <a href='#springUrl("/refset/$refset.publicId/edit")'><input type="button" value="edit"/></a>
+
+  <div class="row">
+      <div class="col-lg-3">
+        <label>Description</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.description</span>
+      </div>        
   </div>
-</div>
+
+  <div class="row">
+      <div class="col-lg-3">
+        <label>Public ID</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.publicId</span>
+      </div>        
+  </div>
+
+
+  <div class="row">
+     <div class="col-lg-2">
+         <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary">Modify Refset</a>   
+     </div>
+  </div>
+</div>  
+  
+  
+<!--   <table> -->
+<!--     <tr> -->
+<!--         <td class="heading">Title:</td> -->
+<!--         <td>$refset.title</td> -->
+<!--     </tr> -->
+<!--     <tr> -->
+<!--         <td class="description">Description:</td> -->
+<!--         <td>$refset.description</td> -->
+<!--     </tr> -->
+<!--    <tr> -->
+<!--         <td class="publicid">Public Id:</td> -->
+<!--         <td>$refset.publicId</td> -->
+<!--     </tr> -->
+<!--   </table> -->
+<!--   <div class="edit"> -->
+<!--     <a href='#springUrl("/refset/$refset.publicId/edit")'><input type="button" value="edit"/></a> -->
+<!--   </div> -->
+<!-- </div> -->

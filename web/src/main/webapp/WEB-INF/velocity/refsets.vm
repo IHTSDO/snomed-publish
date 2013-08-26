@@ -1,22 +1,49 @@
 #set ($title = "#springMessage('page.title.refsets')")
-<div id=refsets>
-    <table>
-      <thead>
-          <td>Title</td>
-      </thead>
-      <tbody>
-        #foreach($refset in $refsets)
-          <tr>
-            <td><a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a></td>
-          </tr>
-        #end
-      </tbody>
-  </table>
-  </div>
-  <div class="new">
-<!--     <form name="refset" action='#springUrl("/refset/new")' method="get"> -->
-<!--         <input type="submit" value="new refset" /> -->
-<!--     </form> -->
-    <a href='#springUrl("/refset/new")'><input type="submit" value="new refset" /></a>
+<h2>Refsets</h2>
+<div id="refsets">
+  #foreach($refset in $refsets)
+    <div class="row">
+        <div class="col-lg-12">
+          <a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a>
+        </div>
+    </div>
+  #end
+  <div class="row">
+     <div class="col-lg-2">
+         <a href='#springUrl("/refset/new")' class="btn btn-sm btn-primary">Create Refset</a>   
+     </div>
   </div>
 </div>
+
+ 
+  
+<!--     <div class="new"> -->
+<!--       <a href='#springUrl("/refset/new")'><input type="submit" value="new refset" /></a> -->
+<!--     </div>   -->
+<!-- </div> -->
+
+
+<!--   <div class="span2"></div> -->
+<!--   <div class="span6"> -->
+<!--     <div id=refsets> -->
+<!--       <table class="table-hover"> -->
+<!--         <thead> -->
+<!--             <td>Title</td> -->
+<!--         </thead> -->
+<!--         <tbody> -->
+<!--           #foreach($refset in $refsets) -->
+<!--             <tr> -->
+<!--               <td><a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a></td> -->
+<!--             </tr> -->
+<!--           #end -->
+<!--         </tbody> -->
+<!--     </table> -->
+<!--     </div> -->
+<!--     <div class="new"> -->
+<!--       <a href='#springUrl("/refset/new")'><input type="submit" value="new refset" /></a> -->
+<!--     </div> -->
+<!--   </div> -->
+<!--   <div class="span2"></div> -->
+<!-- </div> -->
+
+

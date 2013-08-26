@@ -1,9 +1,15 @@
-<div id="company" class="clearfix">
-  <img class="logo" src="/static/img/logo.symbol.png"/>
-  <h1>SNOMED Clinical Terms</h1>
-  <div id="navigation">
-    <div id="logout">
-      You are logged in as <a href='#springUrl("/auth/logout")'> $!user.prefix $user.firstname $user.lastname</a>
+<div id="page-header">
+  <div class="row">
+    <div class="col-lg-1">
+      <img class="logo img-responsive" src="/static/img/logo.symbol.png" alt="Logo"/>
+    </div>
+    <div class="col-lg-6">
+        <h1>SNOMED Clinical Terms</h1>
+    </div>
+    <div class="col-lg-5">
+      <div id="logout">
+        <small>You are logged in as <a href='#springUrl("/auth/logout")'> $!user.prefix $user.firstname $user.lastname</a></small>
+      </div>        
     </div>
   </div>
 </div>

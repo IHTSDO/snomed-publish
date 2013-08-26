@@ -1,7 +1,12 @@
 <div id="footer">
-    <div id="copyright">Copyright 2013 IHTSDO</div>
-<!--     <div id="author">Authored by Henrik Pettersen at http://sparklingideas.co.uk</div> -->
+  <p class="text-center text-muted"><small>&#169; 2013 International Health Terminology Standards Development Organisation</small></p>
+  <p class="text-center text-muted"><small>Authored by Henrik Pettersen @ http://sparklingideas.co.uk</small></p>
 </div>
+    
+<!--     <div id="author">Authored by Henrik Pettersen at http://sparklingideas.co.uk</div> -->
+
+
+
 <script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 <script>
@@ -13,3 +18,7 @@
   ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
   ga('send', 'pageview');
 </script>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="//code.jquery.com/jquery.js"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>

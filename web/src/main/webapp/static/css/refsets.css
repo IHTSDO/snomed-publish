@@ -1,0 +1,40 @@
+h1,h2,h3{
+    font-family : museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}
+
+body {
+/* background-color: #CCC; */
+}
+
+#page-header h1{
+    font-family: click-clack-1, click-clack-2, serif;
+    margin-top: 0.25em;
+}
+
+#page-header{
+    padding: 2em 0;
+}
+
+#page-header img{
+    max-height: 4em;
+}
+
+#footer{
+    padding-top: 4em;
+}
+
+#footer p:first-child{
+    margin-bottom: 0.25em;
+}
+
+#logout{
+    text-align: right;
+}
+
+#refsets a.btn, #refset a.btn, #refset button{
+    margin-top: 2em;
+}
+
+.errors p{
+    margin: 0.25em 0 0;
+}

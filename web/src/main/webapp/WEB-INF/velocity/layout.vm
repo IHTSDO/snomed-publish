@@ -1,26 +1,25 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8">
-    <script type="text/javascript">
-    <!--
-        function toggle_visibility(id) {
-           var e = document.getElementById(id);
-           if(e.style.display == 'block')
-              e.style.display = 'none';
-           else
-              e.style.display = 'block';
-        }
-    //-->
-    </script>
-    
     <title>$title</title>
     <meta name="description" content="IHTSDO Snomed Refset Builder">
     <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-    <link rel="stylesheet" href="/static/css/styles.css?v=1.0">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+  
+      <link rel="stylesheet" href="/static/css/refsets.css">
+  
+  
   </head>
   <body>
-  #parse('header.vm')
-  $screen_content
-  #parse('footer.vm')
+    <div class="container">
+        #parse('header.vm')
+        $screen_content
+        #parse('footer.vm')
+    </div>
   </body>
 </html>
