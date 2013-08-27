@@ -43,9 +43,9 @@ import com.ihtsdo.snomed.model.Refset;
 @Transactional
 public class RefsetDtoTest {
 
-    @PersistenceContext(unitName=PersistenceConstants.ENTITYMANAGER_UNIT_NAME)
-    EntityManager em;
-    
+//    @PersistenceContext(unitName=PersistenceConstants.ENTITYMANAGER_UNIT_NAME)
+//    EntityManager em;
+//    
     @Inject Validator validator;
     
     RefsetDto successDto;
@@ -60,9 +60,9 @@ public class RefsetDtoTest {
     
     @Before
     public void setUp() {
-        em.persist(Refset.getBuilder("pub1", "title1", "description1").build());
-        em.flush();
-        em.clear();        
+//        em.persist(Refset.getBuilder("pub1", "title1", "description1").build());
+//        em.flush();
+//        em.clear();        
         successDto = RefsetTestUtil.createDto(null, "pub11", "title1", "description1");
     }
     
@@ -71,14 +71,7 @@ public class RefsetDtoTest {
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertTrue(violations.isEmpty());
     }
-    
-    @Test
-    public void testNonUniquePublicId(){
-        RefsetDto failDto = RefsetTestUtil.createDto(null, "pub1", "title1", "description1");
-        Set<ConstraintViolation<RefsetDto>> violations = validator.validate(failDto);
-        assertFalse(violations.isEmpty());
-    } 
-    
+
     @Test
     public void testTitleIsNull(){
         successDto.setTitle(null);

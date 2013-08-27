@@ -261,13 +261,14 @@ public class RefsetControllerTest {
         
         //TODO: SPY on parameters being sent
         verify(refsetServiceMock, times(1)).create(any(RefsetDto.class));
+        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
         verifyNoMoreInteractions(refsetServiceMock);
     }  
     
     @Test
     public void shouldUpdateRefset() throws Exception{
         when(refsetServiceMock.update(any(RefsetDto.class))).thenReturn(r2);
-
+        when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
         mockMvc.perform(post("/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
@@ -286,9 +287,54 @@ public class RefsetControllerTest {
         
         //TODO: SPY on parameters being sent
         verify(refsetServiceMock, times(1)).update(any(RefsetDto.class));
+        verify(refsetServiceMock, times(1)).findById(any(Long.class));
+        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
         verifyNoMoreInteractions(refsetServiceMock);
     }     
         
+    
+    @Test public void failOnExistingPublicIdOnCreate() throws Exception{
+        when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r1);
+
+        mockMvc.perform(post("/refset/new")
+                .with(SecurityRequestPostProcessors
+                            .createUserDetailsRequestPostProcessor("bob")
+                            .userDetailsService(openIdUserDetailsService)
+                     )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "1")
+                .param("publicId", "pub1")
+                .param("title", "title1")
+                .param("description", "description1")
+            )
+            .andExpect(status().isOk())
+            .andExpect(view().name("refset.new"));
+        
+        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verifyNoMoreInteractions(refsetServiceMock);
+    }
+    
+    @Test public void failOnExistingPublicIdOnUpdate() throws Exception{
+        when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r2);
+        when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
+        mockMvc.perform(post("/refset/pub1/edit")
+                .with(SecurityRequestPostProcessors
+                            .createUserDetailsRequestPostProcessor("bob")
+                            .userDetailsService(openIdUserDetailsService)
+                     )
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "1")
+                .param("publicId", "pub2")
+                .param("title", "title2")
+                .param("description", "description2")
+            )
+            .andExpect(status().isOk())
+            .andExpect(view().name("refset.edit"));
+        
+        verify(refsetServiceMock, times(1)).findById(any(Long.class));
+        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verifyNoMoreInteractions(refsetServiceMock);        
+    }
     
     public static class UserBuilder{
         private User u;
