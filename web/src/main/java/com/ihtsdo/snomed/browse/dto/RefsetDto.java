@@ -15,8 +15,10 @@ public class RefsetDto {
     @NotNull
     @Size(min=2, max=20, message="validation.refset.publicid.size")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="validation.refset.publicid.charactermix")
-    @Unique(entity=Refset.class, property="publicId")
+    //@Unique(entity=Refset.class, property="publicId")
     private String publicId;
+    
+    private String updatedPublicId;
     
     @NotNull
     @Size(min=4, max=50, message="validation.refset.title.size")

@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
+import com.ihtsdo.snomed.browse.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.browse.repository.RefsetRepository;
 import com.ihtsdo.snomed.model.Refset;
-import com.ihtsdo.snomed.service.InvalidInputException;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 //@Transactional (value = "transactionManager", readOnly = true)
@@ -85,7 +85,7 @@ public class RepositoryRefsetService implements RefsetService {
      */
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException, InvalidInputException {
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException {
         LOG.debug("Updating refset with information: " + updated);
         Refset refset = refsetRepository.findOne(updated.getId());
         if (refset == null) {
@@ -96,7 +96,7 @@ public class RepositoryRefsetService implements RefsetService {
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
-            throw new InvalidInputException(e.getMessage(), e);
+            throw new NonUniquePublicIdException(e.getMessage(), e);
         }
     }    
 
@@ -106,13 +106,13 @@ public class RepositoryRefsetService implements RefsetService {
      */
     @Override
     @Transactional
-    public Refset create(RefsetDto created) throws InvalidInputException{
+    public Refset create(RefsetDto created) throws NonUniquePublicIdException{
         LOG.debug("Creating new refset [{}]", created.toString());
         Refset refset = Refset.getBuilder(created.getPublicId(), created.getTitle(), created.getDescription()).build();
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
-            throw new InvalidInputException(e.getMessage(), e);
+            throw new NonUniquePublicIdException(e.getMessage(), e);
         }
     }
     

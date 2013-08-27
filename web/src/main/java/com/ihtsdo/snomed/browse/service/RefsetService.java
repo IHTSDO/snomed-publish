@@ -3,6 +3,7 @@ package com.ihtsdo.snomed.browse.service;
 import java.util.List;
 
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
+import com.ihtsdo.snomed.browse.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Refset;
 import com.ihtsdo.snomed.service.InvalidInputException;
@@ -21,9 +22,9 @@ public interface RefsetService {
     public abstract Refset findByPublicId(String publicId);
 
     public abstract Refset update(RefsetDto updated)
-            throws RefsetNotFoundException, InvalidInputException;
+            throws RefsetNotFoundException, NonUniquePublicIdException;
 
-    public abstract Refset create(RefsetDto created) throws InvalidInputException;
+    public abstract Refset create(RefsetDto created) throws NonUniquePublicIdException;
 
     public abstract Refset delete(Long refsetId) throws RefsetNotFoundException;
 

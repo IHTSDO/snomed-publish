@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ihtsdo.snomed.browse.dto.RefsetDto;
+import com.ihtsdo.snomed.browse.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.browse.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.browse.model.User;
 import com.ihtsdo.snomed.browse.service.OntologyService;
@@ -124,11 +126,9 @@ public class RefsetController {
         LOG.debug("Controller received request to delete refset [{}]", pubId);
         Refset deleted = refsetService.delete(pubId);
 
-        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED,
-                deleted.getPublicId(), deleted.getTitle());
+        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED, deleted.getPublicId(), deleted.getTitle());
 
         return new ModelAndView("redirect:/refsets");
-
     }
 
     // CREATE
@@ -143,13 +143,23 @@ public class RefsetController {
                 refsetDto.toString());
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        
+        Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
+        if (refset != null){
+            result.addError(createFieldError(refsetDto, result));
+        }
+        
         if (result.hasErrors()) {
             return new ModelAndView("refset.new");
         }
-        Refset created = refsetService.create(refsetDto);
-        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED,
-                created.getPublicId(), created.getTitle());
-        return new ModelAndView("redirect:/refsets");
+        try {
+            Refset created = refsetService.create(refsetDto);
+            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
+            return new ModelAndView("redirect:/refsets");
+        } catch (NonUniquePublicIdException e) {
+            result.addError(createFieldError(refsetDto, result));
+            return new ModelAndView("refset.new");
+        }
     }
 
     // UPDATE
@@ -167,17 +177,42 @@ public class RefsetController {
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("pubid", pubId);
-        if (result.hasErrors()) {
-            model.addAttribute("refset",
-                    //refsetService.findById(refsetDto.getId()));
-                    refsetDto);
-            return new ModelAndView("refset.edit");
-
+        model.addAttribute("refset", refsetDto);
+        
+        Refset refset = refsetService.findById(refsetDto.getId());
+        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
+            //Assertion: user has updated the public id
+            refset = refsetService.findByPublicId(refsetDto.getPublicId());
+            if (refset != null){
+                result.addError(createFieldError(refsetDto, result));
+            }
         }
-        Refset updated = refsetService.update(refsetDto);
-        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED,
-                updated.getPublicId(), updated.getTitle());
-        return new ModelAndView("redirect:/refset/" + updated.getPublicId());
+        
+        if (result.hasErrors()) {
+            return new ModelAndView("refset.edit");
+        }
+        
+        try {
+            Refset updated = refsetService.update(refsetDto);
+            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED, updated.getPublicId(), updated.getTitle());
+            return new ModelAndView("redirect:/refset/" + updated.getPublicId());
+        } catch (NonUniquePublicIdException e) {
+            //defensive coding
+            result.addError(createFieldError(refsetDto, result));
+            return new ModelAndView("refset.edit");
+        }
+    }
+
+    private FieldError createFieldError(RefsetDto refsetDto,
+            BindingResult result) {
+        return new FieldError(
+                result.getObjectName(), 
+                "publicId", 
+                refsetDto.getPublicId(),
+                false, 
+                null,
+                null,
+                "validation.refset.publicid.notunique");
     }
 
     private void addFeedbackMessage(RedirectAttributes attributes,
