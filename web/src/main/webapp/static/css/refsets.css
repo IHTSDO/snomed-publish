@@ -31,10 +31,14 @@ body {
     text-align: right;
 }
 
-#refsets a.btn, #refset a.btn, #refset button{
+#refsets a.btn.bottom, #refset a.btn.bottom, #refset button.bottom{
     margin-top: 2em;
 }
 
 .errors p{
     margin: 0.25em 0 0;
+}
+
+form.delete{
+    margin-bottom: 0.5em;
 }

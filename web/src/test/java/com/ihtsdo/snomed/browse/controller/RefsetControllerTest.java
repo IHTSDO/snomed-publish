@@ -12,7 +12,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -202,7 +201,7 @@ public class RefsetControllerTest {
     public void shouldDeleteRefset() throws Exception{
         when(refsetServiceMock.delete(any(String.class))).thenReturn(r1);
         
-        mockMvc.perform(delete("/refset/pub1")
+        mockMvc.perform(post("/refset/pub1/delete")
             .with(SecurityRequestPostProcessors
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))

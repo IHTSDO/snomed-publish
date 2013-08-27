@@ -7,7 +7,7 @@
   <form role="form" method="post" action='#springUrl("/refset/new")'>
     #parse('refset.edit.inputs.vm')
     <div class="form-actions">
-      <button type="submit" class="btn btn-sm btn-primary">#springMessage('button.refset.create')</button>
+      <button type="submit" class="btn btn-sm btn-primary bottom">#springMessage('button.refset.create')</button>
     </div>
   </form>
 </div>

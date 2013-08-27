@@ -31,7 +31,7 @@
   </div>
   <div class="row">
      <div class="col-lg-2">
-         <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary">#springMessage('button.refset.modify')</a>   
+         <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>   
      </div>
   </div>
 </div>

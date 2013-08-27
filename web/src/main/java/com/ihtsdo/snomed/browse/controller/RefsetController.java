@@ -115,7 +115,7 @@ public class RefsetController {
 
     // DELETE
 
-    @RequestMapping(value = "/refset/{pubId}", method = RequestMethod.DELETE, produces = { MediaType.TEXT_HTML_VALUE })
+    @RequestMapping(value = "/refset/{pubId}/delete", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE })
     public ModelAndView deleteRefset(ModelMap model,
             HttpServletRequest request, Principal principal,
             @PathVariable String pubId, RedirectAttributes attributes)
