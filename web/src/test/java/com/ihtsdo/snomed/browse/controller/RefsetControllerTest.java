@@ -47,6 +47,7 @@ import com.ihtsdo.snomed.browse.dto.RefsetDto;
 import com.ihtsdo.snomed.browse.model.Role;
 import com.ihtsdo.snomed.browse.model.User;
 import com.ihtsdo.snomed.browse.service.RefsetService;
+import com.ihtsdo.snomed.browse.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.browse.testing.SpringProxyUtil;
 import com.ihtsdo.snomed.model.Refset;
 
@@ -180,7 +181,7 @@ public class RefsetControllerTest {
                         hasProperty("publicId", is("pub1"))
                     )
                 ));
-        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verify(refsetServiceMock, times(1)).findByPublicId("pub1");
         verifyNoMoreInteractions(refsetServiceMock);
     }
 
@@ -209,8 +210,8 @@ public class RefsetControllerTest {
             .andExpect(view().name("redirect:/refsets"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Deleted refset pub1: title1")));
-            //TODO: Mockito SPY on values being sent as parameter
-            verify(refsetServiceMock, times(1)).delete(any(String.class));
+
+            verify(refsetServiceMock, times(1)).delete("pub1");
             verifyNoMoreInteractions(refsetServiceMock);
     }     
     
@@ -235,13 +236,14 @@ public class RefsetControllerTest {
                 ))
             .andExpect(model().attribute("user", notNullValue()));
         
-        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verify(refsetServiceMock, times(1)).findByPublicId("pub1");
         verifyNoMoreInteractions(refsetServiceMock);
     }  
     
     @Test
     public void shouldCreateNewRefset() throws Exception{
         when(refsetServiceMock.create(any(RefsetDto.class))).thenReturn(r1);
+        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, "pub2", "title2", "description2");
 
         mockMvc.perform(post("/refset/new")
                 .with(SecurityRequestPostProcessors
@@ -249,19 +251,18 @@ public class RefsetControllerTest {
                             .userDetailsService(openIdUserDetailsService)
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("id", "1")
-                .param("publicId", "pub1")
-                .param("title", "title1")
-                .param("description", "description1")
+                .param("id", refsetDto.getId().toString())
+                .param("publicId", refsetDto.getPublicId())
+                .param("title", refsetDto.getTitle())
+                .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
             .andExpect(view().name("redirect:/refsets"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Added refset pub1: title1")));
         
-        //TODO: SPY on parameters being sent
-        verify(refsetServiceMock, times(1)).create(any(RefsetDto.class));
-        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verify(refsetServiceMock, times(1)).create(refsetDto);
+        verify(refsetServiceMock, times(1)).findByPublicId(refsetDto.getPublicId());
         verifyNoMoreInteractions(refsetServiceMock);
     }  
     
@@ -269,26 +270,27 @@ public class RefsetControllerTest {
     public void shouldUpdateRefset() throws Exception{
         when(refsetServiceMock.update(any(RefsetDto.class))).thenReturn(r2);
         when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
+        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, "pub2", "title2", "description2");
+        
         mockMvc.perform(post("/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .param("id", "1")
-                .param("publicId", "pub2")
-                .param("title", "title2")
-                .param("description", "description2")
+                .param("id", refsetDto.getId().toString())
+                .param("publicId", refsetDto.getPublicId())
+                .param("title", refsetDto.getTitle())
+                .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
             .andExpect(view().name("redirect:/refset/" + r2.getPublicId()))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Updated refset pub2: title2")));
         
-        //TODO: SPY on parameters being sent
-        verify(refsetServiceMock, times(1)).update(any(RefsetDto.class));
-        verify(refsetServiceMock, times(1)).findById(any(Long.class));
-        verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
+        verify(refsetServiceMock, times(1)).update(refsetDto);
+        verify(refsetServiceMock, times(1)).findById(1L);
+        verify(refsetServiceMock, times(1)).findByPublicId(refsetDto.getPublicId());
         verifyNoMoreInteractions(refsetServiceMock);
     }     
         

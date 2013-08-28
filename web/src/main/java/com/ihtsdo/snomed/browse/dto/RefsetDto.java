@@ -46,6 +46,20 @@ public class RefsetDto {
                 .add("publicId", getPublicId())
                 .toString();
     }
+    
+    @Override
+    public boolean equals(Object o){
+        if (o instanceof RefsetDto){
+            RefsetDto dto = (RefsetDto) o;
+            if (Objects.equal(dto.getId(), getId()) &&
+                    (Objects.equal(dto.getTitle(), getTitle())) &&
+                    (Objects.equal(dto.getDescription(), getDescription())) &&
+                    (Objects.equal(dto.getPublicId(), getPublicId()))){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public String getPublicId() {
         return publicId;
