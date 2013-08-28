@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ihtsdo.snomed</groupId>
-        <artifactId>snomed-publish</artifactId>
+        <artifactId>snomed-publish-clients</artifactId>
         <version>0.5</version>
     </parent>
-    <artifactId>rdfs-export-main</artifactId>
+    <artifactId>diff-main</artifactId>
     <packaging>jar</packaging>
-    <name>rdfs-export-main</name>
-    <description>Application for creating the manifest file to go with the release</description>
+    <name>diff</name>
+    <description>Application for importing snomed ontology to database</description>
     <build>
         <plugins>
             <plugin>
@@ -26,34 +26,23 @@
                             <transformers>
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ihtsdo.snomed.client.rdfs.RdfsExportMain</mainClass>
+                                    <mainClass>com.ihtsdo.snomed.client.diff.DiffMain</mainClass>
                                 </transformer>
                             </transformers>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>                            
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-        <finalName>rdfs-export</finalName>
-        <sourceDirectory>src/main/java</sourceDirectory>
+        <finalName>diff</finalName>
+        <sourceDirectory>src/main/java</sourceDirectory>        
     </build>
     <dependencies>
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
-            <artifactId>rdf</artifactId>
+            <artifactId>importexport</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
         <!-- Command Line Interface -->
         <dependency>
             <groupId>commons-cli</groupId>

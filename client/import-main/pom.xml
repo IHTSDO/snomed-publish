@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ihtsdo.snomed</groupId>
-        <artifactId>snomed-publish</artifactId>
+        <artifactId>snomed-publish-clients</artifactId>
         <version>0.5</version>
     </parent>
-    <artifactId>diff-main</artifactId>
+    <artifactId>import-main</artifactId>
     <packaging>jar</packaging>
-    <name>diff</name>
+    <name>import</name>
     <description>Application for importing snomed ontology to database</description>
     <build>
         <plugins>
@@ -26,7 +26,7 @@
                             <transformers>
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ihtsdo.snomed.client.diff.DiffMain</mainClass>
+                                    <mainClass>com.ihtsdo.snomed.client.importer.ImportMain</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -34,7 +34,7 @@
                 </executions>
             </plugin>
         </plugins>
-        <finalName>diff</finalName>
+        <finalName>import</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>        
     </build>
     <dependencies>

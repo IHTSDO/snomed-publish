@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ihtsdo.snomed</groupId>
-        <artifactId>snomed-publish</artifactId>
+        <artifactId>snomed-publish-clients</artifactId>
         <version>0.5</version>
     </parent>
-    <artifactId>canonical-plugin</artifactId>
+    <artifactId>closure-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <name>canonical-plugin</name>
-    <description>Maven Mojo plugin for the canonical project</description>
+    <name>closure-plugin</name>
+    <description>Maven Mojo plugin for the transitive closure algorithm</description>
     <build>
         <plugins>
             <plugin>
@@ -41,7 +41,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
-            <artifactId>canonical</artifactId>
+            <artifactId>closure</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
