@@ -16,6 +16,10 @@
       <url>./</url>
     </site>
   </distributionManagement>
+  <ciManagement>
+    <system>jenkins</system>
+    <url>http://build.sparklingideas.co.uk</url>
+  </ciManagement>  
   <modules>
     <module>canonical</module>
     <module>closure</module>
