@@ -13,6 +13,7 @@
         <module>manifest</module>
         <module>model</module>
         <module>rdf</module>
+        <module>service</module>
         <module>web</module>
     </modules>
 

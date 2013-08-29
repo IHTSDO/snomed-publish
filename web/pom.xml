@@ -69,6 +69,11 @@
       <artifactId>rdf</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.ihtsdo.snomed</groupId>
+      <artifactId>service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <!-- JSR-330 Javax inject annotations -->
     <dependency>
@@ -191,7 +196,7 @@
       <version>${spring.version}</version>
     </dependency>
     
-    <!-- Spring transactions -->
+    <!-- Spring Transactions -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -260,13 +265,6 @@
         <version>2.2.4</version>
     </dependency>
     
-    <!-- Seems to be missing from Hibernate JAVA EE API -->
-<!--     <dependency> -->
-<!--         <groupId>javaee</groupId> -->
-<!--         <artifactId>javaee-api</artifactId> -->
-<!--         <version>5</version> -->
-<!--     </dependency> -->
-    
     <!-- C3P0 Connection Pooling -->
     <!-- Note: Is BoneCP any better? -->
     <dependency>
@@ -305,6 +303,7 @@
     </dependency>
     
     <!-- PROVIDED SCOPE -->
+    
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -319,6 +318,7 @@
     </dependency>
     
     <!-- TEST SCOPE -->
+    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
@@ -337,9 +337,6 @@
         <version>1.4</version>
         <scope>test</scope>
     </dependency>
-    
-    
-    
   </dependencies>
   <repositories>
     <repository>

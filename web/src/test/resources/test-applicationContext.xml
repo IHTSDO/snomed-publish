@@ -27,13 +27,13 @@
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
         
-<!--    <bean id="refsetService" class="com.ihtsdo.snomed.browse.testing.MockitoFactoryBean"> -->
-<!--         <constructor-arg name="classToBeMocked" value="com.ihtsdo.snomed.browse.service.RepositoryRefsetService"/> -->
+<!--    <bean id="refsetService" class="com.ihtsdo.snomed.web.testing.MockitoFactoryBean"> -->
+<!--         <constructor-arg name="classToBeMocked" value="com.ihtsdo.snomed.web.service.RepositoryRefsetService"/> -->
 <!--         <aop:scoped-proxy/> -->
 <!--     </bean> -->
     
-<!--    <bean id="refsetController" class="com.ihtsdo.snomed.browse.testing.MockitoFactoryBean"> -->
-<!--         <constructor-arg name="classToBeMocked" value="com.ihtsdo.snomed.browse.controller.RefsetController"/> -->
+<!--    <bean id="refsetController" class="com.ihtsdo.snomed.web.testing.MockitoFactoryBean"> -->
+<!--         <constructor-arg name="classToBeMocked" value="com.ihtsdo.snomed.web.controller.RefsetController"/> -->
 <!--         <aop:scoped-proxy/> -->
 <!--     </bean>     -->
 

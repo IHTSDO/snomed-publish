@@ -17,8 +17,8 @@
     </persistence-unit>
     
 <!--     <persistence-unit name="hibernatePersistenceUnitAuthentication" transaction-type="RESOURCE_LOCAL"> -->
-<!--         <class>com.ihtsdo.snomed.browse.model.User</class> -->
-<!--         <class>com.ihtsdo.snomed.browse.model.Role</class> -->
+<!--         <class>com.ihtsdo.snomed.web.model.User</class> -->
+<!--         <class>com.ihtsdo.snomed.web.model.Role</class> -->
 <!--         <exclude-unlisted-classes>true</exclude-unlisted-classes> -->
 <!--         <properties> -->
 <!--             <property name="hibernate.hbm2ddl.auto" value="create-drop" /> -->

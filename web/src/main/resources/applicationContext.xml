@@ -33,7 +33,7 @@
     
     <context:component-scan base-package="com.ihtsdo.snomed" />
     
-    <jpa:repositories base-package="com.ihtsdo.snomed.browse.repository" entity-manager-factory-ref="entityManagerFactory" />
+    <jpa:repositories base-package="com.ihtsdo.snomed.web.repository" entity-manager-factory-ref="entityManagerFactory" />
     
     
     <!-- VALIDATOR -->
@@ -183,6 +183,6 @@
         </constructor-arg>
     </bean>
     
-<!--     <bean id="refsetController" class="com.ihtsdo.snomed.browse.controller.RefsetController" autowire="byType"/> -->
+<!--     <bean id="refsetController" class="com.ihtsdo.snomed.web.controller.RefsetController" autowire="byType"/> -->
 
 </beans>

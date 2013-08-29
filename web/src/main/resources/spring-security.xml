@@ -47,7 +47,7 @@
     <!-- Use a Md5 encoder since the user's passwords are stored as Md5 in the database -->
     <bean class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" id="passwordEncoder" />
     
-<!--     <bean class="com.ihtsdo.snomed.browse.auth.OpenIdUserDetailsService" id="userDetailsService"/> -->
+<!--     <bean class="com.ihtsdo.snomed.web.service.security.OpenIdUserDetailsService" id="userDetailsService"/> -->
     
     <!-- An in-memory list of users. No need to access an external database layer. See Spring Security 3.1 Reference 5.2.1 In-Memory Authentication -->
 <!--     <security:user-service id="userDetailsService"> -->
