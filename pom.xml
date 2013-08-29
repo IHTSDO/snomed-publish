@@ -5,6 +5,11 @@
   <artifactId>snomed-publish</artifactId>
   <version>0.5</version>
   <packaging>pom</packaging>
+  <scm>
+    <connection>scm:git:git@github.com:IHTSDO/snomed-publish.git</connection>
+    <developerConnection>scm:git:git@github.com:IHTSDO/snomed-publish.git</developerConnection>
+    <url>https://github.com/IHTSDO/snomed-publish</url>
+  </scm>  
   <distributionManagement>
     <site>
       <id>${project.artifactId}-site</id>
