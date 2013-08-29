@@ -13,22 +13,20 @@
   <name>snomed-browser</name>
   
   <properties>
-    <!-- <spring.version>3.2.2.RELEASE</spring.version> -->
-    <taglibs.standard.version>1.1.2</taglibs.standard.version>
+    <spring.security.version>3.1.4.RELEASE</spring.security.version>
     <jstl.version>1.2</jstl.version>
+    <taglibs.standard.version>1.1.2</taglibs.standard.version>
     <jetty.servlets.version>9.0.4.v20130625</jetty.servlets.version>
+    <bonecp.version>0.7.1.RELEASE</bonecp.version>
     <c3p0.version>0.9.1.2</c3p0.version>
+    <mchange-commons-java.version>0.2.2</mchange-commons-java.version>
     <jsp.api.version>2.0</jsp.api.version>
     <moxy.version>2.5.0</moxy.version>
-    <commons.io.version>2.4</commons.io.version>
     <servlet.api.version>2.5</servlet.api.version>
-    <http.client.version>4.2.5</http.client.version>
-    <spring.data.jpa.version>1.3.4.RELEASE</spring.data.jpa.version>
-    <mysql.connector.version>5.1.26</mysql.connector.version>
-    <bonecp.version>0.7.1.RELEASE</bonecp.version>
     <jetty.version>9.0.4.v20130625</jetty.version>
     <velocity.version>1.7</velocity.version>
-    
+	<velocity.tools.version>2.0</velocity.tools.version>
+    <jackson.version>2.1.4</jackson.version>
   </properties>
   
   <build>
@@ -82,14 +80,6 @@
       <version>${javax.inject.version}</version>
     </dependency>
     
-    <!-- Spring + Mockito integration -->
-<!--     <dependency> -->
-<!--         <groupId>org.kubek2k</groupId> -->
-<!--         <artifactId>springockito</artifactId> -->
-<!--         <version>1.0.5</version> -->
-<!--     </dependency> -->
-              
-    
     <!-- Better (?) JAXB implementation by Moxy. See jaxb.properties -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -108,7 +98,7 @@
     <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.3</version>
+        <version>${commons-fileupload.version}</version>
     </dependency>
 
     <!-- HTTPClient -->
@@ -207,17 +197,17 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.1.4</version>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.1.4</version>
+      <version>${jackson.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.1.4</version>
+      <version>${jackson.version}</version>
     </dependency>
     
     <!-- MySql Database -->
@@ -257,12 +247,12 @@
     <dependency>
         <groupId>javax.el</groupId>
         <artifactId>javax.el-api</artifactId>
-        <version>2.2.4</version>
+        <version>${javax.el.version}</version>
     </dependency>
     <dependency>
         <groupId>org.glassfish.web</groupId>
         <artifactId>javax.el</artifactId>
-        <version>2.2.4</version>
+        <version>${javax.el.version}</version>
     </dependency>
     
     <!-- C3P0 Connection Pooling -->
@@ -275,7 +265,7 @@
     <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>mchange-commons-java</artifactId>
-      <version>0.2.2</version>
+      <version>${mchange-commons-java.version}</version>
     </dependency>
     
     <!-- JSTL + Taglibs -->
@@ -299,7 +289,7 @@
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity-tools</artifactId>
-      <version>2.0</version>
+      <version>${velocity.tools.version}</version>
     </dependency>
     
     <!-- PROVIDED SCOPE -->
@@ -328,21 +318,15 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.3.170</version>
+      <version>${h2.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>commons-dbcp</groupId>
         <artifactId>commons-dbcp</artifactId>
-        <version>1.4</version>
+        <version>${commons-dbcp.version}</version>
         <scope>test</scope>
     </dependency>
+
   </dependencies>
-  <repositories>
-    <repository>
-      <id>spring-milestone</id>
-      <name>Spring Maven MILESTONE Repository</name>
-      <url>http://repo.springsource.org/libs-milestone</url>
-    </repository>
-  </repositories>
 </project>

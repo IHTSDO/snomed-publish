@@ -18,4 +18,9 @@
     <module>rdfs-export-main</module>
     <module>diff-main</module>
   </modules>
+
+  <properties>
+  	<commons-cli.version>1.2</commons-cli.version>
+  </properties>
+
 </project>
