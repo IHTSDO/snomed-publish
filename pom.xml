@@ -5,6 +5,13 @@
     <artifactId>snomed-publish</artifactId>    
     <version>0.5</version>
     <packaging>pom</packaging>
+
+  <distributionManagement>
+    <site>
+      <id>build.sparklingideas.co.uk</id>
+      <url>file:/var/lib/site</url>
+    </site>
+  </distributionManagement>
     
     <modules>
         <module>canonical</module>
@@ -40,6 +47,15 @@
     	<http.client.version>4.2.5</http.client.version>
     </properties>
     <build>
+		<pluginManagement>
+		      <plugins>
+		        <plugin>
+		          <groupId>org.codehaus.mojo</groupId>
+		          <artifactId>cobertura-maven-plugin</artifactId>
+		          <version>2.5.2</version>
+		        </plugin>
+		      </plugins>
+		</pluginManagement>	
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -50,8 +66,54 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>cobertura-maven-plugin</artifactId>
+		        <version>2.6</version>
+		        <configuration>
+		          <check>
+		            <branchRate>85</branchRate>
+		            <lineRate>85</lineRate>
+		            <haltOnFailure>true</haltOnFailure>
+		            <totalBranchRate>85</totalBranchRate>
+		            <totalLineRate>85</totalLineRate>
+		            <packageLineRate>85</packageLineRate>
+		            <packageBranchRate>85</packageBranchRate>
+		            <regexes>
+		              <regex>
+		                <pattern>com.ihtsdo.snomed.*</pattern>
+		                <branchRate>90</branchRate>
+		                <lineRate>80</lineRate>
+		              </regex>
+		              <!--regex>
+		                <pattern>com.example.boringcode.*</pattern>
+		                <branchRate>40</branchRate>
+		                <lineRate>30</lineRate>
+		              </regex-->
+		            </regexes>
+		          </check>
+		        </configuration>
+		        <executions>
+		          <execution>
+		            <goals>
+		              <goal>clean</goal>
+		              <goal>check</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		      </plugin>
         </plugins>
     </build>
+
+	<reporting>
+	    <plugins>
+	      <plugin>
+	        <groupId>org.codehaus.mojo</groupId>
+	        <artifactId>cobertura-maven-plugin</artifactId>
+	        <version>2.5.2</version>
+	      </plugin>
+	    </plugins>
+	  </reporting>
     <dependencies>
 	
         <!-- Logging -->
