@@ -8,7 +8,7 @@
 
   <distributionManagement>
     <site>
-      <id>build.sparklingideas.co.uk</id>
+      <id>build.sparklingideas.co.uk/report</id>
       <url>file:/var/lib/site</url>
     </site>
   </distributionManagement>
