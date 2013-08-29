@@ -54,14 +54,14 @@
           <target>1.7</target>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.3</version>
-        <configuration>
-          <stagingDirectory>/tmp/stage</stagingDirectory>
-        </configuration>
-      </plugin>
+<!--       <plugin> -->
+<!--         <groupId>org.apache.maven.plugins</groupId> -->
+<!--         <artifactId>maven-site-plugin</artifactId> -->
+<!--         <version>3.3</version> -->
+<!--         <configuration> -->
+<!--           <stagingDirectory>/tmp/stage</stagingDirectory> -->
+<!--         </configuration> -->
+<!--       </plugin> -->
 <!--       <plugin> -->
 <!--         <groupId>org.codehaus.mojo</groupId> -->
 <!--         <artifactId>cobertura-it-maven-plugin</artifactId> -->
