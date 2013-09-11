@@ -7,7 +7,10 @@
 
 
 
+<!-- Typekit -->
 <script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
+
+<!-- Google -->
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -18,9 +21,18 @@
   ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
   ga('send', 'pageview');
 </script>
+
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="//code.jquery.com/jquery.js"></script>
-<!-- Latest compiled and minified JavaScript -->
+
+<!-- Bootstrap and Bootbox -->
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="/static/js/bootbox.js"></script>
+
+<!-- Ember, Handlebars -->
+<script src="/static/js/libs/handlebars-1.0.0.js"></script>
+<script src="/static/js/libs/ember-1.0.0.js"></script>
+<script src="/static/js/textsearch.js"></script>
+
+<!-- Application -->
 <script src="/static/js/refsets.js"></script>

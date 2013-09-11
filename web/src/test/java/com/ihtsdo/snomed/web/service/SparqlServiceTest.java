@@ -201,17 +201,17 @@ public class SparqlServiceTest {
             if (source.contains("statement")){
                 assertTrue(sourceBackedObject instanceof Statement);
                 assertEquals(((Statement)sourceBackedObject).getSerialisedId(), sparql.getSerialisedId(source));
-                assertTrue(map.get(var).source.toString().startsWith("http://snomed.sparklingideas.co.uk/ontology/" + ontology.getId() + "/statement/"));
+                assertTrue(map.get(var).source.toString().startsWith("http://browser.sparklingideas.co.uk/ontology/" + ontology.getId() + "/statement/"));
             }
             else if (source.contains("concept")){
                 assertTrue(sourceBackedObject instanceof Concept);
                 assertEquals(((Concept)sourceBackedObject).getSerialisedId(), sparql.getSerialisedId(source));
-                assertTrue(map.get(var).source.toString().startsWith("http://snomed.sparklingideas.co.uk/ontology/" + ontology.getId() + "/concept/"));
+                assertTrue(map.get(var).source.toString().startsWith("http://browser.sparklingideas.co.uk/ontology/" + ontology.getId() + "/concept/"));
             }
             else if (source.contains("description")){
                 assertTrue(sourceBackedObject instanceof Description);
                 assertEquals(((Description)sourceBackedObject).getSerialisedId(), sparql.getSerialisedId(source));
-                assertTrue(map.get(var).source.toString().startsWith("http://snomed.sparklingideas.co.uk/ontology/" + ontology.getId() + "/description/"));
+                assertTrue(map.get(var).source.toString().startsWith("http://browser.sparklingideas.co.uk/ontology/" + ontology.getId() + "/description/"));
             }
         }
     }   

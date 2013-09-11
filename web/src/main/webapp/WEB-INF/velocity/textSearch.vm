@@ -1,0 +1,26 @@
+<script type="text/x-handlebars">
+	<h2>Search Snomed</h2>
+	{{outlet}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="index">
+	{{render "textSearch"}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="textSearch">
+	{{render "searchInput"}}
+	{{render "searchResults"}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="searchInput">
+	{{input type="text" value=query size="50"}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="searchResults" >
+	Total : {{model.total}}
+	<ul>
+		{{#each model.concepts}}
+			<li>{{title}}</li> 
+		{{/each}}
+	</ul>
+</script>

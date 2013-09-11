@@ -14,10 +14,10 @@ public class UrlBuilder {
     private static final String DESCRIPTION_ID_KEY = "__DESCRIPTION_ID__";
     private static final String STATEMENT_ID_KEY = "__STATEMENT_ID__";
     
-    private static final String ONTOLOGY_URL = "http://snomed.sparklingideas.co.uk/ontology/" + ONTOLOGY_ID_KEY;
-    private static final String CONCEPT_URL = "http://snomed.sparklingideas.co.uk/ontology/"+ ONTOLOGY_ID_KEY + "/concept/xml/" + CONCEPT_ID_KEY;
-    private static final String STATEMENT_URL = "http://snomed.sparklingideas.co.uk/ontology/"+ ONTOLOGY_ID_KEY + "/triple/xml/" + STATEMENT_ID_KEY;
-    private static final String DESCRIPTION_URL = "http://snomed.sparklingideas.co.uk/ontology/" + ONTOLOGY_ID_KEY + "/description/xml/" + DESCRIPTION_ID_KEY;
+    private static final String ONTOLOGY_URL = "http://browser.sparklingideas.co.uk/ontology/" + ONTOLOGY_ID_KEY;
+    private static final String CONCEPT_URL = "http://browser.sparklingideas.co.uk/ontology/"+ ONTOLOGY_ID_KEY + "/concept/xml/" + CONCEPT_ID_KEY;
+    private static final String STATEMENT_URL = "http://browser.sparklingideas.co.uk/ontology/"+ ONTOLOGY_ID_KEY + "/triple/xml/" + STATEMENT_ID_KEY;
+    private static final String DESCRIPTION_URL = "http://browser.sparklingideas.co.uk/ontology/" + ONTOLOGY_ID_KEY + "/description/xml/" + DESCRIPTION_ID_KEY;
         
     
     public static URL createOntologyUrl(Concept c) throws MalformedURLException {

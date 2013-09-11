@@ -1,0 +1,29 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/snomed" user="root"
+    password="3wQY2BzD6889bqu7" />
+  <document>
+    <entity name="concept"
+      query="SELECT c.id as internal_id, c.serialisedId as id, c.ontology_id, c.fullySpecifiedName,
+                c.effectiveTime, c.active, c.status_id, c.module_id,
+                status_concept.serialisedId as status_concept_id,
+                module_concept.serialisedId as module_concept_id,
+                o.id as ontology_id, o.name as ontology_title            
+            FROM Concept status_concept, Concept module_concept, Concept c, Ontology o
+            WHERE c.status_id=status_concept.id
+            AND c.module_id=module_concept.id
+            AND c.ontology_id=o.id">
+      <field column="id" name="id" />
+      <field column="ontology_id" name="ontology_id" />
+      <field column="ontology_title" name="ontology_title" />
+      <field column="fullySpecifiedName" name="title" />
+      <field column="effectiveTime" name="effectiveTime" />
+      <field column="active" name="active" />
+      <field column="status_concept_id" name="status_concept_id" />
+      <field column="module_concept_id" name="module_concept_id" />
+      <entity name="description" query="select term, serialisedId from Description where about_id='${concept.internal_id}'">
+        <field column="serialisedId" name="description_id" />
+        <field column="term" name="description_term" />
+      </entity>
+    </entity>
+  </document>
+</dataConfig>

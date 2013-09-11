@@ -1,0 +1,43 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/snomed" user="root"
+    password="3wQY2BzD6889bqu7" />
+  <document>
+    <entity name="triple" 
+        query="SELECT s.id as internal_id, s.serialisedId as id, s.ontology_id, s.effectiveTime, s.groupId, 
+                      s.active, s.characteristicType_id as ct_id, s.module_id, s.modifier_id, s.subject_id, 
+                      s.predicate_id, s.object_id, 
+                      o.id as ontology_id, o.name as ontology_title,
+                      characteristicType_concept.serialisedId as characteristicType_concept_id,
+                      module_concept.serialisedId as module_concept_id,
+                      modifier_concept.serialisedId as modifier_concept_id,
+                      subject_concept.serialisedId as object_concept_id,
+                      predicate_concept.serialisedId as attribute_concept_id,
+                      object_concept.serialisedId as value_concept_id,
+                      subject_concept.fullySpecifiedName as object_title,
+                      predicate_concept.fullySpecifiedName as attribute_title,
+                      object_concept.fullySpecifiedName as value_title
+               FROM Statement s, Ontology o, Concept characteristicType_concept, Concept module_concept, 
+                    Concept modifier_concept, Concept subject_concept, Concept predicate_concept, 
+                    Concept object_concept
+               WHERE o.id=s.ontology_id
+               AND characteristicType_concept.id=s.characteristicType_id
+               AND module_concept.id=s.module_id
+               AND modifier_concept.id=s.modifier_id
+               AND subject_concept.id=s.subject_id
+               AND predicate_concept.id=s.predicate_id
+               AND object_concept.id=s.object_id">
+      <field column="id" name="id" />
+      <field column="ontology_id" name="ontology_id" />
+      <field column="ontology_name" name="ontology_name" />
+      <field column="effectiveTime" name="effectiveTime" />
+      <field column="groupId" name="groupId" />
+      <field column="active" name="active" />
+      <field column="characteristicType" name="characteristicType" />
+      <field column="module" name="module" />
+      <field column="modifier" name="modifier" />
+      <field column="object_concept_id" name="object_concept_id" />
+      <field column="attribute_concept_id" name="attribute_concept_id" />
+      <field column="value_concept_id" name="value_concept_id" />
+    </entity>
+  </document>
+</dataConfig>

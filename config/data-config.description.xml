@@ -1,0 +1,33 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/snomed" user="root"
+    password="3wQY2BzD6889bqu7" />
+  <document>
+    <entity name="description" 
+    query="SELECT d.id as internal_id, d.serialisedId as id, d.ontology_id, d.term, d.languageCode, d.effectiveTime, 
+                  d.about_id, d.active, d.type_id, d.caseSignificance_id, d.module_id,
+                  about_concept.serialisedId as about_concept_id,
+                  type_concept.serialisedId as type_concept_id,
+                  caseSignificance_concept.serialisedId as caseSignificance_concept_id,
+                  module_concept.serialisedId as module_concept_id,
+                  o.id as ontology_id, o.name as ontology_title
+           FROM Description d, Ontology o, Concept about_concept, Concept type_concept, 
+                Concept caseSignificance_concept, Concept module_concept
+           WHERE d.ontology_id=o.id
+           AND d.about_id=about_concept.id
+           AND d.type_id=type_concept.id
+           AND d.caseSignificance_id=caseSignificance_concept.id
+           AND d.module_id=module_concept.id">    
+      <field column="id" name="id" />
+      <field column="ontology_id" name="ontology_id" />
+      <field column="ontology_name" name="ontology_name" />
+      <field column="term" name="title" />
+      <field column="languageCode" name="languageCode" />
+      <field column="effectiveTime" name="effectiveTime" />
+      <field column="active" name="active" />
+      <field column="about_concept_id" name="about_concept_id" />
+      <field column="type_concept_id" name="type_concept_id" />
+      <field column="caseSignificance_concept_id" name="caseSignificance_concept_id" />
+      <field column="module_concept_id" name="module_concept_id" />
+    </entity>
+  </document>
+</dataConfig>

@@ -5,6 +5,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.google.common.base.Objects;
+import com.google.common.primitives.Longs;
 
 public class RefsetDto {
     
@@ -54,6 +55,17 @@ public class RefsetDto {
             }
         }
         return false;
+    }
+    
+    @Override
+    public int hashCode(){
+        if (id != null){
+            return Longs.hashCode(id);
+        }else if (publicId != null){
+            return publicId.hashCode();
+        }else{
+            return 1; //delegate to equals method
+        }
     }
 
     public String getPublicId() {

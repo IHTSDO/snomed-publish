@@ -7,54 +7,54 @@
   </head>
   <results>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4576818021</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4576818021</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/173722008</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/173722008</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4216986021</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4216986021</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/407878008</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/407878008</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4502954025</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4502954025</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/405388000</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/405388000</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4112168023</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4112168023</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/200102005</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/200102005</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4033296024</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4033296024</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/54678006</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/54678006</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4000115029</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4000115029</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/27246003</uri></binding>
+      <binding name="o"><uri>http://brspowser.sparklingideas.co.uk/ontology/1/concept/27246003</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4514413021</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4514413021</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/426391000</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/426391000</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4492804029</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4492804029</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/232797005</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/232797005</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4346696020</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4346696020</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/35655004</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/35655004</uri></binding>
     </result>
     <result>
-      <binding name="s"><uri>http://snomed.sparklingideas.co.uk/ontology/1/statement/4507824029</uri></binding>
+      <binding name="s"><uri>http://browser.sparklingideas.co.uk/ontology/1/statement/4507824029</uri></binding>
       <binding name="p"><uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#subject</uri></binding>
-      <binding name="o"><uri>http://snomed.sparklingideas.co.uk/ontology/1/concept/274784001</uri></binding>
+      <binding name="o"><uri>http://browser.sparklingideas.co.uk/ontology/1/concept/274784001</uri></binding>
     </result>
   </results>
 </sparql>

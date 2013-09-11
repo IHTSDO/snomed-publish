@@ -1,8 +1,15 @@
-//$(document).on("click", ".alert", function(e) {
-//    bootbox.alert("Hello world!", function() {
-//        console.log("Alert Callback");
-//    });
-//});
+// APPLICATION
+// -----------
+
+App = Ember.Application.create();
+
+App.ApplicationController = Ember.Controller.extend({
+  appName: 'Snomed Search'
+});
+
+App.Router.map(function() {
+  this.route("index", {path: "/"});
+});
 
 
 function confirmDelete($title, $message, $callback){

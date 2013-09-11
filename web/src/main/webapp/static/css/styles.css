@@ -883,3 +883,87 @@ body#sparql .attributes .reference{
 body#sparql .attributes .reference:first-child{
     margin-bottom: 0.2em;
 }
+
+
+body#search .text-search {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+
+body#search .concept-input{
+    float: left;
+    width: 100%;
+    font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;     
+}
+
+body#search .concept-input label{
+    float: left;
+    padding-right: 0.75em;
+    padding-left: 1em;
+    color: #cccccc;
+    font-weight: normal;
+    font-size: 1.75em;
+}
+
+body#search .concept-input input{
+    width: 80%;
+    height: 2.5em;
+    float: left;
+}
+
+body#search .concept-results{
+    float: left;
+    clear: both;
+    padding-left: 2em;
+}
+
+body#search .concept-results a{
+    font-size: 1.25em;
+}
+
+body#search .concept-results .identifier{
+    padding-left: 0.5em;
+}
+
+body#search .concept-results ul{
+    color: grey;
+    border: 0;
+    list-style-type: none;
+    margin:0;
+    padding:0;
+}
+
+body#search .concept-results li{
+    border: 0;
+    display:inline;
+}
+
+body#search .concept-results li label{
+    font-weight: normal;
+}
+
+body#search .total {
+    float: right;
+    margin-top: -2.5em;
+    color: #cccccc;
+    padding-right: 2em;
+}
+
+#page-header h1{
+    font-family: click-clack-1, click-clack-2, serif;
+    margin-top: 0.25em;
+}
+
+#page-header{
+    padding: 2em 0;
+}
+
+#page-header img{
+    max-height: 4em;
+    padding-left: 1em;
+}
+
+#logout{
+    text-align: right;
+}

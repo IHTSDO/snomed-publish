@@ -19,6 +19,11 @@ body {
     max-height: 4em;
 }
 
+#logout{
+    text-align: right;
+}
+
+
 #footer{
     padding-top: 4em;
 }
@@ -27,9 +32,6 @@ body {
     margin-bottom: 0.25em;
 }
 
-#logout{
-    text-align: right;
-}
 
 #refsets a.btn.bottom, #refset a.btn.bottom, #refset button.bottom{
     margin-top: 2em;

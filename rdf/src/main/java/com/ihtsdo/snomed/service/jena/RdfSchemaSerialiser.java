@@ -26,9 +26,9 @@ public class RdfSchemaSerialiser{
     private final Logger LOG = LoggerFactory.getLogger(RdfSchemaSerialiser.class);
     
     private final String NS_ONTOLOGY_VARIABLE = "__ONTOLOGY_ID__";
-    private final String NS_CONCEPT = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
-    private final String NS_TRIPLE = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
-    private final String NS_DESCRIPTION = "http://snomed.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
+    private final String NS_CONCEPT = "http://browser.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
+    private final String NS_TRIPLE = "http://browser.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
+    private final String NS_DESCRIPTION = "http://browser.sparklingideas.co.uk/ontology/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
     
     private SimpleDateFormat longTimeParser = new SimpleDateFormat("yyyyMMdd");
     private SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -49,7 +49,7 @@ public class RdfSchemaSerialiser{
         ow.write(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
         ow.write(" xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n");
         ow.write(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n");
-        ow.write(" xmlns:sn=\"http://snomed.sparklingideas.co.uk/term/\"\n");
+        ow.write(" xmlns:sn=\"http://browser.sparklingideas.co.uk/term/\"\n");
         ow.write(" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
         ow.write(">\n");
     }
@@ -60,61 +60,61 @@ public class RdfSchemaSerialiser{
     
     public void printStructural(OutputStreamWriter ow) throws IOException{
         //EffectiveTime
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/effectiveTime\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/effectiveTime\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">EffectiveTime</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Active
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/active\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/active\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Active</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Status
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/status\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/status\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Status</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Module
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/module\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/module\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Module</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Group
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/group\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/group\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Group</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //CharacteristicType
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/characteristictype\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/characteristictype\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">CharacteristicType</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Modifier
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/modifier\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/modifier\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Modifier</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Description
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/description\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/description\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Description</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //CaseSignificance
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/casesignificance\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/casesignificance\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">CaseSignificance</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
         
         //Type
-        ow.write("<rdf:Description rdf:about=\"http://snomed.sparklingideas.co.uk/term/type\">\n");
+        ow.write("<rdf:Description rdf:about=\"http://browser.sparklingideas.co.uk/term/type\">\n");
         ow.write("<rdfs:label xml:lang=\"en-gb\">Type</rdfs:label>\n");
         ow.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         ow.write("</rdf:Description>\n");
@@ -124,15 +124,15 @@ public class RdfSchemaSerialiser{
         LOG.info("Loading concepts");
         Stopwatch stopwatch = new Stopwatch().start();
         TypedQuery<Concept> conceptsQuery = em.createQuery("SELECT c FROM Concept c " +
-                "LEFT JOIN FETCH c.subjectOfStatements " +
+                //"LEFT JOIN FETCH c.subjectOfStatements " +
                 //"LEFT JOIN FETCH c.predicateOfStatements " + 
                 //"LEFT JOIN FETCH c.kindOfs " + 
                 //"LEFT JOIN FETCH c.objectOfStatements " + 
                 //"LEFT JOIN FETCH c.parentOf " +
-                "LEFT JOIN FETCH c.description " +
-                "WHERE c.ontology.id=:ontologyId", 
-                Concept.class);
-        conceptsQuery.setParameter("ontologyId", o.getId());
+                "LEFT JOIN FETCH c.description " 
+                //"WHERE c.ontology.id=:ontologyId", 
+                ,Concept.class);
+        //conceptsQuery.setParameter("ontologyId", o.getId());
         List<Concept> concepts = conceptsQuery.getResultList();
         LOG.info("Loaded " + concepts.size() + " concepts in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
         
