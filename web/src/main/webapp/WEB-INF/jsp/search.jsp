@@ -98,9 +98,9 @@
       <li class="inactive"><a href="#" {{action "previousPage"}}><small>&lt;</small></a></li>
       {{#each page in model itemViewClass="Em.View"}}
         {{#if page.active}}
-          <li class="active"><a href="#" {{action "pageRequest" page}}>{{page.index}}</a></li>
+          <li class="active"><a href="#" class="number" {{action "pageRequest" page}}>{{page.index}}</a></li>
         {{else}}
-          <li class="inactive"><a href="#" {{action "pageRequest" page}}>{{page.index}}</a></li>
+          <li class="inactive"><a href="#" class="number" {{action "pageRequest" page}}>{{page.index}}</a></li>
         {{/if}}
       {{/each}}
       <li class="inactive"><a href="#" {{action "nextPage"}}><small>&gt;</small></a></li>

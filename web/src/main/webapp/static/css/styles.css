@@ -1024,7 +1024,6 @@ body#search .text-search .pages{
 }
 
 body#search .text-search .pages .pagination{
-    width: 56em;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -1034,6 +1033,14 @@ body#search .text-search .pages .pagination{
 body#search .text-search .pages ul{
     width: 100%;
     margin-top: 0;
+}
+
+body#search .text-search .pages a{
+    min-height: 2.6em;
+}
+
+body#search .text-search .pages a.number{
+    padding-top: 0.7em;
 }
 
 #page-header h1{
