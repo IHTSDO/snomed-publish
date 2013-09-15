@@ -27,20 +27,10 @@
 </head>
 <body id="search">
 
-<div id="page-header">
-  <div class="row">
-    <div class="col-lg-1">
-      <img class="logo img-responsive" src="/static/img/logo.symbol.png" alt="Logo"/>
-    </div>
-    <div class="col-lg-6">
-        <h1>SNOMED Clinical Terms</h1>
-    </div>
-    <div class="col-lg-5">
-      <div id="logout">
-        <small>You are logged in as <a href='/auth/logout'> ${user.firstname} ${user.lastname} ${user.prefix}</a></small>
-      </div>        
-    </div>
-  </div>
+<div id="page-header" class="clearfix">
+  <div id="logout"><small>You are logged in as <a href='/auth/logout'> ${user.firstname} ${user.lastname} ${user.prefix}</a></small></div>
+  <img class="logo img-responsive" src="/static/img/logo.symbol.png" alt="Logo"/>
+  <h1>SNOMED Clinical Terms</h1>
 </div>
 
 <script type="text/x-handlebars">
@@ -49,51 +39,76 @@
 
 <script type="text/x-handlebars" data-template-name="index">
   {{render "textSearch"}}
+  <div class="footer">
+    <small>
+      <div class="author">Authored by <span class="name">Henrik Pettersen</span> @ Sparkling Ideas</div>
+      <div class="link"><img src="/static/img/pointing_finger_thumb.png"/><a target="_blank" href="http://sparklingideas.co.uk">http://sparklingideas.co.uk</a></div>
+    </small>
+  </footer>
 </script>
 
 <script type="text/x-handlebars" data-template-name="textSearch">
-  <div class="text-search">
-    <div class="concept-input">
+  <div class="text-search clearfix">
+    <div class="concept-input clearfix">
       {{render "searchInput"}}
     </div>
-    <div class="concept-results">
-      {{render "searchResults"}}
-    </div>
+    {{#if controllers.searchResults.model.total}}
+      <div class="concept-results clearfix">
+        {{render "searchResults"}}
+      </div>
+      <div class="pages clearfix">
+        {{render "pages"}}
+      </div>
+    {{/if}}
   </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="searchInput">
+    <div class="syntax">
+      <small>
+        <a href="http://lucene.apache.org/core/3_5_0/queryparsersyntax.html" target="_blank">Help</a>
+      </small>
+    </div>
     {{view Bootstrap.Forms.TextField valueBinding="query" label="Snomed" placeholder="Search" }}
+    <div class="total">{{controllers.searchResults.model.total}}</div>
 
 </script>
 
 <script type="text/x-handlebars" data-template-name="searchResults" >
-  <div class="total"><small>{{model.total}}</small></div>
   <ul class="list-group">
     {{#each model.concepts}}
       <li class="list-group-item">
         <div class="result">
-          <a {{bindAttr href=url}}>{{title}}</a><span class="identifier">({{id}})</span>
-          <ul>
-            <li>
-              {{#if active}}Active{{else}}Not active{{/if}},
-            </li>
-            <li>
-              <label>Effective</label>
-              <span class="value">{{effectiveTime}}</span>
-            </li>
-          </ul>
+          <a {{action 'click' this}} href="#">{{title}}</a><span class="identifier">({{id}})</span>
+          <div class="result-property">
+            <label>{{#if active}}Active{{else}}Not active{{/if}},</label>
+            <label>Effective</label>
+            <span class="value">{{effectiveTime}}</span>
+          </div>
         </div>
       </li> 
     {{/each}}
   </ul>
-  <ul class="pagination">
-    {{#each model.pages}}
-        <li><a href="#">{{this}}</a></li>
-    {{/each}}
-  </ul>
-
 </script>
+
+<script type="text/x-handlebars" data-template-name="pages">
+  {{#if shouldDisplayNavigation}}
+    <ul class="pagination"  {{bind-attr style=displayWidthStyling}}>
+      <li class="inactive"><a href="#" {{action "firstPage"}} style="border-bottom-left-radius: 4px;border-top-left-radius: 4px;margin-left: 0;"><small>&lt;&lt;</a></small></li>
+      <li class="inactive"><a href="#" {{action "previousPage"}}><small>&lt;</small></a></li>
+      {{#each page in model itemViewClass="Em.View"}}
+        {{#if page.active}}
+          <li class="active"><a href="#" {{action "pageRequest" page}}>{{page.index}}</a></li>
+        {{else}}
+          <li class="inactive"><a href="#" {{action "pageRequest" page}}>{{page.index}}</a></li>
+        {{/if}}
+      {{/each}}
+      <li class="inactive"><a href="#" {{action "nextPage"}}><small>&gt;</small></a></li>
+      <li class="inactive"><a href="#" style="border-bottom-right-radius: 4px; border-top-right-radius: 4px;" {{action "lastPage"}}><small>&gt;&gt;</small></a></li>
+    </ul>
+  {{/if}}
+</script>
+
 
 <!-- Typekit -->
 <script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
@@ -125,12 +140,12 @@
 <!-- Ember Bootstrap -->
 <script src="/static/js/libs/ember-bootstrap.js"></script>
 
-
 <!-- Application -->
 <script src="/static/js/browser.js"></script>
 
 <!-- Text Search -->
 <script src="/static/js/textsearch.js"></script>
+
 
 
 

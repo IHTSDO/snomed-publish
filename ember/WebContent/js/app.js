@@ -11,12 +11,5 @@ App.Router.map(function() {
   this.route("index", {path: "/"});
 });
 
-App.IndexController = Ember.Controller.extend({
-  actions:{
-    click: function(clicked){
-      window.location = clicked.get('url');
-    }
-  }
-});
 
 
