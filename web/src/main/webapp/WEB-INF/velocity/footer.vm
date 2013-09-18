@@ -25,14 +25,27 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="//code.jquery.com/jquery.js"></script>
 
-<!-- Bootstrap and Bootbox -->
+<!-- Bootstrap -->
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootbox -->
 <script src="/static/js/bootbox.js"></script>
 
-<!-- Ember, Handlebars -->
+<!-- Handlebars -->
 <script src="/static/js/libs/handlebars-1.0.0.js"></script>
+
+<!-- Ember -->
 <script src="/static/js/libs/ember-1.0.0.js"></script>
-<script src="/static/js/textsearch.js"></script>
+
+<!-- Ember Bootstrap -->
+<script src="/static/js/libs/ember-bootstrap.js"></script>
+
+<!-- SNOMED MODULES -->
 
 <!-- Application -->
 <script src="/static/js/refsets.js"></script>
+#if ($pageScripts)
+    #foreach ($script in $pageScripts)
+        <script src="$script"></script>
+    #end
+#end

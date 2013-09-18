@@ -8,4 +8,9 @@
 <!-- Optional theme -->
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"/>
 <link rel="stylesheet" href="/static/css/refsets.css"/>
-<link rel="stylesheet" href="/static/css/normalize.css">
+<link rel="stylesheet" href="/static/css/normalise/normalise.css">
+#if ($pageCss)
+  #foreach ($css in $pageCss)
+    <link rel="stylesheet" href="$css">
+  #end
+#end

@@ -43,6 +43,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.ihtsdo.snomed.dto.RefsetDto;
+import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.model.Role;
@@ -82,6 +83,8 @@ public class RefsetControllerTest {
     
     @Mock
     private OpenIdUserDetailsService openIdUserDetailsService;
+    
+    private Concept concept = new Concept(1l);
 
     private User user = new UserBuilder()
         .firstname("firstname")
@@ -92,16 +95,22 @@ public class RefsetControllerTest {
     private Refset r1 = new RefsetBuilder()
         .id(1)
         .title("title1")
+        .concept(concept)
         .description("description1")
         .publicId("pub1")
         .build();
     
     private Refset r2 = new RefsetBuilder()
         .id(2)
+        .concept(concept)
         .title("title2")
         .description("description2")
         .publicId("pub2")
         .build();    
+    
+    public RefsetControllerTest(){
+        concept.setSerialisedId(1234l);
+    }
     
     @PostConstruct
     public void init() throws Exception{
@@ -192,7 +201,7 @@ public class RefsetControllerTest {
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("refset.new"))
+            .andExpect(view().name("new.refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", notNullValue()))
             .andExpect(model().attribute("user", notNullValue()));
@@ -224,7 +233,7 @@ public class RefsetControllerTest {
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("refset.edit"))
+            .andExpect(view().name("edit.refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", 
                     allOf(
@@ -243,7 +252,7 @@ public class RefsetControllerTest {
     @Test
     public void shouldCreateNewRefset() throws Exception{
         when(refsetServiceMock.create(any(RefsetDto.class))).thenReturn(r1);
-        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, "pub2", "title2", "description2");
+        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, 1234l, "pub2", "title2", "description2");
 
         mockMvc.perform(post("/refset/new")
                 .with(SecurityRequestPostProcessors
@@ -270,7 +279,7 @@ public class RefsetControllerTest {
     public void shouldUpdateRefset() throws Exception{
         when(refsetServiceMock.update(any(RefsetDto.class))).thenReturn(r2);
         when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
-        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, "pub2", "title2", "description2");
+        RefsetDto refsetDto = RefsetTestUtil.createDto(1L, 1234l, "pub2", "title2", "description2");
         
         mockMvc.perform(post("/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
@@ -310,7 +319,7 @@ public class RefsetControllerTest {
                 .param("description", "description1")
             )
             .andExpect(status().isOk())
-            .andExpect(view().name("refset.new"));
+            .andExpect(view().name("new.refset"));
         
         verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
         verifyNoMoreInteractions(refsetServiceMock);
@@ -371,6 +380,11 @@ public class RefsetControllerTest {
         
         public RefsetBuilder(){
             r = new Refset();
+        }
+        
+        public RefsetBuilder concept(Concept concept){
+            r.setConcept(concept);
+            return this;
         }
         
         public RefsetBuilder id(long id){

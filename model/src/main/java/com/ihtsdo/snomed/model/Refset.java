@@ -3,10 +3,12 @@ package com.ihtsdo.snomed.model;
 import java.sql.Date;
 import java.util.Calendar;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -36,6 +38,10 @@ public class Refset {
     private long id;
     
     @NotNull
+    @OneToOne
+    private Concept concept;
+    
+    @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
 
@@ -63,7 +69,8 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(String publicId, String title, String description){
+    public Refset update(Concept concept, String publicId, String title, String description){
+        this.setConcept(concept);
         this.setPublicId(publicId);
         this.setTitle(title);
         this.setDescription(description);
@@ -85,6 +92,7 @@ public class Refset {
     public String toString(){
         return Objects.toStringHelper(this)
                 .add("id", getId())
+                .add("concept", getConcept().getId())
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
@@ -108,8 +116,8 @@ public class Refset {
         modificationTime = now;
     }    
     
-    public static Builder getBuilder(String publicId, String title, String description) {
-        return new Builder(publicId, title, description);
+    public static Builder getBuilder(Concept concept, String publicId, String title, String description) {
+        return new Builder(concept, publicId, title, description);
     }
     
     public long getId() {
@@ -118,6 +126,15 @@ public class Refset {
 
     public void setId(long id) {
         this.id = id;
+    }
+    
+
+    public Concept getConcept() {
+        return concept;
+    }
+
+    public void setConcept(Concept concept) {
+        this.concept = concept;
     }
 
     public String getPublicId() {
@@ -169,13 +186,14 @@ public class Refset {
     }
 
     public static class Builder {
-        Refset built;
+        private Refset built;
 
-        Builder(String publicId, String title, String description) {
+        Builder(Concept concept, String publicId, String title, String description) {
             built = new Refset();
             built.publicId = publicId;
             built.title = title;
             built.description = description;
+            built.concept = concept;
         }
 
         public Refset build() {

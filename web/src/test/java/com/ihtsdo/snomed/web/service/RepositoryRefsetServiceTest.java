@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.web.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,8 +31,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ihtsdo.snomed.dto.RefsetDto;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
+import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRepository;
 import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
@@ -62,13 +65,22 @@ public class RepositoryRefsetServiceTest {
     private static final String TITLE_UPDATED       = "FooUpdated";
     private static final String DESCRIPTION         = "Bar";
     private static final String DESCRIPTION_UPDATED = "BarUpdated";
+    private final Concept concept;
     
     @Inject
     private RefsetService refsetService;
 
     @Mock
     private RefsetRepository repoMock;
+    
+    @Mock
+    private ConceptRepository conceptMock;
 
+    public RepositoryRefsetServiceTest() {
+        concept = new Concept(1);
+        concept.setSerialisedId(1234l);
+    }
+    
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -77,20 +89,28 @@ public class RepositoryRefsetServiceTest {
                 ((RepositoryRefsetService) SpringProxyUtil.unwrapProxy(refsetService)), 
                 "refsetRepository", 
                 repoMock);
+        
+        ReflectionTestUtils.setField(
+                ((RepositoryRefsetService) SpringProxyUtil.unwrapProxy(refsetService)), 
+                "conceptRepository", 
+                conceptMock);        
     }
     
     @Test
     public void create() {
-        RefsetDto created = RefsetTestUtil.createDto(null, PUBLIC_ID, TITLE, DESCRIPTION);
-        Refset persisted = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
+        RefsetDto created = RefsetTestUtil.createDto(null, concept.getSerialisedId(), PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset persisted = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         
         when(repoMock.save(any(Refset.class))).thenReturn(persisted);
-        
+        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
+
         Refset returned = refsetService.create(created);
 
         ArgumentCaptor<Refset> refsetArgument = ArgumentCaptor.forClass(Refset.class);
         verify(repoMock, times(1)).save(refsetArgument.capture());
+        verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
         verifyNoMoreInteractions(repoMock);
+        verifyNoMoreInteractions(conceptMock);
 
         assertRefset(created, refsetArgument.getValue());
         assertEquals(persisted, returned);
@@ -98,7 +118,7 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void delete() throws RefsetNotFoundException {
-        Refset deleted = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset deleted = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         when(repoMock.findOne(REFSET_ID)).thenReturn(deleted);
         
         Refset returned = refsetService.delete(REFSET_ID);
@@ -135,7 +155,7 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void findById() {
-        Refset refset = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset refset = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         when(repoMock.findOne(REFSET_ID)).thenReturn(refset);
         
         Refset returned = refsetService.findById(REFSET_ID);
@@ -148,36 +168,44 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void update() throws RefsetNotFoundException {
-        RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
-        Refset updatedRefset = Refset.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED).build();
+        RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
+        Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED).build();
         updatedRefset.setId(REFSET_ID);
-        Refset refsetOriginal = RefsetTestUtil.createModelObject(REFSET_ID, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset refsetOriginal = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         
         when(repoMock.findOne(updatedDto.getId())).thenReturn(refsetOriginal);
         when(repoMock.save(any(Refset.class))).thenReturn(updatedRefset);
+        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
         
         Refset returned = refsetService.update(updatedDto);
         
         verify(repoMock, times(1)).findOne(updatedDto.getId());
         verify(repoMock, times(1)).save(any(Refset.class));
+        verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
         verifyNoMoreInteractions(repoMock);
+        verifyNoMoreInteractions(conceptMock);
         
         assertRefset(updatedDto, returned);
     }
     
     @Test(expected = RefsetNotFoundException.class)
     public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException {
-        RefsetDto updated = RefsetTestUtil.createDto(REFSET_ID, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
+        RefsetDto updated = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
         
         when(repoMock.findOne(updated.getId())).thenReturn(null);
+        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
 
         refsetService.update(updated);
 
         verify(repoMock, times(1)).findOne(updated.getId());
+        verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
         verifyNoMoreInteractions(repoMock);
+        verifyNoMoreInteractions(conceptMock);
     }
 
     private void assertRefset(RefsetDto expected, Refset actual) {
+        assertNotNull(actual.getConcept());
+        assertEquals((expected.getConcept() == null ? 0 : expected.getConcept()), actual.getConcept().getSerialisedId());
         assertEquals((expected.getId() == null ? 0 : expected.getId()), actual.getId());
         assertEquals(expected.getPublicId(), actual.getPublicId());
         assertEquals(expected.getTitle(), actual.getTitle());

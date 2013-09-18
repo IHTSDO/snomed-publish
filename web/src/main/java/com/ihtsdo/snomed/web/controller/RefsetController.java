@@ -94,7 +94,7 @@ public class RefsetController {
         LOG.debug("Displaying new refset screen");
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("refset.new", "refset", new RefsetDto());
+        return new ModelAndView("new.refset", "refset", new RefsetDto());
     }
 
     // EDIT FORM
@@ -108,10 +108,11 @@ public class RefsetController {
                 pubId);
         Refset refset = refsetService.findByPublicId(pubId);
         model.addAttribute("pubid", pubId);
+        model.addAttribute("storedRefset", refset);
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("refset.edit", "refset", new RefsetDto(
-                refset.getId(), refset.getPublicId(), refset.getTitle(),
+        return new ModelAndView("edit.refset", "refset", new RefsetDto(
+                refset.getId(), refset.getConcept().getSerialisedId(), refset.getPublicId(), refset.getTitle(),
                 refset.getDescription()));
     }
 
@@ -150,7 +151,7 @@ public class RefsetController {
         }
         
         if (result.hasErrors()) {
-            return new ModelAndView("refset.new");
+            return new ModelAndView("new.refset");
         }
         try {
             Refset created = refsetService.create(refsetDto);
@@ -158,7 +159,7 @@ public class RefsetController {
             return new ModelAndView("redirect:/refsets");
         } catch (NonUniquePublicIdException e) {
             result.addError(createFieldError(refsetDto, result));
-            return new ModelAndView("refset.new");
+            return new ModelAndView("new.refset");
         }
     }
 
@@ -189,7 +190,7 @@ public class RefsetController {
         }
         
         if (result.hasErrors()) {
-            return new ModelAndView("refset.edit");
+            return new ModelAndView("edit.refset");
         }
         
         try {
@@ -199,7 +200,7 @@ public class RefsetController {
         } catch (NonUniquePublicIdException e) {
             //defensive coding
             result.addError(createFieldError(refsetDto, result));
-            return new ModelAndView("refset.edit");
+            return new ModelAndView("edit.refset");
         }
     }
 

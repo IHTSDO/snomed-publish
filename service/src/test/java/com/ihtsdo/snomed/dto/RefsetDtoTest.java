@@ -33,7 +33,7 @@ public class RefsetDtoTest {
     
     @Before
     public void setUp() {    
-        successDto = RefsetTestUtil.createDto(null, "pub11", "title1", "description1");
+        successDto = RefsetTestUtil.createDto(null, 1234l, "pub11", "title1", "description1");
     }
     
     @Test
@@ -62,6 +62,13 @@ public class RefsetDtoTest {
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
     }
+    
+    @Test
+    public void testMissingConcept(){
+        successDto.setConcept(null);
+        Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
+        assertEquals(1, violations.size());
+    }    
     
     @Test
     public void testDescriptionIsNull(){

@@ -10,6 +10,9 @@ import com.google.common.primitives.Longs;
 public class RefsetDto {
     
     private Long id;
+    
+    @NotNull
+    private Long concept;
 
     @NotNull
     @Size(min=2, max=20, message="validation.refset.publicid.size")
@@ -26,7 +29,8 @@ public class RefsetDto {
     
     public RefsetDto(){}
     
-    public RefsetDto(Long id, String publicId, String title, String description){
+    public RefsetDto(Long id, Long concept, String publicId, String title, String description){
+        this.concept = concept;
         this.id = id;
         this.publicId = publicId;
         this.title = title;
@@ -38,6 +42,7 @@ public class RefsetDto {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("title", getTitle())
+                .add("concept", getConcept())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
                 .toString();
@@ -50,6 +55,7 @@ public class RefsetDto {
             if (Objects.equal(dto.getId(), getId()) &&
                     (Objects.equal(dto.getTitle(), getTitle())) &&
                     (Objects.equal(dto.getDescription(), getDescription())) &&
+                    (Objects.equal(dto.getConcept(), getConcept())) &&
                     (Objects.equal(dto.getPublicId(), getPublicId()))){
                 return true;
             }
@@ -98,6 +104,14 @@ public class RefsetDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getConcept() {
+        return concept;
+    }
+
+    public void setConcept(Long concept) {
+        this.concept = concept;
     }
     
     

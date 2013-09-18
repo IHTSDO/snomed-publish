@@ -3,8 +3,16 @@
 <div id="refset">
   <ol class="breadcrumb">
     <li><a href='#springUrl("/refsets")'>Refsets</a></li>
-    <li class="active">Refset</li>
+    <li class="active">$refset.publicId</li>
   </ol>
+  <div class="row">
+      <div class="col-lg-3">
+        <label>#springMessage('label.field.refset.concept')</label>
+      </div>
+      <div class="col-lg-9">
+        <span><a href="http://browser.sparklingideas.co.uk/ontology/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
+      </div>        
+  </div>
   <div class="row">
       <div class="col-lg-3">
         <label>#springMessage('label.field.refset.title')</label>

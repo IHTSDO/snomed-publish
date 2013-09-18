@@ -1,15 +1,27 @@
 // TEXT SEARCH
 // -----------
 
-App.TextSearchView = Ember.View.extend({
+TextSearch = Ember.Application.create({
+  rootElement: '#textSearchTemplate'
+});
+
+TextSearch.ApplicationController = Ember.Controller.extend({
+  appName: 'Text Search'
+});
+
+TextSearch.Router.map(function() {
+  this.route("index", {path: "/"});
+});
+
+TextSearch.TextSearchView = Ember.View.extend({
   templateName: 'textSearch'
 });
 
-App.TextSearchController = Ember.Controller.extend({
+TextSearch.TextSearchController = Ember.Controller.extend({
   actions:{
     search: function(search) {
       console.log('received search event "' + search + '"');
-      var results = App.TextSearchController.find(search, 1, this.get('controllers.pages').get('pageSize'));
+      var results = TextSearch.TextSearchController.find(search, 1, this.get('controllers.pages').get('pageSize'));
       var _this = this;
       // results is a jquery promise, wait for it to resolve
       // Ember can't resolve it automatically
@@ -28,7 +40,7 @@ App.TextSearchController = Ember.Controller.extend({
       var _this = this;
       console.log('disabling page ' + pagesController.get('currentPage.index'));
       pagesController.get('currentPage').set('active', false);
-      var results = App.TextSearchController.find(
+      var results = TextSearch.TextSearchController.find(
           searchInputController.get('query'), 
           page.index, 
           pagesController.get('pageSize'));
@@ -44,18 +56,18 @@ App.TextSearchController = Ember.Controller.extend({
   needs: ["searchResults", "searchInput", "pages"]
 });
 
-App.TextSearchController.reopenClass({
+TextSearch.TextSearchController.reopenClass({
   find: function(searchString, pageIndex, pageSize){
     return Ember.Deferred.promise(function(p) {
       var startIndex = (pageIndex - 1) * pageSize;
       p.resolve($.getJSON("http://solr.sparklingideas.co.uk/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
         .then(function(solr) {
-            var returned = App.SearchResults.create();
+            var returned = TextSearch.SearchResults.create();
             returned.set('total', solr.response.numFound);
             returned.set('start', solr.response.start);
             var concepts = Ember.A();
             solr.response.docs.forEach(function (doc) {
-              var concept = App.Concept.create();
+              var concept = TextSearch.Concept.create();
               concept.id = doc.id;
               concept.ontologyId = doc.ontology_id;
               concept.title = doc.title;
@@ -79,38 +91,46 @@ App.TextSearchController.reopenClass({
 // SEARCH INPUT
 // ------------
 
-App.SearchInputController  = Ember.Controller.extend({  
+TextSearch.SearchInputController  = Ember.Controller.extend({  
   query: null,
-  needs: "searchResults"
+  needs: ["textSearch", "searchInput", "searchResults"]
 });
 
-App.SearchInputView = Ember.View.extend({
+TextSearch.SearchInputView = Ember.View.extend({
   templateName: 'searchInput',
   keyUp: function(evt) {
     this.get('controller').send('search', this.get('controller.query'));
   },
-  needs: "textSearch"
+  needs: ["textSearch", "searchInput", "searchResults"]
 });
 
 
 // SEARCH RESULTS
 // --------------
 
-App.SearchResultsController  = Ember.Controller.extend({
+TextSearch.SearchResultsController  = Ember.Controller.extend({
   model: null,
   needs: 'pages'
 });
 
-App.SearchResultsView = Ember.View.extend({
+TextSearch.SearchResultsView = Ember.View.extend({
   templateName: 'searchResults'
 });
 
-App.SearchResults = Ember.Object.extend({
+TextSearch.SearchResults = Ember.Object.extend({
   total: 0,
   concepts: Ember.A()
 });
 
-App.Concept = Ember.Object.extend({
+TextSearch.Concept = Ember.Object.extend({
+  stylingClass: function(){
+    if (this.get('active')){
+      return 'active';
+    }
+    else{
+      return 'inactive';
+    }
+  }.property('active'),
   id: null,
   ontologyId: null,
   title: null,
@@ -124,7 +144,7 @@ App.Concept = Ember.Object.extend({
 // PAGE 
 // -----
 
-App.PagesController = Ember.Controller.extend({
+TextSearch.PagesController = Ember.Controller.extend({
   model: null,
   selection: null,
   currentPage: null,
@@ -237,7 +257,7 @@ App.PagesController = Ember.Controller.extend({
     console.log('building pages from ' + startAtPageIndex + ' to max ' + maxIndex + ' out of total ' + numberOfPages);
     console.log('number of pages are ' + numberOfPages);
     for (i=startAtPageIndex; i <= numberOfPages && i <= maxIndex; i++){
-      var page = App.Page.create();
+      var page = TextSearch.Page.create();
       page.active = false;
       page.index = i;
       this.get('model').pushObject(page);
@@ -248,7 +268,7 @@ App.PagesController = Ember.Controller.extend({
   }
 });
 
-App.Page = Ember.Object.extend({
+TextSearch.Page = Ember.Object.extend({
   active: false,
   index: null
 });

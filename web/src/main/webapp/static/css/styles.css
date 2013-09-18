@@ -1,6 +1,5 @@
 body{
     font-family: "proxima-nova-1","proxima-nova-2",sans-serif;
-  
     padding: 0 2em;
     font-size: 0.9em;
 }
@@ -1036,7 +1035,7 @@ body#search .text-search .pages ul{
 }
 
 body#search .text-search .pages a{
-    min-height: 2.6em;
+    min-height: 2.7em;
 }
 
 body#search .text-search .pages a.number{

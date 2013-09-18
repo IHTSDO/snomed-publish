@@ -32,7 +32,11 @@ public class RefsetTest {
     
     @Before
     public void setUp() {
+        Concept c = new Concept(1234);
+        em.persist(c);
+        
         r1 = new Refset();
+        r1.setConcept(c);
         r1.setPublicId("pubid_1");
         r1.setTitle("title1");
         r1.setDescription("description1");

@@ -1,46 +1,70 @@
+body {
+    font-family: "proxima-nova-1","proxima-nova-2",sans-serif !important;
+}
 h1,h2,h3{
     font-family : museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
 }
-
-body {
-/* background-color: #CCC; */
+#logout{
+    text-align: right;
+}
+a.btn.submit, #refset a.btn.submit, #refset button.submit{
+    margin-top: 1em;
+    text-shadow: none;
+}
+.errors p{
+    margin: 0.25em 0 0;
+}
+form.delete{
+    margin-bottom: 0.5em;
 }
 
+/***************
+ * Page Header *
+****************/
 #page-header h1{
     font-family: click-clack-1, click-clack-2, serif;
     margin-top: 0.25em;
 }
-
 #page-header{
     padding: 2em 0;
 }
-
 #page-header img{
     max-height: 4em;
 }
 
-#logout{
-    text-align: right;
-}
-
-
+/**********
+ * Footer *
+***********/
 #footer{
     padding-top: 4em;
 }
-
 #footer p:first-child{
     margin-bottom: 0.25em;
 }
 
-
-#refsets a.btn.bottom, #refset a.btn.bottom, #refset button.bottom{
-    margin-top: 2em;
+/***************
+ * Refset Edit *
+***************/
+#refset .breadcrumb {
+    margin-bottom: 2em;
+}
+#refset.edit .form-group.concept{
+    margin: 0;
+}
+.row.concept{
+    
 }
 
-.errors p{
-    margin: 0.25em 0 0;
+/**********************
+ * Find-Concept Modal *
+***********************/
+.row.concept .toggle-find-concept .btn.change{
+    margin-top: 0.25em;
+    float: right;
 }
-
-form.delete{
-    margin-bottom: 0.5em;
+.row.concept .toggle-find-concept.inactive{
+    display: none;
+}
+.row.concept .toggle-find-concept.active{
+    display: block;
 }

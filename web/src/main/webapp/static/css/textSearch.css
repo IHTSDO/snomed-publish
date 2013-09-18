@@ -1,0 +1,195 @@
+.textsearch {
+    font-family: "proxima-nova-1","proxima-nova-2",sans-serif !important;
+}
+
+.textsearch .input{
+    font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;     
+}
+
+h4.modal-textSearch-title{
+    font-family : "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+    margin: 0;
+} 
+
+.textsearch .input label{
+    color: #cccccc;
+    font-weight: normal;
+    font-size: 1.5em;
+    margin-top: -0.1em;
+}
+
+.textsearch .input input{
+    width: 100%;
+    height: 2.5em;
+    display: block;
+}
+
+.textsearch .input .total{
+    color: #cccccc;
+    text-align: right;
+    margin-top: -2.6em;
+    margin-right: 0.5em;
+}
+
+.textsearch .input .help a{
+}
+
+
+/** RESULTS **/
+
+.textsearch .results{
+}
+
+.results .result:nth-child(3) {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.results .result:nth-last-child(3) {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.textsearch .result{
+    padding: 1em;
+}
+
+.textsearch .result h4{
+    color: #428BCA;
+    font-family: "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+    font-size: 1.1em;
+    margin: 0 0 0.2em;
+}
+
+.textsearch .result h4 .identifier{
+    font-size: 0.75em;    
+    font-family: "futura-pt-1","futura-pt-2",sans-serif;
+    text-align: right
+}
+
+.textsearch .result h4.active .identifier{
+}
+
+.textsearch .result h4.inactive .identifier{
+    color: red;    
+}
+
+.textsearch .result .property{
+    font-size: 0.8em;
+}
+
+.textsearch .result .property label{
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.textsearch .result .property .value{
+        
+}
+
+.textsearch .pagination{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0;
+}
+
+.textsearch .pagination .index{
+    display: inline;
+}
+
+.textsearch .pagination .index a{
+    min-height: 2.7em;
+    padding-top: 0.8em !important;
+}
+
+.textsearch .pagination .index a.number{
+    padding-top: 0.7em !important;
+}
+
+
+.textsearch .pagination .index.active{
+    
+}
+
+.textsearch .pagination .index.inactive{
+    
+}
+
+.textsearch .pagination .index.disabled{
+    
+}
+
+
+
+body#search .text-search .pages{
+    width: 100%;
+    float: left;
+    padding-top: 0.5em;
+}
+
+
+body#search .text-search .pages ul{
+    width: 100%;
+    margin-top: 0;
+}
+
+
+/* BOOTSTRAP FIX */
+
+.textsearch .pagination .index.active a, 
+.textsearch .pagination .index.active span, 
+.textsearch .pagination .index.active a:hover, 
+.textsearch .pagination .index.active span:hover, 
+.textsearch .pagination .index.active a:focus, 
+.textsearch .pagination .index.active span:focus {
+    background-color: #428BCA;
+    border-color: #428BCA;
+    color: #FFFFFF;
+    cursor: default;
+    z-index: 2;
+}
+.textsearch .pagination .index.disabled span, 
+.textsearch .pagination .index.disabled a, 
+.textsearch .pagination .index.disabled a:hover,
+.textsearch .pagination .index.disabled a:focus {
+    background-color: #FFFFFF;
+    border-color: #DDDDDD;
+    color: #999999;
+    cursor: not-allowed;
+}
+.textsearch .pagination li a:hover, 
+.textsearch .pagination li span:hover, 
+.textsearch .pagination li a:focus, 
+.textsearch .pagination li span:focus {
+    background-color: #EEEEEE;
+}
+.textsearch .pagination .index a, 
+.textsearch .pagination .index span {
+    background-color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    float: left;
+    width: 4em;
+    text-align: center;
+    line-height: 1.42857;
+    margin-left: -1px;
+    padding: 6px 12px;
+    position: relative;
+    text-decoration: none;
+}
+
+.textsearch .input input{
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.428571429;
+    color: #555;
+    vertical-align: middle;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+

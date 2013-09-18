@@ -15,8 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ihtsdo.snomed.dto.RefsetDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
+import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRepository;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
@@ -33,6 +35,9 @@ public class RepositoryRefsetService implements RefsetService {
 
     @Inject
     RefsetRepository refsetRepository;
+    
+    @Inject
+    ConceptRepository conceptRepository;    
     
     @PostConstruct
     public void init(){}
@@ -89,11 +94,12 @@ public class RepositoryRefsetService implements RefsetService {
     public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException {
         LOG.debug("Updating refset with information: " + updated);
         Refset refset = refsetRepository.findOne(updated.getId());
+        Concept concept = conceptRepository.findBySerialisedId(updated.getConcept());
         if (refset == null) {
             LOG.debug("No refset found with id: " + updated.getId());
             throw new RefsetNotFoundException();
         }
-        refset.update(updated.getPublicId(), updated.getTitle(), updated.getDescription());
+        refset.update(concept, updated.getPublicId(), updated.getTitle(), updated.getDescription());
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
@@ -109,7 +115,10 @@ public class RepositoryRefsetService implements RefsetService {
     @Transactional
     public Refset create(RefsetDto created) throws NonUniquePublicIdException{
         LOG.debug("Creating new refset [{}]", created.toString());
-        Refset refset = Refset.getBuilder(created.getPublicId(), created.getTitle(), created.getDescription()).build();
+        
+        Concept concept = conceptRepository.findBySerialisedId(created.getConcept());
+        Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription()).build();
+        
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
