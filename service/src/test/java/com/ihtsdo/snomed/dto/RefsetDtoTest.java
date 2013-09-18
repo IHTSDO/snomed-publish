@@ -1,10 +1,14 @@
 package com.ihtsdo.snomed.dto;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -12,6 +16,8 @@ import javax.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -29,6 +35,9 @@ public class RefsetDtoTest {
 
     @Inject Validator validator;
     
+    @Resource(name = "messageSource")
+    private MessageSource messageSource;
+    
     RefsetDto successDto;
     
     @Before
@@ -43,10 +52,19 @@ public class RefsetDtoTest {
     }
 
     @Test
+    public void testConceptIsNull(){
+        successDto.setConcept(null);
+        Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
+        assertEquals(1, violations.size());
+        assertMessage(violations);
+    }
+
+    @Test
     public void testTitleIsNull(){
         successDto.setTitle(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -54,6 +72,7 @@ public class RefsetDtoTest {
         successDto.setTitle("title11231231414234rfsjkdnglkjdsnfgkdnbsldknfskajnglsjngaoetimovinsgoinrs;iovnrvrvrv");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -61,6 +80,7 @@ public class RefsetDtoTest {
         successDto.setTitle("t");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -68,6 +88,7 @@ public class RefsetDtoTest {
         successDto.setConcept(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }    
     
     @Test
@@ -75,6 +96,7 @@ public class RefsetDtoTest {
         successDto.setDescription(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }    
 
     @Test
@@ -82,6 +104,7 @@ public class RefsetDtoTest {
         successDto.setDescription("t");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -89,6 +112,7 @@ public class RefsetDtoTest {
         successDto.setPublicId(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -96,6 +120,7 @@ public class RefsetDtoTest {
         successDto.setPublicId("t");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -103,6 +128,7 @@ public class RefsetDtoTest {
         successDto.setPublicId("tshdddsbciasbdclsdnclkjsnadkcnsadchbsvkjhsbfhaesofnsaldvnklsakjhvbakshjvbnawoeivnsdvsdcsadcsadcs");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
     }
     
     @Test
@@ -110,6 +136,13 @@ public class RefsetDtoTest {
         successDto.setPublicId("tshddd*!@$%asbd");
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
+        assertMessage(violations);
+    }
+    private void assertMessage(Set<ConstraintViolation<RefsetDto>> violations) {
+        String message = messageSource.getMessage(violations.iterator().next().getMessage(), null, "default", Locale.UK);
+        assertNotNull(message);
+        assertFalse(message.isEmpty());
     }
         
+            
 }

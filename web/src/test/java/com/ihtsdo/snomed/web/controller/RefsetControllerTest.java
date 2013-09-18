@@ -155,6 +155,7 @@ public class RefsetControllerTest {
             .andExpect(model().attribute("refsets", hasItem(
                     allOf(
                             hasProperty("id", is(1L)),
+                            hasProperty("concept", is(concept)),
                             hasProperty("description", is("description1")),
                             hasProperty("title", is("title1")),
                             hasProperty("publicId", is("pub1"))
@@ -163,6 +164,7 @@ public class RefsetControllerTest {
             .andExpect(model().attribute("refsets", hasItem(
                     allOf(
                             hasProperty("id", is(2L)),
+                            hasProperty("concept", is(concept)),
                             hasProperty("description", is("description2")),
                             hasProperty("title", is("title2")),
                             hasProperty("publicId", is("pub2"))
@@ -185,6 +187,7 @@ public class RefsetControllerTest {
             .andExpect(model().attribute("refset", 
                     allOf(
                         hasProperty("id", is(1L)),
+                        hasProperty("concept", is(concept)),
                         hasProperty("description", is("description1")),
                         hasProperty("title", is("title1")),
                         hasProperty("publicId", is("pub1"))
@@ -238,6 +241,7 @@ public class RefsetControllerTest {
             .andExpect(model().attribute("refset", 
                     allOf(
                         hasProperty("id", is(1L)),
+                        hasProperty("concept", is(concept.getSerialisedId())),
                         hasProperty("description", is("description1")),
                         hasProperty("title", is("title1")),
                         hasProperty("publicId", is("pub1"))
@@ -261,6 +265,7 @@ public class RefsetControllerTest {
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", refsetDto.getId().toString())
+                .param("concept", refsetDto.getConcept().toString())
                 .param("publicId", refsetDto.getPublicId())
                 .param("title", refsetDto.getTitle())
                 .param("description", refsetDto.getDescription())
@@ -288,6 +293,7 @@ public class RefsetControllerTest {
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", refsetDto.getId().toString())
+                .param("concept", refsetDto.getConcept().toString())
                 .param("publicId", refsetDto.getPublicId())
                 .param("title", refsetDto.getTitle())
                 .param("description", refsetDto.getDescription())
@@ -314,6 +320,7 @@ public class RefsetControllerTest {
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "1")
+                .param("concept", "1234")
                 .param("publicId", "pub1")
                 .param("title", "title1")
                 .param("description", "description1")
@@ -335,12 +342,13 @@ public class RefsetControllerTest {
                      )
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("id", "1")
+                .param("concept", "1234")
                 .param("publicId", "pub2")
                 .param("title", "title2")
                 .param("description", "description2")
             )
             .andExpect(status().isOk())
-            .andExpect(view().name("refset.edit"));
+            .andExpect(view().name("edit.refset"));
         
         verify(refsetServiceMock, times(1)).findById(any(Long.class));
         verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));

@@ -50,6 +50,13 @@ public class RefsetTest {
         Set<ConstraintViolation<Refset>> violations = validator.validate(r1);
         assertTrue(violations.isEmpty());
     }
+
+    @Test
+    public void testConceptIsNull(){
+        r1.setConcept(null);
+        Set<ConstraintViolation<Refset>> violations = validator.validate(r1);
+        assertEquals(1, violations.size());
+    }    
     
     @Test
     public void testTitleIsNull(){

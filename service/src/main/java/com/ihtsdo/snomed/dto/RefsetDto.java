@@ -11,19 +11,19 @@ public class RefsetDto {
     
     private Long id;
     
-    @NotNull
+    @NotNull(message="validation.refset.concept.not.null")
     private Long concept;
 
-    @NotNull
+    @NotNull(message="validation.refset.publicid.not.null")
     @Size(min=2, max=20, message="validation.refset.publicid.size")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="validation.refset.publicid.charactermix")
     private String publicId;
     
-    @NotNull
+    @NotNull(message="validation.refset.title.not.null")
     @Size(min=4, max=50, message="validation.refset.title.size")
     private String title;
     
-    @NotNull
+    @NotNull(message="validation.refset.description.not.null")
     @Size(min=4, message="validation.refset.description.size")
     private String description;
     
