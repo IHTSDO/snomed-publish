@@ -40,6 +40,6 @@ public class SearchController {
         model.addAttribute("ontologyId", ontologyId);
         model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
 
-        return new ModelAndView("search", model);
+        return new ModelAndView("/search/search", model);
     }
 }

@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!doctype html>
-<%@page import="com.ihtsdo.snomed.model.Refset, 
+<%@page import="com.ihtsdo.snomed.model.refset.Refset, 
     java.text.DateFormat, 
     java.text.SimpleDateFormat, 
     java.text.DecimalFormat"%>

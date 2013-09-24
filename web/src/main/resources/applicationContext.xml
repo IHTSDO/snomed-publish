@@ -32,18 +32,13 @@
         ignore-unresolvable="true"/>
     
     <context:component-scan base-package="com.ihtsdo.snomed" />
-    
-    <jpa:repositories base-package="com.ihtsdo.snomed.web.repository" entity-manager-factory-ref="entityManagerFactory" />
-    
-    
+        
     <!-- VALIDATOR -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
 
     <!-- TRACE -->
 <!--     <import resource="trace-context.xml"/> -->
 
-    <!-- Imports datasource configurations -->
-<!--     <import resource="spring-data.xml" /> -->
     
     <!-- ****************** -->
     <!-- JAXB and JACKSON   -->
@@ -104,6 +99,7 @@
     
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="/WEB-INF/velocity/"/>
+<!--         <property name="configLocation" value="/WEB-INF/velocity.properties"/> -->
     </bean>
     
 <!--     <bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver"> -->

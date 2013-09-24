@@ -1,0 +1,46 @@
+#set( $layout = "refset/layout.vm" )
+#set ($title = "#springMessageText('page.title.refset' [$refset.title])")
+#parse('refset/alert.vm')
+<div id="refset">
+  <ol class="breadcrumb">
+    <li><a href='#springUrl("/refsets")'>Refsets</a></li>
+    <li class="active">$refset.publicId</li>
+  </ol>
+  <div class="row">
+      <div class="col-lg-3">
+        <label>#springMessage('label.field.refset.concept')</label>
+      </div>
+      <div class="col-lg-9">
+        <span><a href="http://browser.sparklingideas.co.uk/ontology/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
+      </div>        
+  </div>
+  <div class="row">
+      <div class="col-lg-3">
+        <label>#springMessage('label.field.refset.title')</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.title</span>
+      </div>        
+  </div>
+  <div class="row">
+      <div class="col-lg-3">
+        <label>#springMessage('label.field.refset.description')</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.description</span>
+      </div>        
+  </div>
+  <div class="row">
+      <div class="col-lg-3">
+        <label>#springMessage('label.field.refset.publicid')</label>
+      </div>
+      <div class="col-lg-9">
+        <span>$refset.publicId</span>
+      </div>        
+  </div>
+  <div class="row">
+     <div class="col-lg-2">
+         <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>   
+     </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    #parse('search/head.vm')
+  </head>
+  <body>
+    <div class="container">
+        #parse('header.vm')
+        $screen_content
+        #parse('textSearch.vm')
+        #parse('search/footer.vm')
+    </div>
+  </body>
+</html>

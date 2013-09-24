@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.ihtsdo.snomed.dto.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
-import com.ihtsdo.snomed.model.Refset;
+import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.model.User;
 import com.ihtsdo.snomed.web.service.OntologyService;
@@ -72,7 +72,7 @@ public class RefsetController {
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("refsets", refsetService.findAll());
-        return new ModelAndView("refsets", model);
+        return new ModelAndView("/refset/refsets", model);
     }
 
     // DETAILS
@@ -83,7 +83,7 @@ public class RefsetController {
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("refset", refsetService.findByPublicId(pubId));
-        return new ModelAndView("refset", model);
+        return new ModelAndView("/refset/refset", model);
     }
 
     // CREATE FORM
@@ -94,7 +94,7 @@ public class RefsetController {
         LOG.debug("Displaying new refset screen");
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("new.refset", "refset", new RefsetDto());
+        return new ModelAndView("/refset/new.refset", "refset", new RefsetDto());
     }
 
     // EDIT FORM
@@ -111,7 +111,7 @@ public class RefsetController {
         model.addAttribute("storedRefset", refset);
         model.addAttribute("user",
                 (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("edit.refset", "refset", new RefsetDto(
+        return new ModelAndView("/refset/edit.refset", "refset", new RefsetDto(
                 refset.getId(), refset.getConcept().getSerialisedId(), refset.getPublicId(), refset.getTitle(),
                 refset.getDescription()));
     }
@@ -151,7 +151,7 @@ public class RefsetController {
         }
         
         if (result.hasErrors()) {
-            return new ModelAndView("new.refset");
+            return new ModelAndView("/refset/new.refset");
         }
         try {
             Refset created = refsetService.create(refsetDto);
@@ -159,7 +159,7 @@ public class RefsetController {
             return new ModelAndView("redirect:/refsets");
         } catch (NonUniquePublicIdException e) {
             result.addError(createFieldError(refsetDto, result));
-            return new ModelAndView("new.refset");
+            return new ModelAndView("/refset/new.refset");
         }
     }
 
@@ -190,7 +190,7 @@ public class RefsetController {
         }
         
         if (result.hasErrors()) {
-            return new ModelAndView("edit.refset");
+            return new ModelAndView("/refset/edit.refset");
         }
         
         try {
@@ -200,7 +200,7 @@ public class RefsetController {
         } catch (NonUniquePublicIdException e) {
             //defensive coding
             result.addError(createFieldError(refsetDto, result));
-            return new ModelAndView("edit.refset");
+            return new ModelAndView("/refset/edit.refset");
         }
     }
 

@@ -17,6 +17,7 @@
     <sourceDirectory>src/main/java</sourceDirectory>
   </build>
   <dependencies>
+    
     <!-- Snomed Project Dependencies -->
     <dependency>
       <groupId>com.ihtsdo.snomed</groupId>
@@ -24,16 +25,15 @@
       <version>${project.version}</version>
     </dependency>
     
-    <!-- TEST SCOPE -->
-    
-   <!-- JSR-330 Javax inject annotations -->
+  <!-- JSR-330 Javax inject annotations -->
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
       <version>${javax.inject.version}</version>
-      <scope>test</scope>
-    </dependency>
+    </dependency>    
     
+    <!-- TEST SCOPE -->
+
     <!-- Spring Core -->
     <dependency>
       <groupId>org.springframework</groupId>

@@ -20,6 +20,12 @@ TextSearch.TextSearchView = Ember.View.extend({
 TextSearch.TextSearchController = Ember.Controller.extend({
   actions:{
     search: function(search) {
+      
+      if (search===""){
+        this.get('controllers.searchResults').set('model', null);
+        return false;
+      }
+      
       console.log('received search event "' + search + '"');
       var results = TextSearch.TextSearchController.find(search, 1, this.get('controllers.pages').get('pageSize'));
       var _this = this;

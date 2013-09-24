@@ -25,19 +25,25 @@ h4.modal-textSearch-title{
 }
 
 .textsearch .input .total{
+    font-size: 0.9em;
     color: #cccccc;
     text-align: right;
-    margin-top: -2.6em;
+    margin-top: -2.8em;
     margin-right: 0.5em;
 }
 
-.textsearch .input .help a{
+.textsearch .input .syntax {
+    float: right;
+    margin-top: -0.25em;
+    margin-right: 0.5em
 }
+
 
 
 /** RESULTS **/
 
 .textsearch .results{
+    margin-top: 1.5em;
 }
 
 .results .result:nth-child(3) {
@@ -99,7 +105,7 @@ h4.modal-textSearch-title{
 }
 
 .textsearch .pagination .index a{
-    min-height: 2.7em;
+    min-height: 2.8em;
     padding-top: 0.8em !important;
 }
 

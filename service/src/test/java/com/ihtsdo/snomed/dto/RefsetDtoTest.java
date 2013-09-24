@@ -17,19 +17,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.test.RefsetTestUtil;
 
 /**
  * @author Henrik Pettersen @ http://sparklingideas.co.uk
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:test-applicationContext.xml"})
+@ContextConfiguration(locations = { 
+        "classpath:test-applicationContext.xml"})
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class RefsetDtoTest {
 

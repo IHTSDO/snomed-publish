@@ -20,7 +20,13 @@
 <script type="text/x-handlebars" data-template-name="searchInput">]]#
     <div class="row">
       <div class="col-lg-12">
+        <div class="syntax">
+          <small>
+            <a href="http://lucene.apache.org/core/3_5_0/queryparsersyntax.html" target="_blank">Help</a>
+          </small>
+        </div>
         {{view Bootstrap.Forms.TextField valueBinding="query" label="" placeholder="#springMessage('input.field.refset.concept.search')"}}
+        #[[{{#if controllers.searchResults.model.total}}]]#<div class="total">{{controllers.searchResults.model.total}}</div>#[[{{/if}}]]#
       </div>
     </div>
 </script>#[[

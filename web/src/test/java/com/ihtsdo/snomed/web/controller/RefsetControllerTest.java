@@ -42,9 +42,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.ihtsdo.snomed.dto.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Refset;
+import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.model.Role;
 import com.ihtsdo.snomed.web.model.User;
@@ -58,7 +58,9 @@ import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {
-        "classpath:applicationContext.xml", 
+        "classpath:applicationContext.xml",
+        "classpath:sds-applicationContext.xml",
+        "classpath:sds-spring-data.xml",
         "classpath:spring-mvc.xml",
         "classpath:spring-security.xml",
         "classpath:spring-data.xml",
@@ -143,7 +145,7 @@ public class RefsetControllerTest {
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("refsets"))
+            .andExpect(view().name("/refset/refsets"))
             .andExpect(content().string(containsString("refsets")))
             .andExpect(model().attribute("user", notNullValue()))
             .andExpect(model().attribute("user", allOf(
@@ -182,7 +184,7 @@ public class RefsetControllerTest {
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("refset"))
+            .andExpect(view().name("/refset/refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", 
                     allOf(
@@ -204,7 +206,7 @@ public class RefsetControllerTest {
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("new.refset"))
+            .andExpect(view().name("/refset/new.refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", notNullValue()))
             .andExpect(model().attribute("user", notNullValue()));
@@ -236,7 +238,7 @@ public class RefsetControllerTest {
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
-            .andExpect(view().name("edit.refset"))
+            .andExpect(view().name("/refset/edit.refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", 
                     allOf(
@@ -326,7 +328,7 @@ public class RefsetControllerTest {
                 .param("description", "description1")
             )
             .andExpect(status().isOk())
-            .andExpect(view().name("new.refset"));
+            .andExpect(view().name("/refset/new.refset"));
         
         verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));
         verifyNoMoreInteractions(refsetServiceMock);
@@ -348,7 +350,7 @@ public class RefsetControllerTest {
                 .param("description", "description2")
             )
             .andExpect(status().isOk())
-            .andExpect(view().name("edit.refset"));
+            .andExpect(view().name("/refset/edit.refset"));
         
         verify(refsetServiceMock, times(1)).findById(any(Long.class));
         verify(refsetServiceMock, times(1)).findByPublicId(any(String.class));

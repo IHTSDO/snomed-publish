@@ -58,6 +58,13 @@ form.delete{
 /**********************
  * Find-Concept Modal *
 ***********************/
+.textsearch{
+    margin-top: -1em;
+}
+.textsearch .input .syntax {
+    display: none;
+}
+
 .row.concept .toggle-find-concept .btn.change{
     margin-top: 0.25em;
     float: right;

@@ -1,0 +1,18 @@
+#set( $layout = "refset/layout.vm" )
+#set ($title = "#springMessage('page.title.new.refset')")
+#set ($pageScripts = ["/static/js/textSearch.js", "/static/js/edit.refset.js"])
+#set ($pageCss = ["/static/css/textSearch.css"])
+#set ($modals = ["textSearchModal.vm"])   
+
+<div id="refset" class="new">
+  <ol class="breadcrumb">
+    <li><a href='#springUrl("/refsets")'>Refsets</a></li>
+    <li class="active">New Refset</li>
+  </ol>
+  <form role="form" method="post" action='#springUrl("/refset/new")'>
+    #parse('refset/edit.refset.inputs.vm')
+    <div class="form-actions">
+      <button type="submit" class="btn btn-sm btn-primary bottom">#springMessage('button.refset.create')</button>
+    </div>
+  </form>
+</div>

@@ -1,18 +1,1 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    #parse('head.vm')
-  </head>
-  <body>
-    <div class="container">
-        #parse('header.vm')
-        $screen_content
-        #parse('footer.vm')
-    </div>
-    #if ($modals)
-        #foreach ($modal in $modals)
-            #parse($modal)
-        #end
-    #end
-  </body>
-</html>
+#parse($layout)

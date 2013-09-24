@@ -46,7 +46,9 @@ import com.ihtsdo.snomed.web.service.SparqlService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={
-        "classpath:applicationContext.xml", 
+        "classpath:applicationContext.xml",
+        "classpath:sds-applicationContext.xml",
+        "classpath:sds-spring-data.xml",
         "classpath:spring-mvc.xml",
         "classpath:spring-security.xml",
         "classpath:spring-data.xml",

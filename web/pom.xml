@@ -59,19 +59,15 @@
     <!-- Snomed Project Dependencies -->
     <dependency>
       <groupId>com.ihtsdo.snomed</groupId>
-      <artifactId>model</artifactId>
-      <version>${project.version}</version>
-    </dependency>  
-    <dependency>
-      <groupId>com.ihtsdo.snomed</groupId>
       <artifactId>rdf</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.ihtsdo.snomed</groupId>
-      <artifactId>service</artifactId>
+      <artifactId>spring-data-service</artifactId>
       <version>${project.version}</version>
-    </dependency>
+    </dependency>  
+
     
     <!-- JSR-330 Javax inject annotations -->
     <dependency>

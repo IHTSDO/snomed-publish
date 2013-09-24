@@ -1,0 +1,83 @@
+#set( $layout = "refset/layout.vm" )
+#set ($title = "#springMessage('page.title.refsets')")
+#parse('refset/alert.vm')
+<h2>Refsets</h2>
+<div id="refsets">
+  #foreach($refset in $refsets)
+    <div class="row">
+      <div class="col-lg-6">
+        <a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a>       
+      </div>
+      <div class="col-lg-6">
+        <form class="delete pubid-$refset.publicId" role="form" method="post" action='#springUrl("/refset/$refset.publicId/delete")'>
+          <button 
+            type="button" 
+            class="btn btn-danger btn-xs"
+            onclick='confirmDelete(
+               "#springMessage('modal.title.confirm.delete')",   
+               "#springMessageText('prompt.refset.confirm.delete' [$refset.title, $refset.publicId])",
+               function() {
+                   $("form.delete.pubid-$refset.publicId").submit();
+               })'
+           >#springMessage('button.refset.delete')</button>
+        </form>   
+      </div>
+    </div>
+  #end
+  <div class="row">
+     <div class="col-lg-2">
+         <a href='#springUrl("/refset/new")' class="btn btn-sm btn-primary bottom">#springMessage('button.refsets.create')</a>   
+     </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<!--   <div class="confirm-delete" id="confirmDelete"> -->
+<!--     <div class="modal-dialog"> -->
+<!--       <div class="modal-content"> -->
+<!--         <div class="modal-header"> -->
+<!--           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> -->
+<!--           <h4 class="modal-title">Please confirm deletion</h4> -->
+<!--         </div> -->
+<!--         <div class="modal-body"> -->
+<!--           ... -->
+<!--         </div> -->
+<!--         <div class="modal-footer"> -->
+<!--           <a href="#" class="btn">Close</a> -->
+<!--           <a href="#" class="btn btn-primary">Save changes</a> -->
+<!--         </div> -->
+<!--       </div>/.modal-content -->
+<!--     </div>/.modal-dialog -->
+<!--   </div>/.modal -->
+ 
+  
+<!--     <div class="new"> -->
+<!--       <a href='#springUrl("/refset/new")'><input type="submit" value="new refset" /></a> -->
+<!--     </div>   -->
+<!-- </div> -->
+
+
+<!--   <div class="span2"></div> -->
+<!--   <div class="span6"> -->
+<!--     <div id=refsets> -->
+<!--       <table class="table-hover"> -->
+<!--         <thead> -->
+<!--             <td>Title</td> -->
+<!--         </thead> -->
+<!--         <tbody> -->
+<!--           #foreach($refset in $refsets) -->
+<!--             <tr> -->
+<!--               <td><a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a></td> -->
+<!--             </tr> -->
+<!--           #end -->
+<!--         </tbody> -->
+<!--     </table> -->
+<!--     </div> -->
+<!--     <div class="new"> -->
+<!--       <a href='#springUrl("/refset/new")'><input type="submit" value="new refset" /></a> -->
+<!--     </div> -->
+<!--   </div> -->
+<!--   <div class="span2"></div> -->
+<!-- </div> -->
+
+

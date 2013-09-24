@@ -1,0 +1,13 @@
+#set( $layout = "search/layout.vm" )
+#set ($title = "Search Snomed")
+
+<div id="textSearchTemplate" ></div> <!-- Attach modal here using JS referencing this ID -->
+
+#[[
+<script type="text/x-handlebars">
+  {{render "textSearch"}}
+</script>
+]]#
+
+
+

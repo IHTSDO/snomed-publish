@@ -2,10 +2,10 @@ package com.ihtsdo.snomed.service;
 
 import java.util.List;
 
-import com.ihtsdo.snomed.dto.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
-import com.ihtsdo.snomed.model.Refset;
+import com.ihtsdo.snomed.model.refset.Refset;
 
 /**
  * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
