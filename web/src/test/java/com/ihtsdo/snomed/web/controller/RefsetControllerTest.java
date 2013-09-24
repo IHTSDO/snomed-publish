@@ -147,12 +147,12 @@ public class RefsetControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("/refset/refsets"))
             .andExpect(content().string(containsString("refsets")))
-            .andExpect(model().attribute("user", notNullValue()))
-            .andExpect(model().attribute("user", allOf(
-                            hasProperty("firstname", is("firstname")),
-                            hasProperty("lastname", is("lastname"))
-                    )
-            ))
+//            .andExpect(model().attribute("user", notNullValue()))
+//            .andExpect(model().attribute("user", allOf(
+//                            hasProperty("firstname", is("firstname")),
+//                            hasProperty("lastname", is("lastname"))
+//                    )
+//            ))
             .andExpect(model().attribute("refsets", hasSize(2)))
             .andExpect(model().attribute("refsets", hasItem(
                     allOf(
@@ -209,7 +209,8 @@ public class RefsetControllerTest {
             .andExpect(view().name("/refset/new.refset"))
             .andExpect(content().string(containsString("")))
             .andExpect(model().attribute("refset", notNullValue()))
-            .andExpect(model().attribute("user", notNullValue()));
+            //.andExpect(model().attribute("user", notNullValue()));
+            ;
     } 
     
     @Test
@@ -249,7 +250,8 @@ public class RefsetControllerTest {
                         hasProperty("publicId", is("pub1"))
                     )
                 ))
-            .andExpect(model().attribute("user", notNullValue()));
+            //.andExpect(model().attribute("user", notNullValue()))
+                ;
         
         verify(refsetServiceMock, times(1)).findByPublicId("pub1");
         verifyNoMoreInteractions(refsetServiceMock);

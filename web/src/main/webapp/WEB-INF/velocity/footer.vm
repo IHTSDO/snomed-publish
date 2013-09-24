@@ -3,8 +3,7 @@
     <div class="row">
       <div class="col-lg-12">
 <!--           <div class="author">Authored by <span class="name"><a target="_blank" href="http://uk.linkedin.com/in/sparklingideas">Henrik Pettersen</a></span> <a  href="mailto:henrik@sparklingideas.co.uk"  target="_blank"> @ </a><a target="_blank" href="http://sparklingideas.co.uk">Sparkling Ideas</a></div> -->
-           <div class="organisation">An <a href="http://www.ihtsdo.org" target="_blank">International Health Terminology Standards Development Organisation</a> Project
-<!--  for <a href="http://www.ihtsdo.org/snomed-ct/snomed-ct0/" target="_blank">Snomed Clinical Terms</a></div></a> --> 
+           <div class="organisation">An <a href="http://www.ihtsdo.org" target="_blank">International Health Terminology Standards Development Organisation</a> Project</div> 
       </div>
     </div>
 <!--     <div class="row"> -->

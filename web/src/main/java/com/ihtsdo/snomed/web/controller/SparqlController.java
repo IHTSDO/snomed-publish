@@ -61,7 +61,7 @@ public class SparqlController {
         
         model.addAttribute("ontologies", ontologyService.getAll()); 
         model.addAttribute("ontologyId", ontologyId);
-        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
+//        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
         
         
         overAllstopwatch.stop();
@@ -89,7 +89,7 @@ public class SparqlController {
         
         model.addAttribute("ontologies", ontologyService.getAll()); 
         model.addAttribute("ontologyId", ontologyId);
-        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
+//        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
         
         SparqlQueryFormObject formObject = new SparqlQueryFormObject();
         formObject.setQuery(

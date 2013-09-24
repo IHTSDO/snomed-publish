@@ -32,7 +32,6 @@ import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.service.RefsetService;
-import com.ihtsdo.snomed.web.model.User;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
 /**
@@ -80,8 +79,8 @@ public class RefsetController {
     @RequestMapping(value = "/refset/{pubId}", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
     public ModelAndView getRefset(ModelMap model, HttpServletRequest request,
             Principal principal, @PathVariable String pubId) {
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("refset", refsetService.findByPublicId(pubId));
         return new ModelAndView("/refset/refset", model);
     }
@@ -92,8 +91,8 @@ public class RefsetController {
     public ModelAndView showNewRefsetForm(ModelMap model,
             HttpServletRequest request, Principal principal) {
         LOG.debug("Displaying new refset screen");
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         return new ModelAndView("/refset/new.refset", "refset", new RefsetDto());
     }
 
@@ -109,8 +108,8 @@ public class RefsetController {
         Refset refset = refsetService.findByPublicId(pubId);
         model.addAttribute("pubid", pubId);
         model.addAttribute("storedRefset", refset);
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         return new ModelAndView("/refset/edit.refset", "refset", new RefsetDto(
                 refset.getId(), refset.getConcept().getSerialisedId(), refset.getPublicId(), refset.getTitle(),
                 refset.getDescription()));
@@ -142,8 +141,8 @@ public class RefsetController {
             BindingResult result, RedirectAttributes attributes) {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         
         Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
         if (refset != null){
@@ -175,8 +174,8 @@ public class RefsetController {
         // TODO: Handle RefsetNotFoundException
         LOG.debug("Controller received request to update refset [{}]",
                 refsetDto.toString());
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("pubid", pubId);
         model.addAttribute("refset", refsetDto);
         
