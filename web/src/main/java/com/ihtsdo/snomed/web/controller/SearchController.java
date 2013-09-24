@@ -38,7 +38,7 @@ public class SearchController {
         LOG.debug("Rendering search page for ontology " + ontologyId);
         model.addAttribute("ontologies", ontologyService.getAll()); 
         model.addAttribute("ontologyId", ontologyId);
-        model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
+        //model.addAttribute("user", (User)((OpenIDAuthenticationToken)principal).getPrincipal());
 
         return new ModelAndView("/search/search", model);
     }

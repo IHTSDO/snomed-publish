@@ -69,8 +69,8 @@ public class RefsetController {
     @RequestMapping(value = "/refsets", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
     public ModelAndView getRefsets(ModelMap model, HttpServletRequest request,
             Principal principal) {
-        model.addAttribute("user",
-                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("refsets", refsetService.findAll());
         return new ModelAndView("/refset/refsets", model);
     }

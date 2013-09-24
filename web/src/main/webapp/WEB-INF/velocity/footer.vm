@@ -2,7 +2,9 @@
   <small>
     <div class="row">
       <div class="col-lg-12">
-          <div class="author">Authored by <span class="name"><a target="_blank" href="http://uk.linkedin.com/in/sparklingideas">Henrik Pettersen</a></span> <a  href="mailto:henrik@sparklingideas.co.uk"  target="_blank"> @ </a><a target="_blank" href="http://sparklingideas.co.uk">Sparkling Ideas</a></div>
+<!--           <div class="author">Authored by <span class="name"><a target="_blank" href="http://uk.linkedin.com/in/sparklingideas">Henrik Pettersen</a></span> <a  href="mailto:henrik@sparklingideas.co.uk"  target="_blank"> @ </a><a target="_blank" href="http://sparklingideas.co.uk">Sparkling Ideas</a></div> -->
+           <div class="organisation">An <a href="http://www.ihtsdo.org" target="_blank">International Health Terminology Standards Development Organisation</a> Project
+<!--  for <a href="http://www.ihtsdo.org/snomed-ct/snomed-ct0/" target="_blank">Snomed Clinical Terms</a></div></a> --> 
       </div>
     </div>
 <!--     <div class="row"> -->
@@ -12,7 +14,7 @@
 <!--     </div>   -->
     <div class="row">
       <div class="col-lg-12">
-        <div class="link"><img src="/static/img/pointing_finger_thumb.png"/><a target="_blank" href="http://snomed.sparklingideas.co.uk">Project Details</a></div>  
+        <div class="link"><img src="/static/img/pointing_finger_thumb.png"/><a target="_blank" href="http://otf.snomedtools.com/">Project Details</a></div>  
       </div>
     </div>  
   </small>

@@ -7,20 +7,16 @@
   text-align: center;
 }
 
-#footer .author{
+#footer .organisation{
     color: #cccccc;
 }
 
-#footer .author a{
+#footer .organisation a{
     color: #cccccc;
-}
-
-#footer .author .name{
-    /*font-family: click-clack-1, click-clack-2, serif;*/
 }
 
 #footer .link{
-    margin-top: 0.25em;
+    margin-top: 0.75em;
     margin-left: -0.5em;
 }
 
