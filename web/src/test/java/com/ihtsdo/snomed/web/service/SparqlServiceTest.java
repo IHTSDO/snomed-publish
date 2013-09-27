@@ -44,17 +44,17 @@ import com.ihtsdo.snomed.web.model.SparqlResults;
 import com.ihtsdo.snomed.web.model.SparqlResults.Binding;
 import com.ihtsdo.snomed.web.service.SparqlService;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={
-        "classpath:applicationContext.xml",
-        "classpath:sds-applicationContext.xml",
-        "classpath:sds-spring-data.xml",
-        "classpath:spring-mvc.xml",
-        "classpath:spring-security.xml",
-        "classpath:spring-data.xml",
-        "classpath:test-applicationContext.xml",
-        "classpath:test-spring-data.xml"})
-@Transactional
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations={
+//        "classpath:applicationContext.xml",
+//        "classpath:sds-applicationContext.xml",
+//        "classpath:sds-spring-data.xml",
+//        "classpath:spring-mvc.xml",
+//        "classpath:spring-security.xml",
+//        "classpath:spring-data.xml",
+//        "classpath:test-applicationContext.xml",
+//        "classpath:test-spring-data.xml"})
+//@Transactional
 public class SparqlServiceTest {
     
     String validQuery = 
@@ -184,7 +184,7 @@ public class SparqlServiceTest {
         em.clear();
     }
 
-    @Test
+    //@Test
     public void shouldExecuteSparqlQuery() throws RestClientException, XPathExpressionException, URISyntaxException, ParserConfigurationException, SAXException, IOException {
         mockServer.expect(requestTo(sparqlServerUrl.toString()))
             .andExpect(method(HttpMethod.POST))
