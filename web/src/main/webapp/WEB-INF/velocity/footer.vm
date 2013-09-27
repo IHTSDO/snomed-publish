@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-lg-12">
 <!--           <div class="author">Authored by <span class="name"><a target="_blank" href="http://uk.linkedin.com/in/sparklingideas">Henrik Pettersen</a></span> <a  href="mailto:henrik@sparklingideas.co.uk"  target="_blank"> @ </a><a target="_blank" href="http://sparklingideas.co.uk">Sparkling Ideas</a></div> -->
-           <div class="organisation">An <a href="http://www.ihtsdo.org" target="_blank">International Health Terminology Standards Development Organisation</a> Project</div> 
+           <div class="organisation">An <a href="http://www.ihtsdo.org" target="_blank">IHTSDO</a> <a href="http://en.wikipedia.org/wiki/SNOMED_CT" target="blank">Snomed Tools</a> <a href="http://otf.snomedtools.com/" target="_blank">Open Tooling Framework Project</a></div> 
       </div>
     </div>
 <!--     <div class="row"> -->
@@ -13,7 +13,7 @@
 <!--     </div>   -->
     <div class="row">
       <div class="col-lg-12">
-        <div class="link"><img src="/static/img/pointing_finger_thumb.png"/><a target="_blank" href="http://otf.snomedtools.com/">Project Details</a></div>  
+        <div class="link"><img src="/static/img/pointing_finger_thumb.png"/><a target="_blank" href="https://sites.google.com/a/ihtsdo.org/technical-dev/">Project Details</a></div>  
       </div>
     </div>  
   </small>
