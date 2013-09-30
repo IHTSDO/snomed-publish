@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.test;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 
 /**
  * An utility class which contains useful methods for unit testing person related functions.
@@ -16,6 +17,7 @@ public class RefsetTestUtil {
         dto.setPublicId(publicId);
         dto.setTitle(title);
         dto.setDescription(description);
+        dto.setPlan(new RefsetPlanDto());
 
         return dto;
     }

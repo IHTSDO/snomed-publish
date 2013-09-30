@@ -3,7 +3,9 @@ package com.ihtsdo.snomed.model.refset;
 import java.sql.Date;
 import java.util.Calendar;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,9 +42,10 @@ public class Refset {
     @NotNull
     @OneToOne
     private Concept concept;
-    
-//    @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-//    private RefsetPlan refsetPlan;
+        
+    @NotNull
+    @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
+    private RefsetPlan refsetPlan;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -160,6 +163,16 @@ public class Refset {
         this.description = description;
     }
     
+    
+    
+    public RefsetPlan getRefsetPlan() {
+        return refsetPlan;
+    }
+
+    public void setRefsetPlan(RefsetPlan refsetPlan) {
+        this.refsetPlan = refsetPlan;
+    }
+
     public Date getCreationTime() {
         return creationTime;
     }
@@ -184,20 +197,21 @@ public class Refset {
         this.version = version;
     }
     
-    public static Builder getBuilder(Concept concept, String publicId, String title, String description) {
-        return new Builder(concept, publicId, title, description);
+    public static Builder getBuilder(Concept concept, String publicId, String title, String description, RefsetPlan refsetPlan) {
+        return new Builder(concept, publicId, title, description, refsetPlan);
     }
     
 
     public static class Builder {
         private Refset built;
 
-        Builder(Concept concept, String publicId, String title, String description) {
+        Builder(Concept concept, String publicId, String title, String description, RefsetPlan refsetPlan) {
             built = new Refset();
             built.publicId = publicId;
             built.title = title;
             built.description = description;
             built.concept = concept;
+            built.refsetPlan = refsetPlan;
         }
 
         public Refset build() {

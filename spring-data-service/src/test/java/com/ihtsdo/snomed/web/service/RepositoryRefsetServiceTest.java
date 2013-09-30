@@ -34,6 +34,7 @@ import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRepository;
@@ -166,7 +167,7 @@ public class RepositoryRefsetServiceTest {
     @Test
     public void update() throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException {
         RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
-        Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED).build();
+        Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, new RefsetPlan()).build();
         updatedRefset.setId(REFSET_ID);
         Refset refsetOriginal = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         

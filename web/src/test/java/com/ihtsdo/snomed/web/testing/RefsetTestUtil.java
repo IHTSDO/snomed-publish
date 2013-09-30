@@ -3,6 +3,7 @@ package com.ihtsdo.snomed.web.testing;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
 
 /**
  * An utility class which contains useful methods for unit testing person related functions.
@@ -23,7 +24,7 @@ public class RefsetTestUtil {
     }
 
     public static Refset createModelObject(Long id, Concept concept, String publicId, String title, String description) {
-        Refset model = Refset.getBuilder(concept, publicId, title, description).build();
+        Refset model = Refset.getBuilder(concept, publicId, title, description, new RefsetPlan()).build();
         model.setId(id);
         return model;
     }

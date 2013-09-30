@@ -2,6 +2,11 @@ package com.ihtsdo.snomed.exception;
 
 public class RefsetPlanNotFoundException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6850463390093856124L;
+
     public RefsetPlanNotFoundException() {
         // TODO Auto-generated constructor stub
     }

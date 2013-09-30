@@ -30,7 +30,6 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
-import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.Builder;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
@@ -42,7 +41,6 @@ import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.service.RefsetRuleService;
 import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRuleRepository;
-import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
 /**

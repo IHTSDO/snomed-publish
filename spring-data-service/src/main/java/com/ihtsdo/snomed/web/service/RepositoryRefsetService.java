@@ -18,6 +18,7 @@ import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRepository;
@@ -104,7 +105,8 @@ public class RepositoryRefsetService implements RefsetService {
         if (concept == null){
             throw new ConceptNotFoundException("No concept found with id: " + created.getConcept());
         }        
-        Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription()).build();
+        Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription(),
+                new RefsetPlan()).build();
         
         try {
             return refsetRepository.save(refset);

@@ -3,6 +3,8 @@ package com.ihtsdo.snomed.dto.refset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetException;
@@ -16,8 +18,9 @@ import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 public class RefsetPlanDto {
     private long id;
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
+    
+    @NotNull(message="validation.refsetplan.terminal.not.null")
     private Long terminal;
-
 
     @Override
     public String toString(){

@@ -36,13 +36,8 @@ public class RefsetTest {
     @Before
     public void setUp() {
         Concept c = new Concept(1234);
-        em.persist(c);
-        
-        r1 = new Refset();
-        r1.setConcept(c);
-        r1.setPublicId("pubid_1");
-        r1.setTitle("title1");
-        r1.setDescription("description1");
+        em.persist(c);        
+        r1 = Refset.getBuilder(c, "pubid_1", "title1", "description1", new RefsetPlan()).build();
         em.persist(r1);
         em.flush();
         em.clear();

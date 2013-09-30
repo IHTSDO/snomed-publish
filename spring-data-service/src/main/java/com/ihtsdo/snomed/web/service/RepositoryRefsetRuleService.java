@@ -13,7 +13,6 @@ import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
-import com.ihtsdo.snomed.exception.RefsetRuleNotPersistedException;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;

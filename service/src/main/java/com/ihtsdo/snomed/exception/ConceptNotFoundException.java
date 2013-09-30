@@ -2,6 +2,11 @@ package com.ihtsdo.snomed.exception;
 
 public class ConceptNotFoundException extends Exception {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1081154695445634831L;
+
     public ConceptNotFoundException() {
         // TODO Auto-generated constructor stub
     }

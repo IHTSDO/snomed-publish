@@ -33,7 +33,6 @@ import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
@@ -57,7 +56,6 @@ import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 public class RepositoryRefsetPlanServiceTest {
     
     private static final Long REFSET_PLAN_ID = 1L;
-    private static final Long REFSET_PLAN_UPDATED_ID = 2L;
 
     @Inject
     private RefsetPlanService planService;

@@ -27,6 +27,9 @@ public class RefsetDto {
     @Size(min=4, message="validation.refset.description.size")
     private String description;
     
+    @NotNull(message="validation.refset.plan.not.null")
+    private RefsetPlanDto plan = new RefsetPlanDto();
+    
     public RefsetDto(){}
     
     public RefsetDto(Long id, Long concept, String publicId, String title, String description){
@@ -45,6 +48,7 @@ public class RefsetDto {
                 .add("concept", getConcept())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
+                .add("plan", getPlan())
                 .toString();
     }
     
@@ -112,6 +116,14 @@ public class RefsetDto {
 
     public void setConcept(Long concept) {
         this.concept = concept;
+    }
+
+    public RefsetPlanDto getPlan() {
+        return plan;
+    }
+
+    public void setPlan(RefsetPlanDto plan) {
+        this.plan = plan;
     }
     
     
