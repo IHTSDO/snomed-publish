@@ -13,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.UniqueConstraint;
 
+import com.google.common.base.Objects;
 import com.ihtsdo.snomed.model.Concept;
 
 /*https://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained#Sets*/
@@ -39,16 +40,22 @@ public class ListConceptsRefsetRule extends SourceRefsetRule{
     public boolean equals(Object o){
         if (o instanceof ListConceptsRefsetRule){
             ListConceptsRefsetRule r = (ListConceptsRefsetRule) o;
-            if (r.getConcepts().equals(this.getConcepts())){
+            if ((r.getId() == this.getId()) && (r.getConcepts().equals(this.getConcepts()))){
                 return true;
             }
         }
         return false;
     }
     
+    
     @Override
     public String toString(){
-        return "list(" + getConcepts() == null ? "empty" : getConcepts().size() + ")";
+        return Objects.toStringHelper(this)
+                .add("id", getId())
+                .add("incomingRules", getIncomingRules())
+                .add("concepts", getConcepts())
+                .add("class", this.getClass().getSimpleName())
+                .toString();
     }
     
     public void addConcept(Concept c){

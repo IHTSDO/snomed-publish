@@ -176,9 +176,9 @@ public class RepositoryRefsetRuleServiceTest {
     
     @Test
     public void update() throws RefsetNotFoundException, RefsetRuleNotFoundException {
-        ListConceptsRefsetRule originalRule = new ListConceptsRefsetRule();
-        originalRule.setConcepts(concepts);
-        originalRule.setId(REFSET_RULE_ID);
+        ListConceptsRefsetRule original = new ListConceptsRefsetRule();
+        original.setConcepts(concepts);
+        original.setId(REFSET_RULE_ID);
         
         List<ConceptDto>updatedConceptDtos = Arrays.asList(
                 new ConceptDto(4),
@@ -194,15 +194,15 @@ public class RepositoryRefsetRuleServiceTest {
         
         Set<Concept> updatedConcepts = new HashSet<>(Arrays.asList(uc1, uc2, uc3));
                 
-        ListConceptsRefsetRule updatedRule = new ListConceptsRefsetRule();
-        updatedRule.setConcepts(updatedConcepts);
-        updatedRule.setId(REFSET_RULE_ID);
+        ListConceptsRefsetRule updated = new ListConceptsRefsetRule();
+        updated.setConcepts(updatedConcepts);
+        updated.setId(REFSET_RULE_ID);
 
-        when(refsetRuleRepositoryMock.findOne(updatedDto.getId())).thenReturn(originalRule);
+        when(refsetRuleRepositoryMock.findOne(updatedDto.getId())).thenReturn(original);
         when(conceptRepositoryMock.findBySerialisedId(uc1.getSerialisedId())).thenReturn(uc1);
         when(conceptRepositoryMock.findBySerialisedId(uc2.getSerialisedId())).thenReturn(uc2);
         when(conceptRepositoryMock.findBySerialisedId(uc3.getSerialisedId())).thenReturn(uc3);        
-        when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(updatedRule);
+        when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(updated);
 
         ListConceptsRefsetRule returned = (ListConceptsRefsetRule) ruleService.update(updatedDto);
         
@@ -216,15 +216,8 @@ public class RepositoryRefsetRuleServiceTest {
     }
     
     @Test(expected = RefsetRuleNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetRuleNotFoundException {
-        List<ConceptDto>updatedConceptDtos = Arrays.asList(
-                new ConceptDto(4),
-                new ConceptDto(5),
-                new ConceptDto(6)
-                );
-        
-        RefsetRuleDto updatedDto = builder.concepts(updatedConceptDtos).build();
-
+    public void updateWhenRefsetRuleIsNotFound() throws RefsetRuleNotFoundException {
+        RefsetRuleDto updatedDto = builder.build();
         when(refsetRuleRepositoryMock.findOne(updatedDto.getId())).thenReturn(null);
         ruleService.update(updatedDto);
     }

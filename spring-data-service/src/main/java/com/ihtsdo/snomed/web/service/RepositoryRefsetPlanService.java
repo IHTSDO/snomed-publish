@@ -106,6 +106,11 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
             else{
                 rule = refsetRuleService.create(ruleDto);
             }
+            
+            if (rule == null){
+                throw new RefsetRuleNotFoundException("Unable to find rule for ruleDto " + ruleDto.toString());
+            }
+            
             dtoIdToRuleMap.put(ruleDto.getId(), rule);
             dtoIdToDtoMap.put(ruleDto.getId(), ruleDto);
             allRules.add(rule);
@@ -122,17 +127,13 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
             RefsetRule rule = dtoIdToRuleMap.get(dtoId);
             RefsetRuleDto ruleDto = dtoIdToDtoMap.get(dtoId);
             
-            if (rule == null){
-                throw new ProgrammingException("Rule was null");
-            }
-            
             if (ruleDto == null){
                 throw new ProgrammingException("Rule DTO was null");
             }            
             
             LOG.debug("Processing RuleDto with id {}", dtoId);
-            LOG.debug("Rule is {}", rule);
-            LOG.debug("ruleDto is {}", ruleDto);
+            LOG.debug("Rule is [{}]", rule);
+            LOG.debug("ruleDto is [{}]", ruleDto);
             if (rule instanceof BaseSetOperationRefsetRule){
                 LOG.debug("Found BaseSetOperationRule");
                 BaseSetOperationRefsetRule setOpRule = (BaseSetOperationRefsetRule) rule;

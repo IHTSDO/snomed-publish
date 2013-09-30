@@ -79,6 +79,7 @@ public class RefsetPlanDto {
         plan.getTerminal().accept(parser);
         RefsetPlanDto planDto = parser.getPlanDto();
         planDto.setTerminal(plan.getTerminal().getId());
+        planDto.setId(plan.getId());
         return planDto;
     }
     

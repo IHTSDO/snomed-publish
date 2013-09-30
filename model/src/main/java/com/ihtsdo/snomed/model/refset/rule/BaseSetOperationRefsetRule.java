@@ -11,8 +11,12 @@ public abstract class BaseSetOperationRefsetRule extends BaseRefsetRule {
     
     @Override
     public void accept(Visitor visitor){
-        getIncomingRules().get(LEFT_OPERAND).accept(visitor);
-        getIncomingRules().get(RIGHT_OPERAND).accept(visitor);
+        if (getIncomingRules().get(LEFT_OPERAND) != null){
+            getIncomingRules().get(LEFT_OPERAND).accept(visitor);
+        }
+        if (getIncomingRules().get(RIGHT_OPERAND) != null){
+            getIncomingRules().get(RIGHT_OPERAND).accept(visitor);
+        }
         visitor.visit(this);
     }
     

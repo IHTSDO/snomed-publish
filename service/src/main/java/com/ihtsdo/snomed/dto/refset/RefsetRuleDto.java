@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.dto.refset;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class RefsetRuleDto {
                     (Objects.equal(dto.getType(), getType())) &&
                     (Objects.equal(dto.getLeft(), getLeft())) &&
                     (Objects.equal(dto.getRight(), getRight())) &&
-                    (Objects.equal(dto.getConcepts(), getConcepts()))){
+                    (Objects.equal(new HashSet<>(dto.getConcepts()), new HashSet<>(getConcepts())))){
                 return true;
             }
         }
@@ -89,7 +90,7 @@ public class RefsetRuleDto {
         if (getId() != null){
             return Longs.hashCode(getId());
         }else{
-            return 1; //delegate to equals method
+            return 0; //delegate to equals method
         }
     }    
 

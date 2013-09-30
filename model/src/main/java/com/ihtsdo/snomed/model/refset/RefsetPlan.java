@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 
 @Entity
@@ -79,7 +80,7 @@ public class RefsetPlan {
     public boolean equals(Object o){
         if (o instanceof RefsetPlan){
             RefsetPlan r = (RefsetPlan) o;
-            if ((r.getTerminal()).equals(this.getTerminal())){
+            if ((r.getId() == this.getId()) && (r.getTerminal()).equals(this.getTerminal())){
                 return true;
             }
         }
@@ -96,7 +97,7 @@ public class RefsetPlan {
                     .toString();
         } catch (ConceptsCacheNotBuiltException e) {
             //will never happen, because of the hasConcepts guard above ;-)
-            throw new RuntimeException(e);
+            throw new ProgrammingException(e);
         }
     }    
     
@@ -167,6 +168,11 @@ public class RefsetPlan {
         Builder(RefsetRule terminal) {
             built = new RefsetPlan();
             built.terminal = terminal;
+        }
+        
+        public Builder id(Long id){
+            built.id = id;
+            return this;
         }
 
         public RefsetPlan build() {
