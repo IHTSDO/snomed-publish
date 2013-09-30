@@ -1,32 +1,27 @@
 package com.ihtsdo.snomed.exception;
 
-public class ConceptsCacheNotBuiltException extends Exception {
+public class ConceptNotFoundException extends Exception {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 7956436192594842741L;
-
-    public ConceptsCacheNotBuiltException() {
+    public ConceptNotFoundException() {
         // TODO Auto-generated constructor stub
     }
 
-    public ConceptsCacheNotBuiltException(String message) {
+    public ConceptNotFoundException(String message) {
         super(message);
         // TODO Auto-generated constructor stub
     }
 
-    public ConceptsCacheNotBuiltException(Throwable cause) {
+    public ConceptNotFoundException(Throwable cause) {
         super(cause);
         // TODO Auto-generated constructor stub
     }
 
-    public ConceptsCacheNotBuiltException(String message, Throwable cause) {
+    public ConceptNotFoundException(String message, Throwable cause) {
         super(message, cause);
         // TODO Auto-generated constructor stub
     }
 
-    public ConceptsCacheNotBuiltException(String message, Throwable cause,
+    public ConceptNotFoundException(String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         // TODO Auto-generated constructor stub

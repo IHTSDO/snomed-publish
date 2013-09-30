@@ -25,4 +25,12 @@ public abstract class BaseSetOperationRefsetRule extends BaseRefsetRule {
         this.getIncomingRules().put(RIGHT_OPERAND, rule);
         return this;
     }
+    
+    public RefsetRule getLeft(){
+        return getIncomingRules().get(LEFT_OPERAND);
+    }
+    
+    public RefsetRule getRight(){
+        return getIncomingRules().get(RIGHT_OPERAND);
+    }
 }

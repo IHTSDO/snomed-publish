@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import com.ihtsdo.snomed.client.manifest.model.Manifest;
-import com.ihtsdo.snomed.service.ProgrammingException;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 
 @Named
 public class XmlSerialiser {

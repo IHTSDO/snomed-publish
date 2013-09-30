@@ -2,6 +2,11 @@ package com.ihtsdo.snomed.exception;
 
 public class UnrecognisedRefsetException extends RuntimeException {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1678724826680740046L;
+
     public UnrecognisedRefsetException() {
         // TODO Auto-generated constructor stub
     }

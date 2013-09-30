@@ -35,7 +35,7 @@
     
     <bean id="dataSourceAuthentication" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.h2.Driver" />
-        <property name="url" value="jdbc:h2:mem:testing-model" />
+        <property name="url" value="jdbc:h2:mem:testing-spring-data" />
         <property name="username" value="sa" />
         <property name="password" value="" />
     </bean>

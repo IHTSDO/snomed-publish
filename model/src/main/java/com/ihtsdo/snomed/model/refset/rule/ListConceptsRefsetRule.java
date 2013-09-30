@@ -18,7 +18,7 @@ import com.ihtsdo.snomed.model.Concept;
 /*https://code.google.com/p/guava-libraries/wiki/CollectionUtilitiesExplained#Sets*/
 @Entity
 @DiscriminatorValue("listConcepts")
-public class ListConceptsRefsetRule extends BaseSetOperationRefsetRule{ 
+public class ListConceptsRefsetRule extends SourceRefsetRule{ 
     public static final String NAME = ListConceptsRefsetRule.class.getName();
     
     @ManyToMany
@@ -34,7 +34,7 @@ public class ListConceptsRefsetRule extends BaseSetOperationRefsetRule{
         assert(inputs.size() == 0);
         return getConcepts();
     }
-    
+
     @Override
     public boolean equals(Object o){
         if (o instanceof ListConceptsRefsetRule){

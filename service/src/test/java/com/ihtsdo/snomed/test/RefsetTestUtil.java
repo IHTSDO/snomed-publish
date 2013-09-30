@@ -1,8 +1,6 @@
 package com.ihtsdo.snomed.test;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.Refset;
 
 /**
  * An utility class which contains useful methods for unit testing person related functions.

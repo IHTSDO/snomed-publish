@@ -16,11 +16,45 @@
     <bonecp.version>0.7.1.RELEASE</bonecp.version>
     <c3p0.version>0.9.1.2</c3p0.version>
     <mchange-commons-java.version>0.2.2</mchange-commons-java.version>
+    <querydsl.version>2.9.0.FIXED</querydsl.version>
   </properties>
+  
   
   <build>
     <finalName>spring-data-service</finalName>
     <sourceDirectory>src/main/java</sourceDirectory>
+<!--   <plugins> -->
+<!--   <plugin> -->
+<!--     <groupId>com.mysema.maven</groupId> -->
+<!--     <artifactId>apt-maven-plugin</artifactId> -->
+<!--     <version>1.1.1</version> -->
+<!--     <executions> -->
+<!--         <execution> -->
+<!--             <goals> -->
+<!--                 <goal>process</goal> -->
+<!--             </goals> -->
+<!--             <configuration> -->
+<!--                 <outputDirectory>target/generated-sources/java</outputDirectory> -->
+<!--                 <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor> -->
+<!--             </configuration> -->
+<!--         </execution> -->
+<!--         </executions> -->
+<!--         <dependencies>         -->
+<!--           <dependency> -->
+<!--             <groupId>com.mysema.querydsl</groupId> -->
+<!--             <artifactId>querydsl-apt</artifactId> -->
+<!--             <version>${querydsl.version}</version> -->
+<!--           </dependency> -->
+<!--           <dependency> -->
+<!--             <groupId>com.mysema.querydsl</groupId> -->
+<!--             <artifactId>querydsl-jpa</artifactId> -->
+<!--             <classifier>apt</classifier> -->
+<!--             <version>${querydsl.version}</version> -->
+<!--           </dependency> -->
+<!--         </dependencies> -->
+<!--     </plugin> -->
+<!--   </plugins> -->
+    
   </build>
   
   <dependencies>
@@ -58,12 +92,37 @@
       <version>${spring.version}</version>
     </dependency>
     
-    <!-- Spring JPA -->
+    <!-- Spring Data JPA -->
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
       <version>${spring.data.jpa.version}</version>
     </dependency>
+    
+    <!-- Spring Data Query DSL (Mysema) -->
+<!--     <dependency> -->
+<!--       <groupId>com.mysema.querydsl</groupId> -->
+<!--       <artifactId>querydsl-core</artifactId> -->
+<!--       <version>${querydsl.version}</version> -->
+<!--     </dependency> -->
+    
+<!--     <dependency> -->
+<!--       <groupId>com.mysema.querydsl</groupId> -->
+<!--       <artifactId>querydsl-apt</artifactId> -->
+<!--       <version>${querydsl.version}</version> -->
+<!--     </dependency> -->
+    
+<!--     <dependency> -->
+<!--       <groupId>com.mysema.querydsl</groupId> -->
+<!--       <artifactId>querydsl-jpa</artifactId> -->
+<!--       <version>${querydsl.version}</version> -->
+<!--     </dependency> -->
+    
+<!--     <dependency> -->
+<!--       <groupId>com.mysema.maven</groupId> -->
+<!--       <artifactId>apt-maven-plugin</artifactId> -->
+<!--       <version>1.1.1</version> -->
+<!--     </dependency> -->
     
     <!-- Spring JDBC -->
     <dependency>

@@ -34,9 +34,10 @@ import com.ihtsdo.snomed.model.Concept;
     )
 public abstract class BaseRefsetRule implements RefsetRule{
     
+
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)    
-    protected long id;
+    protected Long id;
     
     @OneToMany(targetEntity=BaseRefsetRule.class, cascade=CascadeType.ALL)
     @JoinColumn
@@ -50,7 +51,7 @@ public abstract class BaseRefsetRule implements RefsetRule{
     
     @Version
     private long version = 0;
-    
+
     public Set<Concept> generateConcepts(){
         Map<String, Set<Concept>> parentResults = new HashMap<>();
         for (String name : incomingRules.keySet()){
@@ -80,7 +81,7 @@ public abstract class BaseRefsetRule implements RefsetRule{
     
     @Override
     public int hashCode(){
-        return Longs.hashCode(getId());
+        return Longs.hashCode(getId() == null ? 0 : getId());
     }
     
     @Override
@@ -103,10 +104,10 @@ public abstract class BaseRefsetRule implements RefsetRule{
                 .toString();
     }
     
-    public long getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

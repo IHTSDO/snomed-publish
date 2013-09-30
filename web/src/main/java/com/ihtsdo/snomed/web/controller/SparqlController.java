@@ -13,7 +13,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.openid.OpenIDAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -29,7 +28,6 @@ import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.web.dto.SparqlQueryFormObject;
 import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.web.model.SparqlResults;
-import com.ihtsdo.snomed.web.model.User;
 import com.ihtsdo.snomed.web.service.OntologyService;
 import com.ihtsdo.snomed.web.service.SparqlService;
 

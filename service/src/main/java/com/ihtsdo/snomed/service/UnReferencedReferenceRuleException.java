@@ -1,31 +1,34 @@
-package com.ihtsdo.snomed.web.exception;
+package com.ihtsdo.snomed.service;
 
 import com.ihtsdo.snomed.exception.ProgrammingException;
 
-public class UnexpectedSparqlResultException extends ProgrammingException {
+public class UnReferencedReferenceRuleException extends ProgrammingException {
 
-    private static final long serialVersionUID = 4020539583906058812L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -4576515398257471702L;
 
-    public UnexpectedSparqlResultException() {
+    public UnReferencedReferenceRuleException() {
         // TODO Auto-generated constructor stub
     }
 
-    public UnexpectedSparqlResultException(String message) {
+    public UnReferencedReferenceRuleException(String message) {
         super(message);
         // TODO Auto-generated constructor stub
     }
 
-    public UnexpectedSparqlResultException(Throwable cause) {
+    public UnReferencedReferenceRuleException(Throwable cause) {
         super(cause);
         // TODO Auto-generated constructor stub
     }
 
-    public UnexpectedSparqlResultException(String message, Throwable cause) {
+    public UnReferencedReferenceRuleException(String message, Throwable cause) {
         super(message, cause);
         // TODO Auto-generated constructor stub
     }
 
-    public UnexpectedSparqlResultException(String message, Throwable cause,
+    public UnReferencedReferenceRuleException(String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         // TODO Auto-generated constructor stub

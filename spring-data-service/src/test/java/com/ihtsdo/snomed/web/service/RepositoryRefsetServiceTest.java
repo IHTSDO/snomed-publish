@@ -29,6 +29,8 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
@@ -49,7 +51,8 @@ import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
     /*,DbUnitTestExecutionListener.class*/ })
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml", 
-        "classpath:sds-spring-data.xml"})
+        "classpath:sds-spring-data.xml",
+        "classpath:test-spring-data.xml"})
 public class RepositoryRefsetServiceTest {
 
     private static final Long   REFSET_ID           = Long.valueOf(5);
@@ -91,7 +94,7 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void create() {
+    public void create() throws NonUniquePublicIdException, ConceptNotFoundException {
         RefsetDto created = RefsetTestUtil.createDto(null, concept.getSerialisedId(), PUBLIC_ID, TITLE, DESCRIPTION);
         Refset persisted = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         
@@ -161,7 +164,7 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void update() throws RefsetNotFoundException {
+    public void update() throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException {
         RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
         Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED).build();
         updatedRefset.setId(REFSET_ID);
@@ -183,18 +186,18 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test(expected = RefsetNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException {
+    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException {
         RefsetDto updated = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
         
         when(repoMock.findOne(updated.getId())).thenReturn(null);
-        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
+//        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
 
         refsetService.update(updated);
-
-        verify(repoMock, times(1)).findOne(updated.getId());
-        verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
-        verifyNoMoreInteractions(repoMock);
-        verifyNoMoreInteractions(conceptMock);
+//
+//        verify(repoMock, times(1)).findOne(updated.getId());
+//        verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
+//        verifyNoMoreInteractions(repoMock);
+//        verifyNoMoreInteractions(conceptMock);
     }
 
     private void assertRefset(RefsetDto expected, Refset actual) {

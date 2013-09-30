@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
-import org.springframework.security.openid.OpenIDAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -28,6 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.refset.Refset;
@@ -138,7 +138,7 @@ public class RefsetController {
     public ModelAndView ceateRefset(ModelMap model, HttpServletRequest request,
             Principal principal,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result, RedirectAttributes attributes) {
+            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
 //        model.addAttribute("user",
@@ -170,7 +170,7 @@ public class RefsetController {
             HttpServletRequest request, Principal principal,
             RedirectAttributes attributes, @PathVariable String pubId,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result) throws RefsetNotFoundException {
+            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException {
         // TODO: Handle RefsetNotFoundException
         LOG.debug("Controller received request to update refset [{}]",
                 refsetDto.toString());

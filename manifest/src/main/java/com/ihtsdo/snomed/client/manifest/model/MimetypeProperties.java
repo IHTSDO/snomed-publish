@@ -10,7 +10,7 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.service.ProgrammingException;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 
 @Named
 public class MimetypeProperties {

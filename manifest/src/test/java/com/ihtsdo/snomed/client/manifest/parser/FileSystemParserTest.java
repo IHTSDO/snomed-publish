@@ -23,9 +23,9 @@ import com.ihtsdo.snomed.client.manifest.model.CrossmapRefsetCollection;
 import com.ihtsdo.snomed.client.manifest.model.LanguageRefsetCollection;
 import com.ihtsdo.snomed.client.manifest.model.Manifest;
 import com.ihtsdo.snomed.client.manifest.parser.RefsetCollectionParser.Mode;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.ProgrammingException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")

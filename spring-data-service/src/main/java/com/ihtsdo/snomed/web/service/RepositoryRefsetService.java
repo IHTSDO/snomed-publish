@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
@@ -42,9 +43,6 @@ public class RepositoryRefsetService implements RefsetService {
     @PostConstruct
     public void init(){}
     
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#findAll(int)
-     */
     @Override
     @Transactional(readOnly = true)
     public List<Refset> findAll(int pageIndex){
@@ -56,9 +54,6 @@ public class RepositoryRefsetService implements RefsetService {
         return null;
     }
     
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#findAll()
-     */
     @Override
     @Transactional(readOnly = true)
     public List<Refset> findAll(){
@@ -66,9 +61,6 @@ public class RepositoryRefsetService implements RefsetService {
         return refsetRepository.findAll(sortByAscendingTitle());
     }    
     
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#findById(java.lang.Long)
-     */
     @Override
     @Transactional(readOnly = true)
     public Refset findById(Long id) {
@@ -76,28 +68,24 @@ public class RepositoryRefsetService implements RefsetService {
         return refsetRepository.findOne(id);
     }
     
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#findByPublicId(java.lang.String)
-     */
     @Override
     @Transactional
     public Refset findByPublicId(String publicId){
         LOG.debug("Getting refset with publicId=" + publicId);
         return refsetRepository.findByPublicId(publicId);
     }    
-    
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#update(com.ihtsdo.snomed.web.dto.RefsetDto)
-     */
+
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException {
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException {
         LOG.debug("Updating refset with information: " + updated);
         Refset refset = refsetRepository.findOne(updated.getId());
-        Concept concept = conceptRepository.findBySerialisedId(updated.getConcept());
         if (refset == null) {
-            LOG.debug("No refset found with id: " + updated.getId());
-            throw new RefsetNotFoundException();
+            throw new RefsetNotFoundException("No refset found with id: " + updated.getId());
+        }
+        Concept concept = conceptRepository.findBySerialisedId(updated.getConcept());
+        if (concept == null){
+            throw new ConceptNotFoundException("No concept found with id: " + updated.getConcept());
         }
         refset.update(concept, updated.getPublicId(), updated.getTitle(), updated.getDescription());
         try {
@@ -107,16 +95,15 @@ public class RepositoryRefsetService implements RefsetService {
         }
     }    
 
-    
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#create(com.ihtsdo.snomed.web.dto.RefsetDto)
-     */
     @Override
     @Transactional
-    public Refset create(RefsetDto created) throws NonUniquePublicIdException{
+    public Refset create(RefsetDto created) throws NonUniquePublicIdException, ConceptNotFoundException{
         LOG.debug("Creating new refset [{}]", created.toString());
         
         Concept concept = conceptRepository.findBySerialisedId(created.getConcept());
+        if (concept == null){
+            throw new ConceptNotFoundException("No concept found with id: " + created.getConcept());
+        }        
         Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription()).build();
         
         try {
@@ -126,9 +113,6 @@ public class RepositoryRefsetService implements RefsetService {
         }
     }
     
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#delete(java.lang.Long)
-     */
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
     public Refset delete(Long refsetId) throws RefsetNotFoundException {
@@ -141,10 +125,7 @@ public class RepositoryRefsetService implements RefsetService {
         refsetRepository.delete(deleted);
         return deleted;
     }  
-    
-    /* (non-Javadoc)
-     * @see com.ihtsdo.snomed.service.RefsetService#delete(java.lang.String)
-     */
+
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
     public Refset delete(String publicId) throws RefsetNotFoundException {
@@ -161,7 +142,7 @@ public class RepositoryRefsetService implements RefsetService {
     private Sort sortByAscendingTitle() {
         return new Sort(Sort.Direction.ASC, "title");
     }
-    
+
 //    private Pageable constructPageSpecification(int pageIndex) {
 //        Pageable pageSpecification = new PageRequest(pageIndex, NUMBER_OF_REFSETS_PER_PAGE, sortByAscendingTitle());
 //        return pageSpecification;

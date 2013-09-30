@@ -18,8 +18,8 @@ import com.ihtsdo.snomed.client.manifest.model.ManifestFileFactory;
 import com.ihtsdo.snomed.client.manifest.model.ManifestFolder;
 import com.ihtsdo.snomed.client.manifest.model.MimetypeProperties;
 import com.ihtsdo.snomed.client.manifest.model.RefsetCollectionFactory;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.ProgrammingException;
 
 @Named
 public class FileSystemParser {

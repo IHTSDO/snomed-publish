@@ -21,9 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ihtsdo.snomed.client.manifest.model.BaseRefsetCollection;
 import com.ihtsdo.snomed.client.manifest.model.MimetypeProperties;
 import com.ihtsdo.snomed.client.manifest.model.RefsetCollectionFactory;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.ProgrammingException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")

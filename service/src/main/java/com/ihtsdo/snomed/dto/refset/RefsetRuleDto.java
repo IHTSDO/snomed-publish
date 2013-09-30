@@ -1,12 +1,12 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.rule.DifferenceRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.IntersectionRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
@@ -15,15 +15,6 @@ import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
 
 
 public class RefsetRuleDto {
-    
-    public static final long NOT_PERSISTED = -1;
-    
-    public static boolean isPersited(long id){
-        if ((id != NOT_PERSISTED) && (id != 0)){
-            return true;
-        }
-        return false;
-    }
     
     public enum RuleType{
         DIFFERENCE, INTERSECTION, LIST, SYMMETRIC, UNION;
@@ -47,23 +38,20 @@ public class RefsetRuleDto {
         TYPE_CLASS_MAP.put(RuleType.LIST, ListConceptsRefsetRule.class);
         TYPE_CLASS_MAP.put(RuleType.SYMMETRIC, SymmetricDifferenceRefsetRule.class);
         TYPE_CLASS_MAP.put(RuleType.UNION, UnionRefsetRule.class);
+    }    
+    
+    public static boolean isPersisted(long id){
+        if (id > 0){
+            return true;
+        }
+        return false;
     }
     
     private Long id;
     protected RuleType type;
     private Long left;
     private Long right;
-    private List<ConceptDto> concepts;
-    
-    public RefsetRuleDto(){}
-    
-    public RefsetRuleDto(Long id, RuleType type, Long left, Long right, List<ConceptDto> concepts){
-        this.id = id;
-        this.type = type;
-        this.left = left;
-        this.right=right;
-        this.concepts = concepts;
-    }
+    private List<ConceptDto> concepts = new ArrayList<>();
     
     public RefsetRuleDto addConcept(ConceptDto concept){
         getConcepts().add(concept);
@@ -75,8 +63,8 @@ public class RefsetRuleDto {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("type", getType())
-                .add("left", getLeft())
-                .add("right", getRight())
+                .add("left", getLeft() == null ? "none" : getLeft())
+                .add("right", getRight() == null ? "none" : getRight())
                 .add("concepts", getConcepts())
                 .toString();
     }
@@ -99,7 +87,7 @@ public class RefsetRuleDto {
     @Override
     public int hashCode(){
         if (getId() != null){
-            return Longs.hashCode(id);
+            return Longs.hashCode(getId());
         }else{
             return 1; //delegate to equals method
         }
@@ -117,16 +105,16 @@ public class RefsetRuleDto {
     public void setType(RuleType type) {
         this.type = type;
     }
-    public long getLeft() {
+    public Long getLeft() {
         return left;
     }
-    public void setLeft(long left) {
+    public void setLeft(Long left) {
         this.left = left;
     }
-    public long getRight() {
+    public Long getRight() {
         return right;
     }
-    public void setRight(long right) {
+    public void setRight(Long right) {
         this.right = right;
     }
     public List<ConceptDto> getConcepts() {
@@ -134,5 +122,54 @@ public class RefsetRuleDto {
     }
     public void setConcepts(List<ConceptDto> concepts) {
         this.concepts = concepts;
+    }
+    
+    public static Builder getBuilder() {
+        return new Builder();
+    }
+    
+    public static class Builder {
+        private RefsetRuleDto built;
+
+        Builder() {
+            built = new RefsetRuleDto();
+        }
+
+        public Builder id(long id){
+            built.setId(id);
+            return this;
+        }
+        
+        public Builder type(RuleType type){
+            built.setType(type);
+            return this;
+        }
+        
+        public Builder left(long left){
+            built.setLeft(left);
+            return this;
+        }
+        
+        public Builder right(long right){
+            built.setRight(right);
+            return this;
+        }
+        
+        public Builder add(ConceptDto conceptDto){
+            if (built.getConcepts() == null){
+                built.setConcepts(new ArrayList<ConceptDto>());
+            }
+            built.getConcepts().add(conceptDto);
+            return this;
+        }
+        
+        public Builder concepts(List<ConceptDto> conceptDtos){
+            built.setConcepts(conceptDtos);
+            return this;
+        }
+
+        public RefsetRuleDto build() {
+            return built;
+        }
     }
 }

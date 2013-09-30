@@ -34,13 +34,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.collect.Ordering;
+import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlConcept;
-import com.ihtsdo.snomed.service.ProgrammingException;
 import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.web.service.ConceptService;
 import com.ihtsdo.snomed.web.service.OntologyService;

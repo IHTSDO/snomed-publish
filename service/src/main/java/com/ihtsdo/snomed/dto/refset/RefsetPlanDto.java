@@ -7,7 +7,6 @@ import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.refset.RefsetRule;
 import com.ihtsdo.snomed.model.refset.Visitor;
@@ -19,7 +18,7 @@ public class RefsetPlanDto {
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
     private Long terminal;
 
-    
+
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
@@ -31,7 +30,7 @@ public class RefsetPlanDto {
     
     @Override
     public boolean equals(Object o){
-        if (o instanceof RefsetRuleDto){
+        if (o instanceof RefsetPlanDto){
             RefsetPlanDto dto = (RefsetPlanDto) o;
             if (Objects.equal(dto.getId(), getId()) &&
                     (Objects.equal(dto.getRefsetRules(), getRefsetRules())) &&
@@ -44,9 +43,8 @@ public class RefsetPlanDto {
     
     @Override
     public int hashCode(){
-        return Longs.hashCode(id);
+        return Longs.hashCode(getId());
     } 
-    
     
     public long getId() {
         return id;
@@ -63,6 +61,10 @@ public class RefsetPlanDto {
     public void setRefsetRules(List<RefsetRuleDto> refsetRules) {
         this.refsetRules = refsetRules;
     }
+    
+    public void addRefsetRule(RefsetRuleDto refsetRule){
+        this.refsetRules.add(refsetRule);
+    }
 
     public Long getTerminal() {
         return terminal;
@@ -71,31 +73,27 @@ public class RefsetPlanDto {
     public void setTerminal(Long terminal) {
         this.terminal = terminal;
     }
-    
-    
-    
-    public static Builder getBuilder(RefsetPlan refsetPlan) {
-        return new Builder(refsetPlan);
+
+    public static RefsetPlanDto parse(RefsetPlan plan){
+        RefsetPlanParser parser = new RefsetPlanParser();
+        plan.getTerminal().accept(parser);
+        RefsetPlanDto planDto = parser.getPlanDto();
+        planDto.setTerminal(plan.getTerminal().getId());
+        return planDto;
     }
     
-
-    public static class Builder implements Visitor{
-        private RefsetPlanDto built;
-
-        Builder(RefsetPlan refsetPlan) {
-            built = new RefsetPlanDto();
-            built.refsetRules = new ArrayList<>();
-            refsetPlan.getTerminal().accept(this);;
-        }
-
-        public RefsetPlanDto build() {
+    private static class RefsetPlanParser implements Visitor{
+        private RefsetPlanDto built = new RefsetPlanDto();
+        
+        public RefsetPlanDto getPlanDto(){
             return built;
         }
-
+        
         @Override
         public void visit(RefsetRule rule) {
             RefsetRuleDto refsetRuleDto = new RefsetRuleDto();
             refsetRuleDto.setType(RefsetRuleDto.CLASS_TYPE_MAP.get(rule.getClass()));
+            refsetRuleDto.setId(rule.getId());
             if (rule instanceof ListConceptsRefsetRule){
                 ListConceptsRefsetRule lcRule = (ListConceptsRefsetRule)rule;
                 for (Concept c : lcRule.getConcepts()){
@@ -103,9 +101,9 @@ public class RefsetPlanDto {
                 }
             }
             else if (rule instanceof BaseSetOperationRefsetRule){
-                BaseSetOperationRefsetRule baseRule = (BaseSetOperationRefsetRule) rule;
-                refsetRuleDto.setLeft(((BaseRefsetRule)baseRule.getIncomingRules().get(BaseSetOperationRefsetRule.LEFT_OPERAND)).getId());
-                refsetRuleDto.setRight(((BaseRefsetRule)baseRule.getIncomingRules().get(BaseSetOperationRefsetRule.RIGHT_OPERAND)).getId());
+                BaseSetOperationRefsetRule setOperationRule = (BaseSetOperationRefsetRule) rule;
+                refsetRuleDto.setLeft(setOperationRule.getLeft().getId());
+                refsetRuleDto.setRight(setOperationRule.getRight().getId());
             }else{
                 throw new UnrecognisedRefsetException("I've not been able to handle RefsetRule of class " + rule.getClass());
             }
@@ -113,5 +111,34 @@ public class RefsetPlanDto {
         }
     }
     
-    
+    public static Builder getBuilder() {
+        return new Builder();
+    }    
+
+    public static class Builder{
+        private RefsetPlanDto built;
+
+        Builder() {
+            built = new RefsetPlanDto();
+        }
+        
+        public Builder id(long id){
+            built.setId(id);
+            return this;
+        }
+        
+        public Builder add(RefsetRuleDto ruleDto){
+            built.addRefsetRule(ruleDto);
+            return this;
+        }
+        
+        public Builder terminal(Long terminalId){
+            built.setTerminal(terminalId);
+            return this;
+        }
+
+        public RefsetPlanDto build() {
+            return built;
+        }
+    }
 }
