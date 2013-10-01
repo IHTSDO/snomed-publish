@@ -1,5 +1,9 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -39,6 +43,8 @@ public class RefsetDto {
         this.title = title;
         this.description = description;
     }
+    
+
     
     @Override
     public String toString(){
@@ -126,6 +132,26 @@ public class RefsetDto {
         this.plan = plan;
     }
     
+    public static Builder getBuilder(Long id, Long conceptId, String title, String description, String publicId, RefsetPlanDto plan) {
+        return new Builder(id, conceptId, title, description, publicId, plan);
+    }
     
+    public static class Builder {
+        private RefsetDto built;
+
+        Builder(Long id, Long conceptId, String title, String description, String publicId, RefsetPlanDto plan) {
+            built = new RefsetDto();
+            built.setConcept(conceptId);
+            built.setDescription(description);
+            built.setId(id);
+            built.setPlan(plan);
+            built.setPublicId(publicId);
+            built.setTitle(title);
+        }
+        
+        public RefsetDto build(){
+            return built;
+        }
+    }
 
 }

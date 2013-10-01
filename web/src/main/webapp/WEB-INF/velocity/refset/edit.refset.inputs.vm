@@ -85,6 +85,64 @@
   </div>
 </div>
 
+  <!-- Display refset plan -->
+  <h2 class="plan">Plan</h2>
+  #springFormHiddenInput("refset.plan.id")
+  <div id="rules">
+    #set ($count = 0)
+    #foreach($rule in ${refset.plan.refsetRules})
+      <div class="bindings"
+        #springBind("refset.plan.refsetRules[$count]")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].id")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].type")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].left")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].right")
+        
+        #set ($concept_counter = 0)
+        #foreach($concept in $rule.concepts)
+            #springFormHiddenInput("refset.plan.refsetRules[$count].concepts[$concept_counter].id")
+            #springFormHiddenInput("refset.plan.refsetRules[$count].concepts[$concept_counter].displayName")
+            #set($concept_counter = $concept_counter + 1)
+        #end        
+        #set ($count = $count + 1)
+      </div>
+      <div class="row">
+        <div class="col-lg-1">Rule $rule.id</div>
+        <div class="col-lg-11">
+          #if( $rule.type.name().equals("LIST") )
+            ListConceptsRefsetRule {$rule.conceptIds()}
+          #elseif( $rule.type.name().equals("DIFFERENCE") )
+              Rule $rule.left <strong>DifferenceRefsetRule</strong> Rule $rule.right
+          #elseif( $rule.type.name().equals("INTERSECTION") )                
+              Rule $rule.left <strong>IntersectionRefsetRule</strong> Rule $rule.right
+          #elseif( $rule.type.name().equals("SYMMETRIC") )
+              Rule $rule.left <strong>Symmetric Difference</strong> Rule $rule.right
+          #elseif( $rule.type.name().equals("UNION") )
+              Rule $rule.left <strong>Union</strong> Rule $rule.right
+          #else
+              Not Found!
+          #end
+        </div>
+      </div>
+    #end
+    
+    <div id="newrule" class="dropdown">
+      <a href="#" data-toggle="dropdown">Add Rule</a>      
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu2">
+        <li role="presentation" class="dropdown-header">Source Rules</li>
+        <li role="presentation"><a role="menuitem" tabindex="-1">List Concepts</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation" class="dropdown-header">Set Operations</li>
+        <li role="presentation"><a role="menuitem" tabindex="-1">Union</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1">Intersection</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1">Difference</a></li>
+        <li role="presentation"><a role="menuitem" tabindex="-1">Symmetric Difference</a></li>
+      </ul>    
+    </div>
+</div>
+
+
+
 <!-- <div class="error"> -->
 <!-- #springBind("refset.*") -->
 <!--   #if(${status.error}) -->

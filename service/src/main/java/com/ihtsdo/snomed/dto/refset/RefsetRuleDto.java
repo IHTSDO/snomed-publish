@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Transient;
+
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.refset.rule.DifferenceRefsetRule;
@@ -58,6 +60,16 @@ public class RefsetRuleDto {
         getConcepts().add(concept);
         return this;
     }
+    
+    @Transient
+    public List<Long> conceptIds(){
+        List<Long> ids = new ArrayList<>(getConcepts().size());
+        for (ConceptDto c : getConcepts()){
+            ids.add(c.getId());
+        }
+        return ids;
+    } 
+ 
     
     @Override
     public String toString(){

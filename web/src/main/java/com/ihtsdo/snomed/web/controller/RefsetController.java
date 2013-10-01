@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.web.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.AutoPopulatingList;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -80,6 +82,8 @@ public class RefsetController {
     public void init() {
     }
 
+    
+    
     // ALL
 
     @RequestMapping(value = "/refsets", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
@@ -122,22 +126,39 @@ public class RefsetController {
     // EDIT FORM
 
     @RequestMapping(value = "/refset/{pubId}/edit", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView showEditRefsetForm(ModelMap model,
+    public ModelAndView showEditRefsetForm(@ModelAttribute("refset") RefsetDto refsetFbo, ModelMap model,
             HttpServletRequest request, Principal principal,
             @PathVariable String pubId) {
         LOG.debug(
                 "Displaying edit refset screen for refset with publicId [{}]",
                 pubId);
         Refset refset = refsetService.findByPublicId(pubId);
+        
+        
+        RefsetPlanDto planDto = RefsetPlanDto.parse(refset.getPlan());
+        List<RefsetRuleDto> autoList = new AutoPopulatingList<>(RefsetRuleDto.class);
+        autoList.addAll(planDto.getRefsetRules());
+        planDto.setRefsetRules(autoList);
+        RefsetDto newRefsetFbo = RefsetDto.getBuilder(
+                refset.getId(), 
+                refset.getConcept().getSerialisedId(), 
+                refset.getTitle(), 
+                refset.getDescription(), 
+                refset.getPublicId(), 
+                planDto)
+                .build();
+
+        //model.addAttribute("refset", newRefsetFbo);
         model.addAttribute("pubid", pubId);
         model.addAttribute("storedRefset", refset);
+        
+        
+        
         //initDummyPlan(refset);
 
 //        model.addAttribute("user",
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("/refset/edit.refset", "refset", new RefsetDto(
-                refset.getId(), refset.getConcept().getSerialisedId(), refset.getPublicId(), refset.getTitle(),
-                refset.getDescription()));
+        return new ModelAndView("/refset/edit.refset", "refset", newRefsetFbo);
     }
     
     private void initDummyPlan(Refset refset){

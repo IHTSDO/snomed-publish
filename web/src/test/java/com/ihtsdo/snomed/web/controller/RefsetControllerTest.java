@@ -45,6 +45,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.model.Role;
 import com.ihtsdo.snomed.web.model.User;
@@ -97,6 +98,7 @@ public class RefsetControllerTest {
     private Refset r1 = new RefsetBuilder()
         .id(1)
         .title("title1")
+        .plan(new RefsetPlan())
         .concept(concept)
         .description("description1")
         .publicId("pub1")
@@ -105,6 +107,7 @@ public class RefsetControllerTest {
     private Refset r2 = new RefsetBuilder()
         .id(2)
         .concept(concept)
+        .plan(new RefsetPlan())
         .title("title2")
         .description("description2")
         .publicId("pub2")
@@ -396,6 +399,11 @@ public class RefsetControllerTest {
         
         public RefsetBuilder concept(Concept concept){
             r.setConcept(concept);
+            return this;
+        }
+        
+        public RefsetBuilder plan(RefsetPlan plan){
+            r.setPlan(plan);
             return this;
         }
         

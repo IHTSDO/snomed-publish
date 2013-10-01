@@ -3,6 +3,7 @@ package com.ihtsdo.snomed.dto.refset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Objects;
@@ -21,7 +22,7 @@ public class RefsetPlanDto {
     
     @NotNull(message="validation.refsetplan.terminal.not.null")
     private Long terminal;
-
+    
     @Override
     public String toString(){
         return Objects.toStringHelper(this)

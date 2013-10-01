@@ -7,34 +7,34 @@
     <li class="active">$refset.publicId</li>
   </ol>
   <div class="row">
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         <label>#springMessage('label.field.refset.concept')</label>
       </div>
-      <div class="col-lg-9">
+      <div class="col-lg-10">
         <span><a href="http://browser.sparklingideas.co.uk/ontology/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
       </div>        
   </div>
   <div class="row">
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         <label>#springMessage('label.field.refset.title')</label>
       </div>
-      <div class="col-lg-9">
+      <div class="col-lg-10">
         <span>$refset.title</span>
       </div>        
   </div>
   <div class="row">
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         <label>#springMessage('label.field.refset.description')</label>
       </div>
-      <div class="col-lg-9">
+      <div class="col-lg-10">
         <span>$refset.description</span>
       </div>        
   </div>
   <div class="row">
-      <div class="col-lg-3">
+      <div class="col-lg-2">
         <label>#springMessage('label.field.refset.publicid')</label>
       </div>
-      <div class="col-lg-9">
+      <div class="col-lg-10">
         <span>$refset.publicId</span>
       </div>        
   </div>
@@ -47,13 +47,13 @@
       <div class="col-lg-1">Rule $rule.id</div>
       <div class="col-lg-11">
         #if( $rule.class.simpleName.equals("ListConceptsRefsetRule") )
-            ListConceptsRefsetRule $rule.conceptIds
+            ListConceptsRefsetRule {$rule.conceptIds}
         #elseif( $rule.class.simpleName.equals("DifferenceRefsetRule"))
-            DifferenceRefsetRule [$rule.id]
+            Rule $rule.left.id <strong>DifferenceRefsetRule</strong> Rule $rule.right.id
         #elseif( $rule.class.simpleName.equals("IntersectionRefsetRule"))                
-            IntersectionRefsetRule [$rule.id]
+            Rule $rule.left.id <strong>IntersectionRefsetRule</strong> Rule $rule.right.id
         #elseif( $rule.class.simpleName.equals("SymmetricDifferenceRefsetRule"))
-            SymmetricDifferenceRefsetRule [$rule.id]
+            Rule $rule.left.id <strong>Symmetric Difference</strong> Rule $rule.right.id
         #elseif( $rule.class.simpleName.equals("UnionRefsetRule"))
             Rule $rule.left.id <strong>Union</strong> Rule $rule.right.id
         #end
