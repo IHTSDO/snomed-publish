@@ -16,10 +16,15 @@ import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
+import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
+import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
+import com.ihtsdo.snomed.service.RefsetPlanService;
 import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRepository;
 
@@ -37,6 +42,9 @@ public class RepositoryRefsetService implements RefsetService {
 
     @Inject
     RefsetRepository refsetRepository;
+    
+    @Inject
+    RefsetPlanService planService;
     
     @Inject
     ConceptRepository conceptRepository;    
@@ -78,7 +86,7 @@ public class RepositoryRefsetService implements RefsetService {
 
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException {
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
         LOG.debug("Updating refset with information: " + updated);
         Refset refset = refsetRepository.findOne(updated.getId());
         if (refset == null) {
@@ -88,7 +96,15 @@ public class RepositoryRefsetService implements RefsetService {
         if (concept == null){
             throw new ConceptNotFoundException("No concept found with id: " + updated.getConcept());
         }
-        refset.update(concept, updated.getPublicId(), updated.getTitle(), updated.getDescription());
+        
+        RefsetPlan plan = planService.findById(updated.getPlan().getId());
+        if (plan == null){
+            planService.create(updated.getPlan());
+        }else{
+            planService.update(updated.getPlan());
+        }
+        
+        refset.update(concept, updated.getPublicId(), updated.getTitle(), updated.getDescription(), plan);
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
@@ -98,15 +114,27 @@ public class RepositoryRefsetService implements RefsetService {
 
     @Override
     @Transactional
-    public Refset create(RefsetDto created) throws NonUniquePublicIdException, ConceptNotFoundException{
+    public Refset create(RefsetDto created) throws NonUniquePublicIdException, ConceptNotFoundException, 
+            UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, 
+            RefsetRuleNotFoundException, RefsetPlanNotFoundException
+    {
         LOG.debug("Creating new refset [{}]", created.toString());
         
         Concept concept = conceptRepository.findBySerialisedId(created.getConcept());
         if (concept == null){
             throw new ConceptNotFoundException("No concept found with id: " + created.getConcept());
         }        
+
+        
+        RefsetPlan plan = planService.findById(created.getPlan().getId());
+        if (plan == null){
+            plan = planService.create(created.getPlan());
+        }else{
+            plan = planService.update(created.getPlan());
+        }
+
         Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription(),
-                new RefsetPlan()).build();
+                plan).build();        
         
         try {
             return refsetRepository.save(refset);

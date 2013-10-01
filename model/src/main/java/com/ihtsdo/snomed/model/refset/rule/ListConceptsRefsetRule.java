@@ -1,6 +1,8 @@
 package com.ihtsdo.snomed.model.refset.rule;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import com.google.common.base.Objects;
@@ -47,13 +50,21 @@ public class ListConceptsRefsetRule extends SourceRefsetRule{
         return false;
     }
     
+    @Transient
+    public List<Long> getConceptIds(){
+        List<Long> concepts = new ArrayList<>();
+        for (Concept c : getConcepts()){
+            concepts.add(c.getSerialisedId());
+        }
+        return concepts;
+    }
     
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("incomingRules", getIncomingRules())
-                .add("concepts", getConcepts())
+                .add("concepts", getConceptIds())
                 .add("class", this.getClass().getSimpleName())
                 .toString();
     }

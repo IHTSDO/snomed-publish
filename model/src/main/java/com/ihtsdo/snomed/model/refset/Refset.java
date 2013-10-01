@@ -45,7 +45,7 @@ public class Refset {
         
     @NotNull
     @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-    private RefsetPlan refsetPlan;
+    private RefsetPlan plan;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -74,11 +74,12 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(Concept concept, String publicId, String title, String description){
+    public Refset update(Concept concept, String publicId, String title, String description, RefsetPlan plan){
         this.setConcept(concept);
         this.setPublicId(publicId);
         this.setTitle(title);
         this.setDescription(description);
+        this.setPlan(plan);
         return this;
     }
     
@@ -101,12 +102,13 @@ public class Refset {
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
+                .add("plan", getPlan())
                 .toString();
     }
     
     @Override
     public int hashCode(){
-        return Longs.hashCode(id);
+        return Longs.hashCode(getId());
     }
 
     @PreUpdate
@@ -163,14 +165,12 @@ public class Refset {
         this.description = description;
     }
     
-    
-    
-    public RefsetPlan getRefsetPlan() {
-        return refsetPlan;
+    public RefsetPlan getPlan() {
+        return plan;
     }
 
-    public void setRefsetPlan(RefsetPlan refsetPlan) {
-        this.refsetPlan = refsetPlan;
+    public void setPlan(RefsetPlan plan) {
+        this.plan = plan;
     }
 
     public Date getCreationTime() {
@@ -211,7 +211,7 @@ public class Refset {
             built.title = title;
             built.description = description;
             built.concept = concept;
-            built.refsetPlan = refsetPlan;
+            built.plan = refsetPlan;
         }
 
         public Refset build() {

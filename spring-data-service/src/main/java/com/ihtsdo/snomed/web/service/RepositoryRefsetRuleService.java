@@ -12,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
+import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetRuleService;
-import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRuleRepository;
 
 /**
@@ -34,8 +35,11 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
     @Inject
     protected RefsetRuleRepository refsetRuleRepository; 
     
-    @Inject 
-    protected ConceptRepository conceptRepository;
+//    @Inject 
+//    protected ConceptRepository conceptRepository;
+    
+    @Inject
+    protected ConceptService conceptService;
     
     @Override
     @Transactional(readOnly = true)
@@ -46,7 +50,7 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
     
     @Override
     @Transactional(rollbackFor = {RefsetRuleNotFoundException.class})
-    public BaseRefsetRule update(RefsetRuleDto updated) throws RefsetRuleNotFoundException {
+    public BaseRefsetRule update(RefsetRuleDto updated) throws RefsetRuleNotFoundException, ConceptNotFoundException {
         LOG.debug("Updating refset rule with information: " + updated);
         BaseRefsetRule rule = refsetRuleRepository.findOne(updated.getId());
         if (rule == null) {
@@ -62,7 +66,7 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
 
     @Override
     @Transactional
-    public BaseRefsetRule create(RefsetRuleDto created) {
+    public BaseRefsetRule create(RefsetRuleDto created) throws ConceptNotFoundException {
         LOG.debug("Creating new refset rule [{}]", created.toString());
         BaseRefsetRule newRule = createRule(created.getType());
         if (newRule instanceof ListConceptsRefsetRule){
@@ -85,11 +89,15 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
         return deleted;
     }  
     
-    private void updateConcepts(RefsetRuleDto created, BaseRefsetRule newRule) {
+    private void updateConcepts(RefsetRuleDto created, BaseRefsetRule newRule) throws ConceptNotFoundException {
         ListConceptsRefsetRule lcRule = (ListConceptsRefsetRule)newRule;
         lcRule.setConcepts(new HashSet<Concept>());
         for (ConceptDto conceptDto : created.getConcepts()){
-            lcRule.addConcept(conceptRepository.findBySerialisedId(conceptDto.getId()));
+            Concept c = conceptService.findBySerialisedId(conceptDto.getId());
+            if (c == null){
+                throw new ConceptNotFoundException("Did not find concept with serialisedId " + conceptDto.getId());
+            }
+            lcRule.addConcept(c);
         }
     }    
 

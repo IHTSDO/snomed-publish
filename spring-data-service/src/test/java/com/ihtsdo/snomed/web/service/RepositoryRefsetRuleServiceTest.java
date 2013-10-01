@@ -33,13 +33,14 @@ import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.Builder;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
+import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetRuleService;
-import com.ihtsdo.snomed.web.repository.ConceptRepository;
 import com.ihtsdo.snomed.web.repository.RefsetRuleRepository;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
@@ -66,7 +67,7 @@ public class RepositoryRefsetRuleServiceTest {
     private RefsetRuleRepository refsetRuleRepositoryMock;
     
     @Mock
-    private ConceptRepository conceptRepositoryMock;
+    private ConceptService conceptServiceMock;
     
     private List<ConceptDto> conceptDtos;
     private Concept c1, c2, c3;
@@ -98,8 +99,8 @@ public class RepositoryRefsetRuleServiceTest {
         
         ReflectionTestUtils.setField(
                 ((RepositoryRefsetRuleService) SpringProxyUtil.unwrapProxy(ruleService)), 
-                "conceptRepository", 
-                conceptRepositoryMock);
+                "conceptService", 
+                conceptServiceMock);
         
         builder = RefsetRuleDto.getBuilder()
                 .id(-1)
@@ -108,25 +109,25 @@ public class RepositoryRefsetRuleServiceTest {
     }
     
     @Test
-    public void shouldCreateListRule() {
+    public void shouldCreateListRule() throws ConceptNotFoundException {
         RefsetRuleDto created = builder.build();
         
         ListConceptsRefsetRule persisted = new ListConceptsRefsetRule();
         persisted.setConcepts(concepts);
         
         when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(persisted);
-        when(conceptRepositoryMock.findBySerialisedId(1L)).thenReturn(c1);
-        when(conceptRepositoryMock.findBySerialisedId(2L)).thenReturn(c2);
-        when(conceptRepositoryMock.findBySerialisedId(3L)).thenReturn(c3);
+        when(conceptServiceMock.findBySerialisedId(1L)).thenReturn(c1);
+        when(conceptServiceMock.findBySerialisedId(2L)).thenReturn(c2);
+        when(conceptServiceMock.findBySerialisedId(3L)).thenReturn(c3);
 
         BaseRefsetRule returned = ruleService.create(created);
         assertTrue(returned instanceof ListConceptsRefsetRule);
         ArgumentCaptor<ListConceptsRefsetRule> refsetRuleArgument = ArgumentCaptor.forClass(ListConceptsRefsetRule.class);
         
         verify(refsetRuleRepositoryMock, times(1)).save(refsetRuleArgument.capture());
-        verify(conceptRepositoryMock, times(3)).findBySerialisedId(any(Long.class));
+        verify(conceptServiceMock, times(3)).findBySerialisedId(any(Long.class));
         verifyNoMoreInteractions(refsetRuleRepositoryMock);
-        verifyNoMoreInteractions(conceptRepositoryMock);
+        verifyNoMoreInteractions(conceptServiceMock);
         
         assertRefsetRule(created, refsetRuleArgument.getValue());
         assertEquals(persisted, returned);
@@ -173,7 +174,7 @@ public class RepositoryRefsetRuleServiceTest {
     }
     
     @Test
-    public void update() throws RefsetNotFoundException, RefsetRuleNotFoundException {
+    public void update() throws RefsetNotFoundException, RefsetRuleNotFoundException, ConceptNotFoundException {
         ListConceptsRefsetRule original = new ListConceptsRefsetRule();
         original.setConcepts(concepts);
         original.setId(REFSET_RULE_ID);
@@ -197,24 +198,24 @@ public class RepositoryRefsetRuleServiceTest {
         updated.setId(REFSET_RULE_ID);
 
         when(refsetRuleRepositoryMock.findOne(updatedDto.getId())).thenReturn(original);
-        when(conceptRepositoryMock.findBySerialisedId(uc1.getSerialisedId())).thenReturn(uc1);
-        when(conceptRepositoryMock.findBySerialisedId(uc2.getSerialisedId())).thenReturn(uc2);
-        when(conceptRepositoryMock.findBySerialisedId(uc3.getSerialisedId())).thenReturn(uc3);        
+        when(conceptServiceMock.findBySerialisedId(uc1.getSerialisedId())).thenReturn(uc1);
+        when(conceptServiceMock.findBySerialisedId(uc2.getSerialisedId())).thenReturn(uc2);
+        when(conceptServiceMock.findBySerialisedId(uc3.getSerialisedId())).thenReturn(uc3);        
         when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(updated);
 
         ListConceptsRefsetRule returned = (ListConceptsRefsetRule) ruleService.update(updatedDto);
         
         verify(refsetRuleRepositoryMock, times(1)).findOne(updatedDto.getId());
         verify(refsetRuleRepositoryMock, times(1)).save(any(BaseRefsetRule.class));
-        verify(conceptRepositoryMock, times(3)).findBySerialisedId(any(Long.class));
+        verify(conceptServiceMock, times(3)).findBySerialisedId(any(Long.class));
         verifyNoMoreInteractions(refsetRuleRepositoryMock);
-        verifyNoMoreInteractions(conceptRepositoryMock);
+        verifyNoMoreInteractions(conceptServiceMock);
         
         assertRefsetRule(updatedDto, returned);
     }
     
     @Test(expected = RefsetRuleNotFoundException.class)
-    public void updateWhenRefsetRuleIsNotFound() throws RefsetRuleNotFoundException {
+    public void updateWhenRefsetRuleIsNotFound() throws RefsetRuleNotFoundException, ConceptNotFoundException {
         RefsetRuleDto updatedDto = builder.build();
         when(refsetRuleRepositoryMock.findOne(updatedDto.getId())).thenReturn(null);
         ruleService.update(updatedDto);

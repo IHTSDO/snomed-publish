@@ -6,6 +6,8 @@ import java.util.Locale;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -26,12 +28,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
+import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
+import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
+import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
+import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
+import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
+import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
 import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
 /**
@@ -58,6 +72,9 @@ public class RefsetController {
 
     @Resource
     private MessageSource messageSource;
+    
+    @PersistenceContext(unitName="hibernatePersistenceUnit")
+    EntityManager em;
 
     @PostConstruct
     public void init() {
@@ -81,7 +98,13 @@ public class RefsetController {
             Principal principal, @PathVariable String pubId) {
 //        model.addAttribute("user",
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        model.addAttribute("refset", refsetService.findByPublicId(pubId));
+
+        Refset refset = refsetService.findByPublicId(pubId);
+        
+        //refset.setRefsetPlan(dummyRefsetPlan());
+        
+        //model.addAttribute("rules", refset.getPlan().getRules());
+        model.addAttribute("refset", refset);
         return new ModelAndView("/refset/refset", model);
     }
 
@@ -108,11 +131,44 @@ public class RefsetController {
         Refset refset = refsetService.findByPublicId(pubId);
         model.addAttribute("pubid", pubId);
         model.addAttribute("storedRefset", refset);
+        //initDummyPlan(refset);
+
 //        model.addAttribute("user",
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         return new ModelAndView("/refset/edit.refset", "refset", new RefsetDto(
                 refset.getId(), refset.getConcept().getSerialisedId(), refset.getPublicId(), refset.getTitle(),
                 refset.getDescription()));
+    }
+    
+    private void initDummyPlan(Refset refset){
+        Concept cc1 = new Concept(184933002L);
+        Concept cc2 = new Concept(210009005L);
+        Concept cc3 = new Concept(104641002L);
+        Concept cc4 = new Concept(118831003L);
+        Concept cc5 = new Concept(305101000L);
+        Concept cc6 = new Concept(321987003L);
+        
+        ListConceptsRefsetRule listRuleLeft = new ListConceptsRefsetRule();
+//        listRuleLeft.setId(-1L);
+        listRuleLeft.addConcept(cc1);
+        listRuleLeft.addConcept(cc2);
+        listRuleLeft.addConcept(cc3);
+        
+        ListConceptsRefsetRule listRuleRight = new ListConceptsRefsetRule();
+//        listRuleRight.setId(-2L);
+        listRuleRight.addConcept(cc4);
+        listRuleRight.addConcept(cc5);
+        listRuleRight.addConcept(cc6);
+        
+        UnionRefsetRule unionRule = new UnionRefsetRule();
+//        unionRule.setId(-3L);
+        unionRule.setLeftRule(listRuleLeft);
+        unionRule.setRightRule(listRuleRight);
+        
+        RefsetPlan plan = RefsetPlan.getBuilder(unionRule).build();
+        refset.setPlan(plan);
+        em.merge(refset);
+        em.flush();
     }
 
     // DELETE
@@ -138,7 +194,7 @@ public class RefsetController {
     public ModelAndView ceateRefset(ModelMap model, HttpServletRequest request,
             Principal principal,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException {
+            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException, RefsetNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
 //        model.addAttribute("user",
@@ -152,7 +208,8 @@ public class RefsetController {
         if (result.hasErrors()) {
             return new ModelAndView("/refset/new.refset");
         }
-        try {
+        try {            
+            addDummyData(refsetDto);
             Refset created = refsetService.create(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
             return new ModelAndView("redirect:/refsets");
@@ -160,6 +217,45 @@ public class RefsetController {
             result.addError(createFieldError(refsetDto, result));
             return new ModelAndView("/refset/new.refset");
         }
+    }
+
+    private void addDummyData(RefsetDto refsetDto) {
+        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
+        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
+        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
+        
+        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
+        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
+        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
+        
+        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
+                .id(-1L)
+                .type(RuleType.LIST)
+                .add(c1).add(c2).add(c3)
+                .build();
+        
+        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
+                .id(-2L)
+                .add(c4).add(c5).add(c6)
+                .type(RuleType.LIST)
+                .build();
+        
+        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
+                .id(-3L)
+                .type(RuleType.UNION)
+                .left(listRuleDtoLeft.getId())
+                .right(listRuleDtoRight.getId())
+                .build();
+        
+        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
+               .terminal(unionRuleDto.getId())
+               .id(-1L)
+               .add(listRuleDtoLeft)
+               .add(listRuleDtoRight)
+               .add(unionRuleDto)
+               .build();
+        
+        refsetDto.setPlan(plan);
     }
 
     // UPDATE
@@ -170,7 +266,7 @@ public class RefsetController {
             HttpServletRequest request, Principal principal,
             RedirectAttributes attributes, @PathVariable String pubId,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException {
+            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
         // TODO: Handle RefsetNotFoundException
         LOG.debug("Controller received request to update refset [{}]",
                 refsetDto.toString());

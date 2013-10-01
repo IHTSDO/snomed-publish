@@ -42,6 +42,26 @@ form.delete{
     margin-bottom: 0.25em;
 }
 
+/***********
+ * Refset  *
+************/
+#rules{
+    font-family: museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}
+
+#rules .row{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+a.btn.bottom{
+    margin-top: 2em;
+}
+
+h2.plan{
+    margin-top: 1em;
+}
+
 /***************
  * Refset Edit *
 ***************/

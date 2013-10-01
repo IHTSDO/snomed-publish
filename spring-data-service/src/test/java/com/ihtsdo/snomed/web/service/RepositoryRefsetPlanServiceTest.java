@@ -29,6 +29,7 @@ import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
@@ -157,7 +158,7 @@ public class RepositoryRefsetPlanServiceTest {
     }
 
     @Test
-    public void create() throws UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException {
+    public void create() throws UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException {
         RefsetPlan persisted = refsetPlan;
         RefsetPlanDto created = refsetPlanDto;
         when(refsetPlanRepositoryMock.save(any(RefsetPlan.class))).thenReturn(persisted);        
@@ -219,7 +220,7 @@ public class RepositoryRefsetPlanServiceTest {
     }
     
     @Test
-    public void update() throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException {
+    public void update() throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException {
         ConceptDto c11 = ConceptDto.getBuilder().id(11L).build();
         ConceptDto c12 = ConceptDto.getBuilder().id(12L).build();
         ConceptDto c13 = ConceptDto.getBuilder().id(13L).build();
@@ -309,13 +310,13 @@ public class RepositoryRefsetPlanServiceTest {
     }
     
     @Test(expected = RefsetPlanNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException {
+    public void updateWhenRefsetIsNotFound() throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException {
         RefsetPlanDto updatedDto = refsetPlanDto;
         when(refsetPlanRepositoryMock.findOne(updatedDto.getId())).thenReturn(null);
         planService.update(updatedDto);
     }
 
-    private void assertRefsetPlan(RefsetPlanDto expected, RefsetPlan actual) {
+    public static void assertRefsetPlan(RefsetPlanDto expected, RefsetPlan actual) {
         RefsetPlanDto parsedActual = RefsetPlanDto.parse(actual);
         assertTrue(
                 (Objects.equal(expected.getRefsetRules(), parsedActual.getRefsetRules())) &&

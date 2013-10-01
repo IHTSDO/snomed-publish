@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Sets;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
@@ -55,7 +56,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
     
     @Override
     @Transactional(rollbackFor = {RefsetPlanNotFoundException.class})
-    public RefsetPlan update(RefsetPlanDto updated) throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException{
+    public RefsetPlan update(RefsetPlanDto updated) throws RefsetPlanNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException{
         LOG.debug("Updating refset plan with information: " + updated);
         RefsetPlan plan = refsetPlanRepository.findOne(updated.getId());
         if (plan == null) {
@@ -69,7 +70,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
 
     @Override
     @Transactional
-    public RefsetPlan create(RefsetPlanDto created) throws UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException {
+    public RefsetPlan create(RefsetPlanDto created) throws UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException {
         LOG.debug("Creating new refset plan [{}]", created.toString());
 
         RefsetPlan plan = new RefsetPlan();
@@ -92,7 +93,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
         return deleted;
     }  
     
-    private RefsetRule createRules(RefsetPlanDto planDto) throws UnconnectedRefsetRuleException, UnReferencedReferenceRuleException, RefsetRuleNotFoundException{
+    private RefsetRule createRules(RefsetPlanDto planDto) throws UnconnectedRefsetRuleException, UnReferencedReferenceRuleException, RefsetRuleNotFoundException, ConceptNotFoundException{
         LOG.debug("Creating rules for refset plan {}", planDto);
         Map<Long, RefsetRule> dtoIdToRuleMap = new HashMap<>();
         Map<Long, RefsetRuleDto> dtoIdToDtoMap = new HashMap<>();

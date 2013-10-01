@@ -38,9 +38,28 @@
         <span>$refset.publicId</span>
       </div>        
   </div>
-  <div class="row">
-     <div class="col-lg-2">
-         <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>   
-     </div>
+  
+  <!-- Display refset plan -->
+  <h2 class="plan">Plan</h2>
+  <div id="rules">
+    #foreach( $rule in $refset.plan.rules )
+    <div class="row">
+      <div class="col-lg-1">Rule $rule.id</div>
+      <div class="col-lg-11">
+        #if( $rule.class.simpleName.equals("ListConceptsRefsetRule") )
+            ListConceptsRefsetRule $rule.conceptIds
+        #elseif( $rule.class.simpleName.equals("DifferenceRefsetRule"))
+            DifferenceRefsetRule [$rule.id]
+        #elseif( $rule.class.simpleName.equals("IntersectionRefsetRule"))                
+            IntersectionRefsetRule [$rule.id]
+        #elseif( $rule.class.simpleName.equals("SymmetricDifferenceRefsetRule"))
+            SymmetricDifferenceRefsetRule [$rule.id]
+        #elseif( $rule.class.simpleName.equals("UnionRefsetRule"))
+            Rule $rule.left.id <strong>Union</strong> Rule $rule.right.id
+        #end
+      </div>
+    </div>
+    #end
   </div>
+  <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
 </div>

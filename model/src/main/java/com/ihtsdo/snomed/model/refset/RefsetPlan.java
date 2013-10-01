@@ -2,7 +2,9 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.beans.Transient;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -22,6 +24,9 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
@@ -35,6 +40,8 @@ import com.ihtsdo.snomed.model.Concept;
 //uniqueConstraints = @UniqueConstraint(columnNames = {"publicId"})
 )
 public class RefsetPlan {
+    private static final Logger LOG = LoggerFactory.getLogger(RefsetPlan.class);
+
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long id;
@@ -69,6 +76,30 @@ public class RefsetPlan {
             throw new ConceptsCacheNotBuiltException("Build the cache before calling getConcepts");
         }
         return concepts;
+    }
+    
+    @Transient
+    public List<RefsetRule> getRules(){
+        if (terminal != null){
+            CollectRulesVisitor visitor = new CollectRulesVisitor();
+            terminal.accept(visitor);
+            LOG.debug("Found {} Rules", visitor.getRules().size());
+            return visitor.getRules();
+        }
+        return new ArrayList<>();
+    }
+    
+    private static class CollectRulesVisitor implements Visitor{
+        private List<RefsetRule> rules = new ArrayList<>();
+
+        @Override
+        public void visit(RefsetRule rule) {
+            rules.add(rule);
+        }
+        
+        public List<RefsetRule> getRules(){
+            return rules;
+        }
     }
     
     @Override
