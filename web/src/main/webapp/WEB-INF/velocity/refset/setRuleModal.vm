@@ -1,0 +1,33 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h4>$title</h4>
+    </div>
+    <div class="modal-body">
+      <div class="container">
+        <div class="row set-operation">
+          <div class="col-lg-3 left">
+            {{view Ember.Select contentBinding="controllers.plan.model" 
+                                selectionBinding="model.left" 
+                                optionLabelPath="content.displayName" 
+                                prompt="Select rule"
+                                optionValuePath="content.id"}}
+          </div>
+          <div class="col-lg-2 operand">{{model.type}}</div>
+          <div class="col-lg-3 right">
+            {{view Ember.Select contentBinding="controllers.plan.model" 
+                                selectionBinding="model.right" 
+                                optionLabelPath="content.displayName"
+                                prompt="Select rule" 
+                                optionValuePath="content.id"}}
+          </div>
+        </div><!-- row -->
+      </div><!-- container -->
+    </div><!-- /.modal-body -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+      <button type="button" data-dismiss="modal" {{action 'saverule'}} class="btn btn-primary btn-sm">Save changes</button>
+    </div>    
+  </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

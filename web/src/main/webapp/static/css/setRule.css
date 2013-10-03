@@ -1,0 +1,13 @@
+.set-operation .operand{
+    text-align: center;
+    float: left;
+}
+
+.set-operation select{
+    float: left;
+    width: 8em;
+}
+
+.set-operation .modal-body{
+    padding: 2em 0 1em 0;
+}

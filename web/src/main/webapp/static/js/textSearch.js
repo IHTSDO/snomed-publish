@@ -11,6 +11,7 @@ TextSearch.ApplicationController = Ember.Controller.extend({
 
 TextSearch.Router.map(function() {
   this.route("index", {path: "/"});
+  this.resource("textsearch-output", { path: '/' });
 });
 
 TextSearch.TextSearchView = Ember.View.extend({

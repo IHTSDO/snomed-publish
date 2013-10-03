@@ -7,10 +7,11 @@
         <h4 class="modal-textSearch-title">#springMessage('modal.title.concept.search')</h4>
       </div>
       <div class="modal-body">
-        <div id="textSearchTemplate" /> <!-- Attach modal here using JS referencing this ID -->
-        <script type="text/x-handlebars">
+        <div id="textSearchTemplate">
+          <script type="text/x-handlebars" data-template-name="textsearch-output">
             {{render "textSearch"}}
         </script>
+        </div>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

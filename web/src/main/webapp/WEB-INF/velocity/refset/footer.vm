@@ -47,6 +47,12 @@
 <script src="https://cdn.firebase.com/v0/firebase.js"></script>
 <script src="http://firebase.github.io/togetherjs/togetherjs.js"></script>
 
+
+<!-- Ember Console Tools -->
+<!-- https://github.com/ebryn/ember-console-utils -->
+<script src="/static/js/libs/ember-console-utils.js"></script>
+
+
 <!-- SNOMED MODULES -->
 
 <!-- Application -->
