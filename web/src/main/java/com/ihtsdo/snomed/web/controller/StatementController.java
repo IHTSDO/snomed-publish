@@ -78,7 +78,7 @@ public class StatementController {
         model.addAttribute("ontologies", ontologyService.getAll());
         model.addAttribute("ontologyId", ontologyId);
         if (o.getSource().equals(Source.RF2)){
-            return new ModelAndView("statement.rf2");
+            return new ModelAndView("statement");
         }else {
             throw new InvalidInputException("Only RF2 ontologies supports this view");
         }

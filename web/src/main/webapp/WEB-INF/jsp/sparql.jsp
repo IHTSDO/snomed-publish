@@ -59,7 +59,7 @@
   </div>
 
     
-    <form:form method="post" action="sparql" modelAttribute="sparql">
+    <form:form method="post" action="/" modelAttribute="sparql">
       <h2><form:label path="query">Enter SPARQL Query</form:label></h2>
       <div class="input"><form:textarea path="query" rows="10" cols="100"/></div>
       
@@ -149,17 +149,17 @@
                   <c:choose>
                     <c:when test="${b.isConcept()}">
                       <div class="concept binding">
-                        <a href="concept/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getDisplayName()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="http://browser.snomedtools.com/version/1/concept/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getDisplayName()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isStatement()}">
                       <div class="statement concept binding">
-                        <a href="statement/<c:url value="${o.getSerialisedId()}"/>">Statement</a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="http://browser.snomedtools.com/version/1/statement/<c:url value="${o.getSerialisedId()}"/>">Statement</a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isDescription()}">
                       <div class="description concept binding">
-                        <a href="description/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="http://browser.snomedtools.com/version/1/description/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isDatatype()}">
