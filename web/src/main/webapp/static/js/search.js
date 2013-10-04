@@ -1,7 +1,7 @@
 // APPLICATION
 // -----------
 
-TextSearch.IndexRoute = Ember.Route.extend({
+TextSearch.ApplicationRoute = Ember.Route.extend({
   setupController: function(controller, model) {
     this.controllerFor('pages').set('maxPageIndexesShown', 10);
   },
