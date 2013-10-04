@@ -6,10 +6,10 @@
 
 <div id="refset" class="new">
   <ol class="breadcrumb">
-    <li><a href='#springUrl("/refsets")'>Refsets</a></li>
+    <li><a href='#springUrl("/refsets/")'>Refsets</a></li>
     <li class="active">New Refset</li>
   </ol>
-  <form role="form" method="post" action='#springUrl("/refset/new")'>
+  <form role="form" method="post" action='#springUrl("/refsets/refset/new")'>
     #parse('refset/edit.refset.inputs.vm')
     <div class="form-actions">
       <button type="submit" class="btn btn-sm btn-primary bottom">#springMessage('button.refset.create')</button>

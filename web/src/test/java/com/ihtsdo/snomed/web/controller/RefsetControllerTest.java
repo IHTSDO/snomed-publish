@@ -141,7 +141,7 @@ public class RefsetControllerTest {
     public void shouldGetAllRefsets() throws Exception{
         when(refsetServiceMock.findAll()).thenReturn(Arrays.asList(r1, r2));
         
-        mockMvc.perform(get("/refsets")
+        mockMvc.perform(get("/refsets/")
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
@@ -180,7 +180,7 @@ public class RefsetControllerTest {
     @Test
     public void shouldGetSpecificRefset() throws Exception{
         when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r1);
-        mockMvc.perform(get("/refset/" + r1.getPublicId())
+        mockMvc.perform(get("/refsets/refset/" + r1.getPublicId())
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
@@ -202,7 +202,7 @@ public class RefsetControllerTest {
     
     @Test
     public void shouldDisplayNewRefsetPage() throws Exception{
-        mockMvc.perform(get("/refset/new")
+        mockMvc.perform(get("/refsets/refset/new")
             .with(SecurityRequestPostProcessors.createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isOk())
@@ -217,12 +217,12 @@ public class RefsetControllerTest {
     public void shouldDeleteRefset() throws Exception{
         when(refsetServiceMock.delete(any(String.class))).thenReturn(r1);
         
-        mockMvc.perform(post("/refset/pub1/delete")
+        mockMvc.perform(post("/refsets/refset/pub1/delete")
             .with(SecurityRequestPostProcessors
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets"))
+            .andExpect(view().name("redirect:/refsets/"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Deleted refset pub1: title1")));
 
@@ -234,7 +234,7 @@ public class RefsetControllerTest {
     public void shouldDisplayEditRefsetPage() throws Exception{
         when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r1);
         
-        mockMvc.perform(get("/refset/pub1/edit")
+        mockMvc.perform(get("/refsets/refset/pub1/edit")
             .with(SecurityRequestPostProcessors
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
@@ -262,7 +262,7 @@ public class RefsetControllerTest {
         when(refsetServiceMock.create(any(RefsetDto.class))).thenReturn(r1);
         RefsetDto refsetDto = RefsetTestUtil.createDto(1L, 1234l, "pub2", "title2", "description2");
 
-        mockMvc.perform(post("/refset/new")
+        mockMvc.perform(post("/refsets/refset/new")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
@@ -275,7 +275,7 @@ public class RefsetControllerTest {
                 .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets"))
+            .andExpect(view().name("redirect:/refsets/"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Added refset pub1: title1")));
         
@@ -290,7 +290,7 @@ public class RefsetControllerTest {
         when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
         RefsetDto refsetDto = RefsetTestUtil.createDto(1L, 1234l, "pub2", "title2", "description2");
         
-        mockMvc.perform(post("/refset/pub1/edit")
+        mockMvc.perform(post("/refsets/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
@@ -303,7 +303,7 @@ public class RefsetControllerTest {
                 .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refset/" + r2.getPublicId()))
+            .andExpect(view().name("redirect:/refsets/refset/" + r2.getPublicId()))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Updated refset pub2: title2")));
         
@@ -317,7 +317,7 @@ public class RefsetControllerTest {
     @Test public void failOnExistingPublicIdOnCreate() throws Exception{
         when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r1);
 
-        mockMvc.perform(post("/refset/new")
+        mockMvc.perform(post("/refsets/refset/new")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)
@@ -339,7 +339,7 @@ public class RefsetControllerTest {
     @Test public void failOnExistingPublicIdOnUpdate() throws Exception{
         when(refsetServiceMock.findByPublicId(any(String.class))).thenReturn(r2);
         when(refsetServiceMock.findById(any(Long.class))).thenReturn(r1);
-        mockMvc.perform(post("/refset/pub1/edit")
+        mockMvc.perform(post("/refsets/refset/pub1/edit")
                 .with(SecurityRequestPostProcessors
                             .createUserDetailsRequestPostProcessor("bob")
                             .userDetailsService(openIdUserDetailsService)

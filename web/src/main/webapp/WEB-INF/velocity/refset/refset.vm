@@ -3,7 +3,7 @@
 #parse('refset/alert.vm')
 <div id="refset">
   <ol class="breadcrumb">
-    <li><a href='#springUrl("/refsets")'>Refsets</a></li>
+    <li><a href='#springUrl("/refsets/")'>Refsets</a></li>
     <li class="active">$refset.publicId</li>
   </ol>
   <div class="row">
@@ -61,5 +61,5 @@
     </div>
     #end
   </div>
-  <a href='#springUrl("/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
+  <a href='#springUrl("/refsets/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
 </div>

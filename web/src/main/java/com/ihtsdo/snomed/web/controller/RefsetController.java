@@ -202,7 +202,7 @@ public class RefsetController {
 
         addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED, deleted.getPublicId(), deleted.getTitle());
 
-        return new ModelAndView("redirect:/refsets");
+        return new ModelAndView("redirect:/refsets/");
     }
 
     // CREATE
@@ -230,7 +230,7 @@ public class RefsetController {
             addDummyData(refsetDto);
             Refset created = refsetService.create(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
-            return new ModelAndView("redirect:/refsets");
+            return new ModelAndView("redirect:/refsets/");
         } catch (NonUniquePublicIdException e) {
             result.addError(createFieldError(refsetDto, result));
             return new ModelAndView("/refset/new.refset");
@@ -309,7 +309,7 @@ public class RefsetController {
         try {
             Refset updated = refsetService.update(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED, updated.getPublicId(), updated.getTitle());
-            return new ModelAndView("redirect:/refset/" + updated.getPublicId());
+            return new ModelAndView("redirect:/refsets/refset/" + updated.getPublicId());
         } catch (NonUniquePublicIdException e) {
             //defensive coding
             result.addError(createFieldError(refsetDto, result));

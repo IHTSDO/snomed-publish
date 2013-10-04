@@ -6,10 +6,10 @@
   #foreach($refset in $refsets)
     <div class="row">
       <div class="col-lg-6">
-        <a href='#springUrl("/refset/$refset.publicId")'>$refset.title</a>       
+        <a href='#springUrl("refset/$refset.publicId")'>$refset.title</a>       
       </div>
       <div class="col-lg-6">
-        <form class="delete pubid-$refset.publicId" role="form" method="post" action='#springUrl("/refset/$refset.publicId/delete")'>
+        <form class="delete pubid-$refset.publicId" role="form" method="post" action='#springUrl("/refsets/refset/$refset.publicId/delete")'>
           <button 
             type="button" 
             class="btn btn-danger btn-xs"
@@ -26,7 +26,7 @@
   #end
   <div class="row">
      <div class="col-lg-2">
-         <a href='#springUrl("/refset/new")' class="btn btn-sm btn-primary bottom">#springMessage('button.refsets.create')</a>   
+         <a href='#springUrl("refset/new")' class="btn btn-sm btn-primary bottom">#springMessage('button.refsets.create')</a>   
      </div>
   </div>
 </div>
