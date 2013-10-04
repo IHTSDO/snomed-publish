@@ -29,7 +29,7 @@
       </div>
       <div class="toggle-find-concept selected $selected-status">
           <div class="col-lg-10">
-              <a id="concept-title" href="http://browser.snomedtools.com/version/20130731/concept/$!storedRefset.concept.id" target="_blank">$!storedRefset.concept.displayName</a>                
+              <a id="concept-title" href="http://browser.snomedtools.com/version/1/concept/$!storedRefset.concept.id" target="_blank">$!storedRefset.concept.displayName</a>                
           </div>
           <div class="col-lg-2">
               <a data-toggle="modal" href="#textSearchModal" class="btn btn-default btn-sm change">Change Concept</a>            

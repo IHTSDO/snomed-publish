@@ -5,12 +5,12 @@
 #set ($modals = ["textSearchModal.vm", "refset/plan.js.vm"])        
 <div id="refset" class="edit">
   <ol class="breadcrumb">
-    <li><a href='#springUrl("/refsets/")'>Refsets</a></li>
-    <li><a href='#springUrl("/refsets/refset/$pubid")'>$pubId</a></li>
+    <li><a href='../..'>Refsets</a></li>
+    <li><a href='#springUrl("../$pubid")'>$pubId</a></li>
     <li class="active">Update Refset</li>
   </ol>
   <div class="container">
-  <form role="form" method="post" action='#springUrl("/refsets/refset/$pubid/edit")'>
+  <form role="form" method="post" action='#springUrl("edit")'>
     #parse('refset/edit.refset.inputs.vm')
     <div class="form-actions">
       <button type="submit" class="btn btn-default btn-primary submit">#springMessage('button.refset.update')</button>

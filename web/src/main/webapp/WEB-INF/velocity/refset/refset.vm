@@ -3,7 +3,7 @@
 #parse('refset/alert.vm')
 <div id="refset">
   <ol class="breadcrumb">
-    <li><a href='#springUrl("/refsets/")'>Refsets</a></li>
+    <li><a href='#springUrl("..")'>Refsets</a></li>
     <li class="active">$refset.publicId</li>
   </ol>
   <div class="row">
@@ -11,7 +11,7 @@
         <label>#springMessage('label.field.refset.concept')</label>
       </div>
       <div class="col-lg-10">
-        <span><a href="http://browser.snomedtools.com/version/20130731/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
+        <span><a href="http://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
       </div>        
   </div>
   <div class="row">
@@ -61,5 +61,5 @@
     </div>
     #end
   </div>
-  <a href='#springUrl("/refsets/refset/$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
+  <a href='#springUrl("$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
 </div>
