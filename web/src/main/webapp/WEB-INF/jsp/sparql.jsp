@@ -12,7 +12,7 @@
   <title>Snomed SPARQL query</title>
   <meta name="description" content="Snomed browser">
   <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-  <link rel="stylesheet" href="/static/css/styles.css?v=1.0">
+  <link rel="stylesheet" href="http://browser.snomedtools.com/static/css/styles.css?v=1.0">
   <script type="text/javascript">
   function changeOntology(value) {
       var redirect;
@@ -40,7 +40,7 @@
 </head>
 <body id="sparql">
   <div id="company" class="clearfix">
-    <img class="logo" src="/static/img/logo.symbol.png"/>
+    <img class="logo" src="http://browser.snomedtools.com/static/img/logo.symbol.png"/>
     <h1>SNOMED Clinical Terms</h1>
     <div id="navigation">
       <div id="logout">
