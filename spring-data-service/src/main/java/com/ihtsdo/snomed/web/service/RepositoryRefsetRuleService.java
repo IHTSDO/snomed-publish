@@ -24,7 +24,6 @@ import com.ihtsdo.snomed.web.repository.RefsetRuleRepository;
 
 /**
  * @see http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
  */
 @Service
 //@Scope(proxyMode=ScopedProxyMode.TARGET_CLASS)

@@ -8,7 +8,7 @@ TextSearch.ApplicationRoute = Ember.Route.extend({
   actions:{
     click: function(concept){
       $("#concept-title").text(concept.title);
-      $("#concept-title").attr('href', 'http://browser.sparklingideas.co.uk/ontology/1/concept/' + concept.id);
+      $("#concept-title").attr('href', 'http://browser.snomedtools.com/version/1/concept/' + concept.id);
       $("#concept-id").val(concept.id);
       var selected = $(".toggle-find-concept.selected");
       var notSelected = $(".toggle-find-concept.not-selected");

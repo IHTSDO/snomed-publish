@@ -25,9 +25,6 @@ import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Refset",
         indexes={@Index(name="refsetPublicIdIndex", columnNames={"publicId"})})

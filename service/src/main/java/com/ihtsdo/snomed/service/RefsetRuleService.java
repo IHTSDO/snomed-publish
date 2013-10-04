@@ -5,9 +5,6 @@ import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 public interface RefsetRuleService {
     public abstract BaseRefsetRule findById(Long id);
 

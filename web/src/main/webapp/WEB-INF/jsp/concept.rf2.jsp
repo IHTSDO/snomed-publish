@@ -33,7 +33,7 @@
 <script type="text/javascript">
 function changeOntology(value) {
     var redirect;
-    redirect = "/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
+    redirect = "/version/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
     document.location.href = redirect;
 }
 </script>
@@ -471,7 +471,7 @@ function changeOntology(value) {
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
+  ga('create', 'UA-21180921-2', 'snomedtools.com');
   ga('send', 'pageview');
 </script>
 </html>

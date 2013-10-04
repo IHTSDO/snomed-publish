@@ -53,9 +53,6 @@ import com.ihtsdo.snomed.web.service.security.OpenIdUserDetailsService;
 import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
-/**
- * @author Henrik Pettersen @ http://sparklingideas.co.uk
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {

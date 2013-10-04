@@ -69,8 +69,11 @@
   <script type="text/x-handlebars" data-template-name="listRuleSearch">
     <a {{action 'goconcepts' this}}>View Concepts</a>
     <h3>Search for Concepts</h3>
+    <div id="textSearchTemplate">
+      [{{render "textsearch"}}]
+    </div>
+  </script> 
 
-  </script>      
 
   <script type="text/x-handlebars" data-template-name="setRule">
     <div class="modal fade set-operation" id="unionRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">

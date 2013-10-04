@@ -29,7 +29,7 @@ public class SearchController {
     @PostConstruct
     public void init(){}
     
-    @RequestMapping(value="/ontology/{ontologyId}/search", method = RequestMethod.GET)
+    @RequestMapping(value="/version/{ontologyId}/search", method = RequestMethod.GET)
     public ModelAndView searchPage(ModelMap model, HttpServletRequest request, 
             @PathVariable long ontologyId, Principal principal)
     {   

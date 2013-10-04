@@ -44,7 +44,7 @@ public class SparqlController {
     @PostConstruct
     public void init(){}
     
-    @RequestMapping(value="/ontology/{ontologyId}/sparql", method = RequestMethod.POST)
+    @RequestMapping(value="/version/{ontologyId}/sparql", method = RequestMethod.POST)
     public ModelAndView runSparqlQuery(ModelMap model, HttpServletRequest request, 
             @PathVariable long ontologyId, Principal principal,
             @ModelAttribute("sparql") SparqlQueryFormObject query) 
@@ -71,15 +71,15 @@ public class SparqlController {
         return 
               "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
               "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-              "PREFIX c: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/concept/rdfs/ >\n" +
-              "PREFIX d: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/description/rdfs >\n" +
-              "PREFIX s: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/rdfs/ >\n" +
-              "PREFIX sn: <http://browser.sparklingideas.co.uk/term/>\n" +
+              "PREFIX c: <http://snomedtools.info/snomed/version/" + ontologyId + "/concept/rdfs/ >\n" +
+              "PREFIX d: <http://snomedtools.info/snomed/version/" + ontologyId + "/description/rdfs >\n" +
+              "PREFIX s: <http://snomedtools.info/snomed/version/" + ontologyId + "/statement/rdfs/ >\n" +
+              "PREFIX sn: <http://snomedtools.info/snomed/term/>\n" +
               "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
               query; 
     }
     
-    @RequestMapping(value="/ontology/{ontologyId}/sparql", method = RequestMethod.GET)
+    @RequestMapping(value="/version/{ontologyId}/sparql", method = RequestMethod.GET)
     public ModelAndView displaySparqlQueryDialogue(ModelMap model, HttpServletRequest request, 
             @PathVariable long ontologyId, Principal principal) throws ConceptNotFoundException
     {
@@ -93,9 +93,9 @@ public class SparqlController {
         formObject.setQuery(
 //                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
 //                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-//                "PREFIX c: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/concept/>\n" +
-//                "PREFIX d: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/description/>\n" +
-//                "PREFIX s: <http://browser.sparklingideas.co.uk/ontology/" + ontologyId + "/statement/>\n\n" +
+//                "PREFIX c: <http://browser.snomedtools.com/ontology/" + ontologyId + "/concept/>\n" +
+//                "PREFIX d: <http://browser.snomedtools.com/ontology/" + ontologyId + "/description/>\n" +
+//                "PREFIX s: <http://browser.snomedtools.com/ontology/" + ontologyId + "/statement/>\n\n" +
 //                
                 "SELECT * WHERE {\n" +
                 " ?s ?p ?o\n" +

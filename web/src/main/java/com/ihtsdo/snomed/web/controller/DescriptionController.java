@@ -34,7 +34,7 @@ import com.ihtsdo.snomed.web.service.OntologyService;
 import com.ihtsdo.snomed.web.service.RdfService;
 
 @Controller
-@RequestMapping("/ontology/{ontologyId}/description")
+@RequestMapping("/version/{ontologyId}/description")
 @Transactional (value = "transactionManager", readOnly = true)
 public class DescriptionController {    
 

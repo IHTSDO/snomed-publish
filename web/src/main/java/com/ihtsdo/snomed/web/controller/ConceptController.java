@@ -116,7 +116,7 @@ public class ConceptController {
     }
     
     @Transactional
-    @RequestMapping(value="/ontology/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
+    @RequestMapping(value="/version/{ontologyId}/concept/{serialisedId}", method = RequestMethod.GET)
     public ModelAndView conceptDetails(
             ModelMap model,
             HttpServletRequest request,
@@ -465,7 +465,7 @@ public class ConceptController {
     }; 
     
     @Transactional
-    @RequestMapping(value = "/ontology/{ontologyId}/concept/json/{serialisedId}", 
+    @RequestMapping(value = "/version/{ontologyId}/concept/json/{serialisedId}", 
             method = RequestMethod.GET, 
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -477,7 +477,7 @@ public class ConceptController {
     }
     
     @Transactional
-    @RequestMapping(value = "/ontology/{ontologyId}/concept/xml/{serialisedId}", 
+    @RequestMapping(value = "/version/{ontologyId}/concept/xml/{serialisedId}", 
             method = RequestMethod.GET, 
             produces=MediaType.APPLICATION_XML_VALUE)
     @ResponseBody
@@ -489,7 +489,7 @@ public class ConceptController {
     }    
 
     @Transactional
-    @RequestMapping(value = "/ontology/{ontologyId}/concept/rdfs/{serialisedId}", 
+    @RequestMapping(value = "/version/{ontologyId}/concept/rdfs/{serialisedId}", 
             method = RequestMethod.GET, 
             produces=MediaType.APPLICATION_XML_VALUE)
     public void getConceptRdfsXml(@PathVariable long ontologyId, @PathVariable long serialisedId, 

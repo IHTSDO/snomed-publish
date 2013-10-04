@@ -39,7 +39,7 @@ public class OntologyController {
        
     }
     
-    @RequestMapping(value="/ontology/{ontologyId}", method = RequestMethod.GET)
+    @RequestMapping(value="/version/{ontologyId}", method = RequestMethod.GET)
     public ModelAndView ontologyDetails(@PathVariable long ontologyId, ModelMap model, HttpServletRequest request){            
         return new ModelAndView("redirect:" + ontologyId + "/concept/138875005");
  

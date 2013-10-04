@@ -67,7 +67,7 @@ TextSearch.TextSearchController.reopenClass({
   find: function(searchString, pageIndex, pageSize){
     return Ember.Deferred.promise(function(p) {
       var startIndex = (pageIndex - 1) * pageSize;
-      p.resolve($.getJSON("http://solr.sparklingideas.co.uk/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
+      p.resolve($.getJSON("http://solr.snomedtools.com/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
         .then(function(solr) {
             var returned = TextSearch.SearchResults.create();
             returned.set('total', solr.response.numFound);
@@ -144,7 +144,7 @@ TextSearch.Concept = Ember.Object.extend({
   active: null,
   effectiveTime: null,
   url: function(){
-    return "/ontology/" + this.ontologyId + "/concept/" + this.id;
+    return "/version/" + this.ontologyId + "/concept/" + this.id;
   }.property()
 });
 

@@ -18,7 +18,7 @@
         <security:openid-login
                 login-page="/auth/login" 
                 authentication-failure-url="/auth/login?error=true" 
-                default-target-url="/ontology/1/sparql">
+                default-target-url="/version/1/search">
         
           <security:attribute-exchange>
             <security:openid-attribute name="email" type="http://schema.openid.net/contact/email" required="true"/>

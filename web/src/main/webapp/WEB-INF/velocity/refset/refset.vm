@@ -11,7 +11,7 @@
         <label>#springMessage('label.field.refset.concept')</label>
       </div>
       <div class="col-lg-10">
-        <span><a href="http://browser.sparklingideas.co.uk/ontology/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
+        <span><a href="http://browser.snomedtools.com/version/20130731/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
       </div>        
   </div>
   <div class="row">

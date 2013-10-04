@@ -82,7 +82,7 @@
     },
     actions:{
       click: function(concept){
-        $.get("http://browser.sparklingideas.co.uk/ontology/1/concept/" + concept.id);
+        $.get("http://browser.snomedtools.com/version/1/concept/" + concept.id);
       }
     }
   });

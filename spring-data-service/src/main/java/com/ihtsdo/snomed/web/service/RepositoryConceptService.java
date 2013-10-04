@@ -16,9 +16,6 @@ import com.ihtsdo.snomed.web.repository.ConceptRepository;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 //@Transactional (value = "transactionManager", readOnly = true)
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @Service
 //@Scope(proxyMode=ScopedProxyMode.TARGET_CLASS)
 public class RepositoryConceptService implements com.ihtsdo.snomed.service.ConceptService {

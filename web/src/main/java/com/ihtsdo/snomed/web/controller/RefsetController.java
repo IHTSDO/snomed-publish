@@ -50,11 +50,8 @@ import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @Controller
-@RequestMapping("/")
+@RequestMapping("/refsets")
 @Transactional(value = "transactionManager")
 public class RefsetController {
     public static final String FEEDBACK_MESSAGE = "feedbackMessage";
@@ -86,7 +83,7 @@ public class RefsetController {
     
     // ALL
 
-    @RequestMapping(value = "/refsets", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
     public ModelAndView getRefsets(ModelMap model, HttpServletRequest request,
             Principal principal) {
 //        model.addAttribute("user",

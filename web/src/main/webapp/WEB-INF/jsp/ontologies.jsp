@@ -13,7 +13,7 @@
 <script type="text/javascript">
 function changeOntology(value) {
     var redirect;
-    redirect = "/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
+    redirect = "/version/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
     document.location.href = redirect;
 }
 </script>
@@ -34,9 +34,9 @@ function changeOntology(value) {
     <ul style="width: 100%; clear: both;" class="ontologies">
         <c:forEach var="o" items="${ontologies}">
             <li>
-                <span class="name"><a href="ontology/<c:out value='${o.getId()}'/>"><c:out value="${o.getName()}"/></a></span>
-                <span class="delete"><a href="ontology/<c:out value='${o.getId()}'/>/delete"/>delete</span></span>
-                <span class="delete"><a href="ontology/<c:out value='${o.getId()}'/>/export"/>export canonical form</span></span>
+                <span class="name"><a href="version/<c:out value='${o.getId()}'/>"><c:out value="${o.getName()}"/></a></span>
+                <span class="delete"><a href="version/<c:out value='${o.getId()}'/>/delete"/>delete</span></span>
+                <span class="delete"><a href="version/<c:out value='${o.getId()}'/>/export"/>export canonical form</span></span>
             </li>
         </c:forEach>
     </ul>

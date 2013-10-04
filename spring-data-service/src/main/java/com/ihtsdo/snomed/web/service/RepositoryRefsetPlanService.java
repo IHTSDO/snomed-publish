@@ -31,10 +31,6 @@ import com.ihtsdo.snomed.service.RefsetRuleService;
 import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.repository.RefsetPlanRepository;
 
-/**
- * @see http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @Service
 //@Scope(proxyMode=ScopedProxyMode.TARGET_CLASS)
 //@Transactional (value = "transactionManager", readOnly = true)

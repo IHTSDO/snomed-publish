@@ -25,9 +25,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.test.RefsetTestUtil;
 
-/**
- * @author Henrik Pettersen @ http://sparklingideas.co.uk
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { 
         "classpath:test-applicationContext.xml"})

@@ -47,10 +47,6 @@ import com.ihtsdo.snomed.web.repository.RefsetRepository;
 import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
-
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class,

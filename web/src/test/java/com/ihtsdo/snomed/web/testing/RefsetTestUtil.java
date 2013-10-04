@@ -7,7 +7,6 @@ import com.ihtsdo.snomed.model.refset.RefsetPlan;
 
 /**
  * An utility class which contains useful methods for unit testing person related functions.
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
  */
 public class RefsetTestUtil {
 

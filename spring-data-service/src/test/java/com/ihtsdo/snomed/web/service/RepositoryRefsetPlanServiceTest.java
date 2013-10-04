@@ -43,9 +43,6 @@ import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.repository.RefsetPlanRepository;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class,

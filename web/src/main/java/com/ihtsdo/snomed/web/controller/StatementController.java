@@ -40,7 +40,7 @@ import com.ihtsdo.snomed.web.service.OntologyService;
 import com.ihtsdo.snomed.web.service.RdfService;
 
 @Controller
-@RequestMapping("/ontology/{ontologyId}/triple")
+@RequestMapping("/version/{ontologyId}/triple")
 @Transactional (value = "transactionManager", readOnly = true)
 public class StatementController {
     private static final Logger LOG = LoggerFactory.getLogger( StatementController.class );

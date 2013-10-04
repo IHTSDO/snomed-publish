@@ -7,9 +7,6 @@ import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 
-/**
- * @author Henrik Pettersen / Sparkling Ideas (henrik@sparklingideas.co.uk)
- */
 public interface RefsetPlanService {
 
     public abstract RefsetPlan findById(Long id);

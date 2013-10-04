@@ -16,7 +16,7 @@
   <script type="text/javascript">
   function changeOntology(value) {
       var redirect;
-      redirect = "/ontology/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
+      redirect = "/version/" + value + "/concept/<c:out value='${concept.getSerialisedId()}' />";
       document.location.href = redirect;
   }
   </script>
@@ -26,14 +26,14 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
   
-    ga('create', 'UA-21180921-2', 'sparklingideas.co.uk');
+    ga('create', 'UA-21180921-2', 'snomedtools.com');
     ga('send', 'pageview');
   
   </script>
   <script type="text/javascript">
   function changeOntology(value) {
       var redirect;
-      redirect = "/ontology/" + value + "/sparql";
+      redirect = "/version/" + value + "/sparql";
       document.location.href = redirect;
   }
   </script>  
@@ -76,19 +76,19 @@
           </tr>
           <tr>
               <td>c</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/concept/rdfs/</td>
+              <td>http://snomedtools.info/version/1/concept/rdfs/</td>
           </tr>
           <tr>
               <td>d</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/description/rdfs/</td>
+              <td>http://snomedtools.info/version/1/description/rdfs/</td>
           </tr>
           <tr>
               <td>s</td>
-              <td>http://snomed.sparklingideas.co.uk/ontology/1/statement/rdfs/</td>
+              <td>http://snomedtools.info/version/1/statement/rdfs/</td>
           </tr>
           <tr>
             <td>sn</td>
-            <td>http://snomed.sparklingideas.co.uk/term/</td>
+            <td>http://snomedtools.info/term/</td>
           </tr>
           <tr>
             <td>xsd</td>
