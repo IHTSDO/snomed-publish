@@ -1,7 +1,7 @@
 server {
 
         listen 80;
-        server_name solr.sparklingideas.co.uk;
+        server_name solr.snomedtools.com;
         root /opt/solr/example/solr-webapp/webapp;
         rewrite ^/solr(.*)$ $1 last;
         location / {
