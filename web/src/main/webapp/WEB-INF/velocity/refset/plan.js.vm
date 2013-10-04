@@ -1,40 +1,21 @@
 <script type="text/javascript">
 
+//APP
+
   MyApp = Ember.Application.create({
-    rootElement: '#planTemplate'
+    rootElement: '#plan',
+    LOG_TRANSITIONS: true
   });
 
   MyApp.Router.map(function() {
     this.route("index", {path: "/"});
     this.resource("plan", {path: '/'});
-    
   });
 
-  
-  MyApp.RuleController = Ember.Controller.extend({
-    model: null,
-    isList: function(){
-      return (this.get('model.type') === "LIST");
-    }.property('type'),
-    isUnion: function(){
-      return (this.get('model.type') === "UNION");
-    }.property('type'),
-    isDifference: function(){
-      return (this.get('model.type') === "DIFFERENCE");
-    }.property('type'),
-    isIntersection: function(){
-      return (this.get('model.type') === "INTERSECTION");
-    }.property('type'),
-    isSymDifference: function(){
-      return (this.get('model.type') === "SYMMETRIC");
-    }.property('type')
-  });
-  
-  MyApp.RuleView = Ember.View.extend({
-    templateName: 'rule',
-  });  
-    
-  
+
+
+//MODELS  
+
   MyApp.RuleModel = Ember.Object.extend({
     id: 0,
     type: "",
@@ -49,7 +30,11 @@
   MyApp.Concept = Ember.Object.extend({
     id: null,
     displayName: null
-  })
+  })  
+
+
+
+//DYNAMICALLY GENERATED WITH VELOCITY
 
   rules = Ember.A();
   #foreach($rule in ${refset.plan.refsetRules})
@@ -72,12 +57,27 @@
     rules.pushObject(rule);
   }
   #end
-  
+
+
+
+
+//PLAN
+
   MyApp.PlanController = Ember.Controller.extend({
     appName: 'Refset Plan',
     model: rules,
     counter: -1,
+    showConcepts: false,
+    showPlan: true,
     actions:{
+      showPlan: function(){
+        this.set('showConcepts', false);
+        this.set('showPlan', true);
+      },
+      showConcepts: function(){
+        this.set('showConcepts', true);
+        this.set('showPlan', false);
+      }, 
       unionRule: function(){
         console.log('new union rule')
         var newRule = MyApp.RuleModel.create();
@@ -113,19 +113,80 @@
         this.set('counter', this.get('counter') - 1);
         this.get('controllers.setRule').set('model', newRule);
         return false;
+      },
+      listRule: function(){
+        console.log('new list rule');
+        var newRule = MyApp.RuleModel.create();
+        newRule.set('type', 'LIST');
+        newRule.set('id', this.get('counter'));
+        var c1 = MyApp.Concept.create();
+        var c2 = MyApp.Concept.create();
+        var c3 = MyApp.Concept.create();
+        c1.set('id', 321987003);
+        c2.set('id', 441519008);
+        c3.set('id', 128665000);
+        newRule.set('concepts', [c1, c2, c3]);
+        this.set('counter', this.get('counter') - 1);
+        this.get('controllers.listRule').set('model', newRule);
+        return false;
       }
     },
-    needs: ["setRule"]
+    needs: ["setRule", "listRule"]
   });
 
   MyApp.PlanView = Ember.View.extend({
     templateName: 'plan'
-  });  
+  });
+
+
+
+// LIST RULE MODAL
   
+  MyApp.ListRuleController = Ember.Controller.extend({
+    model: null,
+    needs: "plan",
+    isSearching: false,
+    actions:{
+      gosearch: function(){
+        this.set('isSearching', true);
+        return false;
+      },
+      goconcepts: function(){
+        this.set('isSearching', false);
+        return false;
+      },      
+      save: function(){
+        this.get('controllers.plan.model').pushObject(this.get('model'));        
+        return false;
+      }
+     }    
+  });
+
+  MyApp.ListRuleRoute = Ember.Controller.extend({
+    renderTemplate: function(){
+      console.log('I need to be here');
+    }
+  })
+
+  MyApp.ListRuleView = Ember.View.extend({
+      templateName: 'listRule',
+      
+      conceptsView: Ember.View.extend({
+        templateName: 'listRuleConcepts'
+      }),
+      searchView: Ember.View.extend({
+        templateName: 'listRuleSearch'
+      })
+  });
+
+
+//SET RULE MODALS
+
   MyApp.SetRuleController = Ember.Controller.extend({
     model: null,
     appName: 'Set Rule',
     needs: "plan",
+
     actions:{
       saverule: function(){
         this.set('model.left', this.get('model.left.id'));
@@ -139,5 +200,31 @@
   MyApp.SetRuleView = Ember.View.extend({
       templateName: 'setRule'
   });
+
+
+
+// DISPLAY RULE
   
+  MyApp.RuleController = Ember.Controller.extend({
+    model: null,
+    isList: function(){
+      return (this.get('model.type') === "LIST");
+    }.property('type'),
+    isUnion: function(){
+      return (this.get('model.type') === "UNION");
+    }.property('type'),
+    isDifference: function(){
+      return (this.get('model.type') === "DIFFERENCE");
+    }.property('type'),
+    isIntersection: function(){
+      return (this.get('model.type') === "INTERSECTION");
+    }.property('type'),
+    isSymDifference: function(){
+      return (this.get('model.type') === "SYMMETRIC");
+    }.property('type')
+  });
+  
+  MyApp.RuleView = Ember.View.extend({
+    templateName: 'rule',
+  });  
 </script>

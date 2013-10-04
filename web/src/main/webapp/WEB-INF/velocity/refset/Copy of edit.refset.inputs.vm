@@ -7,69 +7,34 @@
   #[[
   
   <script type="text/x-handlebars" data-template-name="plan" >
-
-  <div class="clearfix">    
-    {{#if showConcepts}}
-      <a {{action 'showPlan'}}>Edit Plan</a>
-      <h2 class="plan">Concepts</h2>
-    {{/if}}
-    {{#if showPlan}}
-      <a {{action 'showConcepts'}}>Show Concepts</a>
-      <h2 class="plan">Plan</h2>
-      ]]#
-      #parse('refset/edit.refset.rules.menu.vm')
-      #[[
-      {{#each rule in model}}
-        {{render "rule" rule}}
-      {{/each}}
-    {{/if}}
-  </div>
+    ]]#
+    #parse('refset/edit.refset.rules.menu.vm')
+    #[[
+    {{#each rule in model}}
+      {{render "rule" rule}}
+    {{/each}}
     
     {{render "setRule"}}
-    {{render 'listRule'}}
+
+    {{render "listRule"}}
   </script>
 
   <script type="text/x-handlebars" data-template-name="listRule">
-    <div class="modal fade set-operation" id="listRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4>List Concepts</h4>
-          </div>
-          <div class="modal-body">
-          <div class="container">
             
-            
+            ListRule
+            {{outlet}}
 
-            {{#if isSearching}}
-              {{view view.searchView}}
-            {{else}}
-              {{view view.conceptsView}}
-            {{/if}}            
 
-          </div><!-- container -->
-        </div><!-- /.modal-body -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="button" data-dismiss="modal" {{action 'save'}} class="btn btn-primary btn-sm">Save changes</button>
-        </div>    
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
   </script>
 
   <script type="text/x-handlebars" data-template-name="listRuleConcepts">
-    <a {{action 'gosearch' this}}>Search for Concepts</a>
-    <h3>Concepts</h3>
-    {{#each concept in model.concepts}}
-      {{concept.id}}, 
-    {{/each}}
+    {{#linkTo 'listRule.search'}}listRuleSearch{{/linkTo}}
+    concepts
   </script>
 
   <script type="text/x-handlebars" data-template-name="listRuleSearch">
-    <a {{action 'goconcepts' this}}>View Concepts</a>
-    <h3>Search for Concepts</h3>
-
+    {{#linkTo 'listRule.concepts'}}listRuleConcept{{/linkTo}}
+    search
   </script>      
 
   <script type="text/x-handlebars" data-template-name="setRule">

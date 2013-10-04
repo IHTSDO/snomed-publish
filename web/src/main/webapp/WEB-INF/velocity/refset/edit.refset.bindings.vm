@@ -1,0 +1,19 @@
+  #springFormHiddenInput("refset.plan.id")
+    <div id="bindings">
+      #set ($count = 0)
+      #foreach($rule in ${refset.plan.refsetRules})
+        #springBind("refset.plan.refsetRules[$count]")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].id")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].type")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].left")
+        #springFormHiddenInput("refset.plan.refsetRules[$count].right")
+        
+        #set ($concept_counter = 0)
+        #foreach($concept in $rule.concepts)
+            #springFormHiddenInput("refset.plan.refsetRules[$count].concepts[$concept_counter].id")
+            #springFormHiddenInput("refset.plan.refsetRules[$count].concepts[$concept_counter].displayName")
+            #set($concept_counter = $concept_counter + 1)
+        #end  
+        #set ($count = $count + 1)
+      #end
+    </div>

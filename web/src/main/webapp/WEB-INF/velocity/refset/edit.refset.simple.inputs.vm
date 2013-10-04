@@ -1,0 +1,86 @@
+<div id="primary-attr" class="clearfix">
+  #springFormHiddenInput("refset.id")
+  
+  #springBind("refset.concept")
+  #set ($state="")
+  #if ($status.error)
+    #set ($state="has-error")
+  #end
+  <div class="form-group $!state concept">
+    <label for="concept">#springMessage('label.field.refset.concept')</label>
+    <input style="display: none" type="text" class="form-control" id="concept-id" placeholder="#springMessage('input.field.refset.title')" name="${status.expression}" value="$!{status.value}"/>
+    <div class="errors">
+      #foreach($error in $status.errorMessages)
+        <p class="text-danger">#springMessage("$error")</p>
+      #end
+    </div>
+    <div class="row concept">
+      #if ($status.value)
+          #set ($not-selected-status = 'inactive')
+          #set ($selected-status = 'active')
+      #else
+          #set ($not-selected-status = 'active')
+          #set ($selected-status = 'inactive')
+      #end    
+      <div class="toggle-find-concept not-selected $not-selected-status">
+        <div class="col-lg-12">
+          <a data-toggle="modal" href="#textSearchModal" class="btn btn-success btn-sm">Find Concept</a>
+        </div>
+      </div>
+      <div class="toggle-find-concept selected $selected-status">
+          <div class="col-lg-10">
+              <a id="concept-title" href="http://browser.sparklingideas.co.uk/ontology/1/concept/$!storedRefset.concept.id" target="_blank">$!storedRefset.concept.displayName</a>                
+          </div>
+          <div class="col-lg-2">
+              <a data-toggle="modal" href="#textSearchModal" class="btn btn-default btn-sm change">Change Concept</a>            
+          </div>
+      </div>
+    </div>
+  </div>
+  
+
+  #springBind("refset.title")
+  #set ($state="")
+  #if ($status.error)
+    #set ($state="has-error")
+  #end
+  <div class="form-group $state">
+    <label for="title">#springMessage('label.field.refset.title')</label>
+    <input type="text" class="form-control" id="title" placeholder="#springMessage('input.field.refset.title')" name="${status.expression}" value="$!{status.value}">
+    <div class="errors">
+      #foreach($error in $status.errorMessages)
+        <p class="text-danger">#springMessage("$error")</p>
+      #end
+    </div>
+  </div>
+  
+  #springBind("refset.description")
+  #set ($state="")
+  #if ($status.error)
+    #set ($state="has-error")
+  #end
+  <div class="form-group $state">
+    <label for="description">#springMessage('label.field.refset.description')</label>
+    <textarea id="description" class="form-control" rows="3" placeholder="#springMessage('input.field.refset.description')" name="${status.expression}">$!status.value</textarea>  
+    <div class="errors">
+      #foreach($error in $status.errorMessages)
+        <p class="text-danger">#springMessage("$error")</p>
+      #end
+    </div>
+  </div>
+  
+  #springBind("refset.publicId")
+  #set ($state="")
+  #if ($status.error)
+    #set ($state="has-error")
+  #end
+  <div class="form-group $state">
+    <label for="pubid">#springMessage('label.field.refset.publicid')</label>
+    <input type="text" class="form-control" id="pubid" placeholder="#springMessage('input.field.refset.publicid')" name="${status.expression}" value="$!{status.value}">
+    <div class="errors">
+      #foreach($error in $status.errorMessages)
+        <p class="text-danger">#springMessage("$error")</p>
+      #end
+    </div>
+  </div>  
+</div>
