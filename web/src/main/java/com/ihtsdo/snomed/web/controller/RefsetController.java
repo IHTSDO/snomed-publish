@@ -48,9 +48,9 @@ import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.xml.XmlRefset;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
+import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetService;
@@ -268,22 +268,50 @@ public class RefsetController {
     // WEB SERVICE API
     
     @Transactional
+    @RequestMapping(value = "/refset/{pubId}.xml", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            headers="Accept=*/*",
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public @ResponseBody RefsetDto getRefsetXml(@PathVariable String pubId) throws Exception {
+        Refset refset = refsetService.findByPublicId(pubId);
+        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
+                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
+                RefsetPlanDto.parse(refset.getPlan())).build();
+        
+        return refsetDto;
+    }    
+    
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            headers="Accept=*/*",
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody RefsetDto getRefsetJson(@PathVariable String pubId) throws Exception {
+        Refset refset = refsetService.findByPublicId(pubId);
+        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
+                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
+                RefsetPlanDto.parse(refset.getPlan())).build();
+        
+        return refsetDto;
+    }    
+    
+    @Transactional
     @RequestMapping(value = "/refset/{pubId}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody XmlRefsetConcepts getConceptJson(@PathVariable String pubId) throws Exception {
-        System.out.println("in getConceptsJson");
         return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
     }
-    
+
     @Transactional
     @RequestMapping(value = "/refset/{pubId}/concepts.xml", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
-            headers="Accept=*/*",
             produces=MediaType.APPLICATION_XML_VALUE)
-    public @ResponseBody XmlRefsetConcepts getXmlConcepts(@PathVariable String pubId) throws Exception {
+    public @ResponseBody XmlRefsetConcepts getConceptXml(@PathVariable String pubId) throws Exception {
         return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
     }
     
@@ -309,13 +337,13 @@ public class RefsetController {
 
 
 
-    private List<XmlRefset> getRefsetsDto() throws MalformedURLException {
+    private List<XmlRefsetShort> getRefsetsDto() throws MalformedURLException {
         List<Refset> refsets = refsetService.findAll();
-        List<XmlRefset> xmlRefsets = new ArrayList<>();
+        List<XmlRefsetShort> xmlRefsetShorts = new ArrayList<>();
         for (Refset r : refsets){
-            xmlRefsets.add(new XmlRefset(r));
+            xmlRefsetShorts.add(new XmlRefsetShort(r));
         }
-        return xmlRefsets;
+        return xmlRefsetShorts;
     }    
 
     private List<XmlRefsetConcept> getXmlConceptDtos(String pubId) throws ConceptsCacheNotBuiltException, MalformedURLException {

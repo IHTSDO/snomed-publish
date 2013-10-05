@@ -5,6 +5,11 @@ import java.util.List;
 
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
@@ -16,8 +21,16 @@ import com.ihtsdo.snomed.model.refset.Visitor;
 import com.ihtsdo.snomed.model.refset.rule.BaseSetOperationRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 
+@XmlRootElement(name="plan")
 public class RefsetPlanDto {
+    
+    @Transient
     private long id;
+    
+    public RefsetPlanDto(){}
+    
+    @XmlElementWrapper(name = "rules")
+    @XmlElement(name="rule")
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
     
     @NotNull(message="validation.refsetplan.terminal.not.null")

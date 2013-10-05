@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
@@ -16,7 +17,7 @@ import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.SymmetricDifferenceRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
 
-
+@XmlRootElement(name="rule")
 public class RefsetRuleDto {
     
     public enum RuleType{
@@ -24,8 +25,11 @@ public class RefsetRuleDto {
     }
     
     //TODO: Wow, this sucks. Refactor
+    @Transient
     @SuppressWarnings("rawtypes")
     public static final Map<Class, RuleType> CLASS_TYPE_MAP = new HashMap<>();
+    
+    @Transient
     @SuppressWarnings("rawtypes")
     public static final Map<RuleType, Class> TYPE_CLASS_MAP = new HashMap<>();
     
@@ -43,6 +47,7 @@ public class RefsetRuleDto {
         TYPE_CLASS_MAP.put(RuleType.UNION, UnionRefsetRule.class);
     }    
     
+    @Transient
     public static boolean isPersisted(long id){
         if (id > 0){
             return true;

@@ -12,19 +12,19 @@ public class XmlRefsets {
 
     @XmlElementWrapper(name = "refsets")
     @XmlElement(name="refset")
-    private List<XmlRefset> refsets = new ArrayList<>();
+    private List<XmlRefsetShort> refsets = new ArrayList<>();
     
     public XmlRefsets(){}
     
-    public XmlRefsets(List<XmlRefset> refsets){
+    public XmlRefsets(List<XmlRefsetShort> refsets){
         this.refsets = refsets;
     }
 
-    public List<XmlRefset> getRefsets() {
+    public List<XmlRefsetShort> getRefsets() {
         return refsets;
     }
 
-    public void setRefsets(List<XmlRefset> concepts) {
+    public void setRefsets(List<XmlRefsetShort> concepts) {
         this.refsets = concepts;
     }
 }

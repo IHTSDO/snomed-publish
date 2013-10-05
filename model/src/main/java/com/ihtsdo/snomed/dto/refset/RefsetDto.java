@@ -1,16 +1,14 @@
 package com.ihtsdo.snomed.dto.refset;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
+@XmlRootElement(name="refset")
 public class RefsetDto {
     
     private Long id;
