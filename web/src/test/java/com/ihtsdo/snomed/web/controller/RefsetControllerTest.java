@@ -222,7 +222,7 @@ public class RefsetControllerTest {
                         .createUserDetailsRequestPostProcessor("bob")
                         .userDetailsService(openIdUserDetailsService)))
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets/"))
+            .andExpect(view().name("redirect:http://{server}:{port}/refsets/"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Deleted refset pub1: title1")));
 
@@ -275,7 +275,7 @@ public class RefsetControllerTest {
                 .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets/"))
+            .andExpect(view().name("redirect:http://{server}:{port}/refsets/"))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Added refset pub1: title1")));
         
@@ -303,7 +303,7 @@ public class RefsetControllerTest {
                 .param("description", refsetDto.getDescription())
             )
             .andExpect(status().isFound())
-            .andExpect(view().name("redirect:/refsets/refset/" + r2.getPublicId()))
+            .andExpect(view().name("redirect:http://{server}:{port}/refsets/refset/" + r2.getPublicId()))
             .andExpect(flash().attribute(RefsetController.FEEDBACK_MESSAGE, 
                     is("Updated refset pub2: title2")));
         
