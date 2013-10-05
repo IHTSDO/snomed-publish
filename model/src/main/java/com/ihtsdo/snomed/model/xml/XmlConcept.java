@@ -23,7 +23,7 @@ public class XmlConcept {
     private long id;
     
     @XmlAttribute
-    private URL href;    
+    private URL href;
 
     private long serialisedId;
     private String fullySpecifiedName;

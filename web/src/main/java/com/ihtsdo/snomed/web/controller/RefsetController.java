@@ -1,8 +1,11 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.net.MalformedURLException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -36,6 +40,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
@@ -43,9 +48,11 @@ import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.RefsetPlan;
-import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
-import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
+import com.ihtsdo.snomed.model.xml.XmlRefset;
+import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
+import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
+import com.ihtsdo.snomed.model.xml.XmlRefsets;
+import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.service.OntologyService;
@@ -68,6 +75,9 @@ public class RefsetController {
 
     @Inject
     OntologyService ontologyService;
+    
+    @Inject
+    ConceptService conceptService;
 
     @Resource
     private MessageSource messageSource;
@@ -157,37 +167,6 @@ public class RefsetController {
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         return new ModelAndView("/refset/edit.refset", "refset", newRefsetFbo);
     }
-    
-    private void initDummyPlan(Refset refset){
-        Concept cc1 = new Concept(184933002L);
-        Concept cc2 = new Concept(210009005L);
-        Concept cc3 = new Concept(104641002L);
-        Concept cc4 = new Concept(118831003L);
-        Concept cc5 = new Concept(305101000L);
-        Concept cc6 = new Concept(321987003L);
-        
-        ListConceptsRefsetRule listRuleLeft = new ListConceptsRefsetRule();
-//        listRuleLeft.setId(-1L);
-        listRuleLeft.addConcept(cc1);
-        listRuleLeft.addConcept(cc2);
-        listRuleLeft.addConcept(cc3);
-        
-        ListConceptsRefsetRule listRuleRight = new ListConceptsRefsetRule();
-//        listRuleRight.setId(-2L);
-        listRuleRight.addConcept(cc4);
-        listRuleRight.addConcept(cc5);
-        listRuleRight.addConcept(cc6);
-        
-        UnionRefsetRule unionRule = new UnionRefsetRule();
-//        unionRule.setId(-3L);
-        unionRule.setLeftRule(listRuleLeft);
-        unionRule.setRightRule(listRuleRight);
-        
-        RefsetPlan plan = RefsetPlan.getBuilder(unionRule).build();
-        refset.setPlan(plan);
-        em.merge(refset);
-        em.flush();
-    }
 
     // DELETE
 
@@ -237,45 +216,6 @@ public class RefsetController {
         }
     }
 
-    private void addDummyData(RefsetDto refsetDto) {
-        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
-        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
-        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
-        
-        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
-        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
-        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
-        
-        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
-                .id(-1L)
-                .type(RuleType.LIST)
-                .add(c1).add(c2).add(c3)
-                .build();
-        
-        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
-                .id(-2L)
-                .add(c4).add(c5).add(c6)
-                .type(RuleType.LIST)
-                .build();
-        
-        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
-                .id(-3L)
-                .type(RuleType.UNION)
-                .left(listRuleDtoLeft.getId())
-                .right(listRuleDtoRight.getId())
-                .build();
-        
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
-               .terminal(unionRuleDto.getId())
-               .id(-1L)
-               .add(listRuleDtoLeft)
-               .add(listRuleDtoRight)
-               .add(unionRuleDto)
-               .build();
-        
-        refsetDto.setPlan(plan);
-    }
-
     // UPDATE
 
     @Transactional
@@ -316,6 +256,112 @@ public class RefsetController {
             return new ModelAndView("/refset/edit.refset");
         }
     }
+    
+    // WEB SERVICE API
+    
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/concepts.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody XmlRefsetConcepts getConceptJson(@PathVariable String pubId) throws Exception {
+        System.out.println("in getConceptsJson");
+        return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
+    }
+    
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/concepts.xml", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            headers="Accept=*/*",
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public @ResponseBody XmlRefsetConcepts getXmlConcepts(@PathVariable String pubId) throws Exception {
+        return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
+    }
+    
+    
+    @Transactional
+    @RequestMapping(value = "/refsets.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody XmlRefsets findAllRefsetsJson() throws Exception {
+        return new XmlRefsets(getRefsetsDto());
+    }
+    
+    @Transactional
+    @RequestMapping(value = "/refsets.xml", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            headers="Accept=*/*",
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public @ResponseBody XmlRefsets findAllRefsetsXml() throws Exception {
+        return new XmlRefsets(getRefsetsDto());
+    }
+
+
+
+    private List<XmlRefset> getRefsetsDto() throws MalformedURLException {
+        List<Refset> refsets = refsetService.findAll();
+        List<XmlRefset> xmlRefsets = new ArrayList<>();
+        for (Refset r : refsets){
+            xmlRefsets.add(new XmlRefset(r));
+        }
+        return xmlRefsets;
+    }    
+
+    private List<XmlRefsetConcept> getXmlConceptDtos(String pubId) throws ConceptsCacheNotBuiltException, MalformedURLException {
+        Refset refset = refsetService.findByPublicId(pubId);
+        refset.getPlan().refreshConceptsCache();
+        Set<Concept> concepts = refset.getPlan().getConcepts();
+        List<XmlRefsetConcept> xmlConcepts = new ArrayList<>();
+        for (Concept c : concepts){
+            xmlConcepts.add(new XmlRefsetConcept(c));
+        }
+        System.out.println("returning xmlconcepts [" + xmlConcepts.size() + "]");
+        return xmlConcepts;
+    }    
+
+    private void addDummyData(RefsetDto refsetDto) {
+        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
+        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
+        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
+        
+        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
+        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
+        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
+        
+        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
+                .id(-1L)
+                .type(RuleType.LIST)
+                .add(c1).add(c2).add(c3)
+                .build();
+        
+        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
+                .id(-2L)
+                .add(c4).add(c5).add(c6)
+                .type(RuleType.LIST)
+                .build();
+        
+        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
+                .id(-3L)
+                .type(RuleType.UNION)
+                .left(listRuleDtoLeft.getId())
+                .right(listRuleDtoRight.getId())
+                .build();
+        
+        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
+               .terminal(unionRuleDto.getId())
+               .id(-1L)
+               .add(listRuleDtoLeft)
+               .add(listRuleDtoRight)
+               .add(unionRuleDto)
+               .build();
+        
+        refsetDto.setPlan(plan);
+    }
+    
+    
 
     private FieldError createFieldError(RefsetDto refsetDto,
             BindingResult result) {
