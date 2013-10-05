@@ -181,7 +181,9 @@ public class RefsetController {
 
         addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED, deleted.getPublicId(), deleted.getTitle());
 
-        return new ModelAndView("redirect:/refsets/");
+        attributes.addAttribute("server", request.getServerName());
+        attributes.addAttribute("port", request.getServerPort());
+        return new ModelAndView("redirect:http://{server}:{port}/refsets/");
     }
 
     // CREATE
@@ -209,7 +211,10 @@ public class RefsetController {
             addDummyData(refsetDto);
             Refset created = refsetService.create(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
-            return new ModelAndView("redirect:/refsets/");
+            
+            attributes.addAttribute("server", request.getServerName());
+            attributes.addAttribute("port", request.getServerPort());
+            return new ModelAndView("redirect:http://{server}:{port}/refsets/");
         } catch (NonUniquePublicIdException e) {
             result.addError(createFieldError(refsetDto, result));
             return new ModelAndView("/refset/new.refset");
@@ -249,7 +254,10 @@ public class RefsetController {
         try {
             Refset updated = refsetService.update(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED, updated.getPublicId(), updated.getTitle());
-            return new ModelAndView("redirect:/refsets/refset/" + updated.getPublicId());
+            attributes.addAttribute("server", request.getServerName());
+            attributes.addAttribute("port", request.getServerPort());
+            return new ModelAndView("redirect:http://{server}:{port}/refsets/refset/" + updated.getPublicId());
+            
         } catch (NonUniquePublicIdException e) {
             //defensive coding
             result.addError(createFieldError(refsetDto, result));
