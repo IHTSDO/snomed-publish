@@ -111,14 +111,12 @@
    
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="title" type="text_general" indexed="true" stored="true"/>
-   <field name="ontology_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="ontology_title" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="version_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="version_title" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="effectiveTime" type="long" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="active" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="status_concept_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="status_title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="module_concept_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="module_title" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="description_id" type="long" indexed="true" stored="true" required="true" multiValued="true"/>
    <field name="description_term" type="text_general" indexed="true" stored="true" required="true" multiValued="true"/>   
    

@@ -7,14 +7,14 @@
                 c.effectiveTime, c.active, c.status_id, c.module_id,
                 status_concept.serialisedId as status_concept_id,
                 module_concept.serialisedId as module_concept_id,
-                o.id as ontology_id, o.name as ontology_title            
+                o.id as version_id, o.name as version_title            
             FROM Concept status_concept, Concept module_concept, Concept c, Ontology o
             WHERE c.status_id=status_concept.id
             AND c.module_id=module_concept.id
             AND c.ontology_id=o.id">
       <field column="id" name="id" />
-      <field column="ontology_id" name="ontology_id" />
-      <field column="ontology_title" name="ontology_title" />
+      <field column="version_id" name="version_id" />
+      <field column="version_title" name="version_title" />
       <field column="fullySpecifiedName" name="title" />
       <field column="effectiveTime" name="effectiveTime" />
       <field column="active" name="active" />

@@ -6,7 +6,7 @@
         query="SELECT s.id as internal_id, s.serialisedId as id, s.ontology_id, s.effectiveTime, s.groupId, 
                       s.active, s.characteristicType_id as ct_id, s.module_id, s.modifier_id, s.subject_id, 
                       s.predicate_id, s.object_id, 
-                      o.id as ontology_id, o.name as ontology_title,
+                      o.id as version_id, o.name as version_title,
                       characteristicType_concept.serialisedId as characteristicType_concept_id,
                       module_concept.serialisedId as module_concept_id,
                       modifier_concept.serialisedId as modifier_concept_id,
@@ -27,8 +27,8 @@
                AND predicate_concept.id=s.predicate_id
                AND object_concept.id=s.object_id">
       <field column="id" name="id" />
-      <field column="ontology_id" name="ontology_id" />
-      <field column="ontology_name" name="ontology_name" />
+      <field column="version_id" name="version_id" />
+      <field column="version_title" name="version_title" />
       <field column="effectiveTime" name="effectiveTime" />
       <field column="groupId" name="groupId" />
       <field column="active" name="active" />

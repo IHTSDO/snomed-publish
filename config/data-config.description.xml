@@ -9,7 +9,7 @@
                   type_concept.serialisedId as type_concept_id,
                   caseSignificance_concept.serialisedId as caseSignificance_concept_id,
                   module_concept.serialisedId as module_concept_id,
-                  o.id as ontology_id, o.name as ontology_title
+                  o.id as version_id, o.name as version_title
            FROM Description d, Ontology o, Concept about_concept, Concept type_concept, 
                 Concept caseSignificance_concept, Concept module_concept
            WHERE d.ontology_id=o.id
@@ -18,8 +18,8 @@
            AND d.caseSignificance_id=caseSignificance_concept.id
            AND d.module_id=module_concept.id">    
       <field column="id" name="id" />
-      <field column="ontology_id" name="ontology_id" />
-      <field column="ontology_name" name="ontology_name" />
+      <field column="version_id" name="version_id" />
+      <field column="version_title" name="version_title" />
       <field column="term" name="title" />
       <field column="languageCode" name="languageCode" />
       <field column="effectiveTime" name="effectiveTime" />
