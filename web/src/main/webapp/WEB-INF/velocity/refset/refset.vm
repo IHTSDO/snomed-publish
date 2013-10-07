@@ -1,18 +1,32 @@
 #set( $layout = "refset/layout.vm" )
 #set ($title = "#springMessageText('page.title.refset' [$refset.title])")
 #parse('refset/alert.vm')
+#set ($xml = $pubId + ".xml")
+#set ($json = $pubId + ".json")
 <div id="refset">
   <ol class="breadcrumb">
     <li><a href='#springUrl("..")'>Refsets</a></li>
     <li class="active">$refset.publicId</li>
   </ol>
+  
+  <div class="api-container">
+    
+  </div>  
+  
   <div class="row">
       <div class="col-lg-2">
         <label>#springMessage('label.field.refset.concept')</label>
       </div>
-      <div class="col-lg-10">
+      <div class="col-lg-8">
         <span><a href="http://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
-      </div>        
+      </div>
+      <div class="col-lg-2">
+        <div class = "api-links">
+            <span class="xml link"><a href="$xml" target="_blank">XML</a></span>
+            <span class="dividor"> _ </span>
+            <span class="json link"><a href="$json" target="_blank">JSON</a></span>
+        </div>        
+      </div>
   </div>
   <div class="row">
       <div class="col-lg-2">

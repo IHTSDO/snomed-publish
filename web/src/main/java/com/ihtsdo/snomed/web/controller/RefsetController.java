@@ -274,13 +274,10 @@ public class RefsetController {
             headers="Accept=*/*",
             produces=MediaType.APPLICATION_XML_VALUE)
     public @ResponseBody RefsetDto getRefsetXml(@PathVariable String pubId) throws Exception {
-        Refset refset = refsetService.findByPublicId(pubId);
-        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
-                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
-                RefsetPlanDto.parse(refset.getPlan())).build();
+        RefsetDto refsetDto = blah(pubId);
         
         return refsetDto;
-    }    
+    }
     
     @Transactional
     @RequestMapping(value = "/refset/{pubId}.json", 
@@ -289,14 +286,25 @@ public class RefsetController {
             headers="Accept=*/*",
             produces=MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody RefsetDto getRefsetJson(@PathVariable String pubId) throws Exception {
-        Refset refset = refsetService.findByPublicId(pubId);
-        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
-                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
-                RefsetPlanDto.parse(refset.getPlan())).build();
+        RefsetDto refsetDto = blah(pubId);
         
         return refsetDto;
     }    
     
+
+
+    private RefsetDto blah(String pubId) {
+        Refset refset = refsetService.findByPublicId(pubId);
+        System.out.println("Found refset " + refset);
+        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
+                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
+                RefsetPlanDto.parse(refset.getPlan())).build();
+        System.out.println("Returning refsetDto " + refsetDto);
+
+        return refsetDto;
+    }    
+    
+
     @Transactional
     @RequestMapping(value = "/refset/{pubId}/concepts.json", 
             method = RequestMethod.GET, 
@@ -348,6 +356,7 @@ public class RefsetController {
 
     private List<XmlRefsetConcept> getXmlConceptDtos(String pubId) throws ConceptsCacheNotBuiltException, MalformedURLException {
         Refset refset = refsetService.findByPublicId(pubId);
+        System.out.println("Found refset " + refset);
         refset.getPlan().refreshConceptsCache();
         Set<Concept> concepts = refset.getPlan().getConcepts();
         List<XmlRefsetConcept> xmlConcepts = new ArrayList<>();

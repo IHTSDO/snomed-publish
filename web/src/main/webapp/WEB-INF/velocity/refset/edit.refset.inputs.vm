@@ -1,62 +1,8 @@
 #parse('refset/edit.refset.simple.inputs.vm')
 <div id="plan" class="clearfix">
-  
-  #parse('refset/edit.refset.bindings.vm')
+  #parse('textSearch.vm')
 
-
-  #[[
-  
-  <script type="text/x-handlebars" data-template-name="plan" >
-
-  <div class="clearfix">    
-    {{#if showConcepts}}
-      <a {{action 'showPlan'}}>Edit Plan</a>
-      <h2 class="plan">Concepts</h2>
-    {{/if}}
-    {{#if showPlan}}
-      <a {{action 'showConcepts'}}>Show Concepts</a>
-      <h2 class="plan">Plan</h2>
-      ]]#
-      #parse('refset/edit.refset.rules.menu.vm')
-      #[[
-      {{#each rule in model}}
-        {{render "rule" rule}}
-      {{/each}}
-    {{/if}}
-  </div>
-    
-    {{render "setRule"}}
-    {{render 'listRule'}}
-  </script>
-
-  <script type="text/x-handlebars" data-template-name="listRule">
-    <div class="modal fade set-operation" id="listRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4>List Concepts</h4>
-          </div>
-          <div class="modal-body">
-          <div class="container">
-            
-            
-
-            {{#if isSearching}}
-              {{view view.searchView}}
-            {{else}}
-              {{view view.conceptsView}}
-            {{/if}}            
-
-          </div><!-- container -->
-        </div><!-- /.modal-body -->
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
-          <button type="button" data-dismiss="modal" {{action 'save'}} class="btn btn-primary btn-sm">Save changes</button>
-        </div>    
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </script>
+  #[[ 
 
   <script type="text/x-handlebars" data-template-name="listRuleConcepts">
     <a {{action 'gosearch' this}}>Search for Concepts</a>
@@ -70,42 +16,143 @@
     <a {{action 'goconcepts' this}}>View Concepts</a>
     <h3>Search for Concepts</h3>
     <div id="textSearchTemplate">
-      [{{render "textsearch"}}]
+      [{{control textSearch}}]
     </div>
   </script> 
 
+  <script type="text/x-handlebars" data-template-name="listRule">
+      <div class="modal fade set-operation" id="listRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4>List Concepts</h4>
+            </div>
+            <div class="modal-body">
+            <div class="container">
+              
+              
+
+              {{#if isSearching}}
+                {{view view.searchView}}
+              {{else}}
+                {{view view.conceptsView}}
+              {{/if}}            
+
+            </div><!-- container -->
+          </div><!-- /.modal-body -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+            <button type="button" data-dismiss="modal" {{action 'save'}} class="btn btn-primary btn-sm">Save changes</button>
+          </div>    
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </script>  
+
+  <script type="text/x-handlebars" data-template-name="rules">
+    <h2 class="plan">Plan
+      <span id="showConcepts" class="clearfix">
+        {{#link-to 'concepts'}}
+          <button type="button" class="btn btn-success btn-xs">Show Concepts</button>
+        {{/link-to}}
+      </span>
+    </h2>  
+    <h3 class="plan">Rules</h3>
+    <div id="newrule" class="dropdown clearfix">
+      <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">Add Rule</button>      
+      <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
+        <li role="presentation" class="dropdown-header">Source Rules</li>
+        <li role="presentation"><a role="menuitem" {{action 'listRule' this}} data-toggle="modal" href="#listRuleModal" tabindex="-1">List Concepts</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation" class="dropdown-header">Set Operations</li>
+        <li role="presentation"><a role="menuitem" {{action 'unionRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Union</a></li>
+        <li role="presentation"><a role="menuitem" {{action 'intersectionRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Intersection</a></li>
+        <li role="presentation"><a role="menuitem" {{action 'differenceRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Difference</a></li>
+        <li role="presentation"><a role="menuitem" {{action 'symDifferenceRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Symmetric Difference</a></li>          
+      </ul>    
+    </div>
+    <div class="list-group clearfix" id="rules">
+      {{#each rule in model}}
+        <a href="#" {{action 'edit-rule'}} class="list-group-item">{{control "rule" rule}}</a>
+      {{/each}}
+    </div>
+  
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="concepts">
+    <h2 class="plan">Plan
+      <span id="showConcepts" class="clearfix">
+        {{#link-to 'rules'}}
+          <button type="button" class="btn btn-success btn-xs">Show Rules</button>
+        {{/link-to}}
+      </span>
+    </h2>
+    <h3 class="plan">Concepts</h3>
+    <div class="list-group clearfix" id="rules">
+      {{#each concept in model}}
+        <a {{bind-attr href=concept.url}}  target="_blank" class="list-group-item">{{concept.id}}</a>
+      {{/each}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="textSearchModal">
+    <div class="modal fade" id="textSearchModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-textSearch-title">]]##springMessage('modal.title.concept.search')#[[</h4>
+          </div>
+          <div class="modal-body">
+            {{render textSearch}}
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+  </script>
 
   <script type="text/x-handlebars" data-template-name="setRule">
-    <div class="modal fade set-operation" id="unionRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      ]]#
-      #set ($title='Union Set Operation')
-      #parse('refset/setRuleModal.vm')
-      #[[
-    </div>
-    <div class="modal fade set-operation" id="intersectionRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      ]]#
-      #set ($title='Intersection Set Operation')
-      #parse('refset/setRuleModal.vm')
-      #[[
-    </div>
-    <div class="modal fade set-operation" id="differenceRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      ]]#
-      #set ($title='Difference Set Operation')
-      #parse('refset/setRuleModal.vm')
-    #[[
-    </div>
-    <div class="modal fade set-operation" id="symDifferenceRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
-      ]]#
-      #set ($title='Symmetric Difference Set Operation')
-      #parse('refset/setRuleModal.vm')
-      #[[
-    </div>
+    <div class="modal fade set-operation" id="setRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4>Set Operation</h4>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row set-operation">
+                <div class="col-lg-3 left">
+                  {{view Ember.Select contentBinding="controllers.rules.model" 
+                                      selectionBinding="model.left" 
+                                      optionLabelPath="content.displayName" 
+                                      prompt="Select rule"
+                                      optionValuePath="content.id"}}
+                </div>
+                <div class="col-lg-2 operand">{{model.type}}</div>
+                <div class="col-lg-3 right">
+                  {{view Ember.Select contentBinding="controllers.rules.model" 
+                                      selectionBinding="model.right" 
+                                      optionLabelPath="content.displayName"
+                                      prompt="Select rule" 
+                                      optionValuePath="content.id"}}
+                </div>
+              </div><!-- row -->
+            </div><!-- container -->
+          </div><!-- /.modal-body -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+            <button type="button" data-dismiss="modal" {{action 'saverule'}} class="btn btn-primary btn-sm">Save changes</button>
+          </div>    
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->      
+    </div><!-- /.modal -->      
   </script>
 
   <script type="text/x-handlebars" data-template-name="rule" >
     <div class="row">
-      <div class="col-lg-1">Rule {{model.id}}</div>
-      <div class="col-lg-11">
+      <div class="col-lg-1 identifier"><strong>Rule {{model.id}}</strong></div>
+      <div class="col-lg-11 description">
         {{#if isList}}
           List [
           {{#each concept in model.concepts}}
@@ -127,7 +174,5 @@
       </div>
     </div>
   </script>
-
-
   ]]#
 </div>

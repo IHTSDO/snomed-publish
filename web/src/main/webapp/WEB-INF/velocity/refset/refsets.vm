@@ -1,6 +1,11 @@
 #set( $layout = "refset/layout.vm" )
 #set ($title = "#springMessage('page.title.refsets')")
 #parse('refset/alert.vm')
+<!-- <div class="api-links"> -->
+<!--     <span class="xml link"><a href="refsets.xml" target="_blank">XML</a></span> -->
+<!--     <span class="dividor"> _ </span> -->
+<!--     <span class="json link"><a href="refsets.json" target="_blank">JSON</a></span> -->
+<!-- </div> -->
 <h2>Refsets</h2>
 <div id="refsets">
   #foreach($refset in $refsets)

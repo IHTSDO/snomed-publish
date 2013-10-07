@@ -57,6 +57,20 @@
 
 <!-- Application -->
 <script src="/static/js/refsets.js"></script>
+
+#if ($staticPageScripts)
+  #foreach ($script in $staticPageScripts)
+      <script src="$script"></script>
+  #end
+#end
+
+#if ($dynamicPageScripts)
+  #foreach ($script in $dynamicPageScripts)
+        #parse($script)
+  #end
+#end
+
+
 #if ($pageScripts)
     #foreach ($script in $pageScripts)
         <script src="$script"></script>

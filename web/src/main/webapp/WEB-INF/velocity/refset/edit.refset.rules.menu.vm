@@ -1,13 +1,1 @@
-<div id="newrule" class="dropdown">
-  <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">Add Rule</button>      
-  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
-    <li role="presentation" class="dropdown-header">Source Rules</li>
-    <li role="presentation"><a role="menuitem" {{action 'listRule' this}} data-toggle="modal" href="#listRuleModal" tabindex="-1">List Concepts</a></li>
-    <li role="presentation" class="divider"></li>
-    <li role="presentation" class="dropdown-header">Set Operations</li>
-    <li role="presentation"><a role="menuitem" {{action 'unionRule' this}} data-toggle="modal" href="#unionRuleModal" tabindex="-1">Union</a></li>
-    <li role="presentation"><a role="menuitem" {{action 'intersectionRule' this}} data-toggle="modal" href="#intersectionRuleModal" tabindex="-1">Intersection</a></li>
-    <li role="presentation"><a role="menuitem" {{action 'differenceRule' this}} data-toggle="modal" href="#differenceRuleModal" tabindex="-1">Difference</a></li>
-    <li role="presentation"><a role="menuitem" {{action 'symDifferenceRule' this}} data-toggle="modal" href="#symDifferenceRuleModal" tabindex="-1">Symmetric Difference</a></li>          
-  </ul>    
-</div>  
+

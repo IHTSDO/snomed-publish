@@ -65,11 +65,38 @@ h2.plan{
 
 #newrule{
     float: right;
-    margin-top: -2em;
+    margin-top: -2.5em;
 }
 
 #plan{
     margin-top: 2em;
+}
+.api-links{
+    font-size: 0.9em;
+    font-family : futura-pt-1, futura-pt-2; 
+    text-align: right;
+    margin-right: 0.5em;
+}
+
+#rules{
+    margin-top: 2em;
+}
+
+#showConcepts{
+    float: right;
+
+}
+
+#showConcepts button{
+    width: 8.5em;
+}
+
+#rules .identifier{
+    
+}
+
+#rules .description{
+    font-family: "proxima-nova-1","proxima-nova-2",sans-serif !important;
 }
 
 /***************

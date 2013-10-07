@@ -4,12 +4,18 @@
           <div class="input clearfix">
             {{render "searchInput"}}
           </div>
+          searchResults: [{{searchResults.total}}]
+
+          model: {{controllers.searchResults.model}}
+
+          in
           {{#if controllers.searchResults.model.total}}
+          here
             <div class="clearfix">
               {{render "searchResults"}}
             </div>
             <div class="clearfix">
-              {{render "pages"}}
+              {{control "pages"}}
             </div>
           {{/if}}
       </div>
@@ -35,7 +41,9 @@
   <div class="row">
     <div class="col-lg-12">
       <ul class="list-group results">
+        Search results
         {{#each model.concepts}}
+          search results
           <a {{action 'click' this}} href="#" class="list-group-item result">
             <h4 {{bind-attr class=stylingClass}}>
               <div class="row">

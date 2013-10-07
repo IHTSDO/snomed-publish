@@ -6,7 +6,7 @@
   <body>
     <div class="container">
         #parse('header.vm')
-        $screen_content      
+        $screen_content
         #parse('refset/footer.vm')
     </div>
     #if ($modals)

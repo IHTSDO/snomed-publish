@@ -2,17 +2,10 @@
 
 //APP
 
-  MyApp = Ember.Application.create({
-    rootElement: '#plan',
-    LOG_TRANSITIONS: true
-  });
-
-  MyApp.Router.map(function() {
-    this.route("index", {path: "/"});
-    this.resource("plan", {path: '/'});
-  });
-
-
+  MyApp.register('controller:rule', MyApp.RuleController, {singleton: false});
+  MyApp.register('controller:pages', MyApp.PagesController, {singleton: false});
+  MyApp.register('controller:searchInput', MyApp.SearchInputController, {singleton: false});
+  MyApp.register('controller:searchResults', MyApp.SearchResultsController, {singleton: false});
 
 //MODELS  
 
@@ -27,57 +20,70 @@
     }.property('id')
   });
   
-  MyApp.Concept = Ember.Object.extend({
-    id: null,
-    displayName: null
-  })  
 
+  MyApp.ApplicationController = Ember.ObjectController.extend({
+  
+  });
 
+//INDEX
+  MyApp.IndexRoute = Ember.Route.extend({
+    setupController: function(controller, model) {
+      this.controllerFor('pages').set('maxPageIndexesShown', 5);
+    }
+  })
 
-//DYNAMICALLY GENERATED WITH VELOCITY
-
-  rules = Ember.A();
-  #foreach($rule in ${refset.plan.refsetRules})
-  {
-    var rule = MyApp.RuleModel.create();
-    rule.id = $rule.id;
-    rule.type = '$rule.type';
-    #if ($rule.left) rule.left = $rule.left;#end
-    #if ($rule.right) rule.right = $rule.right;#end
-    #if ($rule.concepts)
-      var concepts = Ember.A();
-      #foreach ($concept in ${rule.concepts})
-        var concept = MyApp.Concept.create();
-        concept.id = $concept.id;
-        concept.displayName = '$!concept.displayName';
-        concepts.pushObject(concept)
-      #end
-      rule.concepts = concepts;
-    #end
-    rules.pushObject(rule);
-  }
-  #end
-
-
-
-
-//PLAN
-
-  MyApp.PlanController = Ember.Controller.extend({
-    appName: 'Refset Plan',
-    model: rules,
+  MyApp.IndexController = Ember.ObjectController.extend({
+    publicId: '$refset.publicId',
     counter: -1,
-    showConcepts: false,
-    showPlan: true,
+    needs: ["setRule", "listRule"]
+  });
+
+// CONCEPTS
+  MyApp.ConceptsController = Ember.ObjectController.extend({
+    model: null,
+    needs: ["index"]
+  });
+
+  MyApp.ConceptsController.reopenClass({
+    getConcepts: function(pageIndex, pageSize){
+      return Ember.Deferred.promise(function(p) {
+        var startIndex = (pageIndex - 1) * pageSize;
+        var query = "http://" + location.hostname + ":" + location.port + "/" + location.pathname + "/../concepts.json?start=" + startIndex + "&rows=" + pageSize;
+        console.log('executing query: ' + query);
+        p.resolve($.getJSON(query)
+          .then(function(blah) {
+              var concepts = Ember.A();
+              blah.concepts.forEach(function (doc) {
+                var concept = MyApp.Concept.create();
+                concept.id = doc.id;
+                concept.title = doc.fullySpecifiedName;
+                concept.active = doc.active;
+                concept.effectiveTime= doc.effectiveTime;
+                concepts.pushObject(concept);
+              });
+              return concepts;
+          }) //then
+        );//resolve
+      });//deferred promise
+    },//getConcepts
+  });//reopen
+
+  MyApp.ConceptsRoute = Ember.Route.extend({
+    model: function(){
+      console.log('In ConceptrsRoute, Loading Concepts for [' + this.controllerFor('index').get('publicId') + ']');
+      return MyApp.ConceptsController.getConcepts(-1, -1);
+    }  
+  })
+
+  MyApp.ConceptsView = Ember.View.extend({
+    templateName: 'concepts'
+  });
+
+// RULES
+  MyApp.RulesController = Ember.ObjectController.extend({
+    model: null,
+    counter: -1,
     actions:{
-      showPlan: function(){
-        this.set('showConcepts', false);
-        this.set('showPlan', true);
-      },
-      showConcepts: function(){
-        this.set('showConcepts', true);
-        this.set('showPlan', false);
-      }, 
       unionRule: function(){
         console.log('new union rule')
         var newRule = MyApp.RuleModel.create();
@@ -129,22 +135,77 @@
         this.set('counter', this.get('counter') - 1);
         this.get('controllers.listRule').set('model', newRule);
         return false;
-      }
-    },
-    needs: ["setRule", "listRule"]
+      },
+      click: function(concept){
+        $("#concept-title").text(concept.title);
+        $("#concept-title").attr('href', 'http://browser.snomedtools.com/version/1/concept/' + concept.id);
+        $("#concept-id").val(concept.id);
+        var selected = $(".toggle-find-concept.selected");
+        var notSelected = $(".toggle-find-concept.not-selected");
+        selected.attr('class', 'toggle-find-concept selected active');
+        notSelected.attr('class', 'toggle-find-concept not-selected inactive');
+        $('#textSearchModal').modal('hide');
+      }      
+    },  
+    needs: ["index", "setRule", "listRule"]
   });
 
-  MyApp.PlanView = Ember.View.extend({
-    templateName: 'plan'
+  MyApp.RulesController.reopenClass({
+    getRules: function(pageIndex, pageSize){
+      return Ember.Deferred.promise(function(p) {
+        var startIndex = (pageIndex - 1) * pageSize;
+        var currentUrl = "http://" + location.hostname + ":" + location.port + "/" + location.pathname;
+        var readyUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+        var query = readyUrl + ".json?start=" + startIndex + "&rows=" + pageSize;
+        console.log('executing refset query: ' + query);
+        p.resolve($.getJSON(query)
+          .then(function(blah) {
+              console.log('blah is ' + blah);
+              console.log('plan is ' + blah.plan);
+              console.log('id is ' + blah.plan.id);
+              console.log('rules are ' + blah.plan.refsetRules);
+              console.log('refset rules are of class: ' + blah.plan.refsetRules.constructor.name);
+              var rules = Ember.A(); 
+
+              blah.plan.refsetRules.forEach(function (doc) {
+                var rule = MyApp.RuleModel.create();
+                rule.set('id', doc.id);
+                rule.set('type', doc.type);
+                rule.set('left', doc.left);
+                rule.set('right', doc.right);
+                var concepts = Ember.A();
+                console.log('concepts class is ' + doc.concepts.constructor.name);
+                doc.concepts.forEach(function(doc_c){
+                  var concept = MyApp.Concept.create();
+                  concept.set('id', doc_c.id);
+                  concept.set('title', doc_c.title);
+                  concepts.pushObject(concept);
+                });
+                rule.set('concepts', concepts);
+                rules.pushObject(rule);
+              });
+              return rules;
+          }) //then
+        );//resolve
+      });//deferred promise
+    },//getConcepts
+  });//reopen
+
+  MyApp.RulesRoute = Ember.Route.extend({
+    model: function(){
+      console.log('In RulesRoute, loading Rules');
+      return MyApp.RulesController.getRules(-1, -1);
+    }  
+  })
+
+  MyApp.RulesView = Ember.View.extend({
+    templateName: 'rules'
   });
 
-
-
-// LIST RULE MODAL
-  
-  MyApp.ListRuleController = Ember.Controller.extend({
+// LIST RULE MODAL  
+  MyApp.ListRuleController = Ember.ObjectController.extend({
     model: null,
-    needs: "plan",
+    needs: "index",
     isSearching: false,
     actions:{
       gosearch: function(){
@@ -156,13 +217,13 @@
         return false;
       },      
       save: function(){
-        this.get('controllers.plan.model').pushObject(this.get('model'));        
+        this.get('controllers.index.model').pushObject(this.get('model'));        
         return false;
       }
      }    
   });
 
-  MyApp.ListRuleRoute = Ember.Controller.extend({
+  MyApp.ListRuleRoute = Ember.ObjectController.extend({
     renderTemplate: function(){
       console.log('I need to be here');
     }
@@ -181,17 +242,16 @@
 
 
 //SET RULE MODALS
-
-  MyApp.SetRuleController = Ember.Controller.extend({
+  MyApp.SetRuleController = Ember.ObjectController.extend({
     model: null,
     appName: 'Set Rule',
-    needs: "plan",
+    needs: "rules",
 
     actions:{
       saverule: function(){
         this.set('model.left', this.get('model.left.id'));
         this.set('model.right', this.get('model.right.id'));
-        this.get('controllers.plan.model').pushObject(this.get('model'));
+        this.get('controllers.rules.model').pushObject(this.get('model'));
         return false;
       }
      }    
@@ -202,10 +262,8 @@
   });
 
 
-
 // DISPLAY RULE
-  
-  MyApp.RuleController = Ember.Controller.extend({
+  MyApp.RuleController = Ember.ObjectController.extend({
     model: null,
     isList: function(){
       return (this.get('model.type') === "LIST");
@@ -227,4 +285,280 @@
   MyApp.RuleView = Ember.View.extend({
     templateName: 'rule',
   });  
+
+
+
+// TEXT SEARCH
+
+  MyApp.TextSearchView = Ember.View.extend({
+    templateName: 'textSearch'
+  });
+
+  MyApp.TextSearchController = Ember.ObjectController.extend({
+    searchResults: null,
+    actions:{
+      search: function(search) {
+        
+        if (search===""){
+          this.get('controllers.searchResults').set('model', null);
+          return false;
+        }
+        
+        console.log('received search event "' + search + '"');
+        var results = MyApp.TextSearchController.find(search, 1, this.get('controllers.pages').get('pageSize'));
+        var _this = this;
+        // results is a jquery promise, wait for it to resolve
+        // Ember can't resolve it automatically
+        results.then(function(results){
+          _this.set('searchResults', results);
+          _this.get('controllers.pages').set('totalItems', results.total);
+          _this.get('controllers.pages').buildPages(1, 1);
+        });
+        return false;
+      },
+      pageRequest: function(page){
+        console.log('received page request for page ' + page.get('index'));
+        //console.log('page ' + page.get('display'));
+        var pagesController = this.get('controllers.pages');
+        var searchInputController = this.get('controllers.searchInput');
+        var _this = this;
+        console.log('disabling page ' + pagesController.get('currentPage.index'));
+        pagesController.get('currentPage').set('active', false);
+        var results = MyApp.TextSearchController.find(
+            searchInputController.get('query'), 
+            page.index, 
+            pagesController.get('pageSize'));
+        results.then(function(results){
+          _this.get('controllers.searchResults').set('model', results);
+        });
+        console.log('setting current page to ' + page.get('index') + ' and making active');
+        pagesController.set('currentPage', page);
+        page.set('active', true);
+        return false;
+      }
+    },
+    needs: ["searchResults", "searchInput", "pages"]
+  });
+
+  MyApp.TextSearchController.reopenClass({
+    find: function(searchString, pageIndex, pageSize){
+      return Ember.Deferred.promise(function(p) {
+        var startIndex = (pageIndex - 1) * pageSize;
+        p.resolve($.getJSON("http://solr.snomedtools.com/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
+          .then(function(solr) {
+              var returned = MyApp.SearchResults.create();
+              returned.set('total', solr.response.numFound);
+              returned.set('start', solr.response.start);
+              var concepts = Ember.A();
+              solr.response.docs.forEach(function (doc) {
+                var concept = MyApp.Concept.create();
+                concept.id = doc.id;
+                concept.ontologyId = doc.ontology_id;
+                concept.title = doc.title;
+                concept.active = doc.active;
+                concept.effectiveTime= doc.effectiveTime;
+                concepts.pushObject(concept);
+              });
+              returned.set('concepts',concepts);
+              
+              console.log('returned ' + returned.get('total') + ' records');
+              return returned;
+          }) //then
+        );//resolve
+      });//deferred promise
+    },//find
+  });//reopen
+
+
+
+// (TEXT) SEARCH INPUT
+  //IS this controller even used?
+  MyApp.SearchInputController  = Ember.ObjectController.extend({  
+    query: null,
+    needs: ["textSearch", "searchInput", "searchResults"]
+  });
+
+  MyApp.SearchInputView = Ember.View.extend({
+    templateName: 'searchInput',
+    keyUp: function(evt) {
+      //looks like current controller is textSearchController?
+      //Or maybe it bubbles to it?
+      this.get('controller').send('search', this.get('controller.query'));
+    },
+    needs: ["textSearch", "searchInput", "searchResults"]
+  });
+
+
+
+// (TEXT) SEARCH RESULTS
+
+  MyApp.SearchResultsController  = Ember.ObjectController.extend({
+    needs: 'pages'
+  });
+
+  MyApp.SearchResultsView = Ember.View.extend({
+    templateName: 'searchResults'
+  });
+
+  MyApp.SearchResults = Ember.Object.extend({
+    total: 0,
+    concepts: Ember.A()
+  });
+
+  MyApp.Concept = Ember.Object.extend({
+    stylingClass: function(){
+      if (this.get('active')){
+        return 'active';
+      }
+      else{
+        return 'inactive';
+      }
+    }.property('active'),
+    id: null,
+    ontologyId: null,
+    title: null,
+    active: null,
+    effectiveTime: null,
+    url: function(){
+      return "http://browser.snomedtools.com/version/1/concept/" + this.get('id') 
+    }.property('id')
+  });
+
+
+
+
+// PAGES 
+
+  MyApp.Page = Ember.Object.extend({
+    active: false,
+    index: null
+  });
+
+  MyApp.PagesController = Ember.Controller.extend({
+    model: null,
+    selection: null,
+    currentPage: null,
+    maxPageIndexesShown: 10,
+    pageSize: 8,
+    totalItems: function(){
+      console.log('totalItems: ' + this.get('searchResults.total'))
+      return this.get('searchResults.total');
+    },
+    displayWidthStyling: function(){
+      var itemWidth = 4;
+       return 'width: ' + ((4 * itemWidth) + (this.get('model.length') * itemWidth)) + 'em;';
+    }.property('model'),
+    numberOfPages: function(){
+      return Math.ceil(this.get('totalItems') / this.get('pageSize'));
+    }.property('totalItems'),
+    needs: "searchResults",
+    actions:{
+      firstPage: function(){
+        console.log('First page'); 
+        this.buildPages(1, 1);
+        this.send('pageRequest', this.get('model.firstObject'));
+      },
+      previousPage: function(){
+        console.log('previous page');
+        var page = null;
+        if ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown') == 0){
+          //Assertion: we are at the first displayed page index
+          console.log('we are at the first displayed page index');
+          if (this.get('currentPage.index') == 1){
+            //assertion: we are at the beginning of the list of pages, so loop around to the back.
+            console.log('we are at the beginning of the list of pages, so loop around to the back');
+            console.log('last page');
+            var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
+            console.log('number of pages on last view ' + numberOfPagesOnLastSet);
+            console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
+            this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
+            page = this.get('model.lastObject');
+          }
+          else{
+            //assertion: there are more page indexes to the left / below to display
+            console.log('there are more page indexes to the left / below to display');
+            var index = this.get('currentPage.index') - this.get('maxPageIndexesShown');
+            console.log('buildPages(' + index + ', ' + this.get('maxPageIndexesShown') + ')');
+            this.buildPages(index, this.get('maxPageIndexesShown'));
+            page = this.get('model.lastObject');
+          }
+        }else{
+          var index = ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown')) - 1;
+          console.log('we are not at the beginning of the page list');
+          console.log('selecting model.objectAt (' + index + ') for page');
+          page = this.get('model').objectAt(index);
+        }
+        console.log('change page to index ' + page.get('index'));
+        this.send('pageRequest', page);
+      },
+      nextPage: function(){
+        var page = null;
+        if ((this.get('currentPage.index') % this.get('maxPageIndexesShown') == 0)
+            || (this.get('currentPage.index') == this.get('numberOfPages'))){
+          //Assertion: we are at the last displayed page index
+          console.log('we are at the last displayed page index');
+          if (this.get('currentPage.index') == this.get('numberOfPages')){
+            //assertion: we are at the end of the list of pages, so loop around.
+            console.log('we are at the end of the list of pages, so loop around.');
+            console.log('First page');
+            console.log('buildpages(1, 1)');
+            this.buildPages(1, 1);
+            page = this.get('model.firstObject');
+          }
+          else{
+            //Assertion: we are at the last displayed page index
+            //assertion: there are more page indexes to display
+            console.log('there are more page indexes to display');
+            var index = this.get('currentPage.index') + 1;
+            console.log('buildPages(' + index + ', 1)');
+            this.buildPages(index, 1);
+            page = this.get('model.firstObject');
+          }
+        }else{
+          console.log('we are not at the end of the page list');
+          var index = this.get('currentPage.index') % this.get('maxPageIndexesShown');
+          console.log('getting page: model.objectAt(' + index + ')');
+          page = this.get('model').objectAt(index);
+        }
+        
+        this.send('pageRequest', page);
+      },
+      lastPage: function(){
+        console.log('last page');
+        var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
+        console.log('number of pages on last view ' + numberOfPagesOnLastSet);
+        console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
+        this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
+        this.send('pageRequest', this.get('model.lastObject'));
+      }
+    },
+
+    shouldDisplayNavigation: function(){
+      var model = this.get('model'); 
+      if (model != null){
+        if (model.length > 1) return true;
+      }else{
+        return false;
+      }
+    }.property('model'),
+    
+    buildPages: function(startAtPageIndex, activeIndex){
+      //Build Page Index
+      this.set('model', Ember.A());
+      var numberOfPages = this.get('numberOfPages');
+      var maxIndex = startAtPageIndex + this.get('maxPageIndexesShown') - 1;
+      console.log('building pages from ' + startAtPageIndex + ' to max ' + maxIndex + ' out of total ' + numberOfPages);
+      console.log('number of pages are ' + numberOfPages);
+      for (i=startAtPageIndex; i <= numberOfPages && i <= maxIndex; i++){
+        var page = TextSearch.Page.create();
+        page.active = false;
+        page.index = i;
+        this.get('model').pushObject(page);
+      }
+      console.log('setting current page to ' + (activeIndex) + ' and making active');
+      this.set('currentPage', this.get('model').objectAt(activeIndex - 1));
+      this.get('currentPage').set('active', true);
+    }
+  });
+
 </script>
