@@ -4,13 +4,7 @@
           <div class="input clearfix">
             {{render "searchInput"}}
           </div>
-          searchResults: [{{searchResults.total}}]
-
-          model: {{controllers.searchResults.model}}
-
-          in
-          {{#if controllers.searchResults.model.total}}
-          here
+          {{#if searchResults.total}}
             <div class="clearfix">
               {{render "searchResults"}}
             </div>
@@ -26,13 +20,13 @@
 <script type="text/x-handlebars" data-template-name="searchInput">]]#
     <div class="row">
       <div class="col-lg-12">
-        <div class="syntax">
+        <div class="replaceme">
           <small>
             <a href="http://lucene.apache.org/core/3_5_0/queryparsersyntax.html" target="_blank">Help</a>
           </small>
         </div>
         {{view Bootstrap.Forms.TextField valueBinding="query" label="" placeholder="#springMessage('input.field.refset.concept.search')"}}
-        #[[{{#if controllers.searchResults.model.total}}]]#<div class="total">{{controllers.searchResults.model.total}}</div>#[[{{/if}}]]#
+        #[[{{#if controllers.textSearch.searchResults.total}}]]#<div class="total">{{controllers.textSearch.searchResults.total}}</div>#[[{{/if}}]]#
       </div>
     </div>
 </script>#[[
@@ -41,9 +35,7 @@
   <div class="row">
     <div class="col-lg-12">
       <ul class="list-group results">
-        Search results
-        {{#each model.concepts}}
-          search results
+        {{#each searchResults.concepts}}
           <a {{action 'click' this}} href="#" class="list-group-item result">
             <h4 {{bind-attr class=stylingClass}}>
               <div class="row">

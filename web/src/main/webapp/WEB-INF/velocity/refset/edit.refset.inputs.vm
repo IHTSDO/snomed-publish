@@ -88,9 +88,9 @@
       </span>
     </h2>
     <h3 class="plan">Concepts</h3>
-    <div class="list-group clearfix" id="rules">
+    <div class="list-group clearfix" id="concepts">
       {{#each concept in model}}
-        <a {{bind-attr href=concept.url}}  target="_blank" class="list-group-item">{{concept.id}}</a>
+        <a {{bind-attr href=concept.url}}  target="_blank" class="list-group-item">{{concept.title}} <small style="color: lightgrey;">{{concept.id}}</small></a>
       {{/each}}
     </div>
   </script>
@@ -104,7 +104,7 @@
             <h4 class="modal-textSearch-title">]]##springMessage('modal.title.concept.search')#[[</h4>
           </div>
           <div class="modal-body">
-            {{render textSearch}}
+            {{control textSearch}}
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->

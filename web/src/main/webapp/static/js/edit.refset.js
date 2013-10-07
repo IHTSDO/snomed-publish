@@ -1,6 +1,3 @@
-// APPLICATION
-// -----------
-
 MyApp = Ember.Application.create({
   rootElement: '#refset',
   LOG_TRANSITIONS: true

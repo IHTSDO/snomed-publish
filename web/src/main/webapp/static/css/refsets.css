@@ -95,6 +95,14 @@ h2.plan{
     
 }
 
+#concepts{
+    box-shadow: none;
+}
+
+#concepts a{
+    border: none;
+}
+
 #rules .description{
     font-family: "proxima-nova-1","proxima-nova-2",sans-serif !important;
 }

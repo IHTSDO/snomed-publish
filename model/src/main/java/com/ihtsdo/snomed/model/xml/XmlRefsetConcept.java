@@ -23,14 +23,14 @@ public class XmlRefsetConcept {
     @XmlElement(name="id")
     private long serialisedId;
     
-    private String fullySpecifiedName;
+    private String title;
     private long effectiveTime;
     private boolean active;
     
     public XmlRefsetConcept(Concept c) throws MalformedURLException{
         setSerialisedId(c.getSerialisedId());
-        setId(c.getId());   
-        setFullySpecifiedName(c.getFullySpecifiedName());
+        setId(c.getSerialisedId());   
+        setTitle(c.getFullySpecifiedName());
         setEffectiveTime(c.getEffectiveTime());
         setActive(c.isActive());
         setHref(UrlBuilder.createConceptUrl(c));
@@ -43,7 +43,7 @@ public class XmlRefsetConcept {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("serialisedId", getSerialisedId())
-                .add("fullySpecifiedName", getFullySpecifiedName())
+                .add("title", getTitle())
                 .add("effectiveTime", getEffectiveTime())
                 .add("active", isActive())
                 .add("href", getHref())
@@ -78,12 +78,15 @@ public class XmlRefsetConcept {
     public void setSerialisedId(long serialisedId) {
         this.serialisedId = serialisedId;
     }
-    public String getFullySpecifiedName() {
-        return fullySpecifiedName;
+
+    public String getTitle() {
+        return title;
     }
-    public void setFullySpecifiedName(String fullySpecifiedName) {
-        this.fullySpecifiedName = fullySpecifiedName;
+
+    public void setTitle(String title) {
+        this.title = title;
     }
+
     public long getEffectiveTime() {
         return effectiveTime;
     }

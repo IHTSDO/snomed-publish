@@ -1,10 +1,9 @@
 #set( $layout = "refset/layout.vm" )
 #set ($title = "#springMessage('page.title.edit.refset')")
-#set ($staticPageScripts = ["/static/js/new.refset.js"])
+#set ($staticPageScripts = ["/static/js/edit.refset.js"])
 #set ($dynamicPageScripts = ["refset/plan.js.vm"])
 #set ($pageCss = ["/static/css/textSearch.css"])
-#set ($modals = [])     
-#set ($useExperimental=true)
+#set ($modals = [])
 <div id="refset" class="edit">
   <ol class="breadcrumb">
     <li><a href='../..'>Refsets</a></li>
@@ -13,21 +12,23 @@
   </ol>
   <div class="container">
 
+    #parse('refset/edit.refset.inputs.vm')
+
     #[[  
     <script type="text/x-handlebars">
       {{render "setRule"}}
       {{render 'listRule'}}
       {{partial 'textSearchModal'}}
       {{outlet}}
+      ]]#
+      <form role="form" method="post" action='#springUrl("edit")'>
+        #parse('refset/edit.refset.bindings.vm')      
+        <div class="form-actions">
+          <button type="submit" class="btn btn-default btn-primary submit">#springMessage('button.refset.update')</button>
+        </div>
+      </form>
+      #[[
     </script>
     ]]#
-    <form role="form" method="post" action='#springUrl("edit")'>
-    
-      #parse('refset/edit.refset.inputs.vm')
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-default btn-primary submit">#springMessage('button.refset.update')</button>
-      </div>
-    </form>
   </div>
 </div>

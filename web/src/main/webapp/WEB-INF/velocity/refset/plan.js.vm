@@ -32,11 +32,32 @@
     }
   })
 
+  MyApp.ApplicationRoute = Ember.Route.extend({
+    actions: {
+      click: function(concept){
+        $("#concept-title").text(concept.title);
+        $("#concept-title").attr('href', 'http://browser.snomedtools.com/version/1/concept/' + concept.id);
+        $("#concept-id").val(concept.id);
+        var selected = $(".toggle-find-concept.selected");
+        var notSelected = $(".toggle-find-concept.not-selected");
+        selected.attr('class', 'toggle-find-concept selected active');
+        notSelected.attr('class', 'toggle-find-concept not-selected inactive');
+        $('#textSearchModal').modal('hide');
+        console.log('handled click');
+        return false;
+      },
+    }
+  });
+
   MyApp.IndexController = Ember.ObjectController.extend({
     publicId: '$refset.publicId',
     counter: -1,
     needs: ["setRule", "listRule"]
   });
+
+  MyApp.IndexView = Ember.View.extend({
+
+  })
 
 // CONCEPTS
   MyApp.ConceptsController = Ember.ObjectController.extend({
@@ -56,7 +77,7 @@
               blah.concepts.forEach(function (doc) {
                 var concept = MyApp.Concept.create();
                 concept.id = doc.id;
-                concept.title = doc.fullySpecifiedName;
+                concept.title = doc.title;
                 concept.active = doc.active;
                 concept.effectiveTime= doc.effectiveTime;
                 concepts.pushObject(concept);
@@ -135,17 +156,7 @@
         this.set('counter', this.get('counter') - 1);
         this.get('controllers.listRule').set('model', newRule);
         return false;
-      },
-      click: function(concept){
-        $("#concept-title").text(concept.title);
-        $("#concept-title").attr('href', 'http://browser.snomedtools.com/version/1/concept/' + concept.id);
-        $("#concept-id").val(concept.id);
-        var selected = $(".toggle-find-concept.selected");
-        var notSelected = $(".toggle-find-concept.not-selected");
-        selected.attr('class', 'toggle-find-concept selected active');
-        notSelected.attr('class', 'toggle-find-concept not-selected inactive');
-        $('#textSearchModal').modal('hide');
-      }      
+      }     
     },  
     needs: ["index", "setRule", "listRule"]
   });
@@ -393,7 +404,10 @@
 // (TEXT) SEARCH RESULTS
 
   MyApp.SearchResultsController  = Ember.ObjectController.extend({
-    needs: 'pages'
+    needs: ['pages', 'textSearch'],
+    searchResults: function(){
+      return this.get('controllers.textSearch.searchResults');
+    }.property()
   });
 
   MyApp.SearchResultsView = Ember.View.extend({
@@ -441,17 +455,18 @@
     maxPageIndexesShown: 10,
     pageSize: 8,
     totalItems: function(){
-      console.log('totalItems: ' + this.get('searchResults.total'))
-      return this.get('searchResults.total');
+      console.log('in totalItems now: ' + this.get('controllers.textSearch.searchResults.total'));
+      return this.get('controllers.textSearch.searchResults.total');
     },
+    numberOfPages: function(){
+      return Math.ceil(this.get('controllers.textSearch.searchResults.total') / this.get('pageSize'));
+    }.property('totalItems'),
+
     displayWidthStyling: function(){
       var itemWidth = 4;
        return 'width: ' + ((4 * itemWidth) + (this.get('model.length') * itemWidth)) + 'em;';
     }.property('model'),
-    numberOfPages: function(){
-      return Math.ceil(this.get('totalItems') / this.get('pageSize'));
-    }.property('totalItems'),
-    needs: "searchResults",
+    needs: ["searchResults", "textSearch"],
     actions:{
       firstPage: function(){
         console.log('First page'); 
