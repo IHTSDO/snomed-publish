@@ -20,7 +20,7 @@
       {{partial 'textSearchModal'}}
       {{outlet}}
     </script>
-
+    ]]#
     <form role="form" method="post" action='#springUrl("edit")'>
     
       #parse('refset/edit.refset.inputs.vm')
