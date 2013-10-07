@@ -4,6 +4,7 @@
 #[[
 	<script type="text/x-handlebars">
 		{{render "textSearch"}}
+        ]]##parse('search/footer.vm')#[[
 	</script>
 ]]#
  
