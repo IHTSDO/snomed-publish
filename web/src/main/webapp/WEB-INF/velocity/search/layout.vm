@@ -4,7 +4,7 @@
     #parse('search/head.vm')
   </head>
   <body>
-    <div class="container">
+    <div class="container" id="search">
         #parse('header.vm')
         $screen_content
         #parse('textSearch.vm')

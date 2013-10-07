@@ -1,5 +1,11 @@
 <meta charset="utf-8"/>
 <title>$title</title>
+<script type="text/javascript" >
+ENV = {
+  EXPERIMENTAL_CONTROL_HELPER: true
+};
+</script>
+
 <meta name="description" content="IHTSDO Snomed Refset Builder"/>
 <meta name="author" content="Henrik Pettersen, Sparkling Ideas"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>

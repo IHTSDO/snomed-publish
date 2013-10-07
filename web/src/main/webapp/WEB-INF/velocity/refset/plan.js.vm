@@ -565,7 +565,7 @@
       console.log('building pages from ' + startAtPageIndex + ' to max ' + maxIndex + ' out of total ' + numberOfPages);
       console.log('number of pages are ' + numberOfPages);
       for (i=startAtPageIndex; i <= numberOfPages && i <= maxIndex; i++){
-        var page = TextSearch.Page.create();
+        var page = MyApp.Page.create();
         page.active = false;
         page.index = i;
         this.get('model').pushObject(page);
@@ -575,5 +575,11 @@
       this.get('currentPage').set('active', true);
     }
   });
+
+MyApp.Page = Ember.Object.extend({
+  active: false,
+  index: null
+});
+
 
 </script>

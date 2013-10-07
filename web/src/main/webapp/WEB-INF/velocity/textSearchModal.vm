@@ -9,7 +9,7 @@
       <div class="modal-body">
         <div id="textSearchTemplate">
           <script type="text/x-handlebars" data-template-name="textsearch-output">
-            {{render "textSearch"}}
+            {{control "textSearch"}}
         </script>
         </div>
       </div>

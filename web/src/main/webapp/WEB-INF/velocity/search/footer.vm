@@ -47,12 +47,12 @@
 <script src="https://cdn.firebase.com/v0/firebase.js"></script>
 <script src="http://firebase.github.io/togetherjs/togetherjs.js"></script>
 
-<!-- SNOMED MODULES -->
-<script src="/static/js/textSearch.js"></script>
 
 <!-- This Application -->
 <script src="/static/js/search.js"></script>
 
+<!-- SNOMED MODULES -->
+<script src="/static/js/textSearch.js"></script>
 
 
 

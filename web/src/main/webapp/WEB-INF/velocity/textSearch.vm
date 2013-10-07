@@ -20,7 +20,7 @@
 <script type="text/x-handlebars" data-template-name="searchInput">]]#
     <div class="row">
       <div class="col-lg-12">
-        <div class="replaceme">
+        <div class="syntax">
           <small>
             <a href="http://lucene.apache.org/core/3_5_0/queryparsersyntax.html" target="_blank">Help</a>
           </small>
