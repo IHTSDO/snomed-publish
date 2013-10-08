@@ -10,7 +10,13 @@
   });
 
   MyApp.TextSearchController = Ember.ObjectController.extend({
+    query: null,
     searchResults: null,
+    pages: null,
+    currentPage: null,
+    maxPageIndexesShown: 5,
+    pageSize: 8,
+
     actions:{
       search: function(search) {
         
@@ -20,43 +26,164 @@
         }
         
         console.log('received search event "' + search + '"');
-        var results = MyApp.TextSearchController.find(search, 1, this.get('controllers.pages').get('pageSize'));
+        console.log('pagesize is ' + this.get('pageSize'));
+        var results = MyApp.TextSearchController.find(search, 1, this.get('pageSize'));
         var _this = this;
         // results is a jquery promise, wait for it to resolve
         // Ember can't resolve it automatically
         results.then(function(results){
+          console.log('query returned with ' + results.total + ' results');
+          console.log('blah');
           _this.set('searchResults', results);
-          _this.get('controllers.pages').set('totalItems', results.total);
-          _this.get('controllers.pages').buildPages(1, 1);
+          console.log('blah2');
+          _this.buildPages(1, 1);
+          console.log('blah3');
         });
         return false;
       },
       pageRequest: function(page){
         console.log('received page request for page ' + page.get('index'));
         //console.log('page ' + page.get('display'));
-        var pagesController = this.get('controllers.pages');
-        var searchInputController = this.get('controllers.searchInput');
         var _this = this;
-        console.log('disabling page ' + pagesController.get('currentPage.index'));
-        pagesController.get('currentPage').set('active', false);
+        console.log('disabling page ' + this.get('currentPage.index'));
+        this.get('currentPage').set('active', false);
         var results = MyApp.TextSearchController.find(
-            searchInputController.get('query'), 
+            this.get('query'), 
             page.index, 
-            pagesController.get('pageSize'));
+            this.get('pageSize'));
         results.then(function(results){
-          _this.get('controllers.searchResults').set('model', results);
+          _this.set('searchResults', results);
         });
         console.log('setting current page to ' + page.get('index') + ' and making active');
-        pagesController.set('currentPage', page);
+        this.set('currentPage', page);
         page.set('active', true);
         return false;
+      },
+      firstPage: function(){
+        console.log('First page'); 
+        this.buildPages(1, 1);
+        this.send('pageRequest', this.get('pages.firstObject'));
+      },
+      previousPage: function(){
+        console.log('previous page');
+        var page = null;
+        if ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown') == 0){
+          //Assertion: we are at the first displayed page index
+          console.log('we are at the first displayed page index');
+          if (this.get('currentPage.index') == 1){
+            //assertion: we are at the beginning of the list of pages, so loop around to the back.
+            console.log('we are at the beginning of the list of pages, so loop around to the back');
+            console.log('last page');
+            var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
+            console.log('number of pages on last view ' + numberOfPagesOnLastSet);
+            console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
+            this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
+            page = this.get('pages.lastObject');
+          }
+          else{
+            //assertion: there are more page indexes to the left / below to display
+            console.log('there are more page indexes to the left / below to display');
+            var index = this.get('currentPage.index') - this.get('maxPageIndexesShown');
+            console.log('buildPages(' + index + ', ' + this.get('maxPageIndexesShown') + ')');
+            this.buildPages(index, this.get('maxPageIndexesShown'));
+            page = this.get('pages.lastObject');
+          }
+        }else{
+          var index = ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown')) - 1;
+          console.log('we are not at the beginning of the page list');
+          console.log('selecting pages.objectAt (' + index + ') for page');
+          page = this.get('pages').objectAt(index);
+        }
+        console.log('change page to index ' + page.get('index'));
+        this.send('pageRequest', page);
+      },
+      nextPage: function(){
+        var page = null;
+        if ((this.get('currentPage.index') % this.get('maxPageIndexesShown') == 0)
+            || (this.get('currentPage.index') == this.get('numberOfPages'))){
+          //Assertion: we are at the last displayed page index
+          console.log('we are at the last displayed page index');
+          if (this.get('currentPage.index') == this.get('numberOfPages')){
+            //assertion: we are at the end of the list of pages, so loop around.
+            console.log('we are at the end of the list of pages, so loop around.');
+            console.log('First page');
+            console.log('buildpages(1, 1)');
+            this.buildPages(1, 1);
+            page = this.get('pages.firstObject');
+          }
+          else{
+            //Assertion: we are at the last displayed page index
+            //assertion: there are more page indexes to display
+            console.log('there are more page indexes to display');
+            var index = this.get('currentPage.index') + 1;
+            console.log('buildPages(' + index + ', 1)');
+            this.buildPages(index, 1);
+            page = this.get('pages.firstObject');
+          }
+        }else{
+          console.log('we are not at the end of the page list');
+          var index = this.get('currentPage.index') % this.get('maxPageIndexesShown');
+          console.log('getting page: pagespages.objectAt(' + index + ')');
+          page = this.get('pages').objectAt(index);
+        }
+        
+        this.send('pageRequest', page);
+      },
+      lastPage: function(){
+        console.log('last page');
+        var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
+        console.log('number of pages on last view ' + numberOfPagesOnLastSet);
+        console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
+        this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
+        this.send('pageRequest', this.get('pages.lastObject'));
       }
     },
-    needs: ["searchResults", "searchInput", "pages"]
+
+
+    totalPageItems: function(){
+      return this.get('searchResults.total');
+    }.property('searchResults'),
+    
+    numberOfPages: function(){
+      return Math.ceil(this.get('searchResults.total') / this.get('pageSize'));
+    }.property('searchResults'),
+
+    buildPages: function(startAtPageIndex, activeIndex){
+      //Build Page Index
+      console.log('Building pages with startAtPageIndex: ' + startAtPageIndex + ", activeIndex: " + activeIndex);
+      var newPages = Ember.A();
+      this.set('pages', newPages);
+      var numberOfPages = this.get('numberOfPages');
+      var maxIndex = startAtPageIndex + this.get('maxPageIndexesShown') - 1;
+      console.log('building pages from ' + startAtPageIndex + ' to max ' + maxIndex + ' out of total ' + numberOfPages);
+      console.log('number of pages are ' + numberOfPages);
+      for (i=startAtPageIndex; i <= numberOfPages && i <= maxIndex; i++){
+        var page = MyApp.Page.create();
+        page.active = false;
+        page.index = i;
+        newPages.pushObject(page);
+      }
+      console.log('setting current page to ' + (activeIndex) + ' and making active');
+      this.set('currentPage', newPages.objectAt(activeIndex - 1));
+      this.get('currentPage').set('active', true);
+    },
+    shouldDisplayNavigation: function(){
+      var mypages = this.get('pages'); 
+      if (mypages != null){
+        if (mypages.length > 1) return true;
+      }else{
+        return false;
+      }
+    }.property('pages'),
+    displayWidthStyling: function(){
+      var itemWidth = 4;
+      return 'width: ' + ((4 * itemWidth) + (this.get('pages.length') * itemWidth)) + 'em;';
+    }.property('pages')
   });
 
   MyApp.TextSearchController.reopenClass({
     find: function(searchString, pageIndex, pageSize){
+      console.log('find(searchString: \'' + searchString + '\', pageIndex: ' + pageIndex + ', pageSize: ' + pageSize + ')');
       return Ember.Deferred.promise(function(p) {
         var startIndex = (pageIndex - 1) * pageSize;
         p.resolve($.getJSON("http://solr.snomedtools.com/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
@@ -87,32 +214,18 @@
 
 
 // (TEXT) SEARCH INPUT
-  //IS this controller even used?
-  MyApp.SearchInputController  = Ember.ObjectController.extend({  
-    query: null,
-    needs: ["textSearch", "searchInput", "searchResults"]
-  });
-
   MyApp.SearchInputView = Ember.View.extend({
     templateName: 'searchInput',
     keyUp: function(evt) {
       //looks like current controller is textSearchController?
       //Or maybe it bubbles to it?
       this.get('controller').send('search', this.get('controller.query'));
-    },
-    needs: ["textSearch", "searchInput", "searchResults"]
+    }
   });
 
 
 
 // (TEXT) SEARCH RESULTS
-
-  MyApp.SearchResultsController  = Ember.ObjectController.extend({
-    needs: ['pages', 'textSearch'],
-    searchResults: function(){
-      return this.get('controllers.textSearch.searchResults');
-    }.property()
-  });
 
   MyApp.SearchResultsView = Ember.View.extend({
     templateName: 'searchResults'
@@ -149,139 +262,13 @@
 
   MyApp.Page = Ember.Object.extend({
     active: false,
-    index: null
+    index: null,
   });
 
-  MyApp.PagesController = Ember.Controller.extend({
-    model: null,
-    selection: null,
-    currentPage: null,
-    maxPageIndexesShown: 10,
-    pageSize: 8,
-    totalItems: function(){
-      console.log('in totalItems now: ' + this.get('controllers.textSearch.searchResults.total'));
-      return this.get('controllers.textSearch.searchResults.total');
-    },
-    numberOfPages: function(){
-      return Math.ceil(this.get('controllers.textSearch.searchResults.total') / this.get('pageSize'));
-    }.property('totalItems'),
-
-    displayWidthStyling: function(){
-      var itemWidth = 4;
-       return 'width: ' + ((4 * itemWidth) + (this.get('model.length') * itemWidth)) + 'em;';
-    }.property('model'),
-    needs: ["searchResults", "textSearch"],
-    actions:{
-      firstPage: function(){
-        console.log('First page'); 
-        this.buildPages(1, 1);
-        this.send('pageRequest', this.get('model.firstObject'));
-      },
-      previousPage: function(){
-        console.log('previous page');
-        var page = null;
-        if ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown') == 0){
-          //Assertion: we are at the first displayed page index
-          console.log('we are at the first displayed page index');
-          if (this.get('currentPage.index') == 1){
-            //assertion: we are at the beginning of the list of pages, so loop around to the back.
-            console.log('we are at the beginning of the list of pages, so loop around to the back');
-            console.log('last page');
-            var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
-            console.log('number of pages on last view ' + numberOfPagesOnLastSet);
-            console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
-            this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
-            page = this.get('model.lastObject');
-          }
-          else{
-            //assertion: there are more page indexes to the left / below to display
-            console.log('there are more page indexes to the left / below to display');
-            var index = this.get('currentPage.index') - this.get('maxPageIndexesShown');
-            console.log('buildPages(' + index + ', ' + this.get('maxPageIndexesShown') + ')');
-            this.buildPages(index, this.get('maxPageIndexesShown'));
-            page = this.get('model.lastObject');
-          }
-        }else{
-          var index = ((this.get('currentPage.index') - 1) % this.get('maxPageIndexesShown')) - 1;
-          console.log('we are not at the beginning of the page list');
-          console.log('selecting model.objectAt (' + index + ') for page');
-          page = this.get('model').objectAt(index);
-        }
-        console.log('change page to index ' + page.get('index'));
-        this.send('pageRequest', page);
-      },
-      nextPage: function(){
-        var page = null;
-        if ((this.get('currentPage.index') % this.get('maxPageIndexesShown') == 0)
-            || (this.get('currentPage.index') == this.get('numberOfPages'))){
-          //Assertion: we are at the last displayed page index
-          console.log('we are at the last displayed page index');
-          if (this.get('currentPage.index') == this.get('numberOfPages')){
-            //assertion: we are at the end of the list of pages, so loop around.
-            console.log('we are at the end of the list of pages, so loop around.');
-            console.log('First page');
-            console.log('buildpages(1, 1)');
-            this.buildPages(1, 1);
-            page = this.get('model.firstObject');
-          }
-          else{
-            //Assertion: we are at the last displayed page index
-            //assertion: there are more page indexes to display
-            console.log('there are more page indexes to display');
-            var index = this.get('currentPage.index') + 1;
-            console.log('buildPages(' + index + ', 1)');
-            this.buildPages(index, 1);
-            page = this.get('model.firstObject');
-          }
-        }else{
-          console.log('we are not at the end of the page list');
-          var index = this.get('currentPage.index') % this.get('maxPageIndexesShown');
-          console.log('getting page: model.objectAt(' + index + ')');
-          page = this.get('model').objectAt(index);
-        }
-        
-        this.send('pageRequest', page);
-      },
-      lastPage: function(){
-        console.log('last page');
-        var numberOfPagesOnLastSet = this.get('numberOfPages') % this.get('maxPageIndexesShown');
-        console.log('number of pages on last view ' + numberOfPagesOnLastSet);
-        console.log('calling buildPages(' + (this.get('numberOfPages') - numberOfPagesOnLastSet) + ', ' + this.get('numberOfPages') + ')');
-        this.buildPages(this.get('numberOfPages') - numberOfPagesOnLastSet + 1, numberOfPagesOnLastSet);
-        this.send('pageRequest', this.get('model.lastObject'));
-      }
-    },
-
-    shouldDisplayNavigation: function(){
-      var model = this.get('model'); 
-      if (model != null){
-        if (model.length > 1) return true;
-      }else{
-        return false;
-      }
-    }.property('model'),
+  MyApp.PagesView = Ember.View.extend({
+    templateName: 'pages', 
     
-    buildPages: function(startAtPageIndex, activeIndex){
-      //Build Page Index
-      this.set('model', Ember.A());
-      var numberOfPages = this.get('numberOfPages');
-      var maxIndex = startAtPageIndex + this.get('maxPageIndexesShown') - 1;
-      console.log('building pages from ' + startAtPageIndex + ' to max ' + maxIndex + ' out of total ' + numberOfPages);
-      console.log('number of pages are ' + numberOfPages);
-      for (i=startAtPageIndex; i <= numberOfPages && i <= maxIndex; i++){
-        var page = MyApp.Page.create();
-        page.active = false;
-        page.index = i;
-        this.get('model').pushObject(page);
-      }
-      console.log('setting current page to ' + (activeIndex) + ' and making active');
-      this.set('currentPage', this.get('model').objectAt(activeIndex - 1));
-      this.get('currentPage').set('active', true);
-    }
-  });
+  })
 
-MyApp.Page = Ember.Object.extend({
-  active: false,
-  index: null
-});
+
 

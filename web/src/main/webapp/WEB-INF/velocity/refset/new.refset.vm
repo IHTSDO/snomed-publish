@@ -1,30 +1,30 @@
 #set( $layout = "refset/layout.vm" )
 #set ($title = "#springMessage('page.title.new.refset')")
-#set ($staticPageScripts = ["/static/js/new.refset.js"])
-#set ($dynamicPageScripts = ["refset/plan.js.vm"])
+#set ($staticPageScripts = ["/static/js/edit.refset.js", "/static/js/textSearch.js"])
 #set ($pageCss = ["/static/css/textSearch.css"])
-#set ($modals = [])
+#set ($modals = ['textSearch.vm', 'textSearchModal.vm'])
 <div id="refset" class="new">
   <ol class="breadcrumb">
     <li><a href='#springUrl("..")'>Refsets</a></li>
     <li class="active">New Refset</li>
   </ol>
   <div class="container">
-
     #[[  
     <script type="text/x-handlebars">
       {{partial 'textSearchModal'}}
       {{outlet}}
+      ]]#
+      <form role="form" method="post" action='#springUrl("new")'>
+        #parse('refset/edit.refset.simple.inputs.vm')
+        <div class="form-actions">
+          <button type="submit" class="btn btn-sm btn-primary bottom">#springMessage('button.refset.create')</button>
+        </div>
+      </form>      
+      #[[
     </script>
     ]]#
 
-    <form role="form" method="post" action='#springUrl("new")'>
 
-      #parse('refset/edit.refset.inputs.vm')
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn-sm btn-primary bottom">#springMessage('button.refset.create')</button>
-      </div>
-    </form>
   </div>
 </div>

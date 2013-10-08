@@ -1,0 +1,57 @@
+
+<!-- Typekit -->
+<script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!-- Google -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-21180921-2', 'snomedtools.com');
+  ga('send', 'pageview');
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-21180921-2', 'browser.snomedtools.com');
+  ga('send', 'pageview');
+</script>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="//code.jquery.com/jquery.js"></script>
+
+<!-- Bootstrap -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Bootbox -->
+<script src="/static/js/bootbox.js"></script>
+
+<!-- Handlebars -->
+<script src="/static/js/libs/handlebars-1.0.0.js"></script>
+
+<!-- Ember -->
+<script src="/static/js/libs/ember-1.0.0.js"></script>
+
+<!-- Ember Bootstrap -->
+<script src="/static/js/libs/ember-bootstrap.js"></script>
+
+<!-- TogetherJS + Firebase -->
+<script>
+  TowTruckConfig_hubBase = "https://snomed.firebaseio.com/";
+</script>
+<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+<script src="http://firebase.github.io/togetherjs/togetherjs.js"></script>
+
+
+<!-- This Application -->
+<script src="/static/js/search.js"></script>
+
+<!-- SNOMED MODULES -->
+<script src="/static/js/textSearch.js"></script>

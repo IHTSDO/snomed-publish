@@ -9,5 +9,6 @@
         $screen_content
         #parse('textSearch.vm')
     </div>
+    #parse('search/footer.scripts.vm')
   </body>
 </html>

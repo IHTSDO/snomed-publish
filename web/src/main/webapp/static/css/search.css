@@ -14,44 +14,13 @@ h1,h2,h3{
 #page-header h1{
     font-family: click-clack-1, click-clack-2, serif;
     margin-top: 0.25em;
+    font-size: 3em;
 }
 #page-header{
-    padding: 2em 0;
+    margin: 2em 0 0;
 }
 #page-header img{
     max-height: 4em;
-}
-
-/**********
- * Footer *
-***********/
-#footer{
-  font-family: "museo-sans-1","museo-sans-2", Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
-  margin: 2em 0 4em;
-  text-align: center;
-}
-
-#footer .author{
-    color: #cccccc;
-}
-
-#footer .author a{
-    color: #cccccc;
-}
-
-#footer .author .name{
-    /*font-family: click-clack-1, click-clack-2, serif;*/
-}
-
-#footer .link{
-    margin-top: 0.25em;
-    margin-left: -0.5em;
-}
-
-#footer img{
-    width: 2.5em;
-    margin-right: 0.5em;
-    opacity: 0.6;
 }
 
 

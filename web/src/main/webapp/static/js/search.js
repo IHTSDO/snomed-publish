@@ -12,7 +12,7 @@ MyApp.Router.map(function() {
 
 MyApp.ApplicationRoute = Ember.Route.extend({
   setupController: function(controller, model) {
-    this.controllerFor('pages').set('maxPageIndexesShown', 10);
+    this.controllerFor('textSearch').set('maxPageIndexesShown', 10);
   },
   actions:{
     click: function(concept){
