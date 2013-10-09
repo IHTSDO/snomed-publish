@@ -25,7 +25,7 @@
   <h3 style="padding-top: 1em">Concepts</h3>
   <div class="list-group clearfix" id="concepts">
     #foreach ($concept in $refset.plan.concepts)
-      <a hre="http://browser.snomedtools.com/version/1/concept/$concept.id" target="_blank" class="list-group-item">${concept.displayName} <small style="color: lightgrey;">$concept.id</small></a>
+      <a href="http://browser.snomedtools.com/version/1/concept/$concept.serialisedId" target="_blank" class="list-group-item">${concept.displayName} <small style="color: lightgrey;padding-left:0.5em">$concept.serialisedId</small></a>
     #end
   </div>
   <a href='#springUrl("$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>
