@@ -15,6 +15,8 @@ public class RefsetDto {
     
     @NotNull(message="validation.refset.concept.not.null")
     private Long concept;
+    
+    private String conceptDisplayName;
 
     @NotNull(message="validation.refset.publicid.not.null")
     @Size(min=2, max=20, message="validation.refset.publicid.size")
@@ -130,14 +132,24 @@ public class RefsetDto {
         this.plan = plan;
     }
     
-    public static Builder getBuilder(Long id, Long conceptId, String title, String description, String publicId, RefsetPlanDto plan) {
-        return new Builder(id, conceptId, title, description, publicId, plan);
+    
+    
+    public String getConceptDisplayName() {
+        return conceptDisplayName;
+    }
+
+    public void setConceptDisplayName(String conceptDisplayName) {
+        this.conceptDisplayName = conceptDisplayName;
+    }
+
+    public static Builder getBuilder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, RefsetPlanDto plan) {
+        return new Builder(id, conceptId, conceptDisplayName, title, description, publicId, plan);
     }
     
     public static class Builder {
         private RefsetDto built;
 
-        Builder(Long id, Long conceptId, String title, String description, String publicId, RefsetPlanDto plan) {
+        Builder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, RefsetPlanDto plan) {
             built = new RefsetDto();
             built.setConcept(conceptId);
             built.setDescription(description);
@@ -145,6 +157,7 @@ public class RefsetDto {
             built.setPlan(plan);
             built.setPublicId(publicId);
             built.setTitle(title);
+            built.setConceptDisplayName(conceptDisplayName);
         }
         
         public RefsetDto build(){

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
@@ -59,6 +61,9 @@ public class RefsetRuleDto {
     protected RuleType type;
     private Long left;
     private Long right;
+    
+    @XmlElementWrapper(name = "concepts")
+    @XmlElement(name="concept")
     private List<ConceptDto> concepts = new ArrayList<>();
     
     public RefsetRuleDto addConcept(ConceptDto concept){

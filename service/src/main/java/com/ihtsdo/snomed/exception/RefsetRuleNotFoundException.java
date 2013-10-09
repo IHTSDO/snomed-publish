@@ -4,13 +4,16 @@ public class RefsetRuleNotFoundException extends Exception {
 
     private static final long serialVersionUID = 9145348616866771322L;
 
-    public RefsetRuleNotFoundException() {
-        // TODO Auto-generated constructor stub
+    private Long id;
+    
+    public RefsetRuleNotFoundException(Long id) {
+        super();
+        this.id = id;
     }
 
-    public RefsetRuleNotFoundException(String message) {
+    public RefsetRuleNotFoundException(Long id, String message) {
         super(message);
-        // TODO Auto-generated constructor stub
+        this.id = id;
     }
 
     public RefsetRuleNotFoundException(Throwable cause) {
@@ -29,4 +32,7 @@ public class RefsetRuleNotFoundException extends Exception {
         // TODO Auto-generated constructor stub
     }
 
+    public Long getId() {
+        return id;
+    }
 }

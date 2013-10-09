@@ -120,7 +120,9 @@ public class RefsetPlanDto {
             if (rule instanceof ListConceptsRefsetRule){
                 ListConceptsRefsetRule lcRule = (ListConceptsRefsetRule)rule;
                 for (Concept c : lcRule.getConcepts()){
-                    refsetRuleDto.addConcept(new ConceptDto(c.getSerialisedId()));
+                    ConceptDto conceptDto = new ConceptDto(c.getSerialisedId());
+                    conceptDto.setDisplayName(c.getDisplayName());
+                    refsetRuleDto.addConcept(conceptDto);
                 }
             }
             else if (rule instanceof BaseSetOperationRefsetRule){

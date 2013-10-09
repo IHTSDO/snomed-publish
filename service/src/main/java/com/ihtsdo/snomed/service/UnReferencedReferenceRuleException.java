@@ -4,9 +4,6 @@ import com.ihtsdo.snomed.exception.ProgrammingException;
 
 public class UnReferencedReferenceRuleException extends ProgrammingException {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -4576515398257471702L;
 
     public UnReferencedReferenceRuleException() {

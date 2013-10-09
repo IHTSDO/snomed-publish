@@ -1,6 +1,5 @@
 <div id="primary-attr" class="clearfix">
-  #springFormHiddenInput("refset.id")
-  
+
   #springBind("refset.concept")
   #set ($state="")
   #if ($status.error)

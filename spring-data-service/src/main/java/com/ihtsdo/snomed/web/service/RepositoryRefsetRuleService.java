@@ -53,7 +53,7 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
         LOG.debug("Updating refset rule with information: " + updated);
         BaseRefsetRule rule = refsetRuleRepository.findOne(updated.getId());
         if (rule == null) {
-            throw new RefsetRuleNotFoundException("No refset found with id: " + updated.getId());
+            throw new RefsetRuleNotFoundException(updated.getId(), "No refset found with id: " + updated.getId());
         }
         if (rule instanceof ListConceptsRefsetRule){
             updateConcepts(updated, rule);
@@ -82,7 +82,7 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
         LOG.debug("Deleting refset with id: " + refsetRuleId);
         BaseRefsetRule deleted = refsetRuleRepository.findOne(refsetRuleId);
         if (deleted == null) {
-            throw new RefsetRuleNotFoundException("No refset found with id: " + refsetRuleId);
+            throw new RefsetRuleNotFoundException(refsetRuleId, "No refset found with id: " + refsetRuleId);
         }
         refsetRuleRepository.delete(deleted);
         return deleted;
@@ -94,7 +94,7 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
         for (ConceptDto conceptDto : created.getConcepts()){
             Concept c = conceptService.findBySerialisedId(conceptDto.getId());
             if (c == null){
-                throw new ConceptNotFoundException("Did not find concept with serialisedId " + conceptDto.getId());
+                throw new ConceptNotFoundException(conceptDto.getId(), "Did not find concept with serialisedId " + conceptDto.getId());
             }
             lcRule.addConcept(c);
         }

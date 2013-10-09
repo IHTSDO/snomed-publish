@@ -3,15 +3,29 @@ package com.ihtsdo.snomed.exception;
 public class RefsetNotFoundException extends Exception {
 
     private static final long serialVersionUID = 9145348616866771322L;
+    private Long id;
+    private String publicId;
 
-    public RefsetNotFoundException() {
-        // TODO Auto-generated constructor stub
+    public RefsetNotFoundException(Long id) {
+        super();
+        this.id = id;
+    }
+    
+    public RefsetNotFoundException(String publicId){
+        super();
+        this.publicId = publicId;
     }
 
-    public RefsetNotFoundException(String message) {
+    public RefsetNotFoundException(Long id, String message) {
         super(message);
-        // TODO Auto-generated constructor stub
+        this.id = id;
     }
+    
+    public RefsetNotFoundException(String publicId, String message) {
+        super(message);
+        this.publicId = publicId;
+    }
+
 
     public RefsetNotFoundException(Throwable cause) {
         super(cause);
@@ -29,4 +43,10 @@ public class RefsetNotFoundException extends Exception {
         // TODO Auto-generated constructor stub
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    
+    
 }

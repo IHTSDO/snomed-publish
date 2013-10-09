@@ -26,14 +26,17 @@ import org.springframework.ui.ModelMap;
 import org.springframework.util.AutoPopulatingList;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
@@ -55,6 +58,9 @@ import com.ihtsdo.snomed.model.xml.XmlRefsets;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
+import com.ihtsdo.snomed.web.dto.RefsetErrorDto;
+import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
+import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
 @Controller
@@ -111,7 +117,7 @@ public class RefsetController {
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
 
         Refset refset = refsetService.findByPublicId(pubId);
-        
+        refset.getPlan().refreshConceptsCache();
         //refset.setRefsetPlan(dummyRefsetPlan());
         
         //model.addAttribute("rules", refset.getPlan().getRules());
@@ -148,7 +154,8 @@ public class RefsetController {
         planDto.setRefsetRules(autoList);
         RefsetDto newRefsetFbo = RefsetDto.getBuilder(
                 refset.getId(), 
-                refset.getConcept().getSerialisedId(), 
+                refset.getConcept().getSerialisedId(),
+                refset.getConcept().getDisplayName(),
                 refset.getTitle(), 
                 refset.getDescription(), 
                 refset.getPublicId(), 
@@ -201,7 +208,7 @@ public class RefsetController {
         
         Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
         if (refset != null){
-            result.addError(createFieldError(refsetDto, result));
+            setPublicIdNotUniqueFieldError(refsetDto, result);
         }
         
         if (result.hasErrors()) {
@@ -216,9 +223,119 @@ public class RefsetController {
             attributes.addAttribute("port", request.getServerPort());
             return new ModelAndView("redirect:http://{server}:{port}/refsets/");
         } catch (NonUniquePublicIdException e) {
-            result.addError(createFieldError(refsetDto, result));
+            setPublicIdNotUniqueFieldError(refsetDto, result);
             return new ModelAndView("/refset/new.refset");
         }
+    }
+    
+    
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/put", method = RequestMethod.POST, 
+    produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
+    consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public RefsetResponseDto updateRefsetWs(@Valid @RequestBody RefsetDto refsetDto,
+            BindingResult result, @PathVariable String pubId){
+        int returnCode = RefsetResponseDto.FAIL;
+        LOG.debug("Controller received request to update refset {}", refsetDto.toString());
+        RefsetResponseDto response = new RefsetResponseDto();
+        response.setPublicId(pubId);
+        
+        Refset refset = refsetService.findById(refsetDto.getId());
+        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
+            //Assertion: user has updated the public id
+            refset = refsetService.findByPublicId(refsetDto.getPublicId());
+            if (refset != null){
+                returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+                setPublicIdNotUniqueFieldError(refsetDto, result);
+            }
+        }
+        if (!Objects.equal(refsetDto.getPublicId(), pubId)){
+            returnCode = RefsetResponseDto.FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING;
+            result.addError(new ObjectError(result.getObjectName(), 
+                    getMessage("xml.response.error.url.and.body.public.id.not.matching", 
+                            pubId, refsetDto.getPublicId())));
+        }
+        
+        if (result.hasErrors()) {
+            return withErrors(result, response, returnCode);
+        }
+        
+        try {
+            Refset updated = refsetService.update(refsetDto);
+            if (updated != null){
+                return success(response, updated, Status.UPDATED, RefsetResponseDto.SUCCESS_UPDATED);
+            }
+            
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.updated", refsetDto.getPublicId(), refsetDto.getId())));
+            return withErrors(result, response, RefsetResponseDto.FAIL);
+        } catch (NonUniquePublicIdException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+            setPublicIdNotUniqueFieldError(refsetDto, result);
+        } catch (UnReferencedReferenceRuleException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+           result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
+        } catch (RefsetNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_REFSET_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.found", e.getId())));
+        } catch (ConceptNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
+        } catch (UnconnectedRefsetRuleException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
+        } catch (RefsetRuleNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
+        } catch (RefsetPlanNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
+        }
+        return withErrors(result, response, returnCode);
+    }
+
+
+
+    private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
+        LOG.debug("Refset succesfully updated");
+        response.setRefset(RefsetDto.getBuilder(updated.getId(), 
+                (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
+                (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
+                updated.getTitle(), updated.getDescription(), updated.getPublicId(), 
+                RefsetPlanDto.parse(updated.getPlan())).build());
+        response.setSuccess(true);
+        response.setStatus(status);
+        response.setCode(returnCode);
+        return response;
+    }
+    
+    private RefsetResponseDto withErrors(BindingResult result, RefsetResponseDto response, int returnCode) {
+        LOG.error("Found errors: ");
+        for (ObjectError error : result.getAllErrors()){
+            LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
+        }
+        for (FieldError fError : result.getFieldErrors()){
+            RefsetErrorDto error = new RefsetErrorDto();
+            error.setField(fError.getField());
+            error.setDisplayMessage(fError.getDefaultMessage());
+            response.addFieldError(fError.getField(), error);
+        }
+        for (ObjectError gError : result.getGlobalErrors()){
+            RefsetErrorDto error = new RefsetErrorDto();
+            error.setDisplayMessage(gError.getDefaultMessage());
+            response.addGlobalError(error);
+        }
+        response.setSuccess(false);
+        response.setCode(returnCode);
+        response.setStatus(Status.FAIL);
+        return response;
     }
 
     // UPDATE
@@ -231,8 +348,7 @@ public class RefsetController {
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
             BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
         // TODO: Handle RefsetNotFoundException
-        LOG.debug("Controller received request to update refset [{}]",
-                refsetDto.toString());
+        LOG.debug("Controller received request to update refset [{}]", refsetDto.toString());
 //        model.addAttribute("user",
 //                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
         model.addAttribute("pubid", pubId);
@@ -243,11 +359,15 @@ public class RefsetController {
             //Assertion: user has updated the public id
             refset = refsetService.findByPublicId(refsetDto.getPublicId());
             if (refset != null){
-                result.addError(createFieldError(refsetDto, result));
+                setPublicIdNotUniqueFieldError(refsetDto, result);
             }
         }
         
         if (result.hasErrors()) {
+            LOG.error("Found errors: ");
+            for (ObjectError error : result.getAllErrors()){
+                LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
+            }
             return new ModelAndView("/refset/edit.refset");
         }
         
@@ -260,7 +380,7 @@ public class RefsetController {
             
         } catch (NonUniquePublicIdException e) {
             //defensive coding
-            result.addError(createFieldError(refsetDto, result));
+            setPublicIdNotUniqueFieldError(refsetDto, result);
             return new ModelAndView("/refset/edit.refset");
         }
     }
@@ -296,7 +416,9 @@ public class RefsetController {
     private RefsetDto blah(String pubId) {
         Refset refset = refsetService.findByPublicId(pubId);
         System.out.println("Found refset " + refset);
-        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), (refset.getConcept() == null) ? 0 : refset.getConcept().getId(), 
+        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), 
+                (refset.getConcept() == null) ? 0 : refset.getConcept().getSerialisedId(),
+                (refset.getConcept() == null) ? null : refset.getConcept().getDisplayName(),
                 refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
                 RefsetPlanDto.parse(refset.getPlan())).build();
         System.out.println("Returning refsetDto " + refsetDto);
@@ -408,16 +530,16 @@ public class RefsetController {
     
     
 
-    private FieldError createFieldError(RefsetDto refsetDto,
-            BindingResult result) {
-        return new FieldError(
+    private BindingResult setPublicIdNotUniqueFieldError(RefsetDto refsetDto, BindingResult result){
+        result.addError(new FieldError(
                 result.getObjectName(), 
                 "publicId", 
                 refsetDto.getPublicId(),
                 false, 
                 null,
                 null,
-                "validation.refset.publicid.notunique");
+                "xml.response.error.publicid.not.unique"));
+        return result;
     }
 
     private void addFeedbackMessage(RedirectAttributes attributes,

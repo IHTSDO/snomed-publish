@@ -74,7 +74,9 @@ h2.plan{
     font-size: 0.9em;
     font-family : futura-pt-1, futura-pt-2; 
     text-align: right;
+    margin-bottom: 2em;
     margin-right: 0.5em;
+    margin-top: -3.7em;
 }
 
 #rules{
@@ -105,6 +107,28 @@ h2.plan{
 #rules .description{
     font-family: "proxima-nova-1","proxima-nova-2",sans-serif !important;
 }
+/******************
+ * Response Modal *
+*******************/
+.response{
+    width: 100%;
+}
+
+.response .parameter{
+    padding: 0.25em 0;
+}
+
+.response  .parameter .name{
+    width: 6em;
+    font-weight: bold;
+    float: left;
+    font-family: museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}
+
+.response  .parameter .value{
+    float: left;
+}
+
 
 /***************
  * Refset Edit *

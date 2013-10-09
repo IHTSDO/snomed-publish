@@ -56,7 +56,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
         LOG.debug("Updating refset plan with information: " + updated);
         RefsetPlan plan = refsetPlanRepository.findOne(updated.getId());
         if (plan == null) {
-            throw new RefsetPlanNotFoundException("No refset plan found with id: " + updated.getId());
+            throw new RefsetPlanNotFoundException(updated.getId(), "No refset plan found with id: " + updated.getId());
         }
         plan.setTerminal(createRules(updated));
         RefsetPlan saved = refsetPlanRepository.save(plan);
@@ -83,7 +83,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
         LOG.debug("Deleting refset plan with id: " + refsetPlanId);
         RefsetPlan deleted = refsetPlanRepository.findOne(refsetPlanId);
         if (deleted == null) {
-            throw new RefsetPlanNotFoundException("No refset plan found with id: " + refsetPlanId);
+            throw new RefsetPlanNotFoundException(refsetPlanId, "No refset plan found with id: " + refsetPlanId);
         }
         refsetPlanRepository.delete(deleted);
         return deleted;
@@ -105,7 +105,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
             }
             
             if (rule == null){
-                throw new RefsetRuleNotFoundException("Unable to find rule for ruleDto " + ruleDto.toString());
+                throw new RefsetRuleNotFoundException(ruleDto.getId(), "Unable to find rule for ruleDto " + ruleDto.toString());
             }
             
             dtoIdToRuleMap.put(ruleDto.getId(), rule);
@@ -137,7 +137,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
                 setOpRule.setLeftRule(dtoIdToRuleMap.get(ruleDto.getLeft()));
                 setOpRule.setRightRule(dtoIdToRuleMap.get(ruleDto.getRight()));
                 if ((setOpRule.getLeft() == null)||(setOpRule.getRight() == null)){
-                    throw new UnconnectedRefsetRuleException("Rule DTO [" + ruleDto.toString() + "] has unconnected inputs");
+                    throw new UnconnectedRefsetRuleException(ruleDto.getId(), "Rule DTO [" + ruleDto.toString() + "] has unconnected inputs");
                 }
                 referencedRules.add(setOpRule.getLeft());
                 referencedRules.add(setOpRule.getRight());

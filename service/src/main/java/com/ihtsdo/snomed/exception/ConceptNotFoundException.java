@@ -1,19 +1,18 @@
 package com.ihtsdo.snomed.exception;
 
 public class ConceptNotFoundException extends Exception {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1081154695445634831L;
 
-    public ConceptNotFoundException() {
-        // TODO Auto-generated constructor stub
+    private Long id;
+    
+    public ConceptNotFoundException(Long id) {
+        super();
+        this.id = id;
     }
 
-    public ConceptNotFoundException(String message) {
+    public ConceptNotFoundException(Long id, String message) {
         super(message);
-        // TODO Auto-generated constructor stub
+        this.id = id;
     }
 
     public ConceptNotFoundException(Throwable cause) {
@@ -31,5 +30,11 @@ public class ConceptNotFoundException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
         // TODO Auto-generated constructor stub
     }
+
+    public Long getId() {
+        return id;
+    }
+    
+    
 
 }

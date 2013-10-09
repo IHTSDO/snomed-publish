@@ -1,4 +1,4 @@
-  #springFormHiddenInput("refset.plan.id")
+  
     <div id="bindings">
       #set ($count = 0)
       #foreach($rule in ${refset.plan.refsetRules})

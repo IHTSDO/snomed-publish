@@ -1,19 +1,19 @@
 package com.ihtsdo.snomed.exception;
 
+
 public class UnconnectedRefsetRuleException extends Exception {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -3620245059711682064L;
+    
+    private Long id;
 
-    public UnconnectedRefsetRuleException() {
-        // TODO Auto-generated constructor stub
+    public UnconnectedRefsetRuleException(Long id) {
+        super();
+        this.id = id;
     }
 
-    public UnconnectedRefsetRuleException(String message) {
+    public UnconnectedRefsetRuleException(Long id, String message) {
         super(message);
-        // TODO Auto-generated constructor stub
+        this.id = id;
     }
 
     public UnconnectedRefsetRuleException(Throwable cause) {
@@ -31,5 +31,11 @@ public class UnconnectedRefsetRuleException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
         // TODO Auto-generated constructor stub
     }
+
+    public Long getId() {
+        return id;
+    }
+    
+    
 
 }

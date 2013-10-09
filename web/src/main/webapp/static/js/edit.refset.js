@@ -5,8 +5,8 @@ MyApp = Ember.Application.create({
 
 MyApp.Router.map(function() {
   this.route('index', {path: '/'});
-  this.resource("concepts", {path: "/"});
-  this.resource("rules", {path: "/concepts"});
+  this.resource("rules", {path: "/"});
+  this.resource("concepts", {path: "/concepts"});
 });
  
 MyApp.ApplicationRoute = Ember.Route.extend({
@@ -23,9 +23,9 @@ MyApp.ApplicationRoute = Ember.Route.extend({
       console.log('handled click');
       return false;
     },
-  }  
+  },
 });  
 
 MyApp.IndexController = Ember.ObjectController.extend({
-  
+
 });

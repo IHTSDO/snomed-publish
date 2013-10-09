@@ -8,71 +8,24 @@
     <li><a href='#springUrl("..")'>Refsets</a></li>
     <li class="active">$refset.publicId</li>
   </ol>
-  
-  <div class="api-container">
-    
-  </div>  
-  
-  <div class="row">
-      <div class="col-lg-2">
-        <label>#springMessage('label.field.refset.concept')</label>
-      </div>
-      <div class="col-lg-8">
-        <span><a href="http://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></span>
-      </div>
-      <div class="col-lg-2">
-        <div class = "api-links">
-            <span class="xml link"><a href="$xml" target="_blank">XML</a></span>
-            <span class="dividor"> _ </span>
-            <span class="json link"><a href="$json" target="_blank">JSON</a></span>
-        </div>        
-      </div>
+    <div class = "api-links">
+      <span class="xml link"><a href="$xml" target="_blank">XML</a></span>
+      <span class="dividor"> _ </span>
+      <span class="json link"><a href="$json" target="_blank">JSON</a></span>
+    </div>  
+  <div class="clearfix" style="padding-top: 0.5em">
+    <h2 style="float: left; margin-top: 0">$refset.title</h2>
+    <div class="refsetconcept" style="float: right;"><a href="http://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></div>    
+
   </div>
-  <div class="row">
-      <div class="col-lg-2">
-        <label>#springMessage('label.field.refset.title')</label>
-      </div>
-      <div class="col-lg-10">
-        <span>$refset.title</span>
-      </div>        
+  <div class="clearfix">
+    <div class="description" style="float: left">$refset.description</div>
+
   </div>
-  <div class="row">
-      <div class="col-lg-2">
-        <label>#springMessage('label.field.refset.description')</label>
-      </div>
-      <div class="col-lg-10">
-        <span>$refset.description</span>
-      </div>        
-  </div>
-  <div class="row">
-      <div class="col-lg-2">
-        <label>#springMessage('label.field.refset.publicid')</label>
-      </div>
-      <div class="col-lg-10">
-        <span>$refset.publicId</span>
-      </div>        
-  </div>
-  
-  <!-- Display refset plan -->
-  <h2 class="plan">Plan</h2>
-  <div id="rules">
-    #foreach( $rule in $refset.plan.rules )
-    <div class="row">
-      <div class="col-lg-1">Rule $rule.id</div>
-      <div class="col-lg-11">
-        #if( $rule.class.simpleName.equals("ListConceptsRefsetRule") )
-            ListConceptsRefsetRule {$rule.conceptIds}
-        #elseif( $rule.class.simpleName.equals("DifferenceRefsetRule"))
-            Rule $rule.left.id <strong>DifferenceRefsetRule</strong> Rule $rule.right.id
-        #elseif( $rule.class.simpleName.equals("IntersectionRefsetRule"))                
-            Rule $rule.left.id <strong>IntersectionRefsetRule</strong> Rule $rule.right.id
-        #elseif( $rule.class.simpleName.equals("SymmetricDifferenceRefsetRule"))
-            Rule $rule.left.id <strong>Symmetric Difference</strong> Rule $rule.right.id
-        #elseif( $rule.class.simpleName.equals("UnionRefsetRule"))
-            Rule $rule.left.id <strong>Union</strong> Rule $rule.right.id
-        #end
-      </div>
-    </div>
+  <h3 style="padding-top: 1em">Concepts</h3>
+  <div class="list-group clearfix" id="concepts">
+    #foreach ($concept in $refset.plan.concepts)
+      <a hre="http://browser.snomedtools.com/version/1/concept/$concept.id" target="_blank" class="list-group-item">${concept.displayName} <small style="color: lightgrey;">$concept.id</small></a>
     #end
   </div>
   <a href='#springUrl("$refset.publicId/edit")' class="btn btn-sm btn-primary bottom">#springMessage('button.refset.modify')</a>

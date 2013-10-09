@@ -91,7 +91,7 @@ public class RepositoryRefsetService implements RefsetService {
         }
         Concept concept = conceptRepository.findBySerialisedId(updated.getConcept());
         if (concept == null){
-            throw new ConceptNotFoundException("No concept found with id: " + updated.getConcept());
+            throw new ConceptNotFoundException(updated.getConcept(), "No concept found with id: " + updated.getConcept());
         }
         
         RefsetPlan plan = planService.findById(updated.getPlan().getId());
@@ -119,7 +119,7 @@ public class RepositoryRefsetService implements RefsetService {
         
         Concept concept = conceptRepository.findBySerialisedId(created.getConcept());
         if (concept == null){
-            throw new ConceptNotFoundException("No concept found with id: " + created.getConcept());
+            throw new ConceptNotFoundException(created.getConcept(), "No concept found with id: " + created.getConcept());
         }        
 
         
@@ -146,8 +146,7 @@ public class RepositoryRefsetService implements RefsetService {
         LOG.debug("Deleting refset with id: " + refsetId);
         Refset deleted = refsetRepository.findOne(refsetId);
         if (deleted == null) {
-            LOG.debug("No refset found with id: " + refsetId);
-            throw new RefsetNotFoundException();
+            throw new RefsetNotFoundException(refsetId, "No refset found with id: " + refsetId);
         }
         refsetRepository.delete(deleted);
         return deleted;
@@ -159,8 +158,7 @@ public class RepositoryRefsetService implements RefsetService {
         LOG.debug("Deleting refset with public id: " + publicId);
         Refset deleted = refsetRepository.findByPublicId(publicId);
         if (deleted == null) {
-            LOG.debug("No refset found with id: " + publicId);
-            throw new RefsetNotFoundException();
+            throw new RefsetNotFoundException(publicId, "No refset found with public id: " + publicId);
         }
         refsetRepository.delete(deleted);
         return deleted;

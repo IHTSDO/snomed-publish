@@ -2,7 +2,7 @@
 #set ($title = "#springMessage('page.title.edit.refset')")
 #set ($staticPageScripts = ["/static/js/edit.refset.js", "/static/js/plan.js", "/static/js/textSearch.js"])
 #set ($pageCss = ["/static/css/textSearch.css"])
-#set ($modals = ['textSearch.vm', 'textSearchModal.vm', 'refset/plan.vm'])
+#set ($modals = ["textSearch.vm", "textSearchModal.vm", "refset/plan.vm"])
 <div id="refset" class="edit">
   <ol class="breadcrumb">
     <li><a href='../..'>Refsets</a></li>
@@ -14,13 +14,15 @@
     <script type="text/x-handlebars">
       {{render "setRule"}}
       {{render 'listRule'}}
+      {{render 'updateResponse'}}
       {{partial 'textSearchModal'}}
 
       ]]#
       <form role="form" method="post" action='#springUrl("edit")'>
-        #parse('refset/edit.refset.bindings.vm')
+
+
         #parse('refset/edit.refset.simple.inputs.vm')
-      </form>
+
       #[[
 
       <div class="container">
@@ -29,10 +31,10 @@
       
       ]]#
       <div class="form-actions">
-        <button type="submit" class="btn btn-default btn-primary submit">#springMessage('button.refset.update')</button>
+        <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-success btn-xs">Update</button>
       </div>
       #[[
-
+      </form>
     </script>
     ]]#
   </div>
