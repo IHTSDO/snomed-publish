@@ -19,16 +19,8 @@
 
       ]]#
       <form role="form" method="post" action='#springUrl("edit")'>
-
-
-        #parse('refset/edit.refset.simple.inputs.vm')
-
       #[[
-
-      
         {{outlet}}
-      
-      
       ]]#
       <div class="form-actions">
         <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-success btn-std bottom">Update</button>

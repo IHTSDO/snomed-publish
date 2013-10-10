@@ -1,4 +1,26 @@
 #[[ 
+
+<script type="text/x-handlebars" data-template-name="viewDetails">
+  <div class = "api-links">
+      <span class="xml link"><a {{bind-attr href=xmlUrl}} target="_blank">XML</a></span>
+      <span class="dividor"> _ </span>
+      <span class="json link"><a {{bind-attr href=jsonUrl}} target="_blank">JSON</a></span>
+  </div>  
+  <div class="refsetconcept"><a {{bind-attr href=conceptUrl}} target="_blank">{{conceptDisplayName}}</a></div>
+  <div class="editrefset"><a href="#" {{action 'editDetails'}}><span class="glyphicon glyphicon-edit"></span></a></div>
+  <span data-toggle="tooltip" data-animation=true title="first tooltip"><h1 class="title clearfix" >{{title}}</h1></span>
+</script>
+
+<script type="text/x-handlebars" data-template-name="editDetails">
+  <div class="closedetails clearfix">
+    <button  class="close" chref="#" {{action 'viewDetails'}}>&times;</button>
+  </div>  
+  ]]#
+  #parse('refset/edit.refset.simple.inputs.vm')
+  #[[
+
+</script>
+
 <script type="text/x-handlebars" data-template-name="listRuleConcepts">
   <div class="concepts">
     <button type="button" {{action 'gosearch' this}} class="btn btn-info btn-xs mode">Search</button>    
@@ -48,14 +70,14 @@
 </script>  
 
 <script type="text/x-handlebars" data-template-name="rules">
-  <h2 class="plan">
-    <span id="showConcepts" class="clearfix">
-      {{#link-to 'concepts'}}
-
-      {{/link-to}}
-    </span>
-  </h2>  
-  <h3 class="plan">Rules</h3>
+  <div class="details">
+    {{#if isEdit}}
+      {{view MyApp.EditDetailsView}}
+    {{else}}
+      {{view MyApp.ViewDetailsView}}
+    {{/if}}
+  </div>
+  <h4 class="rules">Rules</h4>
   <div id="newrule" class="dropdown clearfix">
     <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">Add Rule</button>      
     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
@@ -80,7 +102,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="concepts">
-  <h2 class="plan">
+  <h2 class="concepts">
     <span id="showConcepts" class="clearfix">
       {{#link-to 'rules'}}
         <button type="button" class="btn btn-success btn-xs">Show Rules</button>

@@ -46,6 +46,53 @@ form.delete{
 /***********
  * Refset  *
 ************/
+h1.title{
+       margin-top: 0;
+}
+
+h1.title a{
+    
+}
+
+h1.title .text{
+    
+}
+
+.row.concept{
+    margin-bottom: 1.5em;
+}
+
+
+.editrefset{
+    float: right;
+    font-size: 2em;
+    margin-top: -1em;
+}
+
+h1.title .link{
+
+}
+
+.refsetconcept{
+    margin-bottom: 0.3em;
+}
+
+.closedetails{
+    margin-top: -0.5em;
+    margin-bottom: 0.5em;
+    margin-right: 0.25em;
+    font-size: 1.5em;
+    font-family: museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}
+
+.closedetails button{
+}
+
+.details{
+    margin-bottom: 2em;
+    margin-top: 1em;
+}
+
 #rules{
     font-family: museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
 }
@@ -56,10 +103,10 @@ form.delete{
 }
 
 .btn.bottom{
-    margin-top: 2em;
+
 }
 
-h2.plan{
+h2.concept, h2.rules{
     margin:0 0 0.5em;
 }
 
@@ -81,7 +128,7 @@ h2.plan{
 }
 
 #rules{
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
 #showConcepts{
@@ -180,8 +227,7 @@ h2.plan{
 
 #listRuleModal .concepts a{
     border: none;
-    padding-bottom: 0.3em;
-    padding-top: 0.3em;
+
 }
 
 #listRuleModal .concepts .list-group{
@@ -211,7 +257,7 @@ h2.plan{
 }
 
 .row.concept .toggle-find-concept .btn.change{
-    margin-top: 0.25em;
+    margin-top: -1em;
     float: right;
 }
 .row.concept .toggle-find-concept.inactive{

@@ -115,18 +115,42 @@ Handlebars.registerHelper('bindings', function(options) {
     templateName: 'concepts'
   });
 
+  MyApp.EditDetailsView = Ember.View.extend({
+    templateName: 'editDetails'
+  });
+
+  MyApp.ViewDetailsView = Ember.View.extend({
+    templateName: 'viewDetails'
+  }); 
+
 // RULES
   MyApp.RulesController = Ember.ObjectController.extend({
     model: undefined,
     //change model to content to apply ember sorting
     sortProperties: ['id'],
+    isEdit: false,
     sortAscending: true,
+    xmlUrl: function(){
+      return '../' + this.get('publicId') + '.xml';
+    }.property('publicId'),
+    jsonUrl: function(){
+      return '../' + this.get('publicId') + '.json';
+    }.property('publicId'),
+    conceptUrl: function(){
+      return 'http://browser.snomedtools.com/version/1/concept/' + this.get('concept');
+    }.property(),
     rules: function (){
       console.log('in rules');
       return this.get('model.plan.refsetRules');
     }.property('model'),
     counter: -1,
     actions:{
+      editDetails: function(){
+        this.set('isEdit', true);
+      },
+      viewDetails: function(){
+        this.set('isEdit', false);
+      },      
       editrule: function(rule){
         console.log('handling editrule event');
         console.log('rule id is ' + rule.id);
@@ -136,47 +160,7 @@ Handlebars.registerHelper('bindings', function(options) {
       },
       removerule: function(rule){
         console.log('handling removerule event');
-        //console.log('rule id is ' + rule.id);
-        //var myset = new Ember.Set(this.get('plan.refsetRules'));
-        //console.log('myset is ' + JSON.stringify(myset));
-        //myset.remove(rule);
-
-        //console.log('here');
-        //if (this.get('plan.refsetRules') != null){
-        //  console.log('there');
-        //  var index = -1;
-        //  this.get('plan.refsetRules').forEach(function(lrule, lIndex, enumerable){
-        //    if (lrule.get('id') === rule.get('id')){
-        //      index = lIndex;
-        //    }
-        //  });
-        //  console.log('index is ' + index);
-        //  if (index != -1){
-        //    this.set('plan.refsetRules', (new Ember.MutableArray(this.get('plan.refsetRules'))).removeAt(index));
-        //  }
-        //}
-
-        
-        var rules = this.get('plan.refsetRules');
-        //var found = rules.findProperty('id', rule.id);
-        //console.log('rules are ' + JSON.stringify(rules));
-        rules.removeObject(rule);
-        console.log('rules are ' + JSON.stringify(rules));
-        
-
-
-        //var emberArray = Ember.A();
-        //for (i = 0; i < rules.length; i++){
-        //  if (rules.objectAt(i).id != rule.id){
-        //    emberArray.pushObject(rules.objectAt(i));
-        //  }
-        //}
-        //this.set('plan.refsetRules', emberArray);
-
-
-        //console.log('myset is now ' + JSON.stringify(myset));
-        //this.set('plan.refsetRules', Ember.A(myset.toArray()));
-        //console.log('Rules are now ' + JSON.stringify(this.get('plan.refsetRules')));
+        this.get('plan.refsetRules').removeObject(rule);
         return false;
       },    
       setterminal: function(ruleid){
