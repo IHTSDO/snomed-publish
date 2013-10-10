@@ -121,7 +121,7 @@ public class RefsetPlanDto {
                 ListConceptsRefsetRule lcRule = (ListConceptsRefsetRule)rule;
                 for (Concept c : lcRule.getConcepts()){
                     ConceptDto conceptDto = new ConceptDto(c.getSerialisedId());
-                    conceptDto.setDisplayName(c.getDisplayName());
+                    conceptDto.setTitle(c.getDisplayName());
                     refsetRuleDto.addConcept(conceptDto);
                 }
             }

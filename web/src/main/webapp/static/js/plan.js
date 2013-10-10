@@ -120,9 +120,60 @@ Handlebars.registerHelper('bindings', function(options) {
     actions:{
       editrule: function(rule){
         console.log('handling editrule event');
-        console.log('rule is ' + rule);
         console.log('rule id is ' + rule.id);
         this.get('controllers.listRule').set('model', rule);
+        this.get('controllers.setRule').set('model', rule);
+        return false;
+      },
+      removerule: function(rule){
+        console.log('handling removerule event');
+        //console.log('rule id is ' + rule.id);
+        //var myset = new Ember.Set(this.get('plan.refsetRules'));
+        //console.log('myset is ' + JSON.stringify(myset));
+        //myset.remove(rule);
+
+        //console.log('here');
+        //if (this.get('plan.refsetRules') != null){
+        //  console.log('there');
+        //  var index = -1;
+        //  this.get('plan.refsetRules').forEach(function(lrule, lIndex, enumerable){
+        //    if (lrule.get('id') === rule.get('id')){
+        //      index = lIndex;
+        //    }
+        //  });
+        //  console.log('index is ' + index);
+        //  if (index != -1){
+        //    this.set('plan.refsetRules', (new Ember.MutableArray(this.get('plan.refsetRules'))).removeAt(index));
+        //  }
+        //}
+
+        
+        var rules = this.get('plan.refsetRules');
+        //var found = rules.findProperty('id', rule.id);
+        //console.log('rules are ' + JSON.stringify(rules));
+        rules.removeObject(rule);
+        console.log('rules are ' + JSON.stringify(rules));
+        
+
+
+        //var emberArray = Ember.A();
+        //for (i = 0; i < rules.length; i++){
+        //  if (rules.objectAt(i).id != rule.id){
+        //    emberArray.pushObject(rules.objectAt(i));
+        //  }
+        //}
+        //this.set('plan.refsetRules', emberArray);
+
+
+        //console.log('myset is now ' + JSON.stringify(myset));
+        //this.set('plan.refsetRules', Ember.A(myset.toArray()));
+        //console.log('Rules are now ' + JSON.stringify(this.get('plan.refsetRules')));
+        return false;
+      },    
+      setterminal: function(ruleid){
+        console.log('handling setterminal event');
+        this.set('plan.terminal', ruleid);
+        return false;
       },
       unionRule: function(){
         console.log('new union rule')
@@ -165,13 +216,7 @@ Handlebars.registerHelper('bindings', function(options) {
         var newRule = MyApp.RuleModel.create();
         newRule.set('type', 'LIST');
         newRule.set('id', this.get('counter'));
-        var c1 = MyApp.Concept.create();
-        var c2 = MyApp.Concept.create();
-        var c3 = MyApp.Concept.create();
-        c1.set('id', 321987003);
-        c2.set('id', 441519008);
-        c3.set('id', 128665000);
-        newRule.set('concepts', [c1, c2, c3]);
+        newRule.set('concepts', Ember.A());
         this.set('counter', this.get('counter') - 1);
         this.get('controllers.listRule').set('model', newRule);
         return false;
@@ -190,10 +235,10 @@ Handlebars.registerHelper('bindings', function(options) {
         console.log('executing refset query: ' + query);
         p.resolve($.getJSON(query)
           .then(function(refset) {
-              console.log('query: refset id is ' + refset.id);
-              console.log('query: plan id is ' + refset.plan.id);
-              console.log('query: rules are ' + refset.plan.rules);
-              return MyApp.toEmberObject(refset);
+              console.log('initialised rules controller with model ' + JSON.stringify(refset));
+              var emberObject = MyApp.toEmberObject(refset);
+              console.log('After Ember treatment, model is ' + JSON.stringify(emberObject));
+              return emberObject;
           }) //then
         );//resolve
       });//deferred promise
@@ -203,7 +248,9 @@ Handlebars.registerHelper('bindings', function(options) {
   MyApp.RulesRoute = Ember.Route.extend({
     model: function(){
       console.log('In RulesRoute, loading Refset');
-      return MyApp.RulesController.getRefset(-1, -1);
+      var myrefset = MyApp.RulesController.getRefset(-1, -1);
+      
+      return myrefset;
     },
     actions: {
       update: function(){
@@ -227,8 +274,10 @@ Handlebars.registerHelper('bindings', function(options) {
             .then(function(response) {
               console.log('Response to update was [' + JSON.stringify(response) + ']');
               var emberResponse =  MyApp.toEmberObject(response);
+              if (response.success){
+                _this.set('controller.model', emberResponse.refset);
+              }
               _this.controllerFor('updateResponse').set('model', emberResponse);
-              _this.set('controller.model', emberResponse.refset);
             }) //then
           );//resolve
         });//deferred promise
@@ -257,13 +306,30 @@ Handlebars.registerHelper('bindings', function(options) {
       save: function(){
         this.get('controllers.rules.model.plan.refsetRules').pushObject(this.get('model'));
         return false;
+      },
+      removeconcept: function(concept){
+        console.log('removing concept ' + JSON.stringify(concept));
+        var concepts = this.get('model');
+        var emberArray = Ember.A();
+        for (i = 0; i < concepts.length; i++){
+          if (concepts.objectAt(i).id != concept.id){
+            emberArray.pushObject(concepts.objectAt(i));
+          }
+        }
+        this.set('model', emberArray);
+
+      },      
+      click: function(concept){
+        this.get('concepts').pushObject(concept);
+        this.set('isSearching', false);
+        return false;
       }
      }    
   });
 
   MyApp.ListRuleRoute = Ember.ObjectController.extend({
     renderTemplate: function(){
-      console.log('I need to be here');
+      
     }
   })
 
@@ -287,12 +353,20 @@ Handlebars.registerHelper('bindings', function(options) {
 
     actions:{
       saverule: function(){
-        this.set('model.left', this.get('model.left.id'));
-        this.set('model.right', this.get('model.right.id'));
         this.get('controllers.rules.model.plan.refsetRules').pushObject(this.get('model'));
         return false;
+      },
+      setLeft: function(ruleId){
+        console.log('handling set left');
+        this.set('left', ruleId);
+        return false;
+      },
+      setRight: function(ruleId){
+        console.log('handling set right');
+        this.set('right', ruleId);
+        return false;
       }
-     }    
+    }    
   });
 
   MyApp.SetRuleView = Ember.View.extend({
@@ -304,20 +378,21 @@ Handlebars.registerHelper('bindings', function(options) {
   MyApp.RuleController = Ember.ObjectController.extend({
     model: undefined,
     isList: function(){
-      return (this.get('model.type') === "LIST");
+      return (this.get('type') === "LIST");
     }.property('type'),
     isUnion: function(){
-      return (this.get('model.type') === "UNION");
+      return (this.get('type') === "UNION");
     }.property('type'),
     isDifference: function(){
-      return (this.get('model.type') === "DIFFERENCE");
+      return (this.get('type') === "DIFFERENCE");
     }.property('type'),
     isIntersection: function(){
-      return (this.get('model.type') === "INTERSECTION");
+      return (this.get('type') === "INTERSECTION");
     }.property('type'),
     isSymDifference: function(){
-      return (this.get('model.type') === "SYMMETRIC");
-    }.property('type')
+      return (this.get('type') === "SYMMETRIC");
+    }.property('type'),
+    needs: "rules"
   });
   
   MyApp.RuleView = Ember.View.extend({

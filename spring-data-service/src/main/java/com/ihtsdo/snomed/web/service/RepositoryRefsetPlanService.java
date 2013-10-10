@@ -90,6 +90,9 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
     }  
     
     private RefsetRule createRules(RefsetPlanDto planDto) throws UnconnectedRefsetRuleException, UnReferencedReferenceRuleException, RefsetRuleNotFoundException, ConceptNotFoundException{
+        if ((planDto.getRefsetRules() == null) || planDto.getRefsetRules().isEmpty()){
+            return null;
+        }
         LOG.debug("Creating rules for refset plan {}", planDto);
         Map<Long, RefsetRule> dtoIdToRuleMap = new HashMap<>();
         Map<Long, RefsetRuleDto> dtoIdToDtoMap = new HashMap<>();

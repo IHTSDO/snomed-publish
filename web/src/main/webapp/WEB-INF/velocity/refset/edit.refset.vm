@@ -9,7 +9,7 @@
     <li><a href='#springUrl("../$pubid")'>$pubId</a></li>
     <li class="active">Update Refset</li>
   </ol>
-  <div class="container">
+  
     #[[  
     <script type="text/x-handlebars">
       {{render "setRule"}}
@@ -25,17 +25,17 @@
 
       #[[
 
-      <div class="container">
+      
         {{outlet}}
-      </div>
+      
       
       ]]#
       <div class="form-actions">
-        <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-success btn-xs">Update</button>
+        <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-success btn-std bottom">Update</button>
       </div>
       #[[
       </form>
     </script>
     ]]#
-  </div>
+  
 </div>

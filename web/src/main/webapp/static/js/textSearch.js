@@ -16,7 +16,7 @@
     currentPage: null,
     maxPageIndexesShown: 5,
     pageSize: 8,
-
+    needs: "searchResults",
     actions:{
       search: function(search) {
         
@@ -33,9 +33,7 @@
         // Ember can't resolve it automatically
         results.then(function(results){
           console.log('query returned with ' + results.total + ' results');
-          console.log('blah');
           _this.set('searchResults', results);
-          console.log('blah2');
           _this.buildPages(1, 1);
           console.log('blah3');
         });
@@ -226,6 +224,9 @@
 
 
 // (TEXT) SEARCH RESULTS
+
+  MyApp.SearchResultsController = Ember.ObjectController.extend({
+  });
 
   MyApp.SearchResultsView = Ember.View.extend({
     templateName: 'searchResults'

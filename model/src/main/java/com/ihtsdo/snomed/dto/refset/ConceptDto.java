@@ -13,7 +13,9 @@ public class ConceptDto {
     }
     
     private Long id;
-    private String displayName;
+    private String title;
+    private boolean active;
+    private long effectiveTime;
     
     @Override
     public String toString(){
@@ -44,13 +46,30 @@ public class ConceptDto {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getDisplayName() {
-        return displayName;
+    public String getTitle() {
+        return title;
     }
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setTitle(String title) {
+        this.title = title;
     }
     
+    
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public long getEffectiveTime() {
+        return effectiveTime;
+    }
+
+    public void setEffectiveTime(long effectiveTime) {
+        this.effectiveTime = effectiveTime;
+    }
+
     public static Builder getBuilder(){
         return new Builder();
     }
@@ -68,7 +87,7 @@ public class ConceptDto {
         }
 
         public Builder displayName(String displayName){
-            built.setDisplayName(displayName);
+            built.setTitle(displayName);
             return this;
         }
 

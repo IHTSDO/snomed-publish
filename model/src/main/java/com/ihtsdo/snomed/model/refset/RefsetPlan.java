@@ -67,7 +67,9 @@ public class RefsetPlan {
     private long version = 0;
     
     public void refreshConceptsCache(){
-        concepts = terminal.generateConcepts();
+        if (getTerminal() != null){
+            concepts = terminal.generateConcepts();
+        }
     }
     
     @Transient

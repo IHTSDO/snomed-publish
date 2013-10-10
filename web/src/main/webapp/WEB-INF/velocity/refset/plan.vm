@@ -1,17 +1,25 @@
 #[[ 
 <script type="text/x-handlebars" data-template-name="listRuleConcepts">
-  <a {{action 'gosearch' this}}>Search for Concepts</a>
-  <h3>Concepts</h3>
-  {{#each concept in model.concepts}}
-    {{concept.id}},  
-  {{/each}}
+  <div class="concepts">
+    <button type="button" {{action 'gosearch' this}} class="btn btn-info btn-xs mode">Search</button>    
+    <h3>Concepts</h3>
+    <div class="list-group clearfix">
+      {{#each concept in concepts}}
+        <a  {{bind-attr href=concept.url}} target="_blank" class="list-group-item">
+          {{concept.title}} <small style="color: lightgrey; padding-left: 0.5em">{{concept.id}}</small>
+          
+          <button type="button" {{action 'removeconcept' concept}} class="close" aria-hidden="true">&times;</button>
+        </a>
+      {{/each}}
+    </div>
+  </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="listRuleSearch">
-  <a {{action 'goconcepts' this}}>View Concepts</a>
+  <button type="button" {{action 'goconcepts' this}} class="btn btn-info btn-xs mode">List</button>
   <h3>Search for Concepts</h3>
   <div id="textSearchTemplate">
-    [{{control textSearch}}]
+    {{control textSearch}}
   </div>
 </script> 
 
@@ -24,40 +32,30 @@
           <h4>List Concepts</h4>
         </div>
         <div class="modal-body">
-        <div class="container">
+
           {{#if isSearching}}
             {{view view.searchView}}
           {{else}}
             {{view view.conceptsView}}
           {{/if}}
-        </div><!-- container -->
-      </div><!-- /.modal-body -->
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
         <button type="button" data-dismiss="modal" {{action 'save'}} class="btn btn-primary btn-sm">Save changes</button>
       </div>    
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
+    </div>
+  </div>
 </script>  
 
 <script type="text/x-handlebars" data-template-name="rules">
   <h2 class="plan">
     <span id="showConcepts" class="clearfix">
       {{#link-to 'concepts'}}
-        <!--button type="button" class="btn btn-success btn-xs">Show Concepts</button-->
+
       {{/link-to}}
     </span>
   </h2>  
   <h3 class="plan">Rules</h3>
-  <div class="list-group clearfix" id="rules">
-    {{#each rule in rules}}
-      {{#if isList}}
-        <a {{action 'editrule' rule}} data-toggle="modal" href="#listRuleModal" class="list-group-item">{{control "rule" rule}}</a>
-      {{else}}
-        <a {{action 'editrule' rule}} data-toggle="modal" href="#setRuleModal" class="list-group-item">{{control "rule" rule}}</a>
-      {{/if}}
-    {{/each}}
-  </div>
   <div id="newrule" class="dropdown clearfix">
     <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">Add Rule</button>      
     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
@@ -70,6 +68,14 @@
       <li role="presentation"><a role="menuitem" {{action 'differenceRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Difference</a></li>
       <li role="presentation"><a role="menuitem" {{action 'symDifferenceRule' this}} data-toggle="modal" href="#setRuleModal" tabindex="-1">Symmetric Difference</a></li>          
     </ul>    
+  </div>
+  <div class="list-group clearfix" id="rules">
+    {{#each rule in plan.refsetRules}}
+      {{control "rule" rule}}</a>
+    {{/each}}
+  </div>
+  <div id="terminal">
+    <span class="title"><strong style="padding-right: 0.5em">Terminal </strong> Rule {{plan.terminal}}</span>
   </div>
 </script>
 
@@ -90,7 +96,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="setRule">
-  <div class="modal fade set-operation" id="setRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
+  <div class="modal set-operation" id="setRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -99,32 +105,38 @@
         </div>
         <div class="modal-body">
           <div class="container">
-            <div class="row set-operation">
-              <div class="col-lg-3 left">
-                {{view Ember.Select contentBinding="controllers.rules.rules" 
-                                    selectionBinding="model.left" 
-                                    optionLabelPath="content.id" 
-                                    prompt="Select rule"
-                                    optionValuePath="content.id"}}
+            <div class="row set-operation clearfix">
+              <div class="left">
+                <div class="dropdown clearfix">
+                  <a href="#" data-toggle="dropdown">{{#if left}}Rule {{left}} {{else}} Select Rule {{/if}}</a></a>
+                  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
+                    {{#each rule in controllers.rules.rules}}
+                      <li role="presentation"><a role="menuitem" {{action 'setLeft' rule.id}} href="#" tabindex="-1">Rule {{rule.id}}</a></li>
+                    {{/each}}
+                  </ul>
+                </div>
               </div>
-              <div class="col-lg-2 operand">{{model.type}}</div>
-              <div class="col-lg-3 right">
-                {{view Ember.Select contentBinding="controllers.rules.rules" 
-                                    selectionBinding="model.right" 
-                                    optionLabelPath="content.id"
-                                    prompt="Select rule" 
-                                    optionValuePath="content.id"}}
+              <div class="operand">{{model.type}}</div>
+              <div class="right">
+                <div class="dropdown clearfix">
+                  <a href="#" data-toggle="dropdown">{{#if right}} Rule {{right}} {{else}} Select Rule {{/if}}</a>
+                  <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
+                    {{#each rule in controllers.rules.rules}}
+                      <li role="presentation"><a role="menuitem" {{action 'setRight' rule.id}} href="#" tabindex="-1">Rule {{rule.id}}</a></li>
+                    {{/each}}
+                  </ul>
+                </div>
               </div>
-            </div><!-- row -->
-          </div><!-- container -->
-        </div><!-- /.modal-body -->
+            </div>
+          </div>
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
           <button type="button" data-dismiss="modal" {{action 'saverule'}} class="btn btn-primary btn-sm">Save changes</button>
         </div>    
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->      
-  </div><!-- /.modal -->      
+      </div>
+    </div>
+  </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="updateResponse">
@@ -139,62 +151,59 @@
 
           <div class="response">
             <div class="parameter clearfix">
-              <div class="name">Success:</div>
-              <div class="value">{{success}}</div>
+              {{#if success}}<div class="name" style="color:green">Success</div>{{else}}<div class="name" style="color: red">Fail</div>{{/if}}
+              <div class="value">{{status}} ({{code}})</div>
             </div>
             <div class="parameter clearfix">
-              <div class="name">Status:</div>
-              <div class="value">{{status}}</div>
-            </div>
-            <div class="parameter clearfix">
-              <div class="name">Public ID:</div>
+              <div class="name">for</div>
               <div class="value">{{publicId}}</div>
-            </div>
-            <div class="parameter clearfix">
-              <div class="name">Code:</div>
-              <div class="value">{{code}}</div>
-            </div>
+            </div>            
             {{#each error in globalErrors}}
-              <div class="parameter clearfix">
+              <div class="parameter clearfix error">
                 <div class="name">Error</div>
-                <div class="value">Code: {{code}}, Message: {{displayMessage}}</div>
+                <div class="value">{{error.displayMessage}} ({{code}})</div>
               </div>
             {{/each}}      
 
           </div>
-        </div><!-- /.modal-body -->
+        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Close</button>
         </div>    
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->      
-  </div><!-- /.modal -->      
+      </div>
+    </div>
+  </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="rule" >
-  <div class="row">
-
-    <div class="col-lg-1 identifier"><strong>Rule {{id}}</strong></div>
-    <div class="col-lg-11 description">
-      {{#if isList}}
-        List [
-        {{#each concept in model.concepts}}
-          {{concept.id}}
-        {{/each}} ]
-      {{/if}}
-      {{#if isUnion}}
-        Rule {{model.left}} <strong>Union</strong> Rule {{model.right}}
-      {{/if}}
-      {{#if isDifference}}
-        Rule {{model.left}} <strong>Difference</strong> Rule {{model.right}}
-      {{/if}}
-      {{#if isSymDifference}}
-        Rule {{model.left}} <strong>Symmetric Difference</strong> Rule {{model.right}}
-      {{/if}}
-      {{#if isIntersection}}
-        Rule {{model.left}} <strong>Intersection</strong> Rule {{model.right}}
-      {{/if}}
+  {{#if isList}}
+  <a {{action 'editrule' rule}} data-toggle="modal" href="#listRuleModal" class="list-group-item">
+  {{else}}
+  <a {{action 'editrule' rule}} data-toggle="modal" href="#setRuleModal" class="list-group-item">
+  {{/if}}
+    <div class="row">
+      <div class="col-lg-1 identifier"><strong>Rule {{id}}</strong></div>
+      <div class="col-lg-10 description">
+        {{#if isList}}
+          <strong>List</strong> <span style="padding-left: 0.5em; color: lightgrey">{{concepts.length}} concepts</span>
+        {{/if}}
+        {{#if isUnion}}
+          <strong>Set Operation: </strong>{{model.left}} <strong>Union</strong> {{model.right}}
+        {{/if}}
+        {{#if isDifference}}
+          Rule {{model.left}} <strong>Difference</strong> Rule {{model.right}}
+        {{/if}}
+        {{#if isSymDifference}}
+          Rule {{model.left}} <strong>Symmetric Difference</strong> Rule {{model.right}}
+        {{/if}}
+        {{#if isIntersection}}
+          Rule {{model.left}} <strong>Intersection</strong> Rule {{model.right}}
+        {{/if}}
+      </div>
+      <div class="col-lg-1">
+  
+      </div>
     </div>
-  </div>
+  </a>
 </script>
 ]]#  

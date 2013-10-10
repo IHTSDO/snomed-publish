@@ -1,19 +1,11 @@
 #[[
 <script type="text/x-handlebars" data-template-name="textSearch">
   <div class="textsearch clearfix">
-          <div class="input clearfix">
-            {{view MyApp.SearchInputView}}
-          </div>
-          {{#if searchResults.total}}
-            <div class="clearfix">
-              {{view MyApp.SearchResultsView}}
-            </div>
-            <div class="clearfix">
-              {{view MyApp.PagesView}}
-            </div>
-          {{/if}} 
-      </div>
-    </div>
+    <div class="input clearfix">{{view MyApp.SearchInputView}}</div>
+    {{#if searchResults.total}}
+      <div class="clearfix">{{view MyApp.SearchResultsView}}</div>
+      <div class="clearfix">{{view MyApp.PagesView}}</div>
+    {{/if}} 
   </div>
 </script>
 

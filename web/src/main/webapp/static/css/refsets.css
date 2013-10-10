@@ -55,7 +55,7 @@ form.delete{
     margin-bottom: 0.75em;
 }
 
-a.btn.bottom{
+.btn.bottom{
     margin-top: 2em;
 }
 
@@ -65,6 +65,7 @@ h2.plan{
 
 #newrule{
     float: right;
+    margin-top: -2.5em;
 }
 
 #plan{
@@ -129,6 +130,10 @@ h2.plan{
     float: left;
 }
 
+.response .parameter.error .value{
+    width: 32em;
+    font-style: italic;
+}
 
 /***************
  * Refset Edit *
@@ -142,6 +147,58 @@ h2.plan{
 .row.concept{
     
 }
+
+.set-operation .left{
+    float: left;
+}
+
+.set-operation .operand{
+    float: left;
+    padding-left: 1em;
+}
+
+.set-operation .right{
+    float: left;
+    padding-left: 1em;
+}
+
+#setRuleModal .modal-dialog{
+    width: 25em;
+    height: 5em;
+}
+
+#listRuleModal button.mode{
+    float: right;
+    padding-top: -1em;
+    width: 5em;
+}
+
+#listRuleModal h3{
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+
+#listRuleModal .concepts a{
+    border: none;
+    padding-bottom: 0.3em;
+    padding-top: 0.3em;
+}
+
+#listRuleModal .concepts .list-group{
+    box-shadow: 0 !important;
+    margin-bottom: 0;
+}
+
+#listRuleModal button.error{
+    float: left;
+}
+
+#terminal{
+    float: right;
+    padding-right: 0.5em;
+    margin-top: -0.5em;
+    font-family : museo-sans-1, museo-sans-2 , Georgia, Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, Arial, Sans-serif;
+}}
 
 /**********************
  * Find-Concept Modal *

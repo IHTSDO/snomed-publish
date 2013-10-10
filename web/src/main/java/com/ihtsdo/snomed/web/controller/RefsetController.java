@@ -215,7 +215,7 @@ public class RefsetController {
             return new ModelAndView("/refset/new.refset");
         }
         try {            
-            addDummyData(refsetDto);
+            //addDummyData(refsetDto);
             Refset created = refsetService.create(refsetDto);
             addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
             
@@ -330,6 +330,7 @@ public class RefsetController {
         for (ObjectError gError : result.getGlobalErrors()){
             RefsetErrorDto error = new RefsetErrorDto();
             error.setDisplayMessage(gError.getDefaultMessage());
+            error.setCode(returnCode);
             response.addGlobalError(error);
         }
         response.setSuccess(false);
