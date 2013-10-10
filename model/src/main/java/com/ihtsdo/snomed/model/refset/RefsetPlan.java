@@ -4,6 +4,7 @@ import java.beans.Transient;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -69,6 +70,8 @@ public class RefsetPlan {
     public void refreshConceptsCache(){
         if (getTerminal() != null){
             concepts = terminal.generateConcepts();
+        }else{
+            concepts = new HashSet<>();
         }
     }
     

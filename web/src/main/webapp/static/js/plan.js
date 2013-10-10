@@ -43,6 +43,12 @@ Handlebars.registerHelper('bindings', function(options) {
           var type = Ember.typeOf(value);
           if (type === 'array') {
               var emberArray = Ember.A();
+              //{
+              //  replace: function (idx, amt, objects){
+              //    console.log('IN REPLACE!!!')
+              //    this.enumerableContentDidChange()
+              //  }
+              //});
               for (var i = 0; i < value.length; ++i) {
                   emberArray.pushObject(MyApp.toEmberObject(value[i]));
               }
@@ -112,6 +118,9 @@ Handlebars.registerHelper('bindings', function(options) {
 // RULES
   MyApp.RulesController = Ember.ObjectController.extend({
     model: undefined,
+    //change model to content to apply ember sorting
+    sortProperties: ['id'],
+    sortAscending: true,
     rules: function (){
       console.log('in rules');
       return this.get('model.plan.refsetRules');
@@ -258,6 +267,7 @@ Handlebars.registerHelper('bindings', function(options) {
         console.log('controller is ' + this.get("controller"));
         console.log('controller model is ' + this.get('controller.model'));
         console.log('body is ' + JSON.stringify(this.get('controller.model')));
+        console.log('number of rules submitted: ' + this.get('controller.model.plan.refsetRules'));
         var _this = this;
         return Ember.Deferred.promise(function(p) {
           p.resolve(
@@ -304,24 +314,43 @@ Handlebars.registerHelper('bindings', function(options) {
         return false;
       },      
       save: function(){
-        this.get('controllers.rules.model.plan.refsetRules').pushObject(this.get('model'));
+        console.log('handling save');
+        var rules = this.get('controllers.rules.model.plan.refsetRules');
+        var found = rules.findBy('id', this.get('model.id'));
+        console.log('found is ' + JSON.stringify(found));
+        if (found === undefined){
+          console.log('found is null, pushing object');
+          rules.pushObject(this.get('model'));
+        }else{
+          console.log('found is not null, replacing');
+          console.log('index of is ' + rules.indexOf(found));
+          rules.removeAt(rules.indexOf(found));
+          rules.pushObject(this.get('model'));
+        }
         return false;
       },
       removeconcept: function(concept){
         console.log('removing concept ' + JSON.stringify(concept));
-        var concepts = this.get('model');
-        var emberArray = Ember.A();
-        for (i = 0; i < concepts.length; i++){
-          if (concepts.objectAt(i).id != concept.id){
-            emberArray.pushObject(concepts.objectAt(i));
-          }
-        }
-        this.set('model', emberArray);
-
+        //var concepts = this.get('model');
+        //var emberArray = Ember.A();
+        //for (i = 0; i < concepts.length; i++){
+        //  if (concepts.objectAt(i).id != concept.id){
+        //    emberArray.pushObject(concepts.objectAt(i));
+        //  }
+        //}
+        //this.set('model', emberArray);
+        console.log('model is ' + JSON.stringify(this.get('model')));
+        this.get('concepts').removeObject(concept);
       },      
       click: function(concept){
-        this.get('concepts').pushObject(concept);
-        this.set('isSearching', false);
+        console.log('handling add concept click event');
+        var found = this.get('concepts').findBy('id', concept.get('id'));
+        if (found === undefined){
+          this.get('concepts').pushObject(concept);
+          this.set('isSearching', false);
+        }else{
+          console.log('can not add concept that already exists in selection');
+        }
         return false;
       }
      }    

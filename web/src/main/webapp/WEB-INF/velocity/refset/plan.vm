@@ -201,7 +201,7 @@
         {{/if}}
       </div>
       <div class="col-lg-1">
-  
+        <button type="button" class="close" {{action 'removerule' this}}>&times;</button>
       </div>
     </div>
   </a>
