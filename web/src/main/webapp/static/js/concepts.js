@@ -51,7 +51,8 @@ MyApp.ConceptsController = Ember.ObjectController.extend({
 });
 
 MyApp.ConceptsController.reopenClass({
-  serviceUrl: undefined,
+  jsonServiceUrl: undefined,
+  xmlServiceUrl: undefined,
   needs: "index",
   blah: function() {
     console.log("BLAH!");
@@ -60,7 +61,7 @@ MyApp.ConceptsController.reopenClass({
   getConcepts: function(pageIndex, pageSize){
     return Ember.Deferred.promise(function(p) {
       var startIndex = (pageIndex - 1) * pageSize;
-      var query = MyApp.ConceptsController.serviceUrl + "?start=" + startIndex + "&rows=" + pageSize;
+      var query = MyApp.ConceptsController.jsonServiceUrl + "?start=" + startIndex + "&rows=" + pageSize;
       console.log('executing query: ' + query);
       p.resolve($.getJSON(query)
         .then(function(refset) {
@@ -77,10 +78,11 @@ MyApp.ConceptsRoute = Ember.Route.extend({
     console.log('Initialising service url');
     var currentUrl = "http://" + location.hostname + ":" + location.port + "/" + location.pathname;
     var baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-    var conceptUrl = location.pathname.substring(location.pathname.lastIndexOf('/'), location.pathname.length) + '/concepts.json';
+    var conceptUrl = location.pathname.substring(location.pathname.lastIndexOf('/'), location.pathname.length) + '/concepts.';
     var serviceUrl = baseUrl + conceptUrl;
     console.log('Found service url ' + serviceUrl);
-    MyApp.ConceptsController.serviceUrl = serviceUrl;
+    MyApp.ConceptsController.jsonServiceUrl = serviceUrl + 'json';
+    MyApp.ConceptsController.xmlServiceUrl = serviceUrl + 'xml';
     return MyApp.ConceptsController.getConcepts(-1, -1);
   }
 })

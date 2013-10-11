@@ -34,7 +34,6 @@
       </div>
 
       <h1 class="title with-description">$refset.title</h1>
-      <div class="description">$refset.description</div>
     </div>
     #[[
     {{outlet}}

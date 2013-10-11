@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -13,10 +14,17 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.transform.Result;
+import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
@@ -84,6 +92,9 @@ public class RefsetController {
     
     @Inject
     ConceptService conceptService;
+    
+    @Autowired
+    org.springframework.oxm.Marshaller marshaller;
 
     @Resource
     private MessageSource messageSource;
@@ -445,6 +456,23 @@ public class RefsetController {
     public @ResponseBody XmlRefsetConcepts getConceptXml(@PathVariable String pubId) throws Exception {
         return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
     }
+    
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/export", method = RequestMethod.GET)
+    public void exportConcepts(@PathVariable String pubId, HttpServletResponse response) throws JAXBException, ConceptsCacheNotBuiltException {
+        try {
+            List<XmlRefsetConcept> conceptDtos = getXmlConceptDtos(pubId);
+            XmlRefsetConcepts conceptsDto = new XmlRefsetConcepts(conceptDtos);
+            //marshaller.marshal(conceptDtos, response.getOutputStream());
+            Result result = new StreamResult(response.getOutputStream());
+            marshaller.marshal(conceptsDto, result);
+            response.flushBuffer();
+        } catch (IOException ex) {
+          LOG.error("Error writing file to output stream. Public ID was '" + pubId + "'");
+          throw new RuntimeException("IOError writing file to output stream");
+        }
+
+    }    
     
     
     @Transactional

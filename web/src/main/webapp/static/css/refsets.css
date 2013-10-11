@@ -124,13 +124,21 @@ h2.concept, h2.rules{
 #plan{
     margin-top: 2em;
 }
+
+
+.details h4{
+    padding-bottom: 2em;
+}
 .api-links{
     font-size: 0.9em;
     font-family : futura-pt-1, futura-pt-2; 
     text-align: right;
-    margin-bottom: 2em;
-    margin-right: 0.5em;
-    margin-top: -3.7em;
+    margin: -3.7em 0.5em 2em 0;
+}
+
+.api-links.concepts {
+    margin: -2.3em 0.5em 0 0;
+    float: right;
 }
 
 #rules{

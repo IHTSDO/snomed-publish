@@ -1,7 +1,15 @@
 #[[ 
 <script type="text/x-handlebars" data-template-name="concepts">
-  <h4 class="plan">Concepts</h4>
-  <div class="list-group clearfix" id="concepts">
+
+  <h4 class="clearfix">Concepts
+
+  </h4>
+  <span class = "api-links concepts">
+    <span class="xml link"><a {{bind-attr href=MyApp.ConceptsController.xmlServiceUrl}} target="_blank">XML</a></span>
+    <span class="dividor"> _ </span>
+    <span class="json link"><a {{bind-attr href=MyApp.ConceptsController.jsonServiceUrl}} target="_blank">JSON</a></span>
+  </span>  
+  <div class="list-group" id="concepts">
     {{#each concept in content.concepts}}
       <a {{action 'click' concept}} class="list-group-item concept">{{concept.title}} <small style="color: lightgrey;">{{concept.id}}</small></a>
     {{/each}}
