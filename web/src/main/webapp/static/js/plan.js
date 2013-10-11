@@ -75,45 +75,6 @@ Handlebars.registerHelper('bindings', function(options) {
   });
   
 
-// CONCEPTS
-  MyApp.ConceptsController = Ember.ObjectController.extend({
-    model: undefined,
-    needs: ["index"]
-  });
-
-  MyApp.ConceptsController.reopenClass({
-    getConcepts: function(pageIndex, pageSize){
-      return Ember.Deferred.promise(function(p) {
-        var startIndex = (pageIndex - 1) * pageSize;
-        var query = "http://" + location.hostname + ":" + location.port + "/" + location.pathname + "/../concepts.json?start=" + startIndex + "&rows=" + pageSize;
-        console.log('executing query: ' + query);
-        p.resolve($.getJSON(query)
-          .then(function(blah) {
-              var concepts = Ember.A();
-              blah.concepts.forEach(function (doc) {
-                var concept = MyApp.Concept.create();
-                concept.id = doc.id;
-                concept.title = doc.title;
-                concept.active = doc.active;
-                concept.effectiveTime= doc.effectiveTime;
-                concepts.pushObject(concept);
-              });
-              return concepts;
-          }) //then
-        );//resolve
-      });//deferred promise
-    },//getConcepts
-  });//reopen
-
-  MyApp.ConceptsRoute = Ember.Route.extend({
-    model: function(){
-      return MyApp.ConceptsController.getConcepts(-1, -1);
-    }  
-  })
-
-  MyApp.ConceptsView = Ember.View.extend({
-    templateName: 'concepts'
-  });
 
   MyApp.EditDetailsView = Ember.View.extend({
     templateName: 'editDetails'

@@ -101,22 +101,6 @@
   </div>
 </script>
 
-<script type="text/x-handlebars" data-template-name="concepts">
-  <h2 class="concepts">
-    <span id="showConcepts" class="clearfix">
-      {{#link-to 'rules'}}
-        <button type="button" class="btn btn-success btn-xs">Show Rules</button>
-      {{/link-to}}
-    </span>
-  </h2>
-  <h3 class="plan">Concepts</h3>
-  <div class="list-group clearfix" id="concepts">
-    {{#each concept in model}}
-      <a {{bind-attr href=concept.url}}  target="_blank" class="list-group-item">{{concept.title}} <small style="color: lightgrey;">{{concept.id}}</small></a>
-    {{/each}}
-  </div>
-</script>
-
 <script type="text/x-handlebars" data-template-name="setRule">
   <div class="modal set-operation" id="setRuleModal" tabindex="-1" role="dialog" aria-labelledby="h4" aria-hidden="true">
     <div class="modal-dialog">

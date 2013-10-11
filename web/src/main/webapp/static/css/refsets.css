@@ -50,6 +50,10 @@ h1.title{
        margin-top: 0;
 }
 
+h1.title.with-description{
+    margin-bottom: 0;
+}
+
 h1.title a{
     
 }
@@ -65,8 +69,8 @@ h1.title .text{
 
 .editrefset{
     float: right;
-    font-size: 2em;
-    margin-top: -1em;
+    font-size: 1.5em;
+    margin-top: -1.25em;
 }
 
 h1.title .link{

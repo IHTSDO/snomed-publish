@@ -1,0 +1,10 @@
+#[[ 
+<script type="text/x-handlebars" data-template-name="concepts">
+  <h4 class="plan">Concepts</h4>
+  <div class="list-group clearfix" id="concepts">
+    {{#each concept in content.concepts}}
+      <a {{action 'click' concept}} class="list-group-item concept">{{concept.title}} <small style="color: lightgrey;">{{concept.id}}</small></a>
+    {{/each}}
+  </div>
+</script>
+]]#

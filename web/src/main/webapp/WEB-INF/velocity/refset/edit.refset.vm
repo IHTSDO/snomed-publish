@@ -23,7 +23,7 @@
         {{outlet}}
       ]]#
       <div class="form-actions">
-        <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-success btn-std bottom">Update</button>
+        <button type="button" {{action 'update'}} data-toggle="modal" href="#updateResponseModal" class="btn btn-primary btn-std bottom">Update</button>
       </div>
       #[[
       </form>
