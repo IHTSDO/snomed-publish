@@ -194,7 +194,7 @@
           <strong>List</strong> <span style="padding-left: 0.5em; color: lightgrey">{{concepts.length}} concepts</span>
         {{/if}}
         {{#if isUnion}}
-          <strong>Set Operation: </strong>{{model.left}} <strong>Union</strong> {{model.right}}
+          <strong></strong>Rule {{model.left}} <strong>Union</strong> Rule {{model.right}}
         {{/if}}
         {{#if isDifference}}
           Rule {{model.left}} <strong>Difference</strong> Rule {{model.right}}
