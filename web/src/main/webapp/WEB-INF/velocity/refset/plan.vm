@@ -82,6 +82,9 @@
     <button type="button" data-toggle="dropdown" class="btn btn-default btn-sm">Add Rule</button>      
     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu2">
       <li role="presentation" class="dropdown-header">Source Rules</li>
+      <li role="presentation"><a role="menuitem"  tabindex="-1">Import Concepts (tbd)</a></li>
+      <li role="presentation"><a role="menuitem"  tabindex="-1">Simple Query (tbd)</a></li>
+      <li role="presentation"><a role="menuitem"  tabindex="-1">Structured Query (tbd)</a></li>
       <li role="presentation"><a role="menuitem" {{action 'listRule' this}} data-toggle="modal" href="#listRuleModal" tabindex="-1">List Concepts</a></li>
       <li role="presentation" class="divider"></li>
       <li role="presentation" class="dropdown-header">Set Operations</li>

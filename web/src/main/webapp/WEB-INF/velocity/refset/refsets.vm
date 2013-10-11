@@ -27,7 +27,7 @@
     </div>
   #end
 
-  <a href='#springUrl("refset/new")' class="btn btn-sm btn-primary create">#springMessage('button.refsets.create')</a>   
+  <a href='#springUrl("refset/new")' class="btn btn-sm btn-default create">#springMessage('button.refsets.create')</a>   
 
 </div>
 
