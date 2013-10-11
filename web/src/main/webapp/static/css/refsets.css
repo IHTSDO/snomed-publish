@@ -14,8 +14,10 @@ a.btn.submit, #refset a.btn.submit, #refset button.submit{
 .errors p{
     margin: 0.25em 0 0;
 }
-form.delete{
-    margin-bottom: 0.5em;
+form.delete button{
+    margin-right: 0.25em;
+    z-index: 100;
+    float: right;
 }
 
 /***************
@@ -106,8 +108,8 @@ h1.title .link{
     margin-bottom: 0.75em;
 }
 
-.btn.bottom{
-
+.btn.create{
+    margin-top: 3em;
 }
 
 h2.concept, h2.rules{
@@ -152,8 +154,19 @@ h2.concept, h2.rules{
     box-shadow: none;
 }
 
-#concepts a{
+#concepts a.list-group-item{
     border: none;
+}
+
+#refsets{
+    box-shadow: none;
+}
+
+#refsets a.list-group-item{
+    border: none;
+    padding: 0.25em 0;
+    float: left;
+    width: 98%;
 }
 
 #rules .description{

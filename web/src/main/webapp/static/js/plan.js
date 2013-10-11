@@ -25,7 +25,6 @@ Handlebars.registerHelper('bindings', function(options) {
     });
   }
   return bind;
-
 });
 
 
