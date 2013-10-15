@@ -18,5 +18,17 @@ MyApp.ApplicationRoute = Ember.Route.extend({
     click: function(concept){
       window.location.assign("http://browser.snomedtools.com/version/1/concept/" + concept.id);
     }
-  }
+  },
 }); 
+
+MyApp.TextSearchRoute = Ember.Route.extend({
+  setupController: function(controller, model){
+    $('#tandcModal').modal('show');
+  }
+})
+
+
+
+$(window).load(function(){
+    $('#tandcModal').modal('show');
+});
