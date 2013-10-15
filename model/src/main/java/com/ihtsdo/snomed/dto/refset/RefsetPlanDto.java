@@ -127,8 +127,8 @@ public class RefsetPlanDto {
             }
             else if (rule instanceof BaseSetOperationRefsetRule){
                 BaseSetOperationRefsetRule setOperationRule = (BaseSetOperationRefsetRule) rule;
-                refsetRuleDto.setLeft(setOperationRule.getLeft().getId());
-                refsetRuleDto.setRight(setOperationRule.getRight().getId());
+                refsetRuleDto.setLeft(setOperationRule.getLeft() == null ? null : setOperationRule.getLeft().getId());
+                refsetRuleDto.setRight(setOperationRule.getRight() == null ? null : setOperationRule.getRight().getId());
             }else{
                 throw new UnrecognisedRefsetException("I've not been able to handle RefsetRule of class " + rule.getClass());
             }
