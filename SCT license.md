@@ -1,22 +1,15 @@
-Agreement for the use of SNOMED CT for Simple Browsing & Search
-========
+Use of the IHTSDO Simple SNOMED CT Concept Browser - Terms & Conditions
+------
 
-The User accepts:
----------
 
-1. That the use of **SNOMED CT** shall be purely and strictly for the purposes of simple testing and use of the simple single concept browse and search facility provided by the **IHTSDO**.
+The IHTSDO Simple Concept Browser includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of the International Health Terminology Standards Development Organization (IHTSDO).  All rights reserved.  SNOMED CT® was originally created by the College of American Pathologists. 
 
-2. That permission to use **SNOMED CT** for the purposes stated in clause 1, shall be granted free of charge.
-
-3. That the use of **SNOMED CT** for simple single concept browsing and searching will be valid until the end of December 2013.
-
-4. That the copyright of **SNOMED CT** belongs to, and remains with, **IHTSDO**.
-
-5. That no attempt is made to copy or reproduce **SNOMED CT** by any means or in any form without the prior written consent of the copyright holders as identified in clause 4.
-
-6. That any work published as a result of using the simple browsing and search facility shall formally acknowledge **IHTSDO**. These acknowledgements will be display the following statements:
-
-	* “This material includes SNOMED Clinical Terms® (SNOMED CT®) which is used by permission of the International Health Terminology Standards Development Organisation (IHTSDO). All rights reserved. SNOMED CT® was originally created by The College of American Pathologists. “SNOMED” and “SNOMED CT” are registered trademarks of the IHTSDO.”
-	
-
-**15th October, 2013 - © IHTSDO**
+"SNOMED", "SNOMED CT" and "SNOMED Clinical Terms" are registered trademarks of the IHTSDO (<a href="http://www.ihtsdo.org">www.ihtsdo.org</a>). Use of SNOMED CT in the IHTSDO Simple Concept Browser is governed by the conditions of the following SNOMED CT sub-license issued by IHTSDO
+1.	The meaning of the terms "Affiliate", or "Data Analysis System", "Data Creation System", "Derivative", "End User", "Extension", "Member", "Non-Member Territory", "SNOMED CT" and "SNOMED  CT Content" are as defined in the IHTSDO Affiliate License Agreement (see www.ihtsdo.org/license.pdf).2.	Information about Affiliate Licensing is available at www.ihtsdo.org/license. Individuals or organizations wishing to register as IHTSDO Affiliates can register at www.ihtsdo.org/salsa, subject to acceptance of the Affiliate License Agreement (see www.ihtsdo.org/license.pdf). 3.	The current list of IHTSDO Member Territories can be viewed at www.ihtsdo.org/members. Countries not included in that list are "Non-Member Territories".4.	End Users,  that do not hold an IHTSDO Affiliate License, may access SNOMED CT® using the IHTSDO Simple Concept Browser subject to acceptance of and adherence to the following sub-license limitations:
+	a)	The sub-licensee is only permitted to access SNOMED CT® using this software (or service) for the purpose of exploring and evaluating the terminology. 
+	b)	The sub-licensee is not permitted the use of this software as part of a system that constitutes a SNOMED CT "Data Creation System" or "Data Analysis System", as defined in the IHTSDO Affiliate License. This means that the sub-licensee must not use the IHTSDO Simple Concept Browser to add or copy SNOMED CT identifiers into any type of record system, database or document.
+	c)	The sub-licensee is not permitted to translate or modify SNOMED CT Content or Derivatives.
+	d)	The sub-licensee is not permitted to distribute or share SNOMED CT Content or Derivatives.5.	IHTSDO Affiliates may use the IHTSDO Simple Concept Browser as part of a "Data Creation System" or "Data Analysis System" subject to the following conditions:
+	a)	The IHTSDO Affiliate, using the IHTSDO Simple Concept Browser must accept full responsibility for any reporting and fees due for use or deployment of such a system in a Non-Member Territory.
+	b)	The IHTSDO Affiliate must not use the IHTSDO Simple Concept Browser to access or interact with SNOMED CT in any way that is not permitted by the Affiliate License Agreement. 
+	c)	In the event of termination of the Affiliate License Agreement, the use of the IHTSDO Simple Concept Browser will be subject to the End User limitations noted in 4.**15th October, 2013 - © IHTSDO**
