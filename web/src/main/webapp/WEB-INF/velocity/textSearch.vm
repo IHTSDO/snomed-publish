@@ -1,4 +1,6 @@
 #[[
+
+
 <script type="text/x-handlebars" data-template-name="textSearch">
   <div class="textsearch clearfix">
     <div class="input clearfix">{{view MyApp.SearchInputView}}</div>
@@ -17,7 +19,7 @@
             <a href="http://lucene.apache.org/core/3_5_0/queryparsersyntax.html" target="_blank">Help</a>
           </small>
         </div>
-        {{view Bootstrap.Forms.TextField valueBinding="query" label="" placeholder="#springMessage('input.field.refset.concept.search')"}}
+        {{view Ember.TextField valueBinding="query" tabindex=1 label="" placeholder="#springMessage('input.field.refset.concept.search')"}}
         #[[{{#if searchResults.total}}]]#<div class="total">{{searchResults.total}}</div>#[[{{/if}}]]#
       </div>
     </div>

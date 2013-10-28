@@ -186,9 +186,9 @@
 
 <script type="text/x-handlebars" data-template-name="rule" >
   {{#if isList}}
-  <a {{action 'editrule' rule}} data-toggle="modal" href="#listRuleModal" class="list-group-item">
+    <a {{action 'editrule' rule}} data-toggle="modal" href="#listRuleModal" class="list-group-item">
   {{else}}
-  <a {{action 'editrule' rule}} data-toggle="modal" href="#setRuleModal" class="list-group-item">
+    <a {{action 'editrule' rule}} data-toggle="modal" href="#setRuleModal" class="list-group-item">
   {{/if}}
     <div class="row">
       <div class="col-lg-1 identifier"><strong>Rule {{id}}</strong></div>

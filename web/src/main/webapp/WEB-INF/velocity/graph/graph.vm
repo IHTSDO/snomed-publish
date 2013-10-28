@@ -1,0 +1,388 @@
+#set( $layout = "graph/layout.vm" )
+#set ($title = "Snomed Structured Search")
+
+#set ($staticPageScripts = ["/static/js/textSearch.js"])
+#set ($pageCss = ["/static/css/textSearch.css"])
+#set ($modals = ["textSearch.vm", "textSearchModal.vm"])
+
+#[[
+	<script type="text/x-handlebars">
+    
+        {{render "graphSearch"}}
+
+        ]]##parse('graph/footer.vm')#[[
+	</script>
+
+  <script type="text/x-handlebars" data-template-name="graphSearch">
+    <h4>OAV Triples</h4>
+    
+    {{#if model}}
+      <div class="list-group clearfix" id="triples">
+        {{#each triple in model}}
+          <a {{action 'edittriple' triple}} data-toggle="modal" href="#tripleModal" class="list-group-item clearfix">
+            <div class="short-element">
+              <span class="classifier">o</span>
+              {{#if triple.isSubjectVariable}}
+                <span class="short-element">
+                  {{#if triple.subject.variable}}<span class="dollar">$</span>{{triple.subject.variable}}{{else}}Enter name{{/if}}
+                </span>
+              {{/if}}
+              {{#if triple.isSubjectSnomed}}
+                {{#if triple.isSubjectComponentTypeConcept}}
+                  <span class="short-element">{{triple.subject.concept.title}}</span>
+                {{/if}}
+                {{#if triple.isSubjectComponentTypeDescription}}
+                  <span class="short-element">{{triple.subject.description.title}}</span>
+                {{/if}}
+              {{/if}}
+            </div>
+            
+            <div class="short-element">
+              <span class="classifier">a</span>
+              {{#if triple.isPredicateVariable}}
+                <span class="short-element">
+                  {{#if triple.predicate.variable}}<span class="dollar">$</span>{{triple.predicate.variable}}{{else}}Enter name{{/if}}
+                </span>
+              {{/if}}
+              {{#if triple.isPredicateStructural}}
+                <span class="short-element">rdf:{{triple.predicate.structural}}</span>
+              {{/if}}
+              {{#if triple.isPredicateConcept}}
+                <span class="short-element">{{triple.predicate.concept.title}}</span>
+              {{/if}}
+              {{#if triple.isPredicatePrimitive}}
+                <span class="short-element">snomed:{{triple.predicate.primitiveType}}</span>
+              {{/if}}
+            </div>
+
+            <div class="short-element">
+              <span class="classifier">v</span>
+              {{#if triple.isObjectVariable}}
+                <span class="short-element">
+                  {{#if triple.object.variable}}<span class="dollar">$</span>{{triple.object.variable}}{{else}}Enter name{{/if}}
+                </span>
+              {{/if}}
+              {{#if triple.isObjectSnomed}}
+                {{#if triple.isObjectComponentTypeConcept}}
+                  <span class="short-element">{{triple.object.concept.title}}</span>
+                {{/if}}
+                {{#if triple.isObjectComponentTypeDescription}}
+                  <span class="short-element">{{triple.object.description.title}}</span>
+                {{/if}}
+              {{/if}}
+            </div>
+          </a>  
+        {{/each}}
+      </div>
+    {{/if}}
+    <button type="button" {{action 'newtriple'}} data-toggle="modal" href="#tripleModal" class="btn btn-default btn-sm bottom">Add Triple</button>    
+
+
+    <h4>Filters</h4>
+    {{#each filter in filters}}filter{{/each}}
+    <button type="button" {{action 'newtriple'}} data-toggle="modal" href="#tripleModal" class="btn btn-default btn-sm bottom">Add Filter (tbc)</button>    
+
+
+    <h4>Generated Sparql Query</h4>
+    <pre>
+{{sparql}}
+    </pre>
+
+    {{#if results}}
+      <h4>Results</h4>
+      <ul class="list-group clearfix" id="results">
+        {{#each resultSet in results}}
+          <li class="list-group-item">
+            <ul class="list-group clearfix" id="results">
+              {{#each singleResult in resultSet}}
+                <li class="list-group-item">
+                  {{#if isConcept}}
+                    <a {{bind-attr href=url}} target="_blank">{{singleResult.concept.title}}</a>
+                  {{/if}}
+                  {{#if isDescription}}
+                    <a {{bind-attr href=url}} target="_blank">{{singleResult.description.title}}</a>
+                  {{/if}}
+                  {{#if isStatement}}
+                    <a {{bind-attr href=url}} target="_blank">{{singleResult.statement.title}}</a>
+                  {{/if}}
+                  {{#if isValue}}
+                    <a {{bind-attr href=url}} target="_blank">{{singleResult.value.title}}</a>
+                  {{/if}}
+                </li>
+              {{/each}}
+            </ul>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+
+    {{render "tripleEditor"}}
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="tripleEditor">
+    <div class="modal fade" id="tripleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 style="margin: 0">{{#if isEdit}}Edit OAV Triple{{else}}Create OAV Triple{{/if}}</h3>
+          </div>
+          <div class="modal-body">
+            {{partial 'tripleEditorContent'}}
+            <div class="modal-footer">
+              {{#if isEdit}}
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Done</button>
+              {{else}}
+                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+                <button type="button" data-dismiss="modal" {{action 'savetriple' content}} class="btn btn-primary btn-sm">Save changes</button>
+              {{/if}}
+            </div>           
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="tripleEditorContent">
+    <div class="element clearfix">
+      {{partial editorSubject}}
+    </div>
+    <div class="element clearfix">
+      {{partial editorPredicate}}
+    </div>
+    <div class="element clearfix">
+      {{partial editorObject}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="editorSubject">
+    <h4 class="first">Object</h4>
+  
+    <ul class="nav nav-tabs" id="subject-type">
+      <li class="variable active"><a href="#"  {{action 'subjectType' 'variable'}}>Variable</a></li>
+      <li class="snomed"><a href="#" {{action 'subjectType' 'snomed'}}>Component</a></li>
+    </ul>    
+    
+    <div class="resource">
+      {{#if isSubjectVariable}}
+        <div class="input-group">
+          <span class="input-group-addon" style="color: grey">$</span>
+
+          {{view Ember.TextField type="text" class="form-control" valueBinding="subject.variable" tabindex="1" label="" placeholder="enter name..."}}
+
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span></button>
+            {{#if controllers.graphSearch.variables}}
+              <ul class="dropdown-menu pull-right">
+                {{#each variable in controllers.graphSearch.variables}}
+                  <li><a href="#">{{variable}}</a></li>
+                {{/each}}
+              </ul>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if isSubjectSnomed}}
+        <ul class="nav nav-tabs" id="subject-component-type">
+          <li {{bind-attr class=subjectComponentTypeConceptClass}}><a href="#" {{action 'subjectComponentType' 'concept'}}>Concept</a></li>
+          <li {{bind-attr class=subjectComponentTypeDescriptionClass}}><a href="#" {{action 'subjectComponentType' 'description'}}>Description</a></li>
+        </ul>
+        <div class="find">
+          {{#if isSubjectComponentTypeConcept}}
+            {{render "textSearchSubject"}}
+            {{#if subject.concept}}
+              <div class="found"><a class="concept" data-toggle="modal" href="#textSearchModalSubject" >{{subject.concept.title}}</a></div>
+              <button data-toggle="modal" href="#textSearchModalSubject" class="btn btn-default btn-sm">Find Concept</button>
+            {{else}}
+              <button data-toggle="modal" href="#textSearchModalSubject" class="btn btn-default btn-sm">Find Concept</button>
+            {{/if}}
+          {{else}}
+            <button data-toggle="modal" href="#textSearchModalSubject" class="btn btn-default btn-sm">Find Description (TBC)</button>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="editorPredicate">
+ 
+    <h4>Attribute</h4>
+    <ul class="nav nav-tabs" id="predicate-type">
+      <li {{bind-attr class=predicateTypeVariableClass}}><a href="#" {{action 'predicateType' 'variable'}}>Variable</a></li>
+      <li {{bind-attr class=predicateTypeConceptClass}}><a href="#" {{action 'predicateType' 'concept'}}>Concept</a></li>
+      <li {{bind-attr class=predicateTypePrimitiveClass}}><a href="#" {{action 'predicateType' 'primitive'}}>Primitive</a></li>
+      <li {{bind-attr class=predicateTypeStructuralClass}}><a href="#" {{action 'predicateType' 'structural'}}>Structural</a></li>
+    </ul>    
+    <div class="resource">
+      {{#if isPredicateStructural}}
+        <div class="btn-group clearfix" id="predicate-rdf-type">
+          <button type="button" {{action 'predicateStructural' 'type'}} {{bind-attr class=predicateStructuralTypeClass}}>Type</button>
+          <button type="button" {{action 'predicateStructural' 'subject'}} {{bind-attr class=predicateStructuralSubjectClass}}>Subject</button>
+          <button type="button" {{action 'predicateStructural' 'predicate'}} {{bind-attr class=predicateStructuralPredicateClass}}>Predicate</button>
+          <button type="button" {{action 'predicateStructural' 'object'}} {{bind-attr class=predicateStructuralObjectClass}}>Object</button>
+        </div>
+      {{/if}}
+      {{#if isPredicateVariable}}
+        <div class="input-group">
+          <span class="input-group-addon" style="color: grey">$</span>
+
+          {{view Ember.TextField type="text" class="form-control" valueBinding="predicate.variable" tabindex="1" label="" placeholder="enter name..."}}
+          
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span></button>
+            {{#if controllers.graphSearch.variables}}
+              <ul class="dropdown-menu pull-right">
+                {{#each variable in controllers.graphSearch.variables}}
+                  <li><a href="#">{{variable}}</a></li>
+                {{/each}}
+              </ul>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if isPredicateConcept}}
+        {{render "textSearchPredicate"}}
+        <div class="find">
+          {{#if predicate.concept}}
+            <a data-toggle="modal" href="#textSearchModalPredicate" >{{predicate.concept.title}}</a>
+            <button data-toggle="modal" href="#textSearchModalSubject" class="btn btn-default btn-sm">Find Concept</button>
+          {{else}}
+            <button data-toggle="modal" href="#textSearchModalPredicate" class="btn btn-default btn-sm">Find Concept</button>
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#if isPredicatePrimitive}}
+        <ul class="nav nav-tabs" id="predicate-type">
+          <li {{bind-attr class=predicateTypePrimitiveConceptClass}}><a href="#" {{action 'predicatePrimitiveCategory' 'concept'}}>Concept</a></li>
+          <li {{bind-attr class=predicateTypePrimitiveDescriptionClass}}><a href="#" {{action 'predicatePrimitiveCategory' 'description'}}>Description</a></li>
+          <li {{bind-attr class=predicateTypePrimitiveTripleClass}}><a href="#" {{action 'predicatePrimitiveCategory' 'triple'}}>Triple</a></li>
+        </ul>    
+        {{#if isPredicatePrimitiveCategoryConcept}}
+          <div class="btn-group clearfix">
+            <button type="button" {{action 'predicatePrimitiveType' 'effectiveTime'}} {{bind-attr class=predicatePrimitiveEffectiveTimeClass}}>Effective Time</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'active'}} {{bind-attr class=predicatePrimitiveActiveClass}}>Active</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'module'}} {{bind-attr class=predicatePrimitiveModuleClass}}>Module</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'description'}} {{bind-attr class=predicatePrimitiveDescriptionClass}}>Description</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'status'}} {{bind-attr class=predicatePrimitiveStatusClass}}>Status</button>
+          </div>
+        {{/if}}
+        {{#if isPredicatePrimitiveCategoryDescription}}
+          <div class="btn-group clearfix">
+            <button type="button" {{action 'predicatePrimitiveType' 'effectiveTime'}} {{bind-attr class=predicatePrimitiveEffectiveTimeClass}}>Effective Time</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'active'}} {{bind-attr class=predicatePrimitiveActiveClass}}>Active</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'module'}} {{bind-attr class=predicatePrimitiveModuleClass}}>Module</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'type'}} {{bind-attr class=predicatePrimitiveTypeClass}}>Type</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'caseSignificance'}} {{bind-attr class=predicatePrimitiveCaseSignificanceClass}}>Case Significance</button>            
+          </div>
+        {{/if}}
+        {{#if isPredicatePrimitiveCategoryTriple}}
+          <div class="btn-group clearfix"> 
+            <button type="button" {{action 'predicatePrimitiveType' 'effectiveTime'}} {{bind-attr class=predicatePrimitiveEffectiveTimeClass}}>Effective Time</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'active'}} {{bind-attr class=predicatePrimitiveActiveClass}}>Active</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'module'}} {{bind-attr class=predicatePrimitiveModuleClass}}>Module</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'group'}} {{bind-attr class=predicatePrimitiveGroupClass}}>Group</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'modifier'}} {{bind-attr class=predicatePrimitiveModifierClass}}>Modifier</button>
+            <button type="button" {{action 'predicatePrimitiveType' 'characteristicType'}} {{bind-attr class=predicatePrimitiveCharacteristicTypeClass}}>Char Type</button>
+          </div>
+        {{/if}}
+      {{/if}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="editorObject">
+    <h4>Value</h4>
+    
+    <ul class="nav nav-tabs" id="object-type">
+      <li class="variable active"><a href="#" {{action 'objectType' 'variable'}}>Variable</a></li>
+      <li class="snomed"><a href="#" {{action 'objectType' 'snomed'}}>Component</a></li>
+    </ul>    
+    
+    <div class="resource clearfix">
+      {{#if isObjectVariable}}
+        <div class="input-group">
+          <span class="input-group-addon" style="color: grey">$</span>
+
+          {{view Ember.TextField type="text" class="form-control" valueBinding="object.variable" tabindex="1" label="" placeholder="enter name..."}}
+
+
+          <div class="input-group-btn">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span></button>
+            {{#if controllers.graphSearch.variables}}
+              <ul class="dropdown-menu pull-right">
+                {{#each variable in controllers.graphSearch.variables}}
+                  <li><a href="#">{{variable}}</a></li>
+                {{/each}}
+              </ul>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+      {{#if isObjectSnomed}}
+        <ul class="nav nav-tabs" id="object-component-type">
+          <li {{bind-attr class=objectComponentTypeConceptClass}}><a href="#" {{action 'objectComponentType' 'concept'}}>Concept</a></li>
+          <li {{bind-attr class=objectComponentTypeDescriptionClass}}><a href="#" {{action 'objectComponentType' 'description'}}>Description</a></li>
+        </ul>
+        <div class="find">
+          {{#if isObjectComponentTypeConcept}}
+            {{render "textSearchObject"}}
+            {{#if object.concept}}
+              <a class="concept" data-toggle="modal" href="#textSearchModalObject" >{{object.concept.title}}</a>
+            {{else}}
+              <button data-toggle="modal" href="#textSearchModalObject" class="btn btn-default btn-sm">Find Concept</button>
+            {{/if}}
+          {{else}}
+            <button data-toggle="modal" href="#textSearchModalObject" class="btn btn-default btn-sm">Find Description (TBC)</button>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="textSearchSubject">
+    <div class="modal fade" id="textSearchModalSubject" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-textSearch-title">Find Concept</h4>
+          </div>
+          <div class="modal-body">
+            {{render "textSearch" this}}
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="textSearchPredicate">
+    <div class="modal fade" id="textSearchModalPredicate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-textSearch-title">Find Concept</h4>
+          </div>
+          <div class="modal-body">
+            {{render "textSearch" this}}
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+  </script>  
+
+  <script type="text/x-handlebars" data-template-name="textSearchObject">
+    <div class="modal fade" id="textSearchModalObject" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-textSearch-title">Find Concept</h4>
+          </div>
+          <div class="modal-body">
+            {{render "textSearch" this}}
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+  </script>   
+]]#

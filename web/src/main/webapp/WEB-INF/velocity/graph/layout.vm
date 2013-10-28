@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    #parse('graph/head.vm')
+  </head>
+  <body>
+    <div class="container" id="graph">
+      #parse('header.vm')
+      $screen_content
+      #if ($modals)
+          #foreach ($modal in $modals)
+              #parse($modal)
+          #end
+      #end    
+    </div>
+    #parse('graph/footer.scripts.vm')
+  </body>
+</html>

@@ -1,0 +1,56 @@
+
+<!-- Typekit -->
+<script type="text/javascript" src="//use.typekit.net/yny4pvk.js"></script>
+<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+<!-- Google -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
+<!-- Handlebars -->
+<script src="/static/js/libs/handlebars-1.0.0.js"></script>
+
+<!-- Ember -->
+<script src="/static/js/libs/ember-1.1.1.js"></script>
+
+
+<!-- Bootstrap Modal -->
+<!--script src="/static/js/libs/bootstrap-modal.js"></script>
+<script src="/static/js/libs/bootstrap-modalmanager.js"></script-->
+
+
+
+<!-- TogetherJS + Firebase -->
+<script>
+  TowTruckConfig_hubBase = "https://snomed.firebaseio.com/";
+</script>
+<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+<script src="http://firebase.github.io/togetherjs/togetherjs.js"></script>
+
+
+<!-- This Application -->
+<script src="/static/js/graph.js"></script>
+
+#if ($staticPageScripts)
+  #foreach ($script in $staticPageScripts)
+      <script src="$script"></script>
+  #end
+#end
+
+#if ($dynamicPageScripts)
+  #foreach ($script in $dynamicPageScripts)
+        #parse($script)
+  #end
+#end
+
+
+#if ($pageScripts)
+    #foreach ($script in $pageScripts)
+        <script src="$script"></script>
+    #end
+#end
+

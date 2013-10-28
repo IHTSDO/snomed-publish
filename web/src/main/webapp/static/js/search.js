@@ -25,7 +25,7 @@ MyApp.TextSearchRoute = Ember.Route.extend({
   setupController: function(controller, model){
     $('#tandcModal').modal('show');
   }
-})
+});
 
 
 

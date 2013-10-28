@@ -21,12 +21,8 @@
     <url>http://build.sparklingideas.co.uk</url>
   </ciManagement>  
   <modules>
-    <module>canonical</module>
-    <module>closure</module>
-    <module>importexport</module>
-    <module>manifest</module>
+    <module>lib</module>
     <module>model</module>
-    <module>rdf</module>
     <module>service</module>
     <module>spring-data-service</module>
     <module>web</module>

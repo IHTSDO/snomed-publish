@@ -1,0 +1,34 @@
+#[[
+<script type="text/x-handlebars" data-template-name="tandc">
+      <div class="modal fade" id="tandcModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-textSearch-title">Terms &amp; Conditions
+                <button type="button" data-dismiss="modal" class="btn btn-default btn-sm" style="float: right; margin: 0 0.5em 0 0">I accept</button>
+              </h4>
+            </div>
+            <div class="modal-body">
+<h2>Agreement for the use of SNOMED CT for Simple Browsing &amp; Search</h1>
+
+<h4 style="margin: 2em 0 1.5em">The User accepts :</h4>
+<ul class="list-group2">
+<li class="list-group-item2" style="border: none">That the use of <strong>SNOMED CT</strong> shall be purely and strictly for the purposes of simple testing and use of the simple single concept browse and search facility provided by the <strong>IHTSDO</strong>.</p></li>
+<li class="list-group-item2" style="border: none">That permission to use <strong>SNOMED CT</strong> for the purposes stated in clause 1, shall be granted free of charge.</p></li>
+<li class="list-group-item2" style="border: none">That the use of <strong>SNOMED CT</strong> for simple single concept browsing and searching will be valid until the end of December 2013.</p></li>
+<li class="list-group-item2" style="border: none">That the copyright of <strong>SNOMED CT</strong> belongs to, and remains with, <strong>IHTSDO</strong>.</p></li>
+<li class="list-group-item2" style="border: none">That no attempt is made to copy or reproduce <strong>SNOMED CT</strong> by any means or in any form without the prior written consent of the copyright holders as identified in clause 4.</p></li>
+<li class="list-group-item2" style="border: none; font-weight: bold">
+  That any work published as a result of using the simple browsing and search facility shall formally acknowledge <strong>IHTSDO</strong>. These acknowledgements will be display the following statements:
+  <p style="font-style: italic; margin: 1em">This material includes SNOMED Clinical Terms&reg; (SNOMED CT&reg;) which is used by permission of the International Health Terminology Standards Development Organisation (IHTSDO). All rights reserved. <br/><br/>SNOMED CT&copy; was originally created by The College of American Pathologists. 'SNOMED' and 'SNOMED CT' are registered trademarks of the IHTSDO.</p>
+</li>
+    
+            </div>
+        <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-default btn-sm" style="float: right; margin: 0 0.5em 0 0">I accept</button>
+        </div>           
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div>
+    </script>
+]]#

@@ -1,0 +1,29 @@
+<meta charset="utf-8"/>
+<title>Structured Searcb</title>
+
+<script type="text/javascript" >
+ENV = {
+  EXPERIMENTAL_CONTROL_HELPER: true
+};
+</script>
+
+<meta name="description" content="IHTSDO Snomed Structured Query Builder"/>
+<meta name="author" content="Henrik Pettersen, Sparkling Ideas"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.css"/>
+
+<!--  Boostrap Modal -->
+<!--link rel="stylesheet" href="/static/css/bootstrap-modal-bs3patch.css"/>
+<link rel="stylesheet" href="/static/css/bootstrap-modal.css"/-->
+
+<!-- Optional theme -->
+
+<link rel="stylesheet" href="/static/css/graph.css"/>
+<link rel="stylesheet" href="/static/css/footer.css"/>
+<link rel="stylesheet" href="/static/css/normalise/normalise.css">
+#if ($pageCss)
+  #foreach ($css in $pageCss)
+    <link rel="stylesheet" href="$css">
+  #end
+#end
