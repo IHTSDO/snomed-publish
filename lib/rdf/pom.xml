@@ -15,6 +15,7 @@
         <sourceDirectory>src/main/java</sourceDirectory>
     </build>
     <dependencies>
+        
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
             <artifactId>importexport</artifactId>
@@ -25,7 +26,7 @@
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
+            <version>${commons-lang.version}</version>
         </dependency>
         
         <!-- JSR-330 Javax inject annotations -->
@@ -33,17 +34,9 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>${javax.inject.version}</version>
-        </dependency>     
-                
-        <!-- H2 Database -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
-            <scope>test</scope>
-        </dependency>     
+        </dependency>
+
                     
-        
         <!-- JENA -->
         <dependency>
             <groupId>com.hp.hpl.jena</groupId>
@@ -64,6 +57,16 @@
             <groupId>com.hp.hpl.jena</groupId>
             <artifactId>arq-extra</artifactId>
             <version>2.7.0</version>
-        </dependency> 
+        </dependency>         
+
+        <!-- TEST SCOPE -->     
+                
+        <!-- H2 Database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>     
     </dependencies>
 </project>

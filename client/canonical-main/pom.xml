@@ -43,6 +43,11 @@
             <artifactId>canonical</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ihtsdo.snomed</groupId>
+            <artifactId>importexport</artifactId>
+            <version>${project.version}</version>
+        </dependency>        
         <!-- Command Line Interface -->
         <dependency>
             <groupId>commons-cli</groupId>

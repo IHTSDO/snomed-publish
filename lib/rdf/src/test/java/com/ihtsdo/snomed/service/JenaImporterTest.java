@@ -13,7 +13,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,23 +50,30 @@ public class JenaImporterTest {
     protected static final String TEST_RF2_CONCEPTS             = "test.concepts.rf2";
     protected static final String TEST_RF2_DESCRIPTIONS         = "test.descriptions.rf2";
         
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
+    }
+    
+    @AfterClass
+    public static void afterClass(){
+        em.close();
+        emf.close();
+    }
     
     @Before
     public void setUp() throws Exception {
-        LOG.info("Initialising database");
-        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
-        em = emf.createEntityManager();
         em.getTransaction().begin();
         em.getTransaction().setRollbackOnly();
     }
 
     @After
     public void tearDown() throws Exception {
-        LOG.info("Closing database");
         em.getTransaction().rollback();
-        emf.close();
-    }    
-
+    }
+    
     //@Test
     public void shouldCreateJenaModel() throws IOException{
         Ontology ontology = parser.populateDbWithDescriptions("Jena Test", 
@@ -73,7 +82,6 @@ public class JenaImporterTest {
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS), em);
         OntModel model = jena.importJenaModel(ontology, em, new File("TDB"));
         assertNotNull(model);
-        //model.write(System.out, "RDF/XML");
     }
     
     @Test
@@ -86,11 +94,5 @@ public class JenaImporterTest {
         try(OutputStreamWriter ow = new OutputStreamWriter(new BufferedOutputStream(System.out), "utf-8");){
             rdfxml.exportToRdfXml(ontology, em, ow);
         }
-        
-        //File file = File.createTempFile("import.rdfs.rdfxml", "xml");
-        //if (file.exists()) file.delete();
-        //try(OutputStreamWriter ow = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(file)), "utf-8");){
-        //    rdfxml.exportToRdfXml(ontology, em, ow);
-        //}
     }
 }

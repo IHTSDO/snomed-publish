@@ -1,3 +1,5 @@
 1. Update to JAXB 2.1
 2. Document how to generate DDL (see importexport)
 3. Update README for lib/importexport, lib/rdf
+4. Add unit tests for RDF Serialiser
+5. 

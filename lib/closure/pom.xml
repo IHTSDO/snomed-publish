@@ -10,10 +10,19 @@
     <packaging>jar</packaging>
     <name>closure</name>
     <dependencies>
+        
+        <dependency>
+            <groupId>com.ihtsdo.snomed</groupId>
+            <artifactId>model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- TEST SCOPE -->
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
             <artifactId>importexport</artifactId>
             <version>${project.version}</version>
         </dependency>
+
     </dependencies>
 </project>

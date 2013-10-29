@@ -48,6 +48,7 @@
         <sourceDirectory>src/main/java</sourceDirectory>
     </build>
     <dependencies>
+
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>
             <artifactId>rdf</artifactId>
@@ -60,5 +61,16 @@
             <artifactId>commons-cli</artifactId>
             <version>${commons-cli.version}</version>
         </dependency>
+
+        <!-- Test Scope -->
+        
+        <!-- H2 Database -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

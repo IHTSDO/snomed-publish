@@ -43,6 +43,7 @@ public class Rf1HibernateParserTest extends BaseTest{
     
     @AfterClass
     public static void afterClass(){
+        em.close();
         emf.close();
     }    
     
