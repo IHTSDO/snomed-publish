@@ -6,13 +6,15 @@ Transitive Closure Library
 
 This library provides an API for creating the transitive closure of an ontology's isA statements
 
-The API has a single method in class [TransitiveClosureAlgorithm](src/main/java/com/ihtsdo/snomed/service/TransitiveClosureAlgorithm.java) with this signature:
+The API has a single method in class [TransitiveClosureAlgorithm](/lib/closure/src/main/java/com/ihtsdo/snomed/service/TransitiveClosureAlgorithm.java) with this signature:
 
     public void runAlgorithm(Collection<Concept> concepts, OntologySerialiser serialiser)
 
 This method will generate all transitive closures for all isA statements for a set of input concepts. 
 
-The transitive closures are written out to an outputfile using an [OntologySerialiser](/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/OntologySerialiser.java)
+The transitive closures are written out to an outputfile using an [OntologySerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/OntologySerialiser.java).
+
+You can access the OntologySerialisers through the [SerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SerialiserFactory.java)
 
 Example usage (Java 7):
 
@@ -25,8 +27,8 @@ Details for the transitive closure algorithm can be found on the [snomed wiki](h
 
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
-To build the distribution, enter the root project directory (one up from this folder) and type:
+To build the distribution, enter the root project directory (two up from this folder) and type:
 
     mvn clean package
     
-The distribution jar file can be found at closure/target/closure.jar after this. This library can be distributed as this single file.
+When built, you can find the distribution jar file at lib/closure/target/closure.jar.

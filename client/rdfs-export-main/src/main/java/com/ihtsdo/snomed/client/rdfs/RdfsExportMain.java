@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.jena.RdfSchemaSerialiser;
+import com.ihtsdo.snomed.service.RdfSchemaSerialiser;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;

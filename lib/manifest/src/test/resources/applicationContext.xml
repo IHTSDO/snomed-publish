@@ -22,27 +22,28 @@
         http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
-        <context:property-placeholder location="classpath:database.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="true"/>
-        
-        <context:component-scan base-package="com.ihtsdo.snomed.client.manifest.model" />
-        <context:component-scan base-package="com.ihtsdo.snomed.client.manifest.serialiser" />
-        <context:component-scan base-package="com.ihtsdo.snomed.client.manifest.parser" />
-        <tx:annotation-driven transaction-manager="transactionManager" />
-        <context:annotation-config />
-        <jpa:repositories base-package="com.ihtsdo.snomed.model" />
-        
-        <!-- Declare a JPA entityManagerFactory -->
-        <bean id="entityManagerFactory"
-            class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-            <property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml"></property>
-            <property name="persistenceUnitName" value="persistenceManager" />
-            <property name="dataSource" ref="dataSource" />
-            <property name="jpaVendorAdapter">
-                <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                    <property name="showSql" value="false" />
-                </bean>
-            </property>
-        </bean>
+    <context:property-placeholder location="classpath:database.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="true"/>
+    
+    <context:component-scan base-package="com.ihtsdo.snomed.client.manifest" />
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <context:annotation-config />
+
+    <jpa:repositories base-package="com.ihtsdo.snomed.model" />
+    
+    <!-- Declare a JPA entityManagerFactory -->
+    <bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml"></property>
+        <property name="persistenceUnitName" value="persistenceManager" />
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="false" />
+            </bean>
+        </property>
+    </bean>
         
     <bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${database.driver}"/>
@@ -50,22 +51,10 @@
         <property name="username" value="${database.user}"/>
         <property name="password" value="${database.password}"/>
     </bean>
-        
-<!--         Declare a datasource that has pooling capabilities -->
-<!--         <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" -->
-<!--             destroy-method="close" -->
-<!--             p:driverClass="${database.driver}" p:jdbcUrl="${database.url}" -->
-<!--             p:user="${database.user}" p:password="${database.password}" -->
-<!--             p:acquireIncrement="5" p:idleConnectionTestPeriod="60" p:maxPoolSize="100" -->
-<!--             p:maxStatements="1000" p:maxStatementsPerConnection="100" p:minPoolSize="10" />         -->
-        
-        <!-- Declare a transaction manager -->
-        <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-            <property name="entityManagerFactory" ref="entityManagerFactory" />
-        </bean>        
-
-<!--         <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean"> -->
-<!--           <property name="persistenceUnitName" value="persistenceManager"/> -->
-<!--         </bean> -->
+    
+    <!-- Declare a transaction manager -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
 
 </beans>

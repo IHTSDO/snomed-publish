@@ -6,10 +6,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
@@ -19,9 +26,34 @@ import com.ihtsdo.snomed.service.InvalidInputException;
 import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class Rf2HibernateParserTest extends DatabaseTest{
+public class Rf2HibernateParserTest extends BaseTest{
+    private static final Logger LOG = LoggerFactory.getLogger(Rf2HibernateParserTest.class);
 
     HibernateParser parser = HibernateParserFactory.getParser(Parser.RF2).setParseMode(Mode.STRICT);
+    
+    
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
+    }
+    
+    @AfterClass
+    public static void afterClass(){
+        emf.close();
+    }    
+    
+    @After
+    public void tearDown() throws Exception {
+        em.getTransaction().rollback();
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        em.getTransaction().begin();
+        em.getTransaction().setRollbackOnly();   
+    }    
     
     @Test
     public void dbShouldHave28ConceptsAfterPopulateConcepts() throws IOException{

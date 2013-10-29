@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service.jena;
+package com.ihtsdo.snomed.service;
 
 import java.io.File;
 import java.util.List;

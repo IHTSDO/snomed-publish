@@ -36,9 +36,9 @@ public class DatabaseTest {
     protected static final String TEST_CP_STATEMENTS_ERROR      = "test.error.statements.childparent";
     
     protected static final String TEST_RF2_STATEMENTS           = "test.statements.rf2";
-    protected static final String TEST_RF2_CONCEPTS             = "test.concepts.rf2";
-    protected static final String TEST_RF2_DESCRIPTIONS         = "test.descriptions.rf2";
-    protected static final String TEST_RF2_STATEMENTS_ERROR     = "test.error.statements.rf2";
+    protected static final String TEST_RF2_CONCEPTS             = "data/test.concepts.rf2";
+    protected static final String TEST_RF2_DESCRIPTIONS         = "data/test.descriptions.rf2";
+    protected static final String TEST_RF2_STATEMENTS_ERROR     = "data/test.error.statements.rf2";
     protected static final String TEST_RF2_CONCEPTS_ERROR       = "test.error.concepts.rf2";
     protected static final String TEST_RF2_DESCRIPTIONS_ERROR   = "test.error.descriptions.rf2";
 

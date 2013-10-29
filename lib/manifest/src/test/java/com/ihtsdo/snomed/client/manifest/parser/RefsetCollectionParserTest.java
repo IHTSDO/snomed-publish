@@ -32,7 +32,6 @@ public class RefsetCollectionParserTest {
 
     @Inject private RefsetCollectionParser refsetCollectionParser;
     @Inject private RefsetCollectionFactory refsetCollectionFactory;
-    //@Inject private ManifestFileFactory manifestFileFactory;
     @Inject private MimetypeProperties mimetypeProperties;
     @PersistenceContext private EntityManager em;
     

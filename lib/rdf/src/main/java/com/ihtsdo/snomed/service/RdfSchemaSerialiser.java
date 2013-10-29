@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.service.jena;
+package com.ihtsdo.snomed.service;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

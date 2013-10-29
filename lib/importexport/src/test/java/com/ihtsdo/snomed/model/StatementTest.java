@@ -3,23 +3,47 @@ package com.ihtsdo.snomed.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
+import javax.persistence.Persistence;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.service.parser.DatabaseTest;
+import com.ihtsdo.snomed.service.parser.BaseTest;
+import com.ihtsdo.snomed.service.parser.HibernateParser;
 
-public class StatementTest extends DatabaseTest{
+public class StatementTest extends BaseTest{
+    private static final Logger LOG = LoggerFactory.getLogger(StatementTest.class);
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
     }
-
+    
+    @AfterClass
+    public static void afterClass(){
+        emf.close();
+    }    
+    
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
+        em.getTransaction().rollback();
     }
+    
+    @Before
+    public void setUp() throws Exception {
+        em.getTransaction().begin();
+        em.getTransaction().setRollbackOnly();
+    }
+
     
     @Test
     public void shouldSetStatementInConcept() {
@@ -112,7 +136,7 @@ public class StatementTest extends DatabaseTest{
         Concept s2 = new Concept(1);
         Concept p2 = new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
         Concept o2 = new Concept(3);
-        Statement st2 = new Statement(1, s2, p2, o2);
+        Statement st2 = new Statement(2, s2, p2, o2);
         
         em.persist(s1);
         em.persist(p1);
@@ -125,10 +149,9 @@ public class StatementTest extends DatabaseTest{
         em.flush();
         em.clear();
         
-        st1 = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
-        st2 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();
-        
-        assertEquals(st1, st2);
+        List<Statement> results = em.createQuery("SELECT s FROM Statement s", Statement.class).getResultList();
+        assertTrue(results.contains(st1));
+        assertTrue(results.contains(st2));
     }
     
     @Test
@@ -148,10 +171,9 @@ public class StatementTest extends DatabaseTest{
         em.flush();
         em.clear();
         
-        st1 = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
-        st2 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();        
-        
-        assertEquals(st1, st2);
+        List<Statement> results = em.createQuery("SELECT s FROM Statement s", Statement.class).getResultList();
+        assertTrue(results.contains(st1));
+        assertTrue(results.contains(st2));
     }   
     
     @Test
@@ -172,10 +194,12 @@ public class StatementTest extends DatabaseTest{
         em.flush();
         em.clear();
         
-        st1 = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
-        st2 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();           
+        List<Statement> results = em.createQuery("SELECT s FROM Statement s", Statement.class).getResultList();
+        assertTrue(results.contains(st1));
+        assertTrue(results.contains(st2));
+        assertEquals(2, results.size());
         
-        assertEquals(st1.hashCode(), st2.hashCode());
+        assertEquals(results.get(0).hashCode(), results.get(1).hashCode());
     }
 
     
@@ -197,10 +221,12 @@ public class StatementTest extends DatabaseTest{
         em.flush();
         em.clear();
         
-        st1 = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
-        st2 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();         
+        List<Statement> results = em.createQuery("SELECT s FROM Statement s", Statement.class).getResultList();
+        assertTrue(results.contains(st1));
+        assertTrue(results.contains(st2));
+        assertEquals(2, results.size());
         
-        assertEquals(st1.hashCode(), st2.hashCode());
+        assertEquals(results.get(0).hashCode(), results.get(1).hashCode());
     }      
     
 }

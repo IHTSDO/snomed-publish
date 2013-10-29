@@ -9,20 +9,51 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class HibernateParserTest extends DatabaseTest{
+public class HibernateParserTest extends BaseTest{
+    private static final Logger LOG = LoggerFactory.getLogger(HibernateParserTest.class);
 
     private HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
 
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
+    }
+    
+    @AfterClass
+    public static void afterClass(){
+        emf.close();
+    }    
+    
+    @After
+    public void tearDown() throws Exception {
+        em.getTransaction().rollback();
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        em.getTransaction().begin();
+        em.getTransaction().setRollbackOnly();   
+    }       
+    
     @Test
     public void shouldPopulateSubjectOfStatementBidirectionalField() throws IOException{
         parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),

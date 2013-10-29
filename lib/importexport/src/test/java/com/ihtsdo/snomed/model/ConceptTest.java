@@ -6,25 +6,51 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Set;
 
+import javax.persistence.Persistence;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.service.InvalidInputException;
-import com.ihtsdo.snomed.service.parser.DatabaseTest;
+import com.ihtsdo.snomed.service.parser.BaseTest;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class ConceptTest  extends DatabaseTest{
-
+public class ConceptTest  extends BaseTest{
+    private static final Logger LOG = LoggerFactory.getLogger(ConceptTest.class);
+    
     Concept c1,c2,c3,c4;
     
     HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
     
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
+    }
+    
+    @AfterClass
+    public static void afterClass(){
+        emf.close();
+    }    
+    
+    @After
+    public void tearDown() throws Exception {
+        em.getTransaction().rollback();
+    }
+    
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+        em.getTransaction().begin();
+        em.getTransaction().setRollbackOnly();
+        
         c1 = new Concept(1);
         c2 = new Concept(2);
         c3 = new Concept(3);
@@ -46,12 +72,6 @@ public class ConceptTest  extends DatabaseTest{
         c2 = em.createQuery("SELECT c FROM Concept c where c.serialisedId=2", Concept.class).getSingleResult();
         c3 = em.createQuery("SELECT c FROM Concept c where c.serialisedId=3", Concept.class).getSingleResult();
         c4 = em.createQuery("SELECT c FROM Concept c where c.serialisedId=4", Concept.class).getSingleResult();
-    }
-    
-
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
     }
     
     /*

@@ -5,30 +5,49 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.Arrays;
 
+import javax.persistence.Persistence;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.service.InvalidInputException;
-import com.ihtsdo.snomed.service.parser.DatabaseTest;
+import com.ihtsdo.snomed.service.parser.BaseTest;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class GroupTest extends DatabaseTest{
-   
+public class GroupTest extends BaseTest{
+    private static final Logger LOG = LoggerFactory.getLogger(GroupTest.class);
+
     HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
     
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
+    @BeforeClass
+    public static void beforeClass(){
+        LOG.info("Initialising database");
+        emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
+        em = emf.createEntityManager();        
     }
-
+    
+    @AfterClass
+    public static void afterClass(){
+        emf.close();
+    }    
+    
     @After
     public void tearDown() throws Exception {
-        super.tearDown();
+        em.getTransaction().rollback();
     }
 
+    @Before
+    public void setUp() throws Exception {
+        em.getTransaction().begin();
+        em.getTransaction().setRollbackOnly();
+    }
 
     @Test
     public void shouldReturnEqual() throws IOException {

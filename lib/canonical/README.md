@@ -6,7 +6,7 @@ Canonical Form Library
 
 This library provides an API for creating the canonical form of an ontology.
 
-The API has two public methods in class [CanonicalAlgorithm](src/main/java/com/ihtsdo/snomed/service/CanonicalAlgorithm.java) with this signature:
+The API has two public methods in class [CanonicalAlgorithm](/lib/canonical/src/main/java/com/ihtsdo/snomed/service/CanonicalAlgorithm.java) with this signature:
 
     public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails, Set<Long> showDetailsConceptIds)
     public Set<Statement> runAlgorithm(Collection<Concept> concepts, boolean showDetails)
@@ -30,4 +30,4 @@ To build the distribution, enter the root project directory (two up from this fo
 
     mvn clean install package
     
-You can find the distribution jar file at lib/canonical/target/canonical.jar.
+When built, you can find the distribution jar file at lib/canonical/target/canonical.jar.

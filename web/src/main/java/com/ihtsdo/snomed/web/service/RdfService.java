@@ -13,7 +13,7 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.jena.RdfSchemaSerialiser;
+import com.ihtsdo.snomed.service.RdfSchemaSerialiser;
 
 @Named
 @Transactional (value = "transactionManager", readOnly = true)
