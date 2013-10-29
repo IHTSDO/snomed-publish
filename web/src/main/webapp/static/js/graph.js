@@ -36,7 +36,7 @@ MyApp.ApplicationRoute = Ember.Route.extend({
 MyApp.GraphSearchController = Ember.ObjectController.extend({
   model: Ember.A(),
   variables: Ember.A(),
-  results: null;
+  results: null,
   counter: -1,
   sparql: function(){
     console.log('In sparql generator');
@@ -456,7 +456,7 @@ MyApp.SingleResult = Ember.Object.extend({
     else {
       this.set('value', content);
     }
-  }
+  },
 
   isConcept: function(){
     return (this.get('concept') != null);
