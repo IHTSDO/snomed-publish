@@ -10,27 +10,39 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   </tr>
   <tr>
     <td>RF1</td>
-    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser.java">Rf1HibernateParser</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser.java">Rf1HibernateParser</a></td>
   </tr>
   <tr>
     <td>RF2</td>
-    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser.java">Rf2HibernateParser</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser.java">Rf2HibernateParser</a></td>
   </tr>
   <tr>
     <td>CANONICAL</td>
-    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser.java">CanonicalHibernateParser</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser.java">CanonicalHibernateParser</a></td>
   </tr>
   <tr>
     <td>CHILD_PARENT</td>
-    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java">ChildParentHibernateParser</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java">ChildParentHibernateParser</a></td>
   </tr>      
 </table>
 
 ##Available Serialisers
 
-Enum            Class
-CANONICAL       [CanonicalSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser.java)
-CHILD_PARENT    [ChildParentSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java)
+<table>
+  <tr>
+    <th>Enum</th>
+    <th>Class</th>
+  </tr>
+  <tr>
+    <td>CANONICAL</td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser.java"></a></td>
+  </tr>
+  <tr>
+    <td>CHILD_PARENT</td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java"></a></td>
+  </tr>  
+</table>
+
 
 ##Format details
 
