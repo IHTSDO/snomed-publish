@@ -41,6 +41,10 @@ Library for importing and exporting Snomed data in various formats. The parsers 
     <td>CHILD_PARENT</td>
     <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java">ChilParentSerialiser</a></td>
   </tr>  
+  <tr>
+    <td>RDF_SCHEMA_XML</td>
+    <td><a href="#">...</a></td>
+  </tr>    
 </table>
 
 
@@ -83,6 +87,13 @@ Current standard format for capturing all of Snomed. Serialisation format consis
     3829433029  20080731  1 900000000000207008  102977005 102976001 0 116680003 900000000000010007  900000000000451002
     3829434024  20080731  1 900000000000207008  413337008 306751006 0 116680003 900000000000010007  900000000000451002
     etc.
+
+###RDF Schema
+Serialise Snomed to <a href="http://www.w3.org/TR/rdf-schema/" target="_blank">RDF Schema<a/>. Requires a full RF2 import (concepts, descriptions, statements) for conversion. Renders the RDF Schema in <a href="http://www.w3.org/TR/REC-rdf-syntax/" target="_blank">RDF/XML format</a>.
+
+For more detail on how we mapped Snomed to RDF Schema, take at look at the <a href="https://sites.google.com/a/ihtsdo.org/technical-dev/write-ups/mapping-snomed-to-rdf-schema" target="_blank">Snomed Documentation</a>.
+
+
 
 ###Canonical
 A special format for representing the canonical form of Snomed. For more information on the canonical form and how it is calculated, see the [canonical library](/lib/canonical)
