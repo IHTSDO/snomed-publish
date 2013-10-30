@@ -10,19 +10,19 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   </tr>
   <tr>
     <td>RF1</td>
-    <td>[Rf1HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser.java)</td>
+    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser.java">Rf1HibernateParser</a></td>
   </tr>
   <tr>
     <td>RF2</td>
-    <td>[Rf2HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser.java)/td>
+    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser.java">Rf2HibernateParser</a></td>
   </tr>
   <tr>
     <td>CANONICAL</td>
-    <td>[CanonicalHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser.java)</td>
+    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser.java">CanonicalHibernateParser</a></td>
   </tr>
   <tr>
     <td>CHILD_PARENT</td>
-    <td>[ChildParentHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java)</td>
+    <td><a href="importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java">ChildParentHibernateParser</a></td>
   </tr>      
 </table>
 
