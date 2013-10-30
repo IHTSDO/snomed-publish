@@ -14,10 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.rule.DifferenceRefsetRule;
-import com.ihtsdo.snomed.model.refset.rule.IntersectionRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
-import com.ihtsdo.snomed.model.refset.rule.SymmetricDifferenceRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
 
 @Transactional
@@ -28,19 +25,19 @@ public class RefsetRuleTest {
     @PersistenceContext(unitName="testdb")
     EntityManager em;
     
-    private RefsetPlan refsetPlan;
+    //private RefsetPlan refsetPlan;
     private ListConceptsRefsetRule list1Rule;
     private ListConceptsRefsetRule list2Rule;
     private UnionRefsetRule unionRefsetRule;
-    private DifferenceRefsetRule differenceRefsetRule;
-    private IntersectionRefsetRule intersectionRefsetRule;
-    private SymmetricDifferenceRefsetRule symmetricDifferenceRefsetRule;
+//    private DifferenceRefsetRule differenceRefsetRule;
+//    private IntersectionRefsetRule intersectionRefsetRule;
+//    private SymmetricDifferenceRefsetRule symmetricDifferenceRefsetRule;
     
     Concept c1, c2, c3, c4, c5, c6;
 
     @Before
     public void setup(){
-        refsetPlan = new RefsetPlan();
+        //refsetPlan = new RefsetPlan();
         
         c1 = new Concept(1L);
         c2 = new Concept(2L);
@@ -76,9 +73,9 @@ public class RefsetRuleTest {
         
         em.persist(unionRefsetRule);
         
-        differenceRefsetRule = new DifferenceRefsetRule();
-        intersectionRefsetRule = new IntersectionRefsetRule();
-        symmetricDifferenceRefsetRule = new SymmetricDifferenceRefsetRule();
+//        differenceRefsetRule = new DifferenceRefsetRule();
+//        intersectionRefsetRule = new IntersectionRefsetRule();
+//        symmetricDifferenceRefsetRule = new SymmetricDifferenceRefsetRule();
         
         em.flush();
         em.clear();

@@ -18,8 +18,8 @@ public class UnionRefsetRule extends BaseSetOperationRefsetRule{
     protected Set<Concept> apply(Map<String, Set<Concept>> inputs) {
         assert(inputs.size() == 2);
         return Sets.union(
-                inputs.get(LEFT_OPERAND) == null ?  new HashSet() : inputs.get(LEFT_OPERAND),
-                inputs.get(RIGHT_OPERAND) == null ?  new HashSet() : inputs.get(RIGHT_OPERAND));
+                inputs.get(LEFT_OPERAND) == null ?  new HashSet<Concept>() : inputs.get(LEFT_OPERAND),
+                inputs.get(RIGHT_OPERAND) == null ?  new HashSet<Concept>() : inputs.get(RIGHT_OPERAND));
     }
     
 //    public String toString(){

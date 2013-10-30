@@ -8,7 +8,10 @@ import org.slf4j.LoggerFactory;
 
 
 public class BaseTest {
+    
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
+    
     protected static final String DEFAULT_ONTOLOGY_NAME = "Test";
     
     private static final String DATA_FOLDER = "data/";

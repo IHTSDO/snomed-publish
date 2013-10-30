@@ -25,11 +25,14 @@ public class RefsetNotFoundException extends Exception {
         super(message);
         this.publicId = publicId;
     }
+    
+    public String getPublicId(){
+        return publicId;
+    }
 
 
     public RefsetNotFoundException(Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
     public RefsetNotFoundException(String message, Throwable cause) {
