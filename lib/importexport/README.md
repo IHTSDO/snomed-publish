@@ -22,7 +22,7 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   </tr>
   <tr>
     <td>CHILD_PARENT</td>
-    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java">ChildParentHibernateParser</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentHibernateParser.java">ChildParentHibernateParser</a></td>
   </tr>      
 </table>
 
@@ -35,11 +35,11 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   </tr>
   <tr>
     <td>CANONICAL</td>
-    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser.java"></a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser.java">CanonicalSerialiser</a></td>
   </tr>
   <tr>
     <td>CHILD_PARENT</td>
-    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java"></a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java">ChilParentSerialiser</a></td>
   </tr>  
 </table>
 
