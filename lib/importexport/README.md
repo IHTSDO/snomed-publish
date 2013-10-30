@@ -1,19 +1,36 @@
 #Import / Export Library
-Library for importing and exporting Snomed data in various formats. The parsers and serialisers are available using [HibernateParserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/HibernateParserFactory) and [SerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SerialiserFactory)
+Library for importing and exporting Snomed data in various formats. The parsers and serialisers are available using [HibernateParserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/HibernateParserFactory.java) and [SerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SerialiserFactory.java)
 
 ##Available parsers
 
-Enum            Class
-RF1             [Rf1HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser)
-RF2             [Rf2HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser)
-CANONICAL       [CanonicalHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser)
-CHILD_PARENT    [ChildParentHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser)
+<table>
+  <tr>
+    <th>Enum</th>
+    <th>Class</th>
+  </tr>
+  <tr>
+    <td>RF1</td>
+    <td>[Rf1HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf1HibernateParser.java)</td>
+  </tr>
+  <tr>
+    <td>RF2</td>
+    <td>[Rf2HibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/Rf2HibernateParser.java)/td>
+  </tr>
+  <tr>
+    <td>CANONICAL</td>
+    <td>[CanonicalHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/CanonicalHibernateParser.java)</td>
+  </tr>
+  <tr>
+    <td>CHILD_PARENT</td>
+    <td>[ChildParentHibernateParser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentParser.java)</td>
+  </tr>      
+</table>
 
 ##Available Serialisers
 
 Enum            Class
-CANONICAL       [CanonicalSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser)
-CHILD_PARENT    [ChildParentSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser)
+CANONICAL       [CanonicalSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/CanonicalSerialiser.java)
+CHILD_PARENT    [ChildParentSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ChildParentSerialiser.java)
 
 ##Format details
 
