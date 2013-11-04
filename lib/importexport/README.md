@@ -1,5 +1,5 @@
 #Import / Export Library
-Library for importing and exporting Snomed data in various formats. The parsers and serialisers are available using [HibernateParserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/HibernateParserFactory.java) and [SerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SerialiserFactory.java)
+Library for importing and exporting Snomed data in various formats. The parsers and serialisers are available using [HibernateParserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/parser/HibernateParserFactory.java) and [SnomedSerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SnomedSerialiserFactory.java)
 
 ##Available parsers
 
@@ -43,18 +43,15 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   </tr>  
   <tr>
     <td>RDF_SCHEMA_XML</td>
-    <td><a href="#">...</a></td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/RdfSchemaSerialiser.java">RdfSchemaSerialiser</a></td>
   </tr>    
 </table>
 
 
 ##Format details
 
-Data is serialised as / parsed from one or more tab-seperated-values" file(s), of the following formats:
-
-
 ###RF1
-Legacy format, superseded by RF2, but still need to produce RF1 format for release
+Legacy format, superseded by RF2, but still need to produce RF1 format for release. Uses tab-separated-values.
 
     CONCEPTID1  RELATIONSHIPTYPE  CONCEPTID2    RELATIONSHIPGROUP
     280844000   116680003   71737002    0
@@ -65,7 +62,7 @@ The above example is for concepts only - there are other, similar RF1 formats fo
 
 
 ###RF2
-Current standard format for capturing all of Snomed. Serialisation format consists of 3 files for concepts, descriptions and OAV triples. 
+Current standard format for capturing all of Snomed. Serialisation format consists of 3 files for concepts, descriptions and OAV triples.  Uses tab-separated-values.
 
 ####Format for Concepts
 
@@ -89,7 +86,7 @@ Current standard format for capturing all of Snomed. Serialisation format consis
     etc.
 
 ###RDF Schema
-Serialise Snomed to <a href="http://www.w3.org/TR/rdf-schema/" target="_blank">RDF Schema<a/>. Requires a full RF2 import (concepts, descriptions, statements) for conversion. Renders the RDF Schema in <a href="http://www.w3.org/TR/REC-rdf-syntax/" target="_blank">RDF/XML format</a>.
+<a href="http://www.w3.org/TR/rdf-schema/" target="_blank">RDF Schema Format<a/>. Requires a full RF2 import (concepts, descriptions, statements) for conversion. Renders the RDF Schema in <a href="http://www.w3.org/TR/REC-rdf-syntax/" target="_blank">RDF/XML format</a>.
 
 For more detail on how we mapped Snomed to RDF Schema, take at look at the <a href="https://sites.google.com/a/ihtsdo.org/technical-dev/write-ups/mapping-snomed-to-rdf-schema" target="_blank">Snomed Documentation</a>.
 
