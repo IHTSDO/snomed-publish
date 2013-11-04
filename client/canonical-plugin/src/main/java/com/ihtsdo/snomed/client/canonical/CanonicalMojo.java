@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,8 +35,8 @@ import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 @Mojo(name="generate-canonical")
 public class CanonicalMojo extends AbstractMojo{
@@ -101,6 +102,9 @@ public class CanonicalMojo extends AbstractMojo{
             throw new MojoExecutionException("File not found: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to read/write file: " + e.getMessage(), e);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }finally{
             closeDb();
         }
@@ -130,7 +134,7 @@ public class CanonicalMojo extends AbstractMojo{
         return resultSet;
     }    
     
-    private void writeOut(String outputFile, Set<Statement> statements) throws IOException {
+    private void writeOut(String outputFile, Set<Statement> statements) throws IOException, ParseException {
         getLog().info("Writing results to " + outputFile);
 
         File outFile = new File(outputFile);
@@ -139,7 +143,7 @@ public class CanonicalMojo extends AbstractMojo{
         }
         
         try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-            SerialiserFactory.getSerialiser(Form.CANONICAL, bw).write(statements);
+            SnomedSerialiserFactory.getSerialiser(Form.CANONICAL, bw).write(statements);
         }
     }    
     

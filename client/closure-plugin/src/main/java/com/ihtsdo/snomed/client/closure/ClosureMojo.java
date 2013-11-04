@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,9 @@ import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 @Mojo(name="generate-transitive-closure")
 public class ClosureMojo extends AbstractMojo{
@@ -121,7 +122,7 @@ public class ClosureMojo extends AbstractMojo{
             List<Concept> concepts = query.getResultList();
 
             try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
-                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
+                SnomedSerialiser serialiser = SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
                 Stopwatch stopwatch = new Stopwatch().start();
                 getLog().info("Running algorithm");
                 boolean done = false;
@@ -145,7 +146,9 @@ public class ClosureMojo extends AbstractMojo{
                 }
                 stopwatch.stop();
                 getLog().info("Completed algorithm in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds with " + counter + " concepts");
-            }
+            } catch (ParseException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+			}
         } catch (FileNotFoundException e) {
             getLog().error("File not found: " + e.getMessage());
             throw new MojoExecutionException(e.getMessage(), e);

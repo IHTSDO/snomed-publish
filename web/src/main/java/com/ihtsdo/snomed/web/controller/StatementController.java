@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -33,11 +32,12 @@ import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlStatement;
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.web.exception.DescriptionNotFoundException;
 import com.ihtsdo.snomed.web.exception.StatementNotFoundException;
 import com.ihtsdo.snomed.web.service.OntologyService;
-import com.ihtsdo.snomed.web.service.RdfService;
 
 @Controller
 @RequestMapping("/version/{ontologyId}/triple")
@@ -46,7 +46,6 @@ public class StatementController {
     private static final Logger LOG = LoggerFactory.getLogger( StatementController.class );
 
     @Autowired OntologyService ontologyService;
-    @Inject RdfService rdfService;
 
     @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
@@ -156,7 +155,7 @@ public class StatementController {
       Statement s = getStatement(ontologyId, serialisedId);
       response.setContentType("application/rdf+xml");
       try (OutputStreamWriter ow = new OutputStreamWriter(os)){
-          rdfService.writeStatement(s, ow, new Ontology(ontologyId));
+    	  SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(s);
       }
   }    
 }

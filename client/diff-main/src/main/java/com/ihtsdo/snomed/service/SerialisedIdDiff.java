@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -24,14 +25,14 @@ import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
 
 class SerialisedIdDiff implements DiffAlgorithm{
 
     private static final Logger LOG = LoggerFactory.getLogger( SerialisedIdDiff.class );
 
-    public void diff(Ontology base, Ontology compare, OntologySerialiser extrasSerialiser, 
-            OntologySerialiser missingSerialiser, EntityManager em) throws IOException
+    public void diff(Ontology base, Ontology compare, SnomedSerialiser extrasSerialiser, 
+            SnomedSerialiser missingSerialiser, EntityManager em) throws IOException, ParseException
     {
         LOG.info("Getting all base statements");
         Stopwatch stopwatch = new Stopwatch().start();

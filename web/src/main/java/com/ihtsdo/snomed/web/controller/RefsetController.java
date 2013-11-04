@@ -17,14 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
@@ -45,11 +43,9 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
@@ -517,47 +513,47 @@ public class RefsetController {
         System.out.println("returning xmlconcepts [" + xmlConcepts.size() + "]");
         return xmlConcepts;
     }    
-
-    private void addDummyData(RefsetDto refsetDto) {
-        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
-        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
-        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
-        
-        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
-        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
-        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
-        
-        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
-                .id(-1L)
-                .type(RuleType.LIST)
-                .add(c1).add(c2).add(c3)
-                .build();
-        
-        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
-                .id(-2L)
-                .add(c4).add(c5).add(c6)
-                .type(RuleType.LIST)
-                .build();
-        
-        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
-                .id(-3L)
-                .type(RuleType.UNION)
-                .left(listRuleDtoLeft.getId())
-                .right(listRuleDtoRight.getId())
-                .build();
-        
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
-               .terminal(unionRuleDto.getId())
-               .id(-1L)
-               .add(listRuleDtoLeft)
-               .add(listRuleDtoRight)
-               .add(unionRuleDto)
-               .build();
-        
-        refsetDto.setPlan(plan);
-    }
-    
-    
+//
+//    private void addDummyData(RefsetDto refsetDto) {
+//        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
+//        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
+//        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
+//        
+//        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
+//        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
+//        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
+//        
+//        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
+//                .id(-1L)
+//                .type(RuleType.LIST)
+//                .add(c1).add(c2).add(c3)
+//                .build();
+//        
+//        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
+//                .id(-2L)
+//                .add(c4).add(c5).add(c6)
+//                .type(RuleType.LIST)
+//                .build();
+//        
+//        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
+//                .id(-3L)
+//                .type(RuleType.UNION)
+//                .left(listRuleDtoLeft.getId())
+//                .right(listRuleDtoRight.getId())
+//                .build();
+//        
+//        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
+//               .terminal(unionRuleDto.getId())
+//               .id(-1L)
+//               .add(listRuleDtoLeft)
+//               .add(listRuleDtoRight)
+//               .add(unionRuleDto)
+//               .build();
+//        
+//        refsetDto.setPlan(plan);
+//    }
+//    
+//    
 
     private BindingResult setPublicIdNotUniqueFieldError(RefsetDto refsetDto, BindingResult result){
         result.addError(new FieldError(

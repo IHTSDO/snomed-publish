@@ -13,7 +13,7 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ihtsdo.snomed.service.DiffAlgorithmFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 
 public class DiffCliParser {
 
@@ -24,7 +24,7 @@ public class DiffCliParser {
     public static final String USER_KEY                 = "username";
     public static final String HIBERNATE_DIALECT_KEY    = "hibernate.dialect";
     
-    public void parse(String[] args, DiffMain callback) throws IOException, ParseException{
+    public void parse(String[] args, DiffMain callback) throws IOException, java.text.ParseException, ParseException{
         //Create a parser using Commons CLI
         CommandLineParser parser = new BasicParser( );
         Options options = new Options( );
@@ -100,7 +100,7 @@ public class DiffCliParser {
         
         callback.runProgram(baseConceptsFile, baseTriplesFile, baseDescriptionsFile, HibernateParserFactory.Parser.valueOf(baseFormat),
                 compareConceptsFile, compareTriplesFile, compareDescriptionsFile, HibernateParserFactory.Parser.valueOf(compareFormat),
-                DiffAlgorithmFactory.DiffStrategy.valueOf(strategy), extraFile, missingFile, dbLocation, SerialiserFactory.Form.valueOf(outputFormat));
+                DiffAlgorithmFactory.DiffStrategy.valueOf(strategy), extraFile, missingFile, dbLocation, SnomedSerialiserFactory.Form.valueOf(outputFormat));
     }
 
     private void testInputs(String helpString, CommandLine commandLine,
@@ -188,7 +188,7 @@ public class DiffCliParser {
             System.exit(-1);            
         }
         try{
-            SerialiserFactory.Form.valueOf(outputFormat);
+            SnomedSerialiserFactory.Form.valueOf(outputFormat);
         }catch (IllegalArgumentException e){
             System.out.println("Output file format specified '" + outputFormat + "' not supported. Use 'CANONICAL' or 'CHILD_PARENT'");
             System.exit(-1);

@@ -20,7 +20,7 @@ public class CanonicalCliParser {
 
     public static final String SHOW_ALL = "ALL";
     
-    public void parse(String[] args, CanonicalMain callback) throws IOException, ParseException{
+    public void parse(String[] args, CanonicalMain callback) throws IOException, java.text.ParseException, ParseException{
 
         //Create a parser using Commons CLI
         CommandLineParser parser = new BasicParser( );

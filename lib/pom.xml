@@ -13,6 +13,6 @@
     <module>closure</module>
     <module>importexport</module>
     <module>manifest</module>
-    <module>rdf</module>
+    <!--module>jena-spike</module-->
   </modules>
 </project>

@@ -5,22 +5,24 @@ import java.io.Writer;
 
 import com.ihtsdo.snomed.service.InvalidInputException;
 
-public class SerialiserFactory  {
+public class SnomedSerialiserFactory  {
 
-    public static SerialiserFactory instance;
+    public static SnomedSerialiserFactory instance;
     
     public enum Form{
-        CANONICAL, CHILD_PARENT;
+        CANONICAL, CHILD_PARENT, RDF_SCHEMA;
     }
     
-    public static OntologySerialiser getSerialiser(Form form, Writer writer) throws IOException{
+    public static SnomedSerialiser getSerialiser(Form form, Writer writer) throws IOException{
         switch (form){
             case CANONICAL:
                 return new CanonicalSerialiser(writer);
             case CHILD_PARENT:
                 return new ChildParentSerialiser(writer);
+            case RDF_SCHEMA:
+                return new RdfSchemaSerialiser(writer);
             default:
-                throw new InvalidInputException("BaseOntologySerialiser " + form + " not found");
+                throw new InvalidInputException("BaseSnomedSerialiser " + form + " not found");
         }
     }
 }

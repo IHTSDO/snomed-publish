@@ -2,22 +2,39 @@ package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.Description;
+import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 
-public class CanonicalSerialiser extends BaseOntologySerialiser{
-    private static final Logger LOG = LoggerFactory.getLogger( BaseOntologySerialiser.class );
+public class CanonicalSerialiser extends BaseSnomedSerialiser{
+    private static final Logger LOG = LoggerFactory.getLogger( BaseSnomedSerialiser.class );
     
     CanonicalSerialiser(Writer writer) throws IOException{
         super(writer);
     }
     
-    public void write (Collection<Statement> statements) throws IOException{
+    @Override
+    public SnomedSerialiser footer(){
+        return this;
+    }    
+    
+    @Override
+    public SnomedSerialiser header() throws IOException{
+        writer.write("CONCEPTID1" + DELIMITER + "RELATIONSHIPTYPE" + DELIMITER +
+                "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP\r\n");
+        return this;
+    }
+    
+    @Override
+    public void write (Ontology o, Collection<Statement> statements) throws IOException{
         Iterator<Statement> rIt = statements.iterator();
         int counter = 1;
         while (rIt.hasNext()){
@@ -27,6 +44,7 @@ public class CanonicalSerialiser extends BaseOntologySerialiser{
         LOG.info("Wrote " + counter + " lines");
     }
 
+    @Override
     public void write(Statement r) throws IOException{
         writer.write(Long.toString(r.getSubject().getSerialisedId())
                 + DELIMITER + Long.toString(r.getPredicate().getSerialisedId())
@@ -34,11 +52,19 @@ public class CanonicalSerialiser extends BaseOntologySerialiser{
                 + DELIMITER + Integer.toString(r.getGroupId()) + "\r\n");
     }
 
-    protected void writeHeader() throws IOException{
-        writer.write("CONCEPTID1" + DELIMITER + "RELATIONSHIPTYPE" + DELIMITER +
-                "CONCEPTID2" + DELIMITER + "RELATIONSHIPGROUP\r\n");
-    }
 
+	@Override
+	public void write(Concept c) throws IOException, ParseException {
+		throw new UnsupportedOperationException("Write for concept not implemented for canonical serialiser");
+		
+	}
+
+	@Override
+	public void write(Description d) throws IOException, ParseException {
+		throw new UnsupportedOperationException("Write for description not implemented for canonical serialiser");
+	}    
+    
+    
     
 //    protected void printRelationship(Writer w, long serialisedId, long subjectId, long preicateId, long objectId) throws IOException{
 //        w.write(Long.toString(r.getSubject().getSerialisedId())

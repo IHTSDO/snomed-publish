@@ -61,6 +61,7 @@ public class Ontology {
 
     public void addStatement(Statement r){
         getStatements().add(r);
+        r.setOntology(this);
     }
     
     public Concept getIsKindOfPredicate(){
@@ -124,10 +125,12 @@ public class Ontology {
     
     public void addConcept(Concept c){
         getConcepts().add(c);
+        c.setOntology(this);
     }
     
     public void addDescription(Description d){
         getDescriptions().add(d);
+        d.setOntology(this);
     }
 
     public void setConcepts(Set<Concept> concepts) {

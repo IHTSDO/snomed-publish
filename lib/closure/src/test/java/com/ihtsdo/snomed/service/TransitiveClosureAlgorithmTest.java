@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,8 +16,8 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class TransitiveClosureAlgorithmTest {
 
@@ -67,10 +68,10 @@ public class TransitiveClosureAlgorithmTest {
     }
 
     @Test
-    public void shouldReturnAllParentsForC1() throws IOException{
+    public void shouldReturnAllParentsForC1() throws IOException, ParseException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n" + 
@@ -80,10 +81,10 @@ public class TransitiveClosureAlgorithmTest {
     }
 
     @Test
-    public void shouldReturnAllParentsForC1C2() throws IOException{
+    public void shouldReturnAllParentsForC1C2() throws IOException, ParseException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1,c2), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1,c2), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n" + 
@@ -97,10 +98,10 @@ public class TransitiveClosureAlgorithmTest {
     }
 
     @Test
-    public void shouldReturnAllParentsForC1C2C3() throws IOException{
+    public void shouldReturnAllParentsForC1C2C3() throws IOException, ParseException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n" + 
@@ -116,10 +117,10 @@ public class TransitiveClosureAlgorithmTest {
     }
 
     @Test
-    public void shouldReturnAllParentsForC1C2C3C4() throws IOException{
+    public void shouldReturnAllParentsForC1C2C3C4() throws IOException, ParseException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3,c4), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3,c4), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n" + 
@@ -136,10 +137,10 @@ public class TransitiveClosureAlgorithmTest {
     }
 
     @Test
-    public void shouldReturnAllParentsForC1C2C3C4C5() throws IOException{
+    public void shouldReturnAllParentsForC1C2C3C4C5() throws IOException, ParseException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3,c4,c5), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1,c2,c3,c4,c5), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n" + 
@@ -156,12 +157,12 @@ public class TransitiveClosureAlgorithmTest {
     }
     
     @Test
-    public void shouldIgnoreInactiveStatements() throws IOException{
+    public void shouldIgnoreInactiveStatements() throws IOException, ParseException{
         s23.setActive(false);
         s23.setEffectiveTime(20121307);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            algorithm.runAlgorithm(Arrays.asList(c1), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+            algorithm.runAlgorithm(Arrays.asList(c1), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
         }
         baos.flush();
         assertEquals("1\t2\r\n"
@@ -176,7 +177,7 @@ public class TransitiveClosureAlgorithmTest {
 //        c2.setEffectiveTime(20121307);
 //        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 //        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-//            algorithm.runAlgorithm(Arrays.asList(c1,c2), SerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
+//            algorithm.runAlgorithm(Arrays.asList(c1,c2), SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, pw));
 //        }
 //        baos.flush();
 //        assertEquals("1\t2\r\n" + 

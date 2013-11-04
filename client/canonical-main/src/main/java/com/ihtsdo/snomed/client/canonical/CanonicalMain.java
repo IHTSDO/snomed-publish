@@ -27,8 +27,8 @@ import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class CanonicalMain {
     
@@ -60,7 +60,7 @@ public class CanonicalMain {
         emf.close();
     }
 
-    public static void main(String[] args) throws IOException, ParseException{
+    public static void main(String[] args) throws IOException, ParseException, java.text.ParseException{
         Stopwatch overAllstopwatch = new Stopwatch().start();
         CanonicalCliParser cli = new CanonicalCliParser();
         cli.parse(args, new CanonicalMain()); 
@@ -68,7 +68,7 @@ public class CanonicalMain {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException{
+    protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException, java.text.ParseException{
         try{
             initDb(db);  
             Ontology ontology = null;
@@ -101,7 +101,7 @@ public class CanonicalMain {
         return resultStatements;
     }
 
-    private void writeOut(String outputFile, Set<Statement> statements) throws IOException {
+    private void writeOut(String outputFile, Set<Statement> statements) throws IOException, java.text.ParseException {
         LOG.info("Writing results to " + outputFile);
 
         File outFile = new File(outputFile);
@@ -110,7 +110,7 @@ public class CanonicalMain {
         }
         
         try(FileWriter fw = new FileWriter(outFile); BufferedWriter bw = new BufferedWriter(fw)){
-            SerialiserFactory.getSerialiser(Form.CANONICAL, bw).write(statements);
+            SnomedSerialiserFactory.getSerialiser(Form.CANONICAL, bw).write(statements);
         }
     }
 }

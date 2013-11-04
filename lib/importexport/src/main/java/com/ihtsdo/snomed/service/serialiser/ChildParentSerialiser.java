@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.service.serialiser;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,16 +14,20 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.Description;
+import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
 
-public class ChildParentSerialiser extends BaseOntologySerialiser{
+public class ChildParentSerialiser extends BaseSnomedSerialiser{
     private static final Logger LOG = LoggerFactory.getLogger( ChildParentSerialiser.class );
     
     ChildParentSerialiser(Writer writer) throws IOException {
         super(writer);
     }
     
-    public void write(Collection<Statement> statements) throws IOException{
+    @Override
+    public void write(Ontology o, Collection<Statement> statements) throws IOException{
         List<Statement> sortedList = new ArrayList<Statement>(statements);
         Collections.sort(sortedList, bySubjectAndObject);
         Iterator<Statement> rIt = sortedList.iterator();
@@ -34,15 +39,22 @@ public class ChildParentSerialiser extends BaseOntologySerialiser{
         LOG.info("Wrote " + counter + " lines");
     }
 
+    @Override
     public void write(Statement statement) throws IOException{
         if (statement.isKindOfStatement()){
             writer.write(Long.toString(statement.getSubject().getSerialisedId())+ 
                     DELIMITER + Long.toString(statement.getObject().getSerialisedId()) + "\r\n");
         }
     }
+
+    @Override
+    public SnomedSerialiser footer(){
+        return this;
+    }    
     
-    protected void writeHeader() throws IOException{
-        //no header
+    @Override
+    public SnomedSerialiser header(){
+        return this;
     }
     
     private Ordering<Statement> bySubjectAndObject = new Ordering<Statement>() {
@@ -55,7 +67,18 @@ public class ChildParentSerialiser extends BaseOntologySerialiser{
                 return Longs.compare(r1.getSubject().getSerialisedId(), r2.getSubject().getSerialisedId());
             }
         }
-    };    
+    };
+
+	@Override
+	public void write(Concept c) throws IOException, ParseException {
+		throw new UnsupportedOperationException("Write for concept not implemented for ChildParent serialiser");
+		
+	}
+
+	@Override
+	public void write(Description d) throws IOException, ParseException {
+		throw new UnsupportedOperationException("Write for description not implemented for ChildParent serialiser");
+	}    
     
     
 //    protected void printRelationship(Writer w, long serialisedId, long subjectId, long preicateId, long objectId) throws IOException{

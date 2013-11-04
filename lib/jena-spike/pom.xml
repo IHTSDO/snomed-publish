@@ -6,12 +6,12 @@
         <artifactId>snomed-publish-libs</artifactId>
         <version>0.5</version>
     </parent>
-    <artifactId>rdf</artifactId>
+    <artifactId>jena-spike</artifactId>
     <packaging>jar</packaging>
-    <name>rdf</name>
-    <description>RDF and RDF Schema tools</description>
+    <name>jena-spike</name>
+    <description>A working implementation of generating RDF Schema using the Jena API. Way to slow for all of Snomed, See RdfSchemaSerialiser in lib/importexport instead</description>
     <build>
-        <finalName>rdf</finalName>
+        <finalName>jena-spike</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
     </build>
     <dependencies>

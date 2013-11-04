@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -14,8 +15,8 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class CanonicalSerialiserTest {
 
@@ -44,10 +45,10 @@ public class CanonicalSerialiserTest {
     }
 
     @Test
-    public void shouldPrintOntologyInSpecifiedFormat() throws IOException {
+    public void shouldPrintOntologyInSpecifiedFormat() throws IOException, ParseException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(baos, "utf-8"))){
-            SerialiserFactory.getSerialiser(Form.CANONICAL, pw).write(statements);
+            SnomedSerialiserFactory.getSerialiser(Form.CANONICAL, pw).write(statements);
         }
         baos.flush();
         assertEquals(EXPECTED_RESULT, baos.toString());

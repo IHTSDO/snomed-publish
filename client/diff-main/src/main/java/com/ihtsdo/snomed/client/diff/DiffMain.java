@@ -24,8 +24,8 @@ import com.ihtsdo.snomed.service.DiffAlgorithmFactory.DiffStrategy;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class DiffMain {
     private static final Logger LOG = LoggerFactory.getLogger( DiffMain.class );
@@ -52,7 +52,7 @@ public class DiffMain {
         emf.close();
     }
 
-    public static void main(String[] args) throws IOException, ParseException{
+    public static void main(String[] args) throws IOException, ParseException, java.text.ParseException{
         Stopwatch overAllstopwatch = new Stopwatch().start();
         DiffCliParser cli = new DiffCliParser();
         cli.parse(args, new DiffMain()); 
@@ -64,7 +64,7 @@ public class DiffMain {
             File baseDescriptionsFile, Parser baseParserFormat,
             File compareConceptsFile, File compareTriplesFile,
             File compareDescriptionsFile, Parser compareParserFormat, DiffStrategy strategy, 
-            File extraFile, File missingFile, String dbLocation, Form outputFormat)  throws IOException
+            File extraFile, File missingFile, String dbLocation, Form outputFormat)  throws IOException, java.text.ParseException
     {        
         try{
             initDb(dbLocation);
@@ -121,8 +121,8 @@ public class DiffMain {
                 DiffAlgorithmFactory.getAlgorithm(strategy).diff(
                         baseOntology, 
                         compareOntology, 
-                        SerialiserFactory.getSerialiser(outputFormat, extraFw), 
-                        SerialiserFactory.getSerialiser(outputFormat, missingFw), em);
+                        SnomedSerialiserFactory.getSerialiser(outputFormat, extraFw), 
+                        SnomedSerialiserFactory.getSerialiser(outputFormat, missingFw), em);
             }            
         }finally{
             closeDb();

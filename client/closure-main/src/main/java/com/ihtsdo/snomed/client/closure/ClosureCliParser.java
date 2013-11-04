@@ -17,7 +17,7 @@ public class ClosureCliParser {
 
     public static final String SHOW_ALL                 = "ALL";
     
-    public void parse(String[] args, ClosureMain callback) throws IOException, ParseException{
+    public void parse(String[] args, ClosureMain callback) throws IOException, ParseException, java.text.ParseException{
         //Create a parser using Commons CLI
         CommandLineParser parser = new BasicParser( );
         Options options = new Options( );

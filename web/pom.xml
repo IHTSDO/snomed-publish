@@ -60,7 +60,7 @@
     <!-- Snomed Project Dependencies -->
     <dependency>
       <groupId>com.ihtsdo.snomed</groupId>
-      <artifactId>rdf</artifactId>
+      <artifactId>importexport</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

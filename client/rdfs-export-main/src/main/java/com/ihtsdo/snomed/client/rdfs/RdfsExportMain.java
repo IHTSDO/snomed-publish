@@ -20,10 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.RdfSchemaSerialiser;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class RdfsExportMain {
     private static final Logger LOG = LoggerFactory.getLogger( RdfsExportMain.class );
@@ -31,8 +32,6 @@ public class RdfsExportMain {
     private EntityManagerFactory emf  = null;
     private EntityManager em          = null;
     
-//    private JenaRdfSchemaSerialiser jena = new JenaRdfSchemaSerialiser();
-    private RdfSchemaSerialiser export = new RdfSchemaSerialiser();
 
     private void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -92,17 +91,9 @@ public class RdfsExportMain {
                         em);
             }
             
-//            OntModel model = jena.importJenaModel(o, em, tdbFolder);
-//            
-//            if (outputFile != null){
-//                try (FileOutputStream fos = new FileOutputStream(outputFile); BufferedOutputStream bos = new BufferedOutputStream(fos)){
-//                    model.write(bos, outputFormat.toString());
-//                }
-//            }
-            
             if (outputFile != null){
                 try (OutputStreamWriter ow = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outputFile)))){
-                    export.exportToRdfXml(o, em, ow);
+                	 SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(o);
                 }
             }
             

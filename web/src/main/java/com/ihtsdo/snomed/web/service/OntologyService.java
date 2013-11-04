@@ -39,7 +39,7 @@ public class OntologyService {
     
 //    @Transactional
 //    public void exportCanonical(Ontology ontology, Writer writer) throws IOException{
-//        SerialiserFactory.getSerialiser(Form.CANONICAL, writer).write(ontology.getStatements());        
+//        SnomedSerialiserFactory.getSerialiser(Form.CANONICAL, writer).write(ontology.getStatements());        
 //    }
     
 //    @Transactional

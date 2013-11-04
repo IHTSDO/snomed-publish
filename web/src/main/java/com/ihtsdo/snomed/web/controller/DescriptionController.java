@@ -29,9 +29,10 @@ import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.xml.XmlDescription;
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 import com.ihtsdo.snomed.web.exception.DescriptionNotFoundException;
 import com.ihtsdo.snomed.web.service.OntologyService;
-import com.ihtsdo.snomed.web.service.RdfService;
 
 @Controller
 @RequestMapping("/version/{ontologyId}/description")
@@ -41,7 +42,6 @@ public class DescriptionController {
     private static final Logger LOG = LoggerFactory.getLogger( DescriptionController.class );
 
     @Inject OntologyService ontologyService;
-    @Inject RdfService rdfService;
 
     @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;    
@@ -139,7 +139,7 @@ public class DescriptionController {
       Description d = getDescription(ontologyId, serialisedId);
       response.setContentType("application/rdf+xml");
       try (OutputStreamWriter ow = new OutputStreamWriter(os)){
-          rdfService.writeDescription(d, ow, new Ontology(ontologyId));
+    	  SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(d);
       }
   }     
 }

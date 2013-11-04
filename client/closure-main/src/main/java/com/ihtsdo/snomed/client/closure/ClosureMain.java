@@ -28,9 +28,9 @@ import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
-import com.ihtsdo.snomed.service.serialiser.OntologySerialiser;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SerialiserFactory.Form;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class ClosureMain {
     
@@ -79,7 +79,7 @@ public class ClosureMain {
         emf.close();
     }
 
-    public static void main(String[] args) throws IOException, ParseException{
+    public static void main(String[] args) throws IOException, ParseException, java.text.ParseException{
         Stopwatch overAllstopwatch = new Stopwatch().start();
         ClosureCliParser cli = new ClosureCliParser();
         cli.parse(args, new ClosureMain()); 
@@ -92,7 +92,7 @@ public class ClosureMain {
     public void runProgram(File conceptsFile, File triplesFile,
             //File descriptionsFile, 
             Parser type, File outputFile,
-            int pageSize, String dbLocation) throws IOException 
+            int pageSize, String dbLocation) throws IOException, java.text.ParseException 
     {
         try {
             initDb(dbLocation);
@@ -143,7 +143,7 @@ public class ClosureMain {
             List<Concept> concepts = query.getResultList();
 
             try(FileWriter fw = new FileWriter(outputFile); BufferedWriter bw = new BufferedWriter(fw)){
-                OntologySerialiser serialiser = SerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
+                SnomedSerialiser serialiser = SnomedSerialiserFactory.getSerialiser(Form.CHILD_PARENT, bw);
                 Stopwatch stopwatch = new Stopwatch().start();
                 LOG.info("Running algorithm");
                 boolean done = false;
