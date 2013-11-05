@@ -1,6 +1,4 @@
-Canonical Form
---------------
-
+#Canonical Form
 This program takes as an input 2 text files in the [RF1](/lib/importexport) format:
 
 1. Set of concepts of this form:
@@ -23,7 +21,7 @@ and produces an output in [Canonical format](/lib/canonical):
     280844000	116680003	71737002	0
     280845004	116680003	280737002	0
 
-For more information on the implementation, see the [Canonical library](/lib/canonical)
+For more information on the algorithm, see the [Canonical library](/lib/canonical)
 
 When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database. The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 3Gb of heap space ('-Xmx3000m').
 
