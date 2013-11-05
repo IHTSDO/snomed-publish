@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest;
+package com.ihtsdo.snomed.service.manifest;
 
 
 import static org.junit.Assert.assertTrue;
@@ -8,7 +8,7 @@ import javax.xml.bind.JAXBException;
 
 import org.junit.Test;
 
-import com.ihtsdo.snomed.client.manifest.model.Manifest;
+import com.ihtsdo.snomed.service.manifest.model.Manifest;
 
 public class JaxbBindingTest {
     @Test

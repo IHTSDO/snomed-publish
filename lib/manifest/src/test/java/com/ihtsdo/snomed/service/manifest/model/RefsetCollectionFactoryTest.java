@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.model;
+package com.ihtsdo.snomed.service.manifest.model;
 
 import static org.junit.Assert.assertTrue;
 
@@ -10,6 +10,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.manifest.model.ContentRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.CrossmapRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.LanguageRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.MetadataRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")

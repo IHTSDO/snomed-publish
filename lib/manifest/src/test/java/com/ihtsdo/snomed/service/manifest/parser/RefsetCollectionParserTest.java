@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.parser;
+package com.ihtsdo.snomed.service.manifest.parser;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,12 +18,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ihtsdo.snomed.client.manifest.model.BaseRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.MimetypeProperties;
-import com.ihtsdo.snomed.client.manifest.model.RefsetCollectionFactory;
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.MimetypeProperties;
+import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
+import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")

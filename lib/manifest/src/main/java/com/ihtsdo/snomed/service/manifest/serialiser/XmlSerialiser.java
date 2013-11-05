@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.serialiser;
+package com.ihtsdo.snomed.service.manifest.serialiser;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -8,8 +8,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import com.ihtsdo.snomed.client.manifest.model.Manifest;
 import com.ihtsdo.snomed.exception.ProgrammingException;
+import com.ihtsdo.snomed.service.manifest.model.Manifest;
 
 @Named
 public class XmlSerialiser {

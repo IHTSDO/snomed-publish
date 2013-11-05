@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.model;
+package com.ihtsdo.snomed.service.manifest.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.exception.ProgrammingException;
 
-@Named
+
+@Named  
 public class MimetypeProperties {
     private static final Logger LOG = LoggerFactory.getLogger( MimetypeProperties.class );
     

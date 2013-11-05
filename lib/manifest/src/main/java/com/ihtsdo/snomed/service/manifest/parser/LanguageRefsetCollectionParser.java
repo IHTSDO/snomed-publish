@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.parser;
+package com.ihtsdo.snomed.service.manifest.parser;
 
 public class LanguageRefsetCollectionParser extends RefsetCollectionParser{
 

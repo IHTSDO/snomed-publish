@@ -3,7 +3,7 @@
         elementFormDefault = XmlNsForm.QUALIFIED,
         attributeFormDefault = XmlNsForm.QUALIFIED, 
         namespace="http://ihtsdo.org/snomed/schema/manifest/v1")
-package com.ihtsdo.snomed.client.manifest.model;
+package com.ihtsdo.snomed.service.manifest.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlNs;

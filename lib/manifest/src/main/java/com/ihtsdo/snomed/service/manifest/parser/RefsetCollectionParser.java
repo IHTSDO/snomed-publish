@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.parser;
+package com.ihtsdo.snomed.service.manifest.parser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,12 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
-import com.ihtsdo.snomed.client.manifest.model.BaseRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.Refset;
-import com.ihtsdo.snomed.client.manifest.model.RefsetModule;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.Refset;
+import com.ihtsdo.snomed.service.manifest.model.RefsetModule;
 
 @Named
 public class RefsetCollectionParser {

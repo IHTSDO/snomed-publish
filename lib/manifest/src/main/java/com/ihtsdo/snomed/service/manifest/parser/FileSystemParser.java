@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.parser;
+package com.ihtsdo.snomed.service.manifest.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,14 +12,14 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.client.manifest.model.BaseRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.Manifest;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFileFactory;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFolder;
-import com.ihtsdo.snomed.client.manifest.model.MimetypeProperties;
-import com.ihtsdo.snomed.client.manifest.model.RefsetCollectionFactory;
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.Manifest;
+import com.ihtsdo.snomed.service.manifest.model.ManifestFileFactory;
+import com.ihtsdo.snomed.service.manifest.model.ManifestFolder;
+import com.ihtsdo.snomed.service.manifest.model.MimetypeProperties;
+import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
 
 @Named
 public class FileSystemParser {

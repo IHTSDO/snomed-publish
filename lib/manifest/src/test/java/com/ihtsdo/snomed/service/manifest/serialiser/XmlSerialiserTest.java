@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.serialiser;
+package com.ihtsdo.snomed.service.manifest.serialiser;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,15 +18,16 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.ihtsdo.snomed.client.manifest.model.CrossmapRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.LanguageRefsetCollection;
-import com.ihtsdo.snomed.client.manifest.model.Manifest;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFile;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFileFactory;
-import com.ihtsdo.snomed.client.manifest.model.ManifestFolder;
-import com.ihtsdo.snomed.client.manifest.model.Refset;
-import com.ihtsdo.snomed.client.manifest.model.RefsetModule;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.service.manifest.model.CrossmapRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.LanguageRefsetCollection;
+import com.ihtsdo.snomed.service.manifest.model.Manifest;
+import com.ihtsdo.snomed.service.manifest.model.ManifestFile;
+import com.ihtsdo.snomed.service.manifest.model.ManifestFileFactory;
+import com.ihtsdo.snomed.service.manifest.model.ManifestFolder;
+import com.ihtsdo.snomed.service.manifest.model.Refset;
+import com.ihtsdo.snomed.service.manifest.model.RefsetModule;
+import com.ihtsdo.snomed.service.manifest.serialiser.XmlSerialiser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")

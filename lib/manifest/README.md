@@ -12,9 +12,9 @@ Library for creating a manifest to accompany a release
 
 ###Creates
 
-- an instance of a [Manifest](/lib/manifest/src/main/java/com/ihtsdo/snomed/client/manifest/model/Manifest.java) class, which is a wrapper for a [ManifestFolder](/lib/manifest/src/main/java/com/ihtsdo/snomed/client/manifest/model/ManifestFolder.java). A ManifestFolder may contain one or more [ManifestFile](/lib/manifest/src/main/java/com/ihtsdo/snomed/client/manifest/model/ManifestFile.java)s, or other ManifestFolders.
-- For each file, the manifest will contain its file size, mimetype (see above for mapping), and java File mappings.
-- We use the mimetypes (see above) to determine which files we want to parse further, for refset identifiers. For the mimetype rules for this, see [MimetypeProperties.java](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/MimetypeProperties.java).
+- an instance of a [Manifest](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/Manifest.java) class, which is a wrapper for a [ManifestFolder](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/ManifestFolder.java). A ManifestFolder may contain one or more [ManifestFiles](/lib/manifest/src/main/java/com/ihtsdo/snomed/client/manifest/model/ManifestFile.java), or other ManifestFolders again.
+- For each file, the manifest will contain its file size, mimetype (see above for mapping), and java.io.File mappings.
+- We use the mimetypes (see above) to determine which files we want to parse further, looking for refset identifiers. For the mimetype rules for this, see [MimetypeProperties.java](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/MimetypeProperties.java).
 -- We parse Content, Crossmap, Metadata, Language, and Ordertype files. See link above for more details.
 - For each Refset file found 
 -- the Refset Component identifier from Snomed is returned, along with its fullySpecifiedName
@@ -23,7 +23,7 @@ Library for creating a manifest to accompany a release
 
 ###How to use
 
-The mimetypes.properties file must be specified using the system variable 'mimetypes'. One way of doing this, is to specify this property when you launch your jvm, like this:
+The mimetypes.properties file must be specified using the system variable 'mimetypes'. One way of doing this is to specify this property when you launch your jvm, like this:
 
 	java ... -Dmimetypes=../src/test/resouces/mimetypes.properties ...
 

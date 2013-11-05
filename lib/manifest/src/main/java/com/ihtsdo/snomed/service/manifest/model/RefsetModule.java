@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.client.manifest.model;
+package com.ihtsdo.snomed.service.manifest.model;
 
 import java.util.HashSet;
 import java.util.Set;
