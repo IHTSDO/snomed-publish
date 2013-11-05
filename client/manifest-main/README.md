@@ -1,6 +1,4 @@
-Manifest generator
-------------------
-
+#Manifest generator
 Utility for creating a manifest file to go with a release bundle. For more information on the internals of this tool, have a look at the [Manifest library](/lib/manifest).
 
 At the end, this program will create a new folder called 'Manifest' and 4 new manifest files in the root of the distribution folder (specified by -r in the inputs, see below):

@@ -40,7 +40,6 @@ public class RdfsExportCliParser {
         }
     }    
 
-    public static final String SHOW_ALL                 = "ALL";
     public static final String DRIVER_KEY               = "driver";
     public static final String URL_KEY                  = "url";
     public static final String PASSWORD_KEY             = "password";
@@ -56,7 +55,6 @@ public class RdfsExportCliParser {
         options.addOption("c", "concepts", true, "Concepts input file");
         options.addOption("d", "descriptions", true, "Descriptions input file");
         options.addOption("if", "inputformat", true, "Input format");
-        options.addOption("tdb", "triplesdatabase", true, "TDB triples database folder to write out to");
         options.addOption("of", "outputformat", true, "Optional. Format to serialise RDF Schema to. One of 'RDF/XML', 'RDF/XML-ABBREV', 'N-TRIPLE', 'N3' or 'TURTLE'");
         options.addOption("o", "output", true, "Optional. File to serialise RDF Schema to. Must be used with '-of'");
         options.addOption("db", "database", true, "Optional. Database location"); //optional    
@@ -64,7 +62,7 @@ public class RdfsExportCliParser {
         //TODO: ADD OUTPUT FILE PARAM!!!!
         
         String helpString = "-t <triples input file> -c <concepts input file> -d <descriptions input file> " + 
-                "-if <input files format> -tdb <triples database output folder>. Optionally, -db <database file>, " + 
+                "-if <input files format>. Optionally, -db <database file>, " + 
                 "-of <RDF Schema output format> -o <RDF Sschema output file>. Try -h for more help";
         
         // Parse the program arguments
@@ -81,13 +79,12 @@ public class RdfsExportCliParser {
         String concepts = commandLine.getOptionValue('c');//done
         String triples = commandLine.getOptionValue('t');//done
         String inputFormat = commandLine.getOptionValue("if");//done
-        String tdb = commandLine.getOptionValue("tdb"); //done
         String outputFormat = commandLine.getOptionValue("of");//done
         String output = commandLine.getOptionValue("o");//done
         String db = commandLine.getOptionValue("db"); //done
         
         testInputs(helpString, commandLine, descriptions, concepts, triples, 
-                inputFormat, tdb, outputFormat, output, db);
+                inputFormat, outputFormat, output, db);
                 
         File conceptsFile = null;
         File triplesFile = new File(triples);
@@ -98,7 +95,7 @@ public class RdfsExportCliParser {
         if ((descriptions != null) && !descriptions.isEmpty()){
             descriptionsFile = new File(descriptions);
         }
-        File tdbFolder = new File(tdb);
+
         File outputFile = null;
         if ((output != null) && !output.isEmpty()){
             outputFile = new File(output);
@@ -106,23 +103,22 @@ public class RdfsExportCliParser {
         
         
         callback.runProgram(conceptsFile, triplesFile, descriptionsFile, HibernateParserFactory.Parser.valueOf(inputFormat),
-                tdbFolder, RdfFormat.getFormat(outputFormat), outputFile, db);
+                RdfFormat.getFormat(outputFormat), outputFile, db);
     }
     
     private static void testInputs(String helpString, CommandLine commandLine,
-            String descriptions, String concepts, String triples, String inputFormat, String triplesdb, 
+            String descriptions, String concepts, String triples, String inputFormat, 
             String outputFormat, String output, String db) {
         
         if (commandLine.hasOption('h')) {
             System.out.println(
-                    "" + 
+                    "\n" + 
                     "-h,   --help\t\tPrint this help menu\n" +
                     "-t.   --triples\t\tFile containing relationships\n" +
                     "-c,   --concepts\tOptional. File containing concepts\n" +
                     "-d,   --descriptions\tOptional. File containing descriptions\n" +
                     "-if,  --inputformat\tFile format of input files. One of 'RF1', 'RF2', 'CANONICAL', or 'CHILD_PARENT'\n" +
-                    "-tdb, --triplesdb\tTDB triples database folder to write out to\n" +
-                    "-of,  --outputformat\tOptional. Format to serialise RDF Schema to. One of 'RDF/XML', 'RDF/XML-ABBREV', 'N-TRIPLE', 'N3' or 'TURTLE'\n" +
+                    "-of,  --outputformat\tFormat to serialise RDF Schema to. One of 'RDF/XML', 'RDF/XML-ABBREV', 'N-TRIPLE', 'N3' or 'TURTLE'\n" +
                     "-o,   --output\t\tOptional. File to serialise RDF Schema to. Must be used together with '-of' option\n" +
                     "-db,  --database\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database (minimum 3Gb of heap space required)\n");
                     
@@ -133,7 +129,12 @@ public class RdfsExportCliParser {
         {
             System.out.println("Input format parameter not specified. Usage is: " + helpString + "");
             System.exit(-1);
-        }        
+        }
+        
+        if ((output == null) || output.isEmpty()){
+            System.out.println("Output file not specified. Usage is: " + helpString + "");
+            System.exit(-1);            
+        }
         
         try{
             HibernateParserFactory.Parser.valueOf(inputFormat);            
@@ -183,24 +184,6 @@ public class RdfsExportCliParser {
                 System.out.println("Error: Unable to write to output file '" + output +"'. Check your permissions and path.\n");
                 System.exit(-1);
             }
-        }
-        
-        File triplesDbFile = new File(triplesdb);
-        if (triplesDbFile.isFile()){
-            System.out.println("Error: TDB location '" + triplesdb + "' exists as a file. Must be a folder location.\n");
-            System.exit(-1);
-        }
-        
-        if ((triplesDbFile.exists()) && (triplesDbFile.list().length != 0)){
-            System.out.println("Error: TDB folder '" + triplesdb + "' is not empty\n");
-            System.exit(-1);
-        }
-
-        try {
-            new FileOutputStream(new File(triplesDbFile, "test"));
-        } catch (IOException e) {
-            System.out.println("Error: Unable to write to TDB folder '" + triplesdb +"'. Check your permissions and path.\n");
-            System.exit(-1);
         }
 
         if ((db != null) && (!db.isEmpty())){

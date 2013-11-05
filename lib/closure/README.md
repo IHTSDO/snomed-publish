@@ -1,6 +1,4 @@
-Transitive Closure Library
---------------------------
-
+#Transitive Closure Library
 This library provides an API for creating the transitive closure of an ontology's isA statements
 
 The API has a single method in class [TransitiveClosureAlgorithm](/lib/closure/src/main/java/com/ihtsdo/snomed/service/TransitiveClosureAlgorithm.java) with this signature:

@@ -64,7 +64,7 @@ public class RdfsExportMain {
     }    
 
     public void runProgram(File conceptsFile, File triplesFile, File descriptionsFile, Parser inputFormat, 
-            File tdbFolder, RdfsExportCliParser.RdfFormat outputFormat, File outputFile, String db) throws IOException, java.text.ParseException
+            RdfsExportCliParser.RdfFormat outputFormat, File outputFile, String db) throws IOException, java.text.ParseException
     {
         try{
             initDb(db);
@@ -97,6 +97,8 @@ public class RdfsExportMain {
                 }
             }
             
+        }catch (Exception e){
+            LOG.error(e.getMessage(), e);
         }finally{
             closeDb();
         }
