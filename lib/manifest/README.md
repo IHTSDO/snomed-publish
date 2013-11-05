@@ -1,16 +1,14 @@
-#IHTSDO Snomed Publication Tools
-
-##Manifest generator
+#Manifest generator
 
 Library for creating a manifest to accompany a release
 
-###Required
+##Required
 
 - You will need an instance of a Snomed ontology that has entries for every refset referred to in this relases (Each refset has a component identifier in Snomed)
 - You will need specify the folder containing the files for the release. The program will parse this folder, and generate Manifest data based on its contents.
 - The routine also requires a mimetypes.properties file, which maps filenames to our custom Snomed mime types. A sample configuration file can be found in [/lib/manifest/src/test/resources/mimetypes.properties](/lib/manifest/src/test/resources/mimetypes.properties). You will need to make sure this file is up-to-date for each release version of Snomed.
 
-###Creates
+##Creates
 
 - an instance of a [Manifest](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/Manifest.java) class, which is a wrapper for a [ManifestFolder](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/ManifestFolder.java). A ManifestFolder may contain one or more [ManifestFiles](/lib/manifest/src/main/java/com/ihtsdo/snomed/service/manifest/model/ManifestFile.java), or other ManifestFolders again.
 - For each file, the manifest will contain its file size, mimetype (see above for mapping), and java.io.File mappings.
@@ -21,7 +19,7 @@ Library for creating a manifest to accompany a release
 	- For each refset referenced in the refset file, we also return its snomed component id and fullySpecfifiedName
 
 
-###How to use
+##How to use
 
 The mimetypes.properties file must be specified using the system variable 'mimetypes'. One way of doing this is to specify this property when you launch your jvm, like this:
 
@@ -51,6 +49,6 @@ Here is how you use this library in your code:
 		//Assertion: Manifest data contains parsed release folder data
 	...
 
-###Example
+##Example
 
 For an example in the wild, check out our [command line tool](/client/manifest-main)

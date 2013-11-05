@@ -1,6 +1,3 @@
-IHTSDO Snomed Publication Tools
-===============================
-
 Transitive Closure Library
 --------------------------
 
@@ -12,9 +9,9 @@ The API has a single method in class [TransitiveClosureAlgorithm](/lib/closure/s
 
 This method will generate all transitive closures for all isA statements for a set of input concepts. 
 
-The transitive closures are written out to an outputfile using an [OntologySerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/OntologySerialiser.java).
+The transitive closures are written out to an outputfile using an [SnomedSerialiser](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SnomedSerialiser.java).
 
-You can access the OntologySerialisers through the [SerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SerialiserFactory.java)
+You can access the SnomedSerialisers through the [SnomedSerialiserFactory](/lib/importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/SnomedSerialiserFactory.java)
 
 Example usage (Java 7):
 

@@ -1,10 +1,7 @@
-IHTSDO Snomed Publication Tools
-===============================
-
 Canonical Form Library
 ----------------------
 
-This library provides an API for creating the canonical form of an ontology.
+This library provides an API for creating the canonical form of Snomed.
 
 The API has two public methods in class [CanonicalAlgorithm](/lib/canonical/src/main/java/com/ihtsdo/snomed/service/CanonicalAlgorithm.java) with this signature:
 

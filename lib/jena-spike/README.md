@@ -1,6 +1,3 @@
-IHTSDO Snomed Publication Tools
-===============================
-
 Jena Spike
 --------------
 
