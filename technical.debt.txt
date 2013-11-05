@@ -9,4 +9,4 @@
 9. Better / more unit tests for the parsers / serialisers [Implement XMLUnit]
 10. Add Integration Tests (implement using DBUnit)
 11. Implement Injection Factory for serialisers/parsers
-
+12. Snomed parsers takes an EntityManager as a parameter - We should inject these instead of passing them around

@@ -14,11 +14,11 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 
 public class ManifestCliParser {
 
-    public static final String SHOW_ALL                 = "ALL";
     public static final String DRIVER_KEY               = "driver";
     public static final String URL_KEY                  = "url";
     public static final String PASSWORD_KEY             = "password";

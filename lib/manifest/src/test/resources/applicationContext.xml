@@ -24,7 +24,7 @@
 
     <context:property-placeholder location="classpath:database.properties" system-properties-mode="OVERRIDE" ignore-unresolvable="true"/>
     
-    <context:component-scan base-package="com.ihtsdo.snomed.client.manifest" />
+    <context:component-scan base-package="com.ihtsdo.snomed.service.manifest" />
 
     <tx:annotation-driven transaction-manager="transactionManager" />
 

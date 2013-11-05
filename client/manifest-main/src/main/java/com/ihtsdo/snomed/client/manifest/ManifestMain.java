@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.client.manifest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,8 +15,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -27,11 +30,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.client.manifest.model.Manifest;
-import com.ihtsdo.snomed.client.manifest.parser.FileSystemParser;
-import com.ihtsdo.snomed.client.manifest.parser.RefsetCollectionParser.Mode;
-import com.ihtsdo.snomed.client.manifest.serialiser.XmlSerialiser;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.service.manifest.model.Manifest;
+import com.ihtsdo.snomed.service.manifest.parser.FileSystemParser;
+import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser.Mode;
+import com.ihtsdo.snomed.service.manifest.serialiser.XmlSerialiser;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 
@@ -52,8 +55,6 @@ public class ManifestMain {
     
     @Inject
     XmlSerialiser xmlSerialiser; 
-    
-    ApplicationContext applicationContext;
     
     private void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -81,7 +82,6 @@ public class ManifestMain {
     
     public void closeDb(){
         LOG.info("Closing database");
-        em.getTransaction().commit();
         em.close();
         emf.close();
     }    
@@ -94,60 +94,75 @@ public class ManifestMain {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    public void createManifestFolder(File manifestFolder) throws IOException{
-        LOG.info("Refreshing manifest folder");
-        if (manifestFolder.exists()){
-            FileUtils.deleteDirectory(manifestFolder);
-            manifestFolder.mkdir();
-        }
-        
-        
-        
-  //      this.getClass().getClassLoader().getResourceAsStream(TARGET_CSS)
-        
-        FileUtils.copyInputStreamToFile(this.getClass().getClassLoader().getResourceAsStream(TARGET_CSS), new File(manifestFolder.getAbsoluteFile(), TARGET_CSS));
-        FileUtils.copyInputStreamToFile(this.getClass().getClassLoader().getResourceAsStream(TARGET_XSL), new File(manifestFolder.getAbsoluteFile(), TARGET_XSL));
-//        FileUtils.copyURLToFile(new File(TARGET_XSL).toURI().toURL(), new File(manifestFolder.getAbsoluteFile(), TARGET_XSL));
-    }
-    
     protected void runProgram(File conceptFile, File descriptionFile, File releaseFolder,
             HibernateParserFactory.Parser parser, String db) throws IOException, TransformerException
     {
         try{
             initDb(db);
             initSpring();
-            
+            File targetXmlFile = new File(releaseFolder.getAbsolutePath(), TARGET_XML);
             File manifestFolder = new File(releaseFolder.getAbsolutePath(), TARGET_FOLDER);
+            
             createManifestFolder(manifestFolder);
             
-            HibernateParser hibParser = HibernateParserFactory.getParser(parser);
-            Ontology o = hibParser.populateConceptAndDescriptions(
-                    "manifest ontology", 
-                    new FileInputStream(conceptFile), 
-                    new FileInputStream(descriptionFile), 
-                    em);
+            Ontology o = loadSnomedData(conceptFile, descriptionFile, parser);
 
-            fsParser.setParsemode(Mode.STRICT);
-            Manifest manifest = fsParser.parse(releaseFolder, o, em);
-            File targetXmlFile = new File(releaseFolder.getAbsolutePath(), TARGET_XML);
-            try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(targetXmlFile))){
-//                outputStreamWriter.write("<?xml-stylesheet type=\"text/xsl\" href=\"manifest/manifest.xsl\">\n");
-                xmlSerialiser.serialise(outputStreamWriter, manifest);
-            }
+            Manifest manifest = fsParser.setParsemode(Mode.STRICT).parse(releaseFolder, o, em);
             
-            TransformerFactory tFactory = TransformerFactory.newInstance();
+            writeTargetXml(manifest, targetXmlFile);
+            
+            convertToHtmlUsingXslAndWrite(releaseFolder, targetXmlFile);
 
-            Transformer transformer = tFactory.newTransformer(
-                    new StreamSource(
-                            this.getClass().getClassLoader().getResourceAsStream(TARGET_XSL)));
-
-            transformer.transform(new StreamSource(targetXmlFile),
-                    new StreamResult(
-                            (new FileOutputStream(new File(releaseFolder.getAbsolutePath(), TARGET_HTML)))));
-
+        }catch (Exception e){
+            LOG.error(e.getMessage(), e);
         }finally{
             closeDb();
         }
     }
+    
+    public void createManifestFolder(File manifestFolder) throws IOException{
+        LOG.info("Refreshing manifest folder");
+        if (manifestFolder.exists()){
+            FileUtils.deleteDirectory(manifestFolder);
+            manifestFolder.mkdir();
+        }
+        FileUtils.copyInputStreamToFile(this.getClass().getClassLoader().getResourceAsStream(TARGET_CSS), new File(manifestFolder.getAbsoluteFile(), TARGET_CSS));
+        FileUtils.copyInputStreamToFile(this.getClass().getClassLoader().getResourceAsStream(TARGET_XSL), new File(manifestFolder.getAbsoluteFile(), TARGET_XSL));
+    }
+    
+
+	private void writeTargetXml(Manifest manifest, File targetXmlFile) throws IOException,
+			FileNotFoundException {
+		try(OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(targetXmlFile))){
+		    xmlSerialiser.serialise(outputStreamWriter, manifest);
+		}
+	}
+
+	private Ontology loadSnomedData(File conceptFile, File descriptionFile,
+			HibernateParserFactory.Parser parser) throws IOException,
+			FileNotFoundException {
+	    LOG.info("Populating concepts and descriptions");
+		HibernateParser hibParser = HibernateParserFactory.getParser(parser);
+		Ontology o = hibParser.populateConceptAndDescriptions(
+		        "manifest ontology", 
+		        new FileInputStream(conceptFile), 
+		        new FileInputStream(descriptionFile), 
+		        em);
+		return o;
+	}
+
+	private void convertToHtmlUsingXslAndWrite(File releaseFolder, File targetXmlFile)
+			throws TransformerFactoryConfigurationError,
+			TransformerConfigurationException, TransformerException,
+			FileNotFoundException 
+	{
+		TransformerFactory tFactory = TransformerFactory.newInstance();
+		Transformer transformer = tFactory.newTransformer(
+		        new StreamSource(
+		                this.getClass().getClassLoader().getResourceAsStream(TARGET_XSL)));
+		transformer.transform(new StreamSource(targetXmlFile),
+		        new StreamResult(
+		                (new FileOutputStream(new File(releaseFolder.getAbsolutePath(), TARGET_HTML)))));
+	}
 }
 
