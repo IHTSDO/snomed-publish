@@ -1,8 +1,4 @@
-IHTSDO Snomed Publication Tools
-===============================
-
-Transitive Closure 
-------------------
+#Transitive Closure Generator
 
 Computes the transitive closure for the given input files, and saves the results out in simple child-parent format to the specified output file. 
 
@@ -18,9 +14,9 @@ This is the syntax:
     -l, --location      Optional. Specify location of database file. If not specified, defaults to an in-memory database
                         with increased memory requirements, but much imnproved performance and lower IO latency
 
-For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats).
+For more information on the transitive closure algorithm, have a look at the [Closure library](/lib/closure). For more information on available input and output formats, see the [Import Export library](/lib/importexport)
 
-The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 
+The output is generated in the [child-parent format](/lib/importexport), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 
 
 When you run this program, you have the option of using either a disk based embedded database, or an in-memory database.
 The disk based database is slower to use, but has a smaller memory footprint. If you specify the --location parameter, a disk based database will be used, and the data will be stored in the file specified by this --location parameter. Not specifying the --location parameter forces the use of an in-memory database.
@@ -63,4 +59,4 @@ The output from the console will look something like this:
     Completed algorithm in 156 seconds with 344928 concepts
     Overall program completion in 245 seconds
 
-and the results would be stored in results.cp.
+and the results would be stored in results.cp

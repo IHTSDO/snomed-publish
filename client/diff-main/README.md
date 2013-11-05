@@ -1,10 +1,5 @@
-IHTSDO Snomed Publication Tools
-===============================
-
-Ontology Diff
--------------
-
-Finds the difference between two ontologies.
+#Snomed Diff
+Finds the difference between two Snomed ontologies.
 
 This is the syntax:
 
@@ -24,7 +19,7 @@ This is the syntax:
     -db, --database             Optional. Specify location of database file. If not specified, 
                                 defaults to an in-memory database
 
-The program can take any combination of base- and compare- triples, concepts and descriptions, but the support of each configuration of these parameters depends on the format specified. Here you will just have to use try and fail, to see what combination works with which format, e.g. the canonical format only supports a triples file, or refer to the [format documentation](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats) for more information.
+The program can take any combination of base- and compare- triples, concepts and descriptions, but the support of each configuration of these parameters depends on the format specified. Here you will just have to use try and fail, to see what combination works with which format (e.g. the canonical format only supports a triples file) or refer to the [Import Export library](/lib/importexport) for more information.
 
 The program finds all triples that exists in the base-&#42; ontology, and not in the compare-&#42; ontology, prints out the count, and write the missing triples to the file specified by the --missing parameter. 
 
@@ -32,7 +27,7 @@ Similarly, all triples that exists in the compare-&#42; ontology, but not in the
 
 Statements are compared for equality using the strategy specified by the --strategy parameter. For example, the SUBJECT_OBJECT strategy compares only the subject and object of triples, such that if the subject and object are equivalent between two triples, the triples are identical for the purpose of finding the ontology differences. 
 
-A description of the various input and output formats can be [found on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats)
+A description of the various input and output formats can be in the [Import Export library](/lib/importexport)
 
 When you run this program, you have the option of using either a disk based embedded database, or an in-memory database. The disk based database is slower to use, but has a smaller memory footprint. If you specify the --database parameter, a disk based database will be used, and the data will be stored in the file specified by this --location parameter. Not specifying the --database parameter forces the use of an in-memory database.
 

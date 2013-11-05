@@ -1,10 +1,6 @@
-IHTSDO Snomed Publication Tools
-===============================
+#Database Import
 
-Database Import
----------------
-
-Utility for importing an ontology to a database, e.g. for use with the web application.
+Utility for importing Snomed to a relational database, e.g. for use with the web application.
 
 This is the syntax:
 
@@ -34,7 +30,7 @@ Sample configuration
     --descriptions sct2_Description_Snapshot-en_INT_20130731.txt --concepts sct2_Concept_Snapshot_INT_20130731.txt 
     --format RF2 --name testing --properties src/main/resources/database.properties
     
-with this database.properties configuration:
+with this database.properties configuration (a sample one can be [found here](/client/import-main/src/main/resources/database.properties):
 
     hibernate.dialect=org.hibernate.dialect.MySQLDialect
     driver=com.mysql.jdbc.Driver

@@ -1,11 +1,10 @@
-IHTSDO Snomed Publication Tools
-===============================
+#Canonical Form Maven Mojo Plugin
 
-Canonical Form Maven Mojo Plugin
---------------------------------
+Maven Mojo plugin for creating the transitive closure of isA relationships. For more information on the internals of this tool, have a look at the [Closure library](/lib/closure).
 
-This plugin project is a wrapper for the [transitive closure library](/closure), and makes it available as a [Maven Plugin](http://maven.apache.org/guides/mini/guide-configuring-plugins.html).
+More Information on [Maven Mojo](http://maven.apache.org/developers/mojo-api-specification.html).
 
+###Configuration Details
 The goal for this plugin is called 'generate-transitive-closure'.
 
 The configuration for this plugin looks like this:
@@ -19,8 +18,6 @@ The configuration for this plugin looks like this:
         <databaseLocation>/path/to/file</databaseLocation> <!-- optional -->
     </configuration>
 
-For a description of these parameters, have a look at the documentation for the [runnable jar project](/closure-main). 
+For a description of these parameters, have a look at the documentation for the [runnable jar project](/client/closure-main). 
 
-For more information on the transitive closure algorithm, take a look at the [documentation on our wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/algorithm/transitive-closure). Here you can also find documentation on the various [input formats](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats).
-
-The output is generated in the [child-parent format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/child-parent-format), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 
+The output is generated in the [child-parent format](/lib/importexport), which is a two-column layout of concept identifiers where the second column values are simply the parent concepts of the first column values. 

@@ -1,10 +1,7 @@
-IHTSDO Snomed Publication Tools
-===============================
-
 Canonical Form
 --------------
 
-This program takes as an input 2 text files in the [RF1 format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/rf1-format):
+This program takes as an input 2 text files in the [RF1](/lib/importexport) format:
 
 1. Set of concepts of this form:
 
@@ -20,17 +17,15 @@ This program takes as an input 2 text files in the [RF1 format](https://sites.go
         100001029	280845004	116680003	280737002	0	0	0
         etc.
     
-and produces an output in [Canonical format](https://sites.google.com/a/ihtsdo.org/snomed-publish/formats/canonical-format):
+and produces an output in [Canonical format](/lib/canonical):
 
     CONCEPTID1  RELATIONSHIPTYPE	CONCEPTID2	RELATIONSHIPGROUP
     280844000	116680003	71737002	0
     280845004	116680003	280737002	0
 
-The rules for the transformation taking place can be found in [this PDF document](https://github.com/sparkling/snomed-publish/blob/master/doc/doc1_CanonicalTableGuide_Current-en-US_INT_20130131.pdf?raw=true) [PDF], with an updated section to be found on [this wiki](https://sites.google.com/a/ihtsdo.org/snomed-publish/canonical/algorithm)
+For more information on the implementation, see the [Canonical library](/lib/canonical)
 
-When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database.
-The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 
-3Gb of heap space ('-Xmx3000m').
+When you run this program, you have the option of using either a disk based embedded database (H2), or an in-memory database. The disk based database is slower to use, but has a smaller memory footprint. The in-memory database requires about 3Gb of heap space ('-Xmx3000m').
 
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
 
