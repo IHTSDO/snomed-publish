@@ -9,7 +9,7 @@ Maven MOJO build plugin for generating the canonical form of Snomed. [Algorithm 
 ###[Closure Generator](/client/closure-main)
 Command line tool for creating the transitive closure of isA relationships. [Algorithm details](/lib/closure)
 ###[Closure Maven MOJO Plugin](/client/closure-plugin)
-Maven MOJO build plugin for creating the transitive closure of isA relationships. [Algorithm details](/lib/closure)
+Maven MOJO build plugin for creating the transitive closure of isA relationships ([algorithm details](/lib/closure)).
 ###[Snomed Diff Tool](/client/diff-main)
 Command line tool for comparing two snomed releases
 ###[Database Import Tool](/client/import-main)
