@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
@@ -107,7 +108,7 @@ public class RepositoryRefsetService implements RefsetService {
         } catch (DataIntegrityViolationException e) {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
-    }    
+    }   
 
     @Override
     @Transactional
@@ -122,13 +123,11 @@ public class RepositoryRefsetService implements RefsetService {
             throw new ConceptNotFoundException(created.getConcept(), "No concept found with id: " + created.getConcept());
         }        
 
-        
-        RefsetPlan plan = planService.findById(created.getPlan().getId());
-        if (plan == null){
-            plan = planService.create(created.getPlan());
-        }else{
-            plan = planService.update(created.getPlan());
+        if (created.getPlan() == null){
+            created.setPlan(new RefsetPlanDto());
         }
+
+        RefsetPlan plan = planService.create(created.getPlan());
 
         Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription(),
                 plan).build();        
@@ -167,6 +166,8 @@ public class RepositoryRefsetService implements RefsetService {
     private Sort sortByAscendingTitle() {
         return new Sort(Sort.Direction.ASC, "title");
     }
+
+
 
 //    private Pageable constructPageSpecification(int pageIndex) {
 //        Pageable pageSpecification = new PageRequest(pageIndex, NUMBER_OF_REFSETS_PER_PAGE, sortByAscendingTitle());

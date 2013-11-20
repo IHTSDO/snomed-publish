@@ -34,7 +34,9 @@
     <context:component-scan base-package="com.ihtsdo.snomed" />
         
     <!-- VALIDATOR -->
-    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+    <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+            <property name="validationMessageSource" ref="messageSource" />
+    </bean>
 
     <!-- TRACE -->
 <!--     <import resource="trace-context.xml"/> -->
@@ -70,6 +72,8 @@
             </list>
         </property>
     </bean>
+
+    
     <bean id="marshallingXmlHttpMessageConverter" class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
         <property name="marshaller" ref="jaxb2Marshaller" />
         <property name="unmarshaller" ref="jaxb2Marshaller" />

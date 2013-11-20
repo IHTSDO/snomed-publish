@@ -19,7 +19,13 @@
 
     <!-- Configures the annotation-driven Spring MVC Controller programming model.
          Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
-    <mvc:annotation-driven/>
+    <mvc:annotation-driven >
+        <mvc:message-converters>
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+			    <property name="objectMapper" ref="jacksonObjectMapper" />
+			</bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
     <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
         <!-- Turn off working out content type based on URL file extension, should fall back to looking at the Accept headers -->

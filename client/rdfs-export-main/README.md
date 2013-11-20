@@ -1,11 +1,9 @@
 #RDF Schema Generator
 
-Command line tool for converting a version of Snomed into RDF Schema RDF/XML. For more information on implementation, see the [Import Export library]. 
+Command line tool for converting a version of Snomed into RDF Schema RDF/XML. For more information on implementation, see the [Import Export library](/lib/importexport). 
 
 ###Building
-You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
-
-To build the distribution, enter the root project directory (two up from this folder) and type:
+You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it. To build the distribution, enter the root project directory (two up from this folder) and type:
 
     mvn clean package
     

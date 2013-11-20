@@ -5,33 +5,35 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 
 @XmlRootElement(name="refset")
+@JsonRootName("refset")
 public class RefsetDto {
     
     private Long id;
     
-    @NotNull(message="validation.refset.concept.not.null")
+    @NotNull(message="You must select a concept")
     private Long concept;
     
     private String conceptDisplayName;
 
-    @NotNull(message="validation.refset.publicid.not.null")
-    @Size(min=2, max=20, message="validation.refset.publicid.size")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="validation.refset.publicid.charactermix")
+    @NotNull(message="Public ID can not be empty")
+    @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
+    @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
     private String publicId;
     
-    @NotNull(message="validation.refset.title.not.null")
-    @Size(min=4, max=50, message="validation.refset.title.size")
+    @NotNull(message="validation.title.not.empty")
+    @Size(min=4, max=50, message="validation.title.wrong.size")
     private String title;
     
-    @NotNull(message="validation.refset.description.not.null")
-    @Size(min=4, message="validation.refset.description.size")
+    @NotNull(message="Description can not be empty")
+    @Size(min=4, message="Description must be longer than 4 characters")
     private String description;
     
-    @NotNull(message="validation.refset.plan.not.null")
+    @NotNull(message="A plan must be associated with a refset")
     private RefsetPlanDto plan = new RefsetPlanDto();
     
     public RefsetDto(){}

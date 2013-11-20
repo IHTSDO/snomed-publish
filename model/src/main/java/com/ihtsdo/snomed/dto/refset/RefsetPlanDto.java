@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetException;
@@ -27,11 +29,14 @@ public class RefsetPlanDto {
     
     public RefsetPlanDto(){}
     
+    public RefsetPlanDto(long id){this.id = id;}
+    
     @XmlElementWrapper(name = "rules")
     @XmlElement(name="rule")
+    @JsonProperty("rules")
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
     
-    @NotNull(message="validation.refsetplan.terminal.not.null")
+    @NotNull(message="A terminal rule must be specified")
     private Long terminal;
     
     @Override

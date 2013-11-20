@@ -10,3 +10,45 @@
 10. Add Integration Tests (implement using DBUnit)
 11. Implement Injection Factory for serialisers/parsers
 12. Snomed parsers takes an EntityManager as a parameter - We should inject these instead of passing them around
+13. Unit tests for MOJO plugins
+
+
+- use node express for mocking apis (web framework)
+
+
+
+You should use pre-compiled client templates. They are faster executing and allow you to use the same template language on the server and client.
+
+Install handlebars globally npm install handlebars -g
+Precompile your templates handlebars client-template1.handlebars -f templates.js
+Include templates.js <script src="templates.js"></script>
+Execute the template var html = Handlebars.templates["client-template1"](context);
+http://stackoverflow.com/a/13884587/8360
+
+actually, precompile the handlebars templates to jst: https://npmjs.org/package/grunt-contrib-handlebars
+then serve up jst files as handlebars?
+
+
+- Use Nunjucks.js to render handlebar templates on the server side (see 'raw')
+- Use Express JS as a web framework
+- Serve up mock web services using Express JS
+- Use Node Proxy to proxy the (spring) api in development (for integration testing, really)
+- Use Nginx to proxy api / apps in production
+- Use require js to handle dependencies???
+- nodemon to watch for changes and redeploy
+
+
+
+
+
+nope
+
+
+
+
+- javascript: livescript
+- css: sass
+- client side templating: Handlebars + Ember
+- server side templating: EJS
+- server: mimosa embedded express
+

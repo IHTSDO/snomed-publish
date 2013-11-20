@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.web.dto;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,38 +10,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 
 @XmlRootElement(name="response")
+@JsonRootName("response")
 public class RefsetResponseDto {
-    
-    /*
-     *         } catch (NonUniquePublicIdException e) {
-            //defensive coding
-            result.addError(createPublicIdNotUniqueFieldError(refsetDto, result));
-            return withErrors(result, response);
-
-        } catch (UnReferencedReferenceRuleException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RefsetNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ConceptNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnconnectedRefsetRuleException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RefsetRuleNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (RefsetPlanNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-     */
     
     public static final int SUCCESS                                   = 0;
     public static final int FAIL                                      = -1;
@@ -55,21 +36,23 @@ public class RefsetResponseDto {
     public static final int FAIL_PUBLIC_ID_NOT_UNIQUE                 = -60;
     public static final int FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING  = -70;
     public static final int FAIL_CONCEPT_NOT_FOUND                    = -80;
+    public static final int FAIL_VALIDATION                           = -90;
+    
     
     public enum Status{
         CREATED, DELETED, UPDATED, FAIL;
     }
 
-    private boolean success = false;
     private Status status;
     
     @XmlElementWrapper(name = "fieldErrors")
     @XmlElement(name="error")
-    private Map<String, RefsetErrorDto> fieldErrors = new HashMap<>();
+    //@JsonSerialize(using = fieldErrorsSerialiser.class, as=String.class)
+    private Map<String, List<String>> fieldErrors = new HashMap<>();
     
     @XmlElementWrapper(name = "globalErrors")
     @XmlElement(name="error")
-    private List<RefsetErrorDto> globalErrors = new ArrayList<>();
+    private List<String> globalErrors = new ArrayList<>();
     
     private RefsetDto refset;
     private String publicId;
@@ -78,7 +61,6 @@ public class RefsetResponseDto {
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
-                .add("success", isSuccess())
                 .add("status", getStatus())
                 .add("publicId", getPublicId())
                 .add("code", getCode())
@@ -88,34 +70,37 @@ public class RefsetResponseDto {
                 .toString();
     }    
     
-    public RefsetResponseDto addFieldError(String field, RefsetErrorDto error){
-        this.getFieldErrors().put(field, error);
+    public RefsetResponseDto addFieldError(String fieldName, String message){
+        if (getFieldErrors().get(fieldName) == null){
+            getFieldErrors().put(fieldName, new ArrayList<String>());
+        }
+        this.getFieldErrors().get(fieldName).add(message);
         return this;
     }
     
-    public RefsetResponseDto addGlobalError(RefsetErrorDto error){
-        this.getGlobalErrors().add(error);
+    public RefsetResponseDto addGlobalError(String message){
+        this.getGlobalErrors().add(message);
         return this;
     }
+
     
-    public Map<String, RefsetErrorDto> getFieldErrors() {
+
+    public Map<String, List<String>> getFieldErrors() {
         return fieldErrors;
     }
-    public void setFieldErrors(Map<String, RefsetErrorDto> fieldErrors) {
+
+    public void setFieldErrors(Map<String, List<String>> fieldErrors) {
         this.fieldErrors = fieldErrors;
     }
-    public List<RefsetErrorDto> getGlobalErrors() {
+
+    public List<String> getGlobalErrors() {
         return globalErrors;
     }
-    public void setGlobalErrors(List<RefsetErrorDto> objectErrors) {
-        this.globalErrors = objectErrors;
+
+    public void setGlobalErrors(List<String> globalErrors) {
+        this.globalErrors = globalErrors;
     }
-    public boolean isSuccess() {
-        return success;
-    }
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+
     public RefsetDto getRefset() {
         return refset;
     }
@@ -145,6 +130,17 @@ public class RefsetResponseDto {
         this.code = code;
     }
     
+    private class fieldErrorsSerialiser extends JsonSerializer<Map<String, List<String>>>{
+
+        @Override
+        public void serialize(Map<String, List<String>> errors,JsonGenerator arg1, SerializerProvider arg2)
+                throws IOException, JsonProcessingException 
+        {
+
+            
+        }
+        
+    }
     
 
 }

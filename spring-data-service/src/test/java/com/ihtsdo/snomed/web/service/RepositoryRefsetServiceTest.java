@@ -111,7 +111,7 @@ public class RepositoryRefsetServiceTest {
         
         when(repoMock.save(any(Refset.class))).thenReturn(persisted);
         when(planServiceMock.findById(any(Long.class))).thenReturn(new RefsetPlan());
-        when(planServiceMock.update(any(RefsetPlanDto.class))).thenReturn(new RefsetPlan());
+        when(planServiceMock.create(any(RefsetPlanDto.class))).thenReturn(new RefsetPlan());
         when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
 
         Refset returned = refsetService.create(created);
@@ -119,8 +119,8 @@ public class RepositoryRefsetServiceTest {
         ArgumentCaptor<Refset> refsetArgument = ArgumentCaptor.forClass(Refset.class);
         verify(repoMock, times(1)).save(refsetArgument.capture());
         verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
-        verify(planServiceMock, times(1)).findById(any(Long.class));
-        verify(planServiceMock, times(1)).update(any(RefsetPlanDto.class));
+        //verify(planServiceMock, times(1)).findById(any(Long.class));
+        verify(planServiceMock, times(1)).create(any(RefsetPlanDto.class));
         verifyNoMoreInteractions(repoMock);
         verifyNoMoreInteractions(conceptMock);
         verifyNoMoreInteractions(planServiceMock);

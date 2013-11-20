@@ -51,6 +51,7 @@
     <hibernate-jpa-2.version>1.0.1.Final</hibernate-jpa-2.version>
     <commons-lang.version>2.6</commons-lang.version>
     <spring.data.jpa.version>1.4.1.RELEASE</spring.data.jpa.version>
+    <jackson.version>2.3.0-rc1</jackson.version>
   </properties>
   <build>
     <plugins>
