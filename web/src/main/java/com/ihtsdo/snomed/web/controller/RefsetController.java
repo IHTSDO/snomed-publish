@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -396,6 +397,59 @@ public class RefsetController {
     public @ResponseBody RefsetDto getRefsetJsonApi(@PathVariable String pubId) throws Exception {
         return getRefsetDto(pubId);
     }    
+    
+    @Transactional
+    @RequestMapping(value = "/api/refsets/{pubId}/concepts.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody XmlRefsetConcepts getConceptJsonApi(@PathVariable String pubId) throws Exception {
+        return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
+    }    
+
+    @Transactional
+    @RequestMapping(value = "/api/refsets/{pubId}/plan.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody RefsetPlanDto getRefsetPlanJsonApi(@PathVariable String pubId) throws Exception {
+        Refset refset = refsetService.findByPublicId(pubId);
+        System.out.println("Found refset " + refset);
+        return RefsetPlanDto.parse(refset.getPlan());
+    }    
+        
+    
+    @Transactional
+    @RequestMapping(value = "/api/refsets/{pubId}", 
+            method = RequestMethod.DELETE, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RefsetResponseDto> deleteRefsetApi(HttpServletRequest request, @PathVariable String pubId){
+        LOG.debug("Received request to delete refset [{}]", pubId);
+        RefsetResponseDto response = new RefsetResponseDto();
+        response.setPublicId(pubId);
+        try {
+            Refset deleted = refsetService.delete(pubId);
+            response.setRefset(
+                RefsetDto.getBuilder(
+                    deleted.getId(), 
+                    (deleted.getConcept() == null) ? 0 : deleted.getConcept().getSerialisedId(),
+                    (deleted.getConcept() == null) ? null : deleted.getConcept().getDisplayName(),
+                    deleted.getTitle(), deleted.getDescription(), deleted.getPublicId(), 
+                    RefsetPlanDto.parse(deleted.getPlan())).build());
+            response.setCode(RefsetResponseDto.SUCCESS_DELETED);
+            response.setStatus(Status.DELETED);
+            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.OK);
+        } catch (RefsetNotFoundException e) {
+            response.setCode(RefsetResponseDto.FAIL_REFSET_NOT_FOUND);
+            response.setStatus(Status.FAIL);
+            response.setGlobalErrors(Arrays.asList(messageSource.getMessage(
+                    "global.error.refset.not.found", 
+                    Arrays.asList(pubId).toArray(), 
+                    LocaleContextHolder.getLocale())));
+            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.PRECONDITION_FAILED);
+        }
+    }
 
     @Transactional
     @RequestMapping(value = "/api/refsets", method = RequestMethod.POST, 
@@ -581,7 +635,8 @@ public class RefsetController {
         }
         System.out.println("returning xmlconcepts [" + xmlConcepts.size() + "]");
         return xmlConcepts;
-    }    
+    }
+    
 //
 //    private void addDummyData(RefsetDto refsetDto) {
 //        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();

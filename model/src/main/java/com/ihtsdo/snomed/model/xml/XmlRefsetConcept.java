@@ -28,7 +28,6 @@ public class XmlRefsetConcept {
     private boolean active;
     
     public XmlRefsetConcept(Concept c) throws MalformedURLException{
-        setSerialisedId(c.getSerialisedId());
         setId(c.getSerialisedId());   
         setTitle(c.getFullySpecifiedName());
         setEffectiveTime(c.getEffectiveTime());
