@@ -33,7 +33,7 @@ public class RefsetPlanDto {
     
     @XmlElementWrapper(name = "rules")
     @XmlElement(name="rule")
-    //@JsonProperty("rules")
+    @JsonProperty("rules")
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
     
     @NotNull(message="A terminal rule must be specified")
