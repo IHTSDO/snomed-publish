@@ -20,15 +20,15 @@ import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
-import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleException;
+import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleTYpeException;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.refset.RefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.BaseSetOperationRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.service.RefsetPlanService;
 import com.ihtsdo.snomed.service.RefsetRuleService;
-import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.repository.RefsetPlanRepository;
 
 @Service
@@ -152,7 +152,7 @@ public class RepositoryRefsetPlanService implements RefsetPlanService {
 //                    lcRule.addConcept(conceptService.findById(c.getId()));
 //                }
             }else{
-                throw new UnrecognisedRefsetRuleException("Unable to handle rule of type " + ruleDto.getType());
+                throw new UnrecognisedRefsetRuleTYpeException("Unable to handle rule of type " + ruleDto.getType());
             }
         }
         LOG.debug("Done Processing");

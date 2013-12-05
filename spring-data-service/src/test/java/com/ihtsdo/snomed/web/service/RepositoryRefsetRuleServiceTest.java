@@ -100,7 +100,7 @@ public class RepositoryRefsetRuleServiceTest {
                 conceptServiceMock);
         
         builder = RefsetRuleDto.getBuilder()
-                .id(-1)
+                .id(-1l)
                 .type(RuleType.LIST)
                 .concepts(conceptDtos);
     }

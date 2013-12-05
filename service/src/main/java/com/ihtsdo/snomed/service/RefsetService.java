@@ -8,6 +8,7 @@ import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.refset.Refset;
 

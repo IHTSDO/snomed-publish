@@ -32,6 +32,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
@@ -39,7 +40,6 @@ import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
 import com.ihtsdo.snomed.service.RefsetPlanService;
 import com.ihtsdo.snomed.service.RefsetRuleService;
-import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.web.repository.RefsetPlanRepository;
 import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 

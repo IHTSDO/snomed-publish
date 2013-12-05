@@ -1,6 +1,5 @@
-package com.ihtsdo.snomed.service;
+package com.ihtsdo.snomed.exception;
 
-import com.ihtsdo.snomed.exception.ProgrammingException;
 
 public class UnReferencedReferenceRuleException extends ProgrammingException {
 

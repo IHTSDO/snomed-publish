@@ -14,7 +14,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
-import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleException;
+import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleTYpeException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
@@ -100,11 +100,11 @@ public class RepositoryRefsetRuleService implements RefsetRuleService {
         }
     }    
 
-    private static BaseRefsetRule createRule(RuleType type) throws UnrecognisedRefsetRuleException {
+    private static BaseRefsetRule createRule(RuleType type) throws UnrecognisedRefsetRuleTYpeException {
         try {
             return (BaseRefsetRule)RefsetRuleDto.TYPE_CLASS_MAP.get(type).newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new UnrecognisedRefsetRuleException("I've not been able to handle RefsetRule of type " + type + " and class " + RefsetRuleDto.TYPE_CLASS_MAP.get(type));
+            throw new UnrecognisedRefsetRuleTYpeException("I've not been able to handle RefsetRule of type " + type + " and class " + RefsetRuleDto.TYPE_CLASS_MAP.get(type));
         }
     }
   

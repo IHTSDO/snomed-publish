@@ -4,6 +4,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 
@@ -16,4 +17,5 @@ public interface RefsetPlanService {
     public abstract RefsetPlan create(RefsetPlanDto created) throws UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, ConceptNotFoundException;
 
     public abstract RefsetPlan delete(Long refsetId) throws RefsetPlanNotFoundException;
+
 }

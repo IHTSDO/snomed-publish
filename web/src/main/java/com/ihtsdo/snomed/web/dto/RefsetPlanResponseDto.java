@@ -16,34 +16,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
+import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
 @XmlRootElement(name="response")
 @JsonRootName("response")
-public class RefsetResponseDto {
-    
-    public static final int SUCCESS                                   = 0;
-    public static final int FAIL                                      = -1;
-    public static final int SUCCESS_CREATED                           = 10;
-    public static final int SUCCESS_DELETED                           = 20;
-    public static final int SUCCESS_UPDATED                           = 30;
-    public static final int FAIL_UNREFERENCED_RULE                    = -10;
-    public static final int FAIL_REFSET_NOT_FOUND                     = -20;
-    public static final int FAIL_UNCONNECTED_RULE                     = -30;
-    public static final int FAIL_RULE_NOT_FOUND                       = -40;
-    public static final int FAIL_PLAN_NOT_FOUND                       = -50;
-    public static final int FAIL_PUBLIC_ID_NOT_UNIQUE                 = -60;
-    public static final int FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING  = -70;
-    public static final int FAIL_CONCEPT_NOT_FOUND                    = -80;
-    public static final int FAIL_VALIDATION                           = -90;
-    
-    
-    public enum Status{
-        CREATED, DELETED, UPDATED, VALIDATED, FAIL;
-    }
+public class RefsetPlanResponseDto {
 
-    private Status status;
-    
     @XmlElementWrapper(name = "fieldErrors")
     @XmlElement(name="error")
     //@JsonSerialize(using = fieldErrorsSerialiser.class, as=String.class)
@@ -53,23 +32,20 @@ public class RefsetResponseDto {
     @XmlElement(name="error")
     private List<String> globalErrors = new ArrayList<>();
     
-    private RefsetDto refset;
-    private String publicId;
+    private RefsetPlanDto refsetPlan;
     private int code;
+    private Status status;
     
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
-                .add("status", getStatus())
-                .add("publicId", getPublicId())
                 .add("code", getCode())
                 .add("fieldErrors", getFieldErrors())
                 .add("globalErrors", getGlobalErrors())
-                .add("refset", getRefset())
                 .toString();
     }    
     
-    public RefsetResponseDto addFieldError(String fieldName, String message){
+    public RefsetPlanResponseDto addFieldError(String fieldName, String message){
         if (getFieldErrors().get(fieldName) == null){
             getFieldErrors().put(fieldName, new ArrayList<String>());
         }
@@ -77,7 +53,7 @@ public class RefsetResponseDto {
         return this;
     }
     
-    public RefsetResponseDto addGlobalError(String message){
+    public RefsetPlanResponseDto addGlobalError(String message){
         this.getGlobalErrors().add(message);
         return this;
     }
@@ -100,27 +76,7 @@ public class RefsetResponseDto {
         this.globalErrors = globalErrors;
     }
 
-    public RefsetDto getRefset() {
-        return refset;
-    }
-    public void setRefset(RefsetDto refset) {
-        this.refset = refset;
-    }
-    public Status getStatus() {
-        return status;
-    }
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public String getPublicId() {
-        return publicId;
-    }
-
-    public void setPublicId(String publicId) {
-        this.publicId = publicId;
-    }
-
+  
     public int getCode() {
         return code;
     }
@@ -129,6 +85,28 @@ public class RefsetResponseDto {
         this.code = code;
     }
     
+    
+    
+    public RefsetPlanDto getRefsetPlan() {
+        return refsetPlan;
+    }
+
+    public void setRefsetPlan(RefsetPlanDto refsetPlan) {
+        this.refsetPlan = refsetPlan;
+    }
+
+
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+
+
     private class fieldErrorsSerialiser extends JsonSerializer<Map<String, List<String>>>{
 
         @Override

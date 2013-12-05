@@ -52,12 +52,14 @@ import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
+import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
@@ -67,7 +69,7 @@ import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.RefsetService;
-import com.ihtsdo.snomed.service.UnReferencedReferenceRuleException;
+import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 import com.ihtsdo.snomed.web.service.OntologyService;
@@ -314,12 +316,10 @@ public class RefsetController {
             result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
         }
         return error.build(result, response, returnCode);
-    }
-
-
+    }   
+    
 
     private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
-        LOG.debug("Refset succesfully updated");
         response.setRefset(RefsetDto.getBuilder(updated.getId(), 
                 (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
                 (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
@@ -330,7 +330,6 @@ public class RefsetController {
         return response;
     }
     
-
     // UPDATE
 
     @Transactional
@@ -417,8 +416,7 @@ public class RefsetController {
         System.out.println("Found refset " + refset);
         return RefsetPlanDto.parse(refset.getPlan());
     }    
-        
-    
+
     @Transactional
     @RequestMapping(value = "/api/refsets/{pubId}", 
             method = RequestMethod.DELETE, 
@@ -514,6 +512,38 @@ public class RefsetController {
     public RefsetResponseDto processValidationError(MethodArgumentNotValidException ex) {
         return error.build(ex.getBindingResult(), new RefsetResponseDto(), RefsetResponseDto.FAIL_VALIDATION);
     }
+    
+    @Transactional
+    @RequestMapping(value = "/api/refsets/validate", method = RequestMethod.PUT, 
+    produces = {MediaType.APPLICATION_JSON_VALUE}, 
+    consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<RefsetPlanResponseDto> validateRefset(@Valid @RequestBody RefsetPlanDto refsetPlanDto,BindingResult result){
+        LOG.debug("Controller received request to validate refset {}", refsetPlanDto.toString());
+        RefsetPlanResponseDto response = new RefsetPlanResponseDto();
+        response.setRefsetPlan(refsetPlanDto);
+        response.setCode(RefsetResponseDto.FAIL);
+        response.setStatus(Status.FAIL);
+        
+        if (result.hasErrors()) {
+            return new ResponseEntity<RefsetPlanResponseDto>(
+                    error.build(result, response, RefsetResponseDto.FAIL), 
+                    HttpStatus.NOT_ACCEPTABLE);
+        }
+        
+        ValidationResult validationResult = refsetPlanDto.validate();
+        
+        if (validationResult.isSuccess()){
+            response.setStatus(Status.VALIDATED);
+            response.setCode(RefsetResponseDto.SUCCESS);
+            return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.OK);            
+        }
+
+        return new ResponseEntity<RefsetPlanResponseDto>(
+                error.build(validationResult, response), 
+                HttpStatus.NOT_ACCEPTABLE);
+    }
+
 
     
     // WEB SERVICE API
@@ -536,8 +566,7 @@ public class RefsetController {
     public @ResponseBody XmlRefsets findAllRefsetsXml() throws Exception {
         return new XmlRefsets(getRefsetsDto());
     }
-        
-    
+
     @Transactional
     @RequestMapping(value = "/refset/{pubId}.xml", 
             method = RequestMethod.GET, 
@@ -562,8 +591,6 @@ public class RefsetController {
         return refsetDto;
     }    
     
-
-
     private RefsetDto getRefsetDto(String pubId) {
         Refset refset = refsetService.findByPublicId(pubId);
         System.out.println("Found refset " + refset);
@@ -577,7 +604,6 @@ public class RefsetController {
         return refsetDto;
     }    
     
-
     @Transactional
     @RequestMapping(value = "/refset/{pubId}/concepts.json", 
             method = RequestMethod.GET, 
@@ -613,8 +639,6 @@ public class RefsetController {
 
     }    
     
-    
-
     private List<XmlRefsetShort> getRefsetsDto() throws MalformedURLException {
         List<Refset> refsets = refsetService.findAll();
         List<XmlRefsetShort> xmlRefsetShorts = new ArrayList<>();
