@@ -63,11 +63,13 @@ import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
 import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
 import com.ihtsdo.snomed.service.ConceptService;
+import com.ihtsdo.snomed.service.RefsetPlanService;
 import com.ihtsdo.snomed.service.RefsetService;
 import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
@@ -89,6 +91,10 @@ public class RefsetController {
 
     @Inject
     RefsetService refsetService;
+    
+    @Inject
+    RefsetPlanService refsetPlanService;
+    
 
     @Inject
     OntologyService ontologyService;
@@ -377,6 +383,15 @@ public class RefsetController {
         }
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
     // WEB SERVICE API II
     
     @Transactional
@@ -512,13 +527,71 @@ public class RefsetController {
     public RefsetResponseDto processValidationError(MethodArgumentNotValidException ex) {
         return error.build(ex.getBindingResult(), new RefsetResponseDto(), RefsetResponseDto.FAIL_VALIDATION);
     }
+
+    @Transactional
+    @RequestMapping(value = "/api/refsets/{pubId}/plan", method = RequestMethod.PUT, 
+    produces = {MediaType.APPLICATION_JSON_VALUE}, 
+    consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public ResponseEntity<RefsetPlanResponseDto> updateRefsetPlan(
+            @Valid @RequestBody RefsetPlanDto refsetPlanDto,
+            BindingResult result, 
+            @PathVariable String pubId)
+    {
+        LOG.debug("Controller received request to update refset plan {} for refset {}", 
+                refsetPlanDto.toString(), pubId);
+
+        RefsetPlanResponseDto response = new RefsetPlanResponseDto();
+        response.setRefsetPlan(refsetPlanDto);
+                
+        ValidationResult validationResult = refsetPlanDto.validate();
+        if (!validationResult.isSuccess()){
+            return new ResponseEntity<RefsetPlanResponseDto>(
+                    error.build(validationResult, response), 
+                    HttpStatus.NOT_ACCEPTABLE);
+        }
+
+        Refset refset = refsetService.findByPublicId(pubId);        
+        if (refset == null){
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.NOT_FOUND);
+        }
+        
+        //Replace any plan db ids, using the url parameter instead
+        //So, yes, plan ids are ignored / overwritten based on url params
+        //TODO: Remove plan id from ws req/resp payload (?)
+        refsetPlanDto.setId(refset.getPlan().getId());
+        
+        try {
+            RefsetPlan plan = refsetPlanService.update(refsetPlanDto);
+            response.setRefsetPlan(RefsetPlanDto.parse(plan));
+            response.setCode(RefsetResponseDto.SUCCESS_UPDATED);
+            response.setStatus(Status.UPDATED);
+            return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.OK);
+            
+        //TODO: These exceptions needs to be refactored, as we implemented the validation
+        // as a separate step above. We should not have any validation errors here. 
+        // Need to throw a single exception for validation error instead
+        } catch (UnReferencedReferenceRuleException e) {
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (RefsetPlanNotFoundException e) {
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.NOT_FOUND);
+        } catch (UnconnectedRefsetRuleException e) {
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (RefsetRuleNotFoundException e) {
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ConceptNotFoundException e) {
+            //TODO: This is a test we are not able to do above (needs db access). Need to handle this 
+            //properly, and send back a proper error report
+            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     
     @Transactional
     @RequestMapping(value = "/api/refsets/validate", method = RequestMethod.PUT, 
     produces = {MediaType.APPLICATION_JSON_VALUE}, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public ResponseEntity<RefsetPlanResponseDto> validateRefset(@Valid @RequestBody RefsetPlanDto refsetPlanDto,BindingResult result){
+    public ResponseEntity<RefsetPlanResponseDto> validateRefsetPlan(@Valid @RequestBody RefsetPlanDto refsetPlanDto,BindingResult result){
         LOG.debug("Controller received request to validate refset {}", refsetPlanDto.toString());
         RefsetPlanResponseDto response = new RefsetPlanResponseDto();
         response.setRefsetPlan(refsetPlanDto);
@@ -532,6 +605,8 @@ public class RefsetController {
         }
         
         ValidationResult validationResult = refsetPlanDto.validate();
+        
+        //TODO: Add check to see of concepts exists in database
         
         if (validationResult.isSuccess()){
             response.setStatus(Status.VALIDATED);
