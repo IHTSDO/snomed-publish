@@ -48,7 +48,7 @@ public class RefsetPlanDto {
     @JsonProperty("rules")
     private List<RefsetRuleDto> refsetRules = new ArrayList<>();
     
-    @NotNull(message="A terminal rule must be specified")
+    //@NotNull(message="A terminal rule must be specified")
     private Long terminal;
 
   
