@@ -273,6 +273,49 @@ public class RefsetPlanDtoTest {
     }
     
     @Test
+    public void shouldFailOnSelfReferencingRule(){
+        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+                .id(1L)
+                .type(RuleType.LIST)
+                .concepts(Arrays.asList(
+                        new ConceptDto(1l), 
+                        new ConceptDto(2l)))                        
+                .build();
+        
+        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+                .id(2L)
+                .type(RuleType.UNION)
+                .left(1L)
+                .right(2L)
+                .build();
+        
+        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+                add(left).
+                add(union).
+                terminal(union.getId()).
+                build();
+        
+        ValidationResult expected = ValidationResult.getBuilder().
+                terminal(union).build()
+                    .addError(
+                        GlobalValidationError.getBuilder(
+                                ValidationResult.Error.NO_UNREFERENCED_RULE_FOR_TERMINAL_CANDIDATE,
+                                "Unabled to find unreferenced rule to act as terminal candidate")
+                            .build())
+                    .addError(
+                        FieldValidationError.getBuilder(
+                                ValidationResult.Error.SELF_REFERENCING_RULE,
+                                union,
+                                "Right operand references itself")
+                            .build());                
+        
+                
+        
+        assertEquals(expected, plan.validate()); 
+        
+    }    
+    
+    @Test
     public void shouldFailOnRuleReferencedMoreThanOnce(){
         RefsetRuleDto r1 = RefsetRuleDto.getBuilder()
                 .id(1L)

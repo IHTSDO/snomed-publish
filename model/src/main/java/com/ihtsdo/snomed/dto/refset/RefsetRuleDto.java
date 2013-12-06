@@ -10,7 +10,9 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleTYpeException;
@@ -69,17 +71,23 @@ public class RefsetRuleDto {
     }    
     
     @Transient
+    @XmlTransient
+    @JsonIgnore
     public boolean isSetOperation(){
         return SET_OPERATIONS.contains(getType());
     }
     
     @Transient
+    @XmlTransient
+    @JsonIgnore    
     public boolean isListOperation(){
         return getType() == RuleType.LIST;
     }
     
     
     @Transient
+    @XmlTransient
+    @JsonIgnore    
     public static boolean isPersisted(long id){
         if (id > 0){
             return true;

@@ -135,13 +135,14 @@ public class RefsetPlanDto {
                     param(unReferencedRules.toString()).
                     build());
         }
-        if (unReferencedRules.size() < 1){
+        else if (unReferencedRules.size() < 1){
             result.addError(
                     ValidationResult.Error.NO_UNREFERENCED_RULE_FOR_TERMINAL_CANDIDATE, 
                     "Unabled to find unreferenced rule to act as terminal candidate");            
+        }else{
+            result.setTerminal(ruleIdToRuleMap.get(unReferencedRules.iterator().next()));
         }
-        //assertion: unReferencedRules.size == 1
-        result.setTerminal(ruleIdToRuleMap.get(unReferencedRules.iterator().next()));
+        
         return result;
     }
 
@@ -209,6 +210,22 @@ public class RefsetPlanDto {
                     param(rule.getLeft() == null ? "null" : rule.getLeft().toString()).
                     build());
         }
+        if ((rule.getRight() != null) && (rule.getLeft() != null) && rule.getId() == rule.getLeft()){
+            result.addError(
+                FieldValidationError.getBuilder(
+                        ValidationResult.Error.SELF_REFERENCING_RULE,
+                        rule,
+                        "Left operand references itself").
+                    build());
+        }
+        if ((rule.getRight() != null) && (rule.getLeft() != null) && rule.getId() == rule.getRight()){
+            result.addError(
+                FieldValidationError.getBuilder(
+                        ValidationResult.Error.SELF_REFERENCING_RULE,
+                        rule,
+                        "Right operand references itself").
+                    build());
+        }        
         if (referencedRefsetRuleIds.keySet().contains(rule.getLeft())){
             result.addError(
                 FieldValidationError.getBuilder(
