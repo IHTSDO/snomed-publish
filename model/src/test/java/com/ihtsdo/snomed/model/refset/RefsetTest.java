@@ -1,8 +1,8 @@
 package com.ihtsdo.snomed.model.refset;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 
@@ -20,7 +20,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.Refset;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)

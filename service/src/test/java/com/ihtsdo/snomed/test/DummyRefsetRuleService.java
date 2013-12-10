@@ -2,8 +2,6 @@ package com.ihtsdo.snomed.test;
 
 import javax.inject.Named;
 
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
 import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.service.RefsetRuleService;
 
@@ -21,22 +19,10 @@ public class DummyRefsetRuleService implements RefsetRuleService {
     }
 
     @Override
-    public BaseRefsetRule update(RefsetRuleDto updated)
-            throws RefsetRuleNotFoundException {
+    public BaseRefsetRule delete(Long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
-    public BaseRefsetRule create(RefsetRuleDto created) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BaseRefsetRule delete(Long refsetId) throws RefsetRuleNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
 }

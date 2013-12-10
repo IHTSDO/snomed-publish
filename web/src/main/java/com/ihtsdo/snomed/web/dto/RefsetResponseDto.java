@@ -35,8 +35,7 @@ public class RefsetResponseDto {
     public static final int FAIL_PUBLIC_ID_NOT_UNIQUE                 = -60;
     public static final int FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING  = -70;
     public static final int FAIL_CONCEPT_NOT_FOUND                    = -80;
-    public static final int FAIL_VALIDATION                           = -90;
-    
+    public static final int FAIL_VALIDATION                           = -90;    
     
     public enum Status{
         CREATED, DELETED, UPDATED, VALIDATED, FAIL;

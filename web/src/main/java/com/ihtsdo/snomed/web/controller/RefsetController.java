@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -28,7 +26,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
@@ -52,29 +49,29 @@ import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
 import com.ihtsdo.snomed.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
-import com.ihtsdo.snomed.exception.RefsetRuleNotFoundException;
-import com.ihtsdo.snomed.exception.UnReferencedReferenceRuleException;
-import com.ihtsdo.snomed.exception.UnconnectedRefsetRuleException;
+import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
+import com.ihtsdo.snomed.exception.validation.ConceptNotFoundValidationException;
+import com.ihtsdo.snomed.exception.validation.MoreThanOneCandidateForTerminalException;
+import com.ihtsdo.snomed.exception.validation.NoTerminalCandidateException;
+import com.ihtsdo.snomed.exception.validation.RefsetRuleNotFoundValidationException;
+import com.ihtsdo.snomed.exception.validation.UnReferencedRuleException;
+import com.ihtsdo.snomed.exception.validation.UnconnectedRefsetRuleException;
+import com.ihtsdo.snomed.exception.validation.UnrecognisedRefsetRuleTypeException;
+import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
-import com.ihtsdo.snomed.service.ConceptService;
-import com.ihtsdo.snomed.service.RefsetPlanService;
 import com.ihtsdo.snomed.service.RefsetService;
-import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
-import com.ihtsdo.snomed.web.service.OntologyService;
 
 @Controller
 @RequestMapping("/refsets")
@@ -91,17 +88,7 @@ public class RefsetController {
 
     @Inject
     RefsetService refsetService;
-    
-    @Inject
-    RefsetPlanService refsetPlanService;
-    
-
-    @Inject
-    OntologyService ontologyService;
-    
-    @Inject
-    ConceptService conceptService;
-    
+        
     @Inject
     RefsetErrorBuilder error;
     
@@ -113,512 +100,6 @@ public class RefsetController {
     
     @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
-
-    @PostConstruct
-    public void init() {
-    }
-
-    
-    
-    // ALL
-
-    @RequestMapping(value = "/", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView getRefsets(ModelMap model, HttpServletRequest request,
-            Principal principal) {
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        model.addAttribute("refsets", refsetService.findAll());
-        return new ModelAndView("/refset/refsets", model);
-    }
-
-    // DETAILS
-
-    @RequestMapping(value = "/refset/{pubId}", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView getRefset(ModelMap model, HttpServletRequest request,
-            Principal principal, @PathVariable String pubId) {
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-
-        Refset refset = refsetService.findByPublicId(pubId);
-        refset.getPlan().refreshConceptsCache();
-        //refset.setRefsetPlan(dummyRefsetPlan());
-        
-        //model.addAttribute("rules", refset.getPlan().getRules());
-        model.addAttribute("refset", refset);
-        return new ModelAndView("/refset/refset", model);
-    }
-
-    // CREATE FORM
-
-    @RequestMapping(value = "/refset/new", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView showNewRefsetForm(ModelMap model,
-            HttpServletRequest request, Principal principal) {
-        LOG.debug("Displaying new refset screen");
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("/refset/new.refset", "refset", new RefsetDto());
-    }
-
-    // EDIT FORM
-
-    @RequestMapping(value = "/refset/{pubId}/edit", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView showEditRefsetForm(@ModelAttribute("refset") RefsetDto refsetFbo, ModelMap model,
-            HttpServletRequest request, Principal principal,
-            @PathVariable String pubId) {
-        LOG.debug(
-                "Displaying edit refset screen for refset with publicId [{}]",
-                pubId);
-        Refset refset = refsetService.findByPublicId(pubId);
-        
-        
-        RefsetPlanDto planDto = RefsetPlanDto.parse(refset.getPlan());
-        List<RefsetRuleDto> autoList = new AutoPopulatingList<>(RefsetRuleDto.class);
-        autoList.addAll(planDto.getRefsetRules());
-        planDto.setRefsetRules(autoList);
-        RefsetDto newRefsetFbo = RefsetDto.getBuilder(
-                refset.getId(), 
-                refset.getConcept().getSerialisedId(),
-                refset.getConcept().getDisplayName(),
-                refset.getTitle(), 
-                refset.getDescription(), 
-                refset.getPublicId(), 
-                planDto)
-                .build();
-
-        //model.addAttribute("refset", newRefsetFbo);
-        model.addAttribute("pubid", pubId);
-        model.addAttribute("storedRefset", refset);
-        
-        
-            
-        //initDummyPlan(refset);
-
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        return new ModelAndView("/refset/edit.refset", "refset", newRefsetFbo);
-    }
-
-    // DELETE
-
-    @RequestMapping(value = "/refset/{pubId}/delete", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView deleteRefset(ModelMap model,
-            HttpServletRequest request, Principal principal,
-            @PathVariable String pubId, RedirectAttributes attributes)
-            throws RefsetNotFoundException {
-        // TODO: Handle RefsetNotFoundException
-        LOG.debug("Controller received request to delete refset [{}]", pubId);
-        Refset deleted = refsetService.delete(pubId);
-
-        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED, deleted.getPublicId(), deleted.getTitle());
-
-        attributes.addAttribute("server", request.getServerName());
-        attributes.addAttribute("port", request.getServerPort());
-        return new ModelAndView("redirect:http://{server}:{port}/refsets/");
-    }
-
-    // CREATE
-
-    @Transactional
-    @RequestMapping(value = "/refset/new", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE })
-    public ModelAndView ceateRefset(ModelMap model, HttpServletRequest request,
-            Principal principal,
-            @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException, RefsetNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
-        LOG.debug("Controller received request to create new refset [{}]",
-                refsetDto.toString());
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        
-        Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
-        if (refset != null){
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-        }
-        
-        if (result.hasErrors()) {
-            return new ModelAndView("/refset/new.refset");
-        }
-        try {            
-            //addDummyData(refsetDto);
-            Refset created = refsetService.create(refsetDto);
-            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
-            
-            attributes.addAttribute("server", request.getServerName());
-            attributes.addAttribute("port", request.getServerPort());
-            return new ModelAndView("redirect:http://{server}:{port}/refsets/");
-        } catch (NonUniquePublicIdException e) {
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-            return new ModelAndView("/refset/new.refset");
-        }
-    }
-    
-    
-    @Transactional
-    @RequestMapping(value = "/refset/{pubId}/put", method = RequestMethod.POST, 
-    produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
-    consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public RefsetResponseDto updateRefsetWs(@Valid @RequestBody RefsetDto refsetDto,
-            BindingResult result, @PathVariable String pubId){
-        int returnCode = RefsetResponseDto.FAIL;
-        LOG.debug("Controller received request to update refset {}", refsetDto.toString());
-        RefsetResponseDto response = new RefsetResponseDto();
-        response.setPublicId(pubId);
-        
-        Refset refset = refsetService.findById(refsetDto.getId());
-        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
-            //Assertion: user has updated the public id
-            refset = refsetService.findByPublicId(refsetDto.getPublicId());
-            if (refset != null){
-                returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
-                setPublicIdNotUniqueFieldError(refsetDto, result);
-            }
-        }
-        if (!Objects.equal(refsetDto.getPublicId(), pubId)){
-            returnCode = RefsetResponseDto.FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING;
-            result.addError(new ObjectError(result.getObjectName(), 
-                    getMessage("xml.response.error.url.and.body.public.id.not.matching", 
-                            pubId, refsetDto.getPublicId())));
-        }
-        
-        if (result.hasErrors()) {
-            return error.build(result, response, returnCode);
-        }
-        
-        try {
-            Refset updated = refsetService.update(refsetDto);
-            if (updated != null){
-                return success(response, updated, Status.UPDATED, RefsetResponseDto.SUCCESS_UPDATED);
-            }
-            
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.updated", refsetDto.getPublicId(), refsetDto.getId())));
-            return error.build(result, response, RefsetResponseDto.FAIL);
-        } catch (NonUniquePublicIdException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-        } catch (UnReferencedReferenceRuleException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
-           result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
-        } catch (RefsetNotFoundException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_REFSET_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.found", e.getId())));
-        } catch (ConceptNotFoundException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
-        } catch (UnconnectedRefsetRuleException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
-        } catch (RefsetRuleNotFoundException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
-        } catch (RefsetPlanNotFoundException e) {
-            LOG.debug("Update failed", e);
-            returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
-        }
-        return error.build(result, response, returnCode);
-    }   
-    
-
-    private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
-        response.setRefset(RefsetDto.getBuilder(updated.getId(), 
-                (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
-                (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
-                updated.getTitle(), updated.getDescription(), updated.getPublicId(), 
-                RefsetPlanDto.parse(updated.getPlan())).build());
-        response.setStatus(status);
-        response.setCode(returnCode);
-        return response;
-    }
-    
-    // UPDATE
-
-    @Transactional
-    @RequestMapping(value = "/refset/{pubId}/edit", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ModelAndView updateRefset(ModelMap model,
-            HttpServletRequest request, Principal principal,
-            RedirectAttributes attributes, @PathVariable String pubId,
-            @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException, UnReferencedReferenceRuleException, UnconnectedRefsetRuleException, RefsetRuleNotFoundException, RefsetPlanNotFoundException {
-        // TODO: Handle RefsetNotFoundException
-        LOG.debug("Controller received request to update refset [{}]", refsetDto.toString());
-//        model.addAttribute("user",
-//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
-        model.addAttribute("pubid", pubId);
-        model.addAttribute("refset", refsetDto);
-        
-        Refset refset = refsetService.findById(refsetDto.getId());
-        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
-            //Assertion: user has updated the public id
-            refset = refsetService.findByPublicId(refsetDto.getPublicId());
-            if (refset != null){
-                setPublicIdNotUniqueFieldError(refsetDto, result);
-            }
-        }
-        
-        if (result.hasErrors()) {
-            LOG.error("Found errors: ");
-            for (ObjectError error : result.getAllErrors()){
-                LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
-            }
-            return new ModelAndView("/refset/edit.refset");
-        }
-        
-        try {
-            Refset updated = refsetService.update(refsetDto);
-            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED, updated.getPublicId(), updated.getTitle());
-            attributes.addAttribute("server", request.getServerName());
-            attributes.addAttribute("port", request.getServerPort());
-            return new ModelAndView("redirect:http://{server}:{port}/refsets/refset/" + updated.getPublicId());
-            
-        } catch (NonUniquePublicIdException e) {
-            //defensive coding
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-            return new ModelAndView("/refset/edit.refset");
-        }
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    // WEB SERVICE API II
-    
-    @Transactional
-    @RequestMapping(value = "/api/refsets", 
-            method = RequestMethod.GET, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<XmlRefsetShort> findAllRefsetsJsonApi() throws Exception {
-        return getRefsetsDto();
-    }    
-        
-    @Transactional
-    @RequestMapping(value = "/api/refsets/{pubId}", 
-            method = RequestMethod.GET, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody RefsetDto getRefsetJsonApi(@PathVariable String pubId) throws Exception {
-        return getRefsetDto(pubId);
-    }    
-    
-    @Transactional
-    @RequestMapping(value = "/api/refsets/{pubId}/concepts.json", 
-            method = RequestMethod.GET, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody XmlRefsetConcepts getConceptJsonApi(@PathVariable String pubId) throws Exception {
-        return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
-    }    
-
-    @Transactional
-    @RequestMapping(value = "/api/refsets/{pubId}/plan.json", 
-            method = RequestMethod.GET, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody RefsetPlanDto getRefsetPlanJsonApi(@PathVariable String pubId) throws Exception {
-        Refset refset = refsetService.findByPublicId(pubId);
-        System.out.println("Found refset " + refset);
-        return RefsetPlanDto.parse(refset.getPlan());
-    }    
-
-    @Transactional
-    @RequestMapping(value = "/api/refsets/{pubId}", 
-            method = RequestMethod.DELETE, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RefsetResponseDto> deleteRefsetApi(HttpServletRequest request, @PathVariable String pubId){
-        LOG.debug("Received request to delete refset [{}]", pubId);
-        RefsetResponseDto response = new RefsetResponseDto();
-        response.setPublicId(pubId);
-        try {
-            Refset deleted = refsetService.delete(pubId);
-            response.setRefset(
-                RefsetDto.getBuilder(
-                    deleted.getId(), 
-                    (deleted.getConcept() == null) ? 0 : deleted.getConcept().getSerialisedId(),
-                    (deleted.getConcept() == null) ? null : deleted.getConcept().getDisplayName(),
-                    deleted.getTitle(), deleted.getDescription(), deleted.getPublicId(), 
-                    RefsetPlanDto.parse(deleted.getPlan())).build());
-            response.setCode(RefsetResponseDto.SUCCESS_DELETED);
-            response.setStatus(Status.DELETED);
-            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.OK);
-        } catch (RefsetNotFoundException e) {
-            response.setCode(RefsetResponseDto.FAIL_REFSET_NOT_FOUND);
-            response.setStatus(Status.FAIL);
-            response.setGlobalErrors(Arrays.asList(messageSource.getMessage(
-                    "global.error.refset.not.found", 
-                    Arrays.asList(pubId).toArray(), 
-                    LocaleContextHolder.getLocale())));
-            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.PRECONDITION_FAILED);
-        }
-    }
-
-    @Transactional
-    @RequestMapping(value = "/api/refsets", method = RequestMethod.POST, 
-    produces = {MediaType.APPLICATION_JSON_VALUE }, 
-    consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public ResponseEntity<RefsetResponseDto> createRefset(@Valid @RequestBody RefsetDto refsetDto, BindingResult result)
-    {
-        LOG.debug("Controller received request to create new refset [{}]",
-                refsetDto.toString());
-
-        int returnCode = RefsetResponseDto.FAIL;
-        RefsetResponseDto response = new RefsetResponseDto();
-        
-        Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
-        if (refset != null){
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-        }
-
-        if (result.hasErrors()) {
-            return new ResponseEntity<RefsetResponseDto>(error.build(result, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
-        }
-        try {            
-            Refset created = refsetService.create(refsetDto);
-            if (created != null){
-                return new ResponseEntity<RefsetResponseDto>(success(response, created, Status.CREATED, RefsetResponseDto.SUCCESS_CREATED), HttpStatus.CREATED);
-            }
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.created", refsetDto.getPublicId(), refsetDto.getId())));
-            return new ResponseEntity<RefsetResponseDto>(error.build(result, response, RefsetResponseDto.FAIL), HttpStatus.NOT_ACCEPTABLE);
-        } catch (NonUniquePublicIdException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
-            setPublicIdNotUniqueFieldError(refsetDto, result);
-        } catch (UnReferencedReferenceRuleException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
-           result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
-        } catch (ConceptNotFoundException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
-        } catch (UnconnectedRefsetRuleException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
-        } catch (RefsetRuleNotFoundException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
-        } catch (RefsetPlanNotFoundException e) {
-            LOG.debug("Create failed", e);
-            returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
-            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
-        }
-
-        return new ResponseEntity<RefsetResponseDto>(error.build(result, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
-    }
-    
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public RefsetResponseDto processValidationError(MethodArgumentNotValidException ex) {
-        return error.build(ex.getBindingResult(), new RefsetResponseDto(), RefsetResponseDto.FAIL_VALIDATION);
-    }
-
-    @Transactional
-    @RequestMapping(value = "/api/refsets/{pubId}/plan", method = RequestMethod.PUT, 
-    produces = {MediaType.APPLICATION_JSON_VALUE}, 
-    consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public ResponseEntity<RefsetPlanResponseDto> updateRefsetPlan(
-            @Valid @RequestBody RefsetPlanDto refsetPlanDto,
-            BindingResult result, 
-            @PathVariable String pubId)
-    {
-        LOG.debug("Controller received request to update refset plan {} for refset {}", 
-                refsetPlanDto.toString(), pubId);
-
-        RefsetPlanResponseDto response = new RefsetPlanResponseDto();
-        response.setRefsetPlan(refsetPlanDto);
-                
-        ValidationResult validationResult = refsetPlanDto.validate();
-        if (!validationResult.isSuccess()){
-            return new ResponseEntity<RefsetPlanResponseDto>(
-                    error.build(validationResult, response), 
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
-
-        Refset refset = refsetService.findByPublicId(pubId);        
-        if (refset == null){
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.NOT_FOUND);
-        }
-        
-        //Replace any plan db ids, using the url parameter instead
-        //So, yes, plan ids are ignored / overwritten based on url params
-        //TODO: Remove plan id from ws req/resp payload (?)
-        refsetPlanDto.setId(refset.getPlan().getId());
-        
-        try {
-            RefsetPlan plan = refsetPlanService.update(refsetPlanDto);
-            response.setRefsetPlan(RefsetPlanDto.parse(plan));
-            response.setCode(RefsetResponseDto.SUCCESS_UPDATED);
-            response.setStatus(Status.UPDATED);
-            return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.OK);
-            
-        //TODO: These exceptions needs to be refactored, as we implemented the validation
-        // as a separate step above. We should not have any validation errors here. 
-        // Need to throw a single exception for validation error instead
-        } catch (UnReferencedReferenceRuleException e) {
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (RefsetPlanNotFoundException e) {
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.NOT_FOUND);
-        } catch (UnconnectedRefsetRuleException e) {
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (RefsetRuleNotFoundException e) {
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ConceptNotFoundException e) {
-            //TODO: This is a test we are not able to do above (needs db access). Need to handle this 
-            //properly, and send back a proper error report
-            return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    @Transactional
-    @RequestMapping(value = "/api/refsets/validate", method = RequestMethod.PUT, 
-    produces = {MediaType.APPLICATION_JSON_VALUE}, 
-    consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @ResponseBody
-    public ResponseEntity<RefsetPlanResponseDto> validateRefsetPlan(@Valid @RequestBody RefsetPlanDto refsetPlanDto,BindingResult result){
-        LOG.debug("Controller received request to validate refset {}", refsetPlanDto.toString());
-        RefsetPlanResponseDto response = new RefsetPlanResponseDto();
-        response.setRefsetPlan(refsetPlanDto);
-        response.setCode(RefsetResponseDto.FAIL);
-        response.setStatus(Status.FAIL);
-        
-        if (result.hasErrors()) {
-            return new ResponseEntity<RefsetPlanResponseDto>(
-                    error.build(result, response, RefsetResponseDto.FAIL), 
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
-        
-        ValidationResult validationResult = refsetPlanDto.validate();
-        
-        //TODO: Add check to see of concepts exists in database
-        
-        if (validationResult.isSuccess()){
-            response.setStatus(Status.VALIDATED);
-            response.setCode(RefsetResponseDto.SUCCESS);
-            return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.OK);            
-        }
-
-        return new ResponseEntity<RefsetPlanResponseDto>(
-                error.build(validationResult, response), 
-                HttpStatus.NOT_ACCEPTABLE);
-    }
-
 
     
     // WEB SERVICE API
@@ -735,49 +216,21 @@ public class RefsetController {
         System.out.println("returning xmlconcepts [" + xmlConcepts.size() + "]");
         return xmlConcepts;
     }
+    private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
+        response.setRefset(RefsetDto.getBuilder(updated.getId(), 
+                (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
+                (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
+                updated.getTitle(), updated.getDescription(), updated.getPublicId(), 
+                RefsetPlanDto.parse(updated.getPlan())).build());
+        response.setStatus(status);
+        response.setCode(returnCode);
+        return response;
+    }
     
-//
-//    private void addDummyData(RefsetDto refsetDto) {
-//        ConceptDto c1 = ConceptDto.getBuilder().id(321987003L).build();
-//        ConceptDto c2 = ConceptDto.getBuilder().id(441519008L).build();
-//        ConceptDto c3 = ConceptDto.getBuilder().id(128665000L).build();
-//        
-//        ConceptDto c4 = ConceptDto.getBuilder().id(412398008L).build();
-//        ConceptDto c5 = ConceptDto.getBuilder().id(118831003L).build();
-//        ConceptDto c6 = ConceptDto.getBuilder().id(254597002L).build();
-//        
-//        RefsetRuleDto listRuleDtoLeft = RefsetRuleDto.getBuilder()
-//                .id(-1L)
-//                .type(RuleType.LIST)
-//                .add(c1).add(c2).add(c3)
-//                .build();
-//        
-//        RefsetRuleDto listRuleDtoRight = RefsetRuleDto.getBuilder()
-//                .id(-2L)
-//                .add(c4).add(c5).add(c6)
-//                .type(RuleType.LIST)
-//                .build();
-//        
-//        RefsetRuleDto unionRuleDto = RefsetRuleDto.getBuilder()
-//                .id(-3L)
-//                .type(RuleType.UNION)
-//                .left(listRuleDtoLeft.getId())
-//                .right(listRuleDtoRight.getId())
-//                .build();
-//        
-//        RefsetPlanDto plan = RefsetPlanDto.getBuilder()
-//               .terminal(unionRuleDto.getId())
-//               .id(-1L)
-//               .add(listRuleDtoLeft)
-//               .add(listRuleDtoRight)
-//               .add(unionRuleDto)
-//               .build();
-//        
-//        refsetDto.setPlan(plan);
-//    }
-//    
-//    
 
+    
+        
+    
     private BindingResult setPublicIdNotUniqueFieldError(RefsetDto refsetDto, BindingResult result){
         result.addError(new FieldError(
                 result.getObjectName(), 
@@ -790,17 +243,6 @@ public class RefsetController {
         return result;
     }
     
-//    private BindingResult setPublicIdNotUniqueFieldError(XmlRefsetShort refsetDto, BindingResult result){
-//        result.addError(new FieldError(
-//                result.getObjectName(), 
-//                "publicId", 
-//                refsetDto.getPublicId(),
-//                false, 
-//                null,
-//                null,
-//                "xml.response.error.publicid.not.unique"));
-//        return result;
-//    }    
 
     private void addFeedbackMessage(RedirectAttributes attributes,
             String messageCode, Object... messageParameters) {
@@ -823,4 +265,529 @@ public class RefsetController {
     public RefsetService getRefsetService() {
         return refsetService;
     }
+    
+    
+
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public RefsetResponseDto processValidationError(MethodArgumentNotValidException ex) {
+        return error.build(ex.getBindingResult(), new RefsetResponseDto(), RefsetResponseDto.FAIL_VALIDATION);
+    }
+    
+    
+    
+    //DEPRECATED
+    
+    
+    // UPDATE
+
+    @Deprecated
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/edit", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE }, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ModelAndView updateRefset(ModelMap model,
+            HttpServletRequest request, Principal principal,
+            RedirectAttributes attributes, @PathVariable String pubId,
+            @Valid @ModelAttribute("refset") RefsetDto refsetDto,
+            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
+        // TODO: Handle RefsetNotFoundException
+        LOG.debug("Controller received request to update refset [{}]", refsetDto.toString());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        model.addAttribute("pubid", pubId);
+        model.addAttribute("refset", refsetDto);
+        
+        Refset refset = refsetService.findById(refsetDto.getId());
+        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
+            //Assertion: user has updated the public id
+            refset = refsetService.findByPublicId(refsetDto.getPublicId());
+            if (refset != null){
+                setPublicIdNotUniqueFieldError(refsetDto, result);
+            }
+        }
+        
+        if (result.hasErrors()) {
+            LOG.error("Found errors: ");
+            for (ObjectError error : result.getAllErrors()){
+                LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
+            }
+            return new ModelAndView("/refset/edit.refset");
+        }
+        
+        try {
+            Refset updated = refsetService.update(refsetDto);
+            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_UPDATED, updated.getPublicId(), updated.getTitle());
+            attributes.addAttribute("server", request.getServerName());
+            attributes.addAttribute("port", request.getServerPort());
+            return new ModelAndView("redirect:http://{server}:{port}/refsets/refset/" + updated.getPublicId());
+            
+        } catch (NonUniquePublicIdException e) {
+            //defensive coding
+            setPublicIdNotUniqueFieldError(refsetDto, result);
+            return new ModelAndView("/refset/edit.refset");
+        } catch (NoTerminalCandidateException e) {
+            return new ModelAndView("/refset/edit.refset");
+        } catch (MoreThanOneCandidateForTerminalException e) {
+            return new ModelAndView("/refset/edit.refset");
+        } catch (UnrecognisedRefsetRuleTypeException e) {
+            return new ModelAndView("/refset/edit.refset");
+        }
+    }
+    
+    
+
+    
+    // ALL
+
+    @Deprecated
+    @RequestMapping(value = "/", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView getRefsets(ModelMap model, HttpServletRequest request,
+            Principal principal) {
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        model.addAttribute("refsets", refsetService.findAll());
+        return new ModelAndView("/refset/refsets", model);
+    }
+
+    // DETAILS
+
+    @Deprecated
+    @RequestMapping(value = "/refset/{pubId}", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView getRefset(ModelMap model, HttpServletRequest request,
+            Principal principal, @PathVariable String pubId) {
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+
+        Refset refset = refsetService.findByPublicId(pubId);
+        refset.getPlan().refreshConceptsCache();
+        //refset.setRefsetPlan(dummyRefsetPlan());
+        
+        //model.addAttribute("rules", refset.getPlan().getRules());
+        model.addAttribute("refset", refset);
+        return new ModelAndView("/refset/refset", model);
+    }
+
+    // CREATE FORM
+
+    @Deprecated
+    @RequestMapping(value = "/refset/new", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView showNewRefsetForm(ModelMap model,
+            HttpServletRequest request, Principal principal) {
+        LOG.debug("Displaying new refset screen");
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        return new ModelAndView("/refset/new.refset", "refset", new RefsetDto());
+    }
+
+    // EDIT FORM
+
+    @Deprecated
+    @RequestMapping(value = "/refset/{pubId}/edit", method = RequestMethod.GET, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView showEditRefsetForm(@ModelAttribute("refset") RefsetDto refsetFbo, ModelMap model,
+            HttpServletRequest request, Principal principal,
+            @PathVariable String pubId) {
+        LOG.debug(
+                "Displaying edit refset screen for refset with publicId [{}]",
+                pubId);
+        Refset refset = refsetService.findByPublicId(pubId);
+        
+        
+        RefsetPlanDto planDto = RefsetPlanDto.parse(refset.getPlan());
+        List<RefsetRuleDto> autoList = new AutoPopulatingList<>(RefsetRuleDto.class);
+        autoList.addAll(planDto.getRefsetRules());
+        planDto.setRefsetRules(autoList);
+        RefsetDto newRefsetFbo = RefsetDto.getBuilder(
+                refset.getId(), 
+                refset.getConcept().getSerialisedId(),
+                refset.getConcept().getDisplayName(),
+                refset.getTitle(), 
+                refset.getDescription(), 
+                refset.getPublicId(), 
+                planDto)
+                .build();
+
+        //model.addAttribute("refset", newRefsetFbo);
+        model.addAttribute("pubid", pubId);
+        model.addAttribute("storedRefset", refset);
+        
+        
+            
+        //initDummyPlan(refset);
+
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        return new ModelAndView("/refset/edit.refset", "refset", newRefsetFbo);
+    }
+
+    // DELETE
+
+    @Deprecated
+    @RequestMapping(value = "/refset/{pubId}/delete", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView deleteRefset(ModelMap model,
+            HttpServletRequest request, Principal principal,
+            @PathVariable String pubId, RedirectAttributes attributes)
+            throws RefsetNotFoundException {
+        // TODO: Handle RefsetNotFoundException
+        LOG.debug("Controller received request to delete refset [{}]", pubId);
+        Refset deleted = refsetService.delete(pubId);
+
+        addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_DELETED, deleted.getPublicId(), deleted.getTitle());
+
+        attributes.addAttribute("server", request.getServerName());
+        attributes.addAttribute("port", request.getServerPort());
+        return new ModelAndView("redirect:http://{server}:{port}/refsets/");
+    }
+
+    // CREATE
+    @Deprecated
+    @Transactional
+    @RequestMapping(value = "/refset/new", method = RequestMethod.POST, produces = { MediaType.TEXT_HTML_VALUE })
+    public ModelAndView ceateRefset(ModelMap model, HttpServletRequest request,
+            Principal principal,
+            @Valid @ModelAttribute("refset") RefsetDto refsetDto,
+            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException, ValidationException {
+        LOG.debug("Controller received request to create new refset [{}]",
+                refsetDto.toString());
+//        model.addAttribute("user",
+//                (User) ((OpenIDAuthenticationToken) principal).getPrincipal());
+        
+        Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
+        if (refset != null){
+            setPublicIdNotUniqueFieldError(refsetDto, result);
+        }
+        
+        if (result.hasErrors()) {
+            return new ModelAndView("/refset/new.refset");
+        }
+        try {            
+            //addDummyData(refsetDto);
+            Refset created = refsetService.create(refsetDto);
+            addFeedbackMessage(attributes, FEEDBACK_MESSAGE_KEY_REFSET_ADDED, created.getPublicId(), created.getTitle());
+            
+            attributes.addAttribute("server", request.getServerName());
+            attributes.addAttribute("port", request.getServerPort());
+            return new ModelAndView("redirect:http://{server}:{port}/refsets/");
+        } catch (NonUniquePublicIdException e) {
+            setPublicIdNotUniqueFieldError(refsetDto, result);
+            return new ModelAndView("/refset/new.refset");
+        }
+    }
+         
+
+    
+    @Deprecated
+    @Transactional
+    @RequestMapping(value = "/refset/{pubId}/put", method = RequestMethod.POST, 
+    produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE }, 
+    consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
+    public RefsetResponseDto updateRefsetWs(@Valid @RequestBody RefsetDto refsetDto,
+            BindingResult result, @PathVariable String pubId) throws ConceptNotFoundException, ValidationException, RefsetTerminalRuleNotFoundException{
+        int returnCode = RefsetResponseDto.FAIL;
+        LOG.debug("Controller received request to update refset {}", refsetDto.toString());
+        RefsetResponseDto response = new RefsetResponseDto();
+        response.setPublicId(pubId);
+        
+        Refset refset = refsetService.findById(refsetDto.getId());
+        if (!refset.getPublicId().equals(refsetDto.getPublicId())){
+            //Assertion: user has updated the public id
+            refset = refsetService.findByPublicId(refsetDto.getPublicId());
+            if (refset != null){
+                returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+                setPublicIdNotUniqueFieldError(refsetDto, result);
+            }
+        }
+        if (!Objects.equal(refsetDto.getPublicId(), pubId)){
+            returnCode = RefsetResponseDto.FAIL_URL_AND_BODY_PUBLIC_ID_NOT_MATCHING;
+            result.addError(new ObjectError(result.getObjectName(), 
+                    getMessage("xml.response.error.url.and.body.public.id.not.matching", 
+                            pubId, refsetDto.getPublicId())));
+        }
+        
+        if (result.hasErrors()) {
+            return error.build(result, response, returnCode);
+        }
+        
+        try {
+            Refset updated = refsetService.update(refsetDto);
+            if (updated != null){
+                return success(response, updated, Status.UPDATED, RefsetResponseDto.SUCCESS_UPDATED);
+            }
+            
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.updated", refsetDto.getPublicId(), refsetDto.getId())));
+            return error.build(result, response, RefsetResponseDto.FAIL);
+        } catch (NonUniquePublicIdException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+            setPublicIdNotUniqueFieldError(refsetDto, result);
+        } catch (UnReferencedRuleException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+           result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
+        } catch (RefsetNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_REFSET_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.refset.not.found")));
+        } catch (ConceptNotFoundValidationException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found")));
+        } catch (UnconnectedRefsetRuleException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule")));
+        } catch (RefsetRuleNotFoundValidationException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found")));
+        } catch (RefsetPlanNotFoundException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found")));
+        } catch (NoTerminalCandidateException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_VALIDATION;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.no.terminal.candidate")));
+        } catch (MoreThanOneCandidateForTerminalException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_VALIDATION;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.more.than.one.terminal.candidate")));
+        } catch (UnrecognisedRefsetRuleTypeException e) {
+            LOG.debug("Update failed", e);
+            returnCode = RefsetResponseDto.FAIL_VALIDATION;
+            result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unrecognised.refset.rule.type")));
+        }
+        return error.build(result, response, returnCode);
+    }   
+        
+    
 }
+
+
+
+
+
+//private BindingResult setPublicIdNotUniqueFieldError(XmlRefsetShort refsetDto, BindingResult result){
+//result.addError(new FieldError(
+//      result.getObjectName(), 
+//      "publicId", 
+//      refsetDto.getPublicId(),
+//      false, 
+//      null,
+//      null,
+//      "xml.response.error.publicid.not.unique"));
+//return result;
+//}    
+
+
+//} catch (NonUniquePublicIdException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+//setPublicIdNotUniqueFieldError(refsetDto, result);
+//} catch (UnReferencedRuleException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
+//} catch (ConceptNotFoundValidationException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
+//} catch (UnconnectedRefsetRuleException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
+//} catch (RefsetRuleNotFoundValidationException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
+//} catch (RefsetPlanNotFoundException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
+//} catch (NoTerminalCandidateException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.no.terminal.candidate")));
+//} catch (MoreThanOneCandidateForTerminalException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.more.than.one.terminal.candidate")));
+//} catch (UnrecognisedRefsetRuleTypeException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unrecognised.refset.rule.type")));
+//}
+
+//return new ResponseEntity<RefsetResponseDto>(error.build(result, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+
+
+//public void handleInvalidRefsetRuleException(RuleValidationException e){
+//try{
+//throw e;
+//}
+//catch (NonUniquePublicIdException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+//setPublicIdNotUniqueFieldError(refsetDto, result);
+//} catch (UnReferencedRuleException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
+//} catch (ConceptNotFoundValidationException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
+//} catch (UnconnectedRefsetRuleException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
+//} catch (RefsetRuleNotFoundValidationException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
+//} catch (RefsetPlanNotFoundException e) {
+//LOG.debug("Create failed", e);
+//returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
+//} catch (NoTerminalCandidateException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.no.terminal.candidate")));
+//} catch (MoreThanOneCandidateForTerminalException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.more.than.one.terminal.candidate")));
+//} catch (UnrecognisedRefsetRuleTypeException e) {
+//LOG.debug("Update failed", e);
+//returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unrecognised.refset.rule.type")));
+//}        
+//}
+
+
+
+
+//
+//refsetPlanDto.setId(refset.getPlan().getId());
+//
+//try {
+//  RefsetPlan plan = refsetPlanService.update(refsetPlanDto);
+//  
+//  refset.setPlan(plan);
+//  refsetService.update(refset);
+//  
+//  response.setRefsetPlan(RefsetPlanDto.parse(plan));
+//  response.setCode(RefsetResponseDto.SUCCESS_UPDATED);
+//  response.setStatus(Status.UPDATED);
+//
+//} catch (UnReferencedRuleException e) {
+//  LOG.debug("Create failed", e);
+//  returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.unreferenced.rule")));            
+//} catch (ConceptNotFoundValidationException e) {
+//  LOG.debug("Create failed", e);
+//  returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
+//} catch (UnconnectedRefsetRuleException e) {
+//  LOG.debug("Create failed", e);
+//  returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
+//} catch (RefsetRuleNotFoundValidationException e) {
+//  LOG.debug("Create failed", e);
+//  returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
+//} catch (RefsetPlanNotFoundException e) {
+//  LOG.debug("Create failed", e);
+//  returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
+//} catch (NoTerminalCandidateException e) {
+//  LOG.debug("Update failed", e);
+//  returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.no.terminal.candidate")));
+//} catch (MoreThanOneCandidateForTerminalException e) {
+//  LOG.debug("Update failed", e);
+//  returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//  bindingResult.addError(new ObjectError(bindingResult.getObjectName(), getMessage("xml.response.error.more.than.one.terminal.candidate")));
+//} catch (UnrecognisedRefsetRuleTypeException e) {
+//  // TODO Auto-generated catch block
+//  e.printStackTrace();
+//}
+//
+//return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.OK);
+
+
+
+//
+//public void handleInvalidRefsetRuleException(RuleValidationException ex, RefsetDto refsetDto, ValidationResult result){
+//  long returnCode;
+//  try{
+//      if (ex.getCause() == null){
+//          throw new ProgrammingException("Failed to add cause to InvalidRefsetRuelException");
+//      }
+//      throw ex.getCause();
+//  }
+//  catch (UnReferencedRuleException e) {
+//      LOG.debug("Create failed", e);
+//      returnCode = RefsetResponseDto.FAIL_UNREFERENCED_RULE;
+//      result.addError(
+//              FieldValidationError.getBuilder(
+//                      ValidationResult.Error.DECLARED_RULE_NEVER_REFERENCED,
+//                      e.getId(),
+//                      "Declared rule " + e.getId() + " never referenced").
+//                  build());
+//  } catch (ConceptNotFoundValidationException e) {
+//      LOG.debug("Create failed", e);
+//      returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.concept.not.found", e.getId())));
+//  } catch (UnconnectedRefsetRuleException e) {
+//      LOG.debug("Create failed", e);
+//      returnCode = RefsetResponseDto.FAIL_UNCONNECTED_RULE;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unconnected.rule", e.getId())));
+//  } catch (RefsetRuleNotFoundValidationException e) {
+//      LOG.debug("Create failed", e);
+//      returnCode = RefsetResponseDto.FAIL_RULE_NOT_FOUND;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.rule.not.found", e.getId())));
+//  } catch (RefsetPlanNotFoundException e) {
+//      LOG.debug("Create failed", e);
+//      returnCode = RefsetResponseDto.FAIL_PLAN_NOT_FOUND;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.plan.not.found", e.getId())));
+//  } catch (NoTerminalCandidateException e) {
+//      LOG.debug("Update failed", e);
+//      returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.no.terminal.candidate")));
+//  } catch (MoreThanOneCandidateForTerminalException e) {
+//      LOG.debug("Update failed", e);
+//      returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.more.than.one.terminal.candidate")));
+//  } catch (UnrecognisedRefsetRuleTypeException e) {
+//      LOG.debug("Update failed", e);
+//      returnCode = RefsetResponseDto.FAIL_VALIDATION;
+//      result.addError(new ObjectError(result.getObjectName(), getMessage("xml.response.error.unrecognised.refset.rule.type")));
+//  }        
+//}
+
+//if (e instanceof ConceptNotFoundValidationException){
+//
+//}
+//else if (e instanceof MoreThanOneCandidateForTerminalException){
+//
+//}
+//else if (e instanceof NoTerminalCandidateException){
+//          
+//      }
+//else if (e instanceof NullOrZeroRefsetRuleIdException){
+//
+//}
+//else if (e instanceof RefsetRuleNotFoundValidationException){
+//
+//}
+//else if (e instanceof UnconnectedRefsetRuleException){
+//
+//}
+//else if (e instanceof UnrecognisedRefsetRuleTypeException){
+//
+//}
+//else if (e instanceof UnReferencedRuleException){
+//
+//}

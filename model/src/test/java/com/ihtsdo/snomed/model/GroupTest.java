@@ -1,15 +1,14 @@
 package com.ihtsdo.snomed.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Group;
-import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class GroupTest{

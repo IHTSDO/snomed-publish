@@ -79,4 +79,5 @@ public class ListConceptsRefsetRule extends SourceRefsetRule{
     public void setConcepts(Set<Concept> concepts) {
         this.concepts = concepts;
     }
+
 }

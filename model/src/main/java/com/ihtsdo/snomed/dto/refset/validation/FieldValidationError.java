@@ -2,7 +2,6 @@ package com.ihtsdo.snomed.dto.refset.validation;
 
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.dto.refset.validation.GlobalValidationError.Builder;
 
 public class FieldValidationError extends GlobalValidationError{
     public RefsetRuleDto rule;

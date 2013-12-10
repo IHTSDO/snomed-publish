@@ -25,8 +25,6 @@ import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.manifest.model.CrossmapRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.LanguageRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.Manifest;
-import com.ihtsdo.snomed.service.manifest.parser.FileSystemParser;
-import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser;
 import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser.Mode;
 
 @RunWith(SpringJUnit4ClassRunner.class)

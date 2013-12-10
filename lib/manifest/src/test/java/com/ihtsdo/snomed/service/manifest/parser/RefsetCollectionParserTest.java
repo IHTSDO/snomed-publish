@@ -24,7 +24,6 @@ import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.MimetypeProperties;
 import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
-import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:applicationContext.xml")

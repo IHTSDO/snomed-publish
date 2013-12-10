@@ -27,7 +27,6 @@ import com.ihtsdo.snomed.service.manifest.model.ManifestFileFactory;
 import com.ihtsdo.snomed.service.manifest.model.ManifestFolder;
 import com.ihtsdo.snomed.service.manifest.model.Refset;
 import com.ihtsdo.snomed.service.manifest.model.RefsetModule;
-import com.ihtsdo.snomed.service.manifest.serialiser.XmlSerialiser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/applicationContext.xml")

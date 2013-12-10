@@ -10,7 +10,8 @@ import org.junit.Test;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto.RuleType;
+import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
+import com.ihtsdo.snomed.model.refset.BaseRefsetRule.RuleType;
 
 public class RefsetPlanDtoTest {
 
@@ -28,7 +29,7 @@ public class RefsetPlanDtoTest {
         RefsetPlanDto plan = RefsetPlanDto.getBuilder().
                 add(RefsetRuleDto.getBuilder()
                         .id(1L)
-                        .type(RuleType.LIST)
+                        .type(BaseRefsetRule.RuleType.LIST)
                         .concepts(Arrays.asList(
                                 new ConceptDto(1l), 
                                 new ConceptDto(2l)))

@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class CanonicalSerialiserTest {

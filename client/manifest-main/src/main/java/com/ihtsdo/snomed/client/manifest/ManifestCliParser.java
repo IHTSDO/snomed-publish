@@ -14,7 +14,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 
 public class ManifestCliParser {

@@ -6,11 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +21,10 @@ import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.dto.refset.validation.FieldValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.GlobalValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
-import com.ihtsdo.snomed.exception.UnrecognisedRefsetException;
-import com.ihtsdo.snomed.exception.UnrecognisedRefsetRuleTYpeException;
+import com.ihtsdo.snomed.exception.UnrecognisedRefsetClassException;
+import com.ihtsdo.snomed.exception.validation.UnrecognisedRefsetRuleTypeException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
 import com.ihtsdo.snomed.model.refset.RefsetPlan;
 import com.ihtsdo.snomed.model.refset.RefsetRule;
 import com.ihtsdo.snomed.model.refset.Visitor;
@@ -87,13 +86,13 @@ public class RefsetPlanDto {
         
         //First instantiate the rules, set the ids, and add these ids to the map
         Map<Long, RefsetRuleDto> ruleIdToRuleMap = new HashMap<>();
-        for (RefsetRuleDto rule : this.getRefsetRules()){
+        for (RefsetRuleDto rule : getRefsetRules()){
             ruleIdToRuleMap.put(rule.getId(), rule);
         }
         //Assertion: The map now contains indexed references to all the rule we will need
         //Now we can populate the rule data
         Map<Long, Long> referencedRefsetRuleIds = new HashMap<>();
-        for (RefsetRuleDto rule : this.getRefsetRules()){
+        for (RefsetRuleDto rule : getRefsetRules()){
             LOG.debug("Validating rule {}", rule);
             if ((rule.getId() == null) || rule.getId() == 0){
                 result.addError(ValidationResult.Error.NULL_OR_ZERO_REFSET_RULE_ID, rule, "Null or zero rule id");
@@ -101,15 +100,16 @@ public class RefsetPlanDto {
 
             //throws exception if not found
             try {
-                RefsetRuleDto.getRuleInstanceFor(rule);
-            } catch (UnrecognisedRefsetRuleTYpeException e) {
+                BaseRefsetRule.getRuleInstanceFor(rule);
+            } catch (UnrecognisedRefsetRuleTypeException e) {
                 result.addError(
                     FieldValidationError.getBuilder(
                             ValidationResult.Error.UNRECOGNISED_REFSET_RULE_TYPE,
                             rule,
                             e.getMessage()).
-                        param(ruleIdToRuleMap.get(rule.getType()).toString()).
+                        param(java.util.Objects.toString(ruleIdToRuleMap.get(rule.getType()))).
                         build());
+                continue;
             }
             if (rule.isSetOperation()){
                 validateSetOperation(result, ruleIdToRuleMap, referencedRefsetRuleIds, rule);
@@ -121,7 +121,7 @@ public class RefsetPlanDto {
                             ValidationResult.Error.UNRECOGNISED_REFSET_RULE_TYPE,
                             rule,
                             "Internal error: Application did not handle rule type " + rule.getType()).
-                        param(rule.getType().toString()).
+                        param(java.util.Objects.toString(rule.getType())).
                         build());
             }
         } 
@@ -188,7 +188,7 @@ public class RefsetPlanDto {
                         ValidationResult.Error.REFERENCING_UNDECLARED_RULE,
                         rule,
                         "Referencing undeclared rule: Left rule " + rule.getLeft() + " has not been declared").
-                    param(rule.getLeft() == null ? "null" : rule.getLeft().toString()).
+                    param(rule.getLeft() == null ? "null" : java.util.Objects.toString(rule.getLeft())).
                     build());
         }
         if ((rule.getRight() != null) && !ruleIdToRuleMap.containsKey(rule.getRight())){
@@ -197,7 +197,7 @@ public class RefsetPlanDto {
                         ValidationResult.Error.REFERENCING_UNDECLARED_RULE,
                         rule,
                         "Referencing undeclared rule: Right rule " + rule.getRight() + " has not been declared").
-                    param(rule.getRight() == null ? "null" : rule.getRight().toString()).
+                    param(rule.getRight() == null ? "null" : java.util.Objects.toString(rule.getRight())).
                     build());                            
                     
         }
@@ -207,7 +207,7 @@ public class RefsetPlanDto {
                         ValidationResult.Error.LEFT_AND_RIGHT_OPERAND_REFERENCE_SAME_RULE,
                         rule,
                         "Left and right operand rule references the same rule " + rule.getLeft()).
-                    param(rule.getLeft() == null ? "null" : rule.getLeft().toString()).
+                    param(rule.getLeft() == null ? "null" : java.util.Objects.toString(rule.getLeft())).
                     build());
         }
         if ((rule.getRight() != null) && (rule.getLeft() != null) && rule.getId() == rule.getLeft()){
@@ -232,7 +232,7 @@ public class RefsetPlanDto {
                         ValidationResult.Error.RULE_REFERENCED_MORE_THAN_ONCE,
                         rule,
                         "Left reference has already been referenced by rule " + rule.getLeft()).
-                    param(rule.getLeft().toString()).
+                    param(java.util.Objects.toString(rule.getLeft())).
                     build());
         }
         if (referencedRefsetRuleIds.keySet().contains(rule.getRight())){
@@ -241,7 +241,7 @@ public class RefsetPlanDto {
                         ValidationResult.Error.RULE_REFERENCED_MORE_THAN_ONCE,
                         rule,
                         "Right reference has already been referenced by rule " + rule.getRight()).
-                    param(rule.getRight().toString()).
+                    param(java.util.Objects.toString(rule.getRight())).
                     build());
         }                
         referencedRefsetRuleIds.put(rule.getLeft(), rule.getId());
@@ -300,7 +300,7 @@ public class RefsetPlanDto {
         @Override
         public void visit(RefsetRule rule) {
             RefsetRuleDto refsetRuleDto = new RefsetRuleDto();
-            refsetRuleDto.setType(RefsetRuleDto.CLASS_TYPE_MAP.get(rule.getClass()));
+            refsetRuleDto.setType(BaseRefsetRule.CLASS_TYPE_MAP.get(rule.getClass()));
             refsetRuleDto.setId(rule.getId());
             if (rule instanceof ListConceptsRefsetRule){
                 ListConceptsRefsetRule lcRule = (ListConceptsRefsetRule)rule;
@@ -315,7 +315,7 @@ public class RefsetPlanDto {
                 refsetRuleDto.setLeft(setOperationRule.getLeft() == null ? null : setOperationRule.getLeft().getId());
                 refsetRuleDto.setRight(setOperationRule.getRight() == null ? null : setOperationRule.getRight().getId());
             }else{
-                throw new UnrecognisedRefsetException("I've not been able to handle RefsetRule of class " + rule.getClass());
+                throw new UnrecognisedRefsetClassException("I've not been able to handle RefsetRule of class " + rule.getClass());
             }
             built.refsetRules.add(refsetRuleDto);
         }

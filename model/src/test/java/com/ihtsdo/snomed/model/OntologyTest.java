@@ -6,9 +6,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
-
 public class OntologyTest {
 
     @BeforeClass

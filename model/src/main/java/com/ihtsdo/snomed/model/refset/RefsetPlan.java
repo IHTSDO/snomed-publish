@@ -41,6 +41,7 @@ import com.ihtsdo.snomed.model.Concept;
 //uniqueConstraints = @UniqueConstraint(columnNames = {"publicId"})
 )
 public class RefsetPlan {
+    
     private static final Logger LOG = LoggerFactory.getLogger(RefsetPlan.class);
 
     @Id 
@@ -66,14 +67,14 @@ public class RefsetPlan {
     
     @Version
     private long version = 0;
-    
+     
     public void refreshConceptsCache(){
         if (getTerminal() != null){
             concepts = terminal.generateConcepts();
         }else{
             concepts = new HashSet<>();
         }
-    }
+    } 
     
     @Transient
     public final Set<Concept> getConcepts() throws ConceptsCacheNotBuiltException{
@@ -192,8 +193,8 @@ public class RefsetPlan {
         Date now = new Date(Calendar.getInstance().getTime().getTime());
         creationTime = now;
         modificationTime = now;
-    }    
-    
+    }
+
     public static Builder getBuilder(RefsetRule terminal) {
         return new Builder(terminal);
     }
@@ -217,3 +218,5 @@ public class RefsetPlan {
     }
     
 }
+
+

@@ -1,40 +1,41 @@
 package com.ihtsdo.snomed.exception;
 
+import com.ihtsdo.snomed.dto.refset.ConceptDto;
+
+
 public class ConceptNotFoundException extends Exception {
     private static final long serialVersionUID = 1081154695445634831L;
-
-    private Long id;
     
-    public ConceptNotFoundException(Long id) {
+    private ConceptDto conceptDto;
+    
+    public ConceptNotFoundException() {
         super();
-        this.id = id;
     }
 
-    public ConceptNotFoundException(Long id, String message) {
+    public ConceptNotFoundException(ConceptDto conceptDto, String message) {
         super(message);
-        this.id = id;
+        this.conceptDto = conceptDto;
     }
 
-    public ConceptNotFoundException(Throwable cause) {
+    public ConceptNotFoundException(ConceptDto conceptDto, Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
+        this.conceptDto = conceptDto;
     }
 
-    public ConceptNotFoundException(String message, Throwable cause) {
+    public ConceptNotFoundException(ConceptDto conceptDto, String message, Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
+        this.conceptDto = conceptDto;
     }
 
-    public ConceptNotFoundException(String message, Throwable cause,
+    public ConceptNotFoundException(ConceptDto conceptDto, String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-        // TODO Auto-generated constructor stub
-    }
-
-    public Long getId() {
-        return id;
+        this.conceptDto = conceptDto;
     }
     
-    
 
+    public ConceptDto getConceptDto() {
+        return conceptDto;
+    }
+        
 }
