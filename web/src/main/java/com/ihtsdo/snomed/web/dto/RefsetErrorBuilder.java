@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.web.controller;
+package com.ihtsdo.snomed.web.dto;
 
 import java.util.Locale;
 
@@ -17,8 +17,6 @@ import org.springframework.validation.ObjectError;
 import com.ihtsdo.snomed.dto.refset.validation.FieldValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.GlobalValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
-import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
-import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
 @Named

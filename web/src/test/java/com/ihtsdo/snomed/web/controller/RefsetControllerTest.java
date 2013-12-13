@@ -60,7 +60,6 @@ import com.ihtsdo.snomed.web.service.security.OpenIdUserDetailsService;
         "classpath:applicationContext.xml",
         "classpath:spring-mvc.xml",
         "classpath:spring-security.xml",
-        "classpath:sds-applicationContext.xml",
         "classpath:spring-data.xml",
         "classpath:test-applicationContext.xml",
         "classpath:test-spring-data.xml"})

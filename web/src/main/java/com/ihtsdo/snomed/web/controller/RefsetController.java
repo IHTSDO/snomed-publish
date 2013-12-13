@@ -70,6 +70,7 @@ import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
 import com.ihtsdo.snomed.service.refset.RefsetService;
+import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 

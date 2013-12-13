@@ -55,7 +55,6 @@ import com.ihtsdo.snomed.service.refset.RepositoryRefsetService;
     /*,DbUnitTestExecutionListener.class*/ })
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml",
-        "classpath:sds-spring-data.xml",
         "classpath:test-spring-data.xml"})
 public class RepositoryRefsetServiceTest {
 

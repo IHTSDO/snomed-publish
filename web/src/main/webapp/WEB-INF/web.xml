@@ -63,9 +63,7 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>
             classpath:applicationContext.xml
-            classpath:sds-applicationContext.xml
             classpath:spring-security.xml
-            classpath:sds-spring-data.xml
             classpath:spring-data.xml
         </param-value>
     </context-param>

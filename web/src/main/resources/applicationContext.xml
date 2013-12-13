@@ -31,7 +31,28 @@
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
     
-    <context:component-scan base-package="com.ihtsdo.snomed" />
+    <context:component-scan base-package="com.ihtsdo.snomed.config" />
+    <context:component-scan base-package="com.ihtsdo.snomed.repository" />
+    <context:component-scan base-package="com.ihtsdo.snomed.service" />
+    <context:component-scan base-package="com.ihtsdo.snomed.model" />
+    <context:component-scan base-package="com.ihtsdo.snomed.dto" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.config" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.dto" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.filter" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.model" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.service" />
+    <context:component-scan base-package="com.ihtsdo.snomed.web.validator" />
+    
+    <context:property-placeholder location="classpath:swagger.properties" />
+    
+      <!-- pulls in the Controllers to document -->
+    <context:component-scan base-package="com.mangofactory.swagger.springmvc.example" />
+    
+    
+    
+    <jpa:repositories base-package="com.ihtsdo.snomed.repository" entity-manager-factory-ref="entityManagerFactory" />
+    
+    
         
     <!-- VALIDATOR -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">

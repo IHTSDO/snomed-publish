@@ -26,15 +26,11 @@
         http://www.springframework.org/schema/data/jpa
         http://www.springframework.org/schema/data/jpa/spring-jpa-1.0.xsd">
     
-    <context:property-placeholder 
-        location="classpath:sds-spring.properties" 
-        system-properties-mode="OVERRIDE" 
-        ignore-unresolvable="true"/>
-    
     <context:component-scan base-package="com.ihtsdo.snomed" />
     
     <jpa:repositories base-package="com.ihtsdo.snomed.repository" entity-manager-factory-ref="entityManagerFactory" />
     
     <!-- VALIDATOR -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>
+    
 </beans>

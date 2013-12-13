@@ -66,6 +66,16 @@
       <artifactId>spring-data-service</artifactId>
       <version>${project.version}</version>
     </dependency>  
+    
+    
+    
+    <dependency>
+	    <groupId>com.mangofactory</groupId>
+	    <artifactId>swagger-springmvc</artifactId>
+	    <version>0.6.5</version>
+	</dependency>
+	            
+    
 
     
     <!-- JSR-330 Javax inject annotations -->
