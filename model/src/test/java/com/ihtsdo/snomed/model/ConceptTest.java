@@ -10,7 +10,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 
 public class ConceptTest {
 

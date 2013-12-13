@@ -8,7 +8,7 @@ public class ConceptDto {
 
     public ConceptDto(){}
     
-    public ConceptDto(long id){
+    public ConceptDto(Long id){
         this.id = id;
     }
     

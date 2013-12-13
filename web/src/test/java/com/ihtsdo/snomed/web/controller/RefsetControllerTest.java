@@ -42,23 +42,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import test.com.ihtsdo.snomed.web.RefsetTestUtil;
+import test.com.ihtsdo.snomed.web.SpringProxyUtil;
+
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.RefsetPlan;
-import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.model.refset.Plan;
+import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.web.model.Role;
 import com.ihtsdo.snomed.web.model.User;
 import com.ihtsdo.snomed.web.service.security.OpenIdUserDetailsService;
-import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
-import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(locations = {
         "classpath:applicationContext.xml",
-        "classpath:sds-applicationContext.xml",
-        "classpath:sds-spring-data.xml",
         "classpath:spring-mvc.xml",
         "classpath:spring-security.xml",
         "classpath:spring-data.xml",
@@ -95,7 +94,7 @@ public class RefsetControllerTest {
     private Refset r1 = new RefsetBuilder()
         .id(1)
         .title("title1")
-        .plan(new RefsetPlan())
+        .plan(new Plan())
         .concept(concept)
         .description("description1")
         .publicId("pub1")
@@ -104,7 +103,7 @@ public class RefsetControllerTest {
     private Refset r2 = new RefsetBuilder()
         .id(2)
         .concept(concept)
-        .plan(new RefsetPlan())
+        .plan(new Plan())
         .title("title2")
         .description("description2")
         .publicId("pub2")
@@ -399,7 +398,7 @@ public class RefsetControllerTest {
             return this;
         }
         
-        public RefsetBuilder plan(RefsetPlan plan){
+        public RefsetBuilder plan(Plan plan){
             r.setPlan(plan);
             return this;
         }

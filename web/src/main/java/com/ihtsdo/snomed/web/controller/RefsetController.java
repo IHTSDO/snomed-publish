@@ -47,9 +47,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
@@ -69,7 +69,7 @@ import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsets;
-import com.ihtsdo.snomed.service.RefsetService;
+import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
@@ -154,7 +154,7 @@ public class RefsetController {
                 (refset.getConcept() == null) ? 0 : refset.getConcept().getSerialisedId(),
                 (refset.getConcept() == null) ? null : refset.getConcept().getDisplayName(),
                 refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
-                RefsetPlanDto.parse(refset.getPlan())).build();
+                PlanDto.parse(refset.getPlan())).build();
         System.out.println("Returning refsetDto " + refsetDto);
 
         return refsetDto;
@@ -221,7 +221,7 @@ public class RefsetController {
                 (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
                 (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
                 updated.getTitle(), updated.getDescription(), updated.getPublicId(), 
-                RefsetPlanDto.parse(updated.getPlan())).build());
+                PlanDto.parse(updated.getPlan())).build());
         response.setStatus(status);
         response.setCode(returnCode);
         return response;
@@ -290,7 +290,7 @@ public class RefsetController {
             HttpServletRequest request, Principal principal,
             RedirectAttributes attributes, @PathVariable String pubId,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result) throws RefsetNotFoundException, ConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
+            BindingResult result) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
         // TODO: Handle RefsetNotFoundException
         LOG.debug("Controller received request to update refset [{}]", refsetDto.toString());
 //        model.addAttribute("user",
@@ -393,8 +393,8 @@ public class RefsetController {
         Refset refset = refsetService.findByPublicId(pubId);
         
         
-        RefsetPlanDto planDto = RefsetPlanDto.parse(refset.getPlan());
-        List<RefsetRuleDto> autoList = new AutoPopulatingList<>(RefsetRuleDto.class);
+        PlanDto planDto = PlanDto.parse(refset.getPlan());
+        List<RuleDto> autoList = new AutoPopulatingList<>(RuleDto.class);
         autoList.addAll(planDto.getRefsetRules());
         planDto.setRefsetRules(autoList);
         RefsetDto newRefsetFbo = RefsetDto.getBuilder(
@@ -446,7 +446,7 @@ public class RefsetController {
     public ModelAndView ceateRefset(ModelMap model, HttpServletRequest request,
             Principal principal,
             @Valid @ModelAttribute("refset") RefsetDto refsetDto,
-            BindingResult result, RedirectAttributes attributes) throws ConceptNotFoundException, ValidationException {
+            BindingResult result, RedirectAttributes attributes) throws RefsetConceptNotFoundException, ValidationException {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
 //        model.addAttribute("user",
@@ -483,7 +483,7 @@ public class RefsetController {
     consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public RefsetResponseDto updateRefsetWs(@Valid @RequestBody RefsetDto refsetDto,
-            BindingResult result, @PathVariable String pubId) throws ConceptNotFoundException, ValidationException, RefsetTerminalRuleNotFoundException{
+            BindingResult result, @PathVariable String pubId) throws RefsetConceptNotFoundException, ValidationException, RefsetTerminalRuleNotFoundException{
         int returnCode = RefsetResponseDto.FAIL;
         LOG.debug("Controller received request to update refset {}", refsetDto.toString());
         RefsetResponseDto response = new RefsetResponseDto();
@@ -672,12 +672,12 @@ public class RefsetController {
 //refsetPlanDto.setId(refset.getPlan().getId());
 //
 //try {
-//  RefsetPlan plan = refsetPlanService.update(refsetPlanDto);
+//  Plan plan = planService.update(refsetPlanDto);
 //  
 //  refset.setPlan(plan);
 //  refsetService.update(refset);
 //  
-//  response.setRefsetPlan(RefsetPlanDto.parse(plan));
+//  response.setRefsetPlan(PlanDto.parse(plan));
 //  response.setCode(RefsetResponseDto.SUCCESS_UPDATED);
 //  response.setStatus(Status.UPDATED);
 //

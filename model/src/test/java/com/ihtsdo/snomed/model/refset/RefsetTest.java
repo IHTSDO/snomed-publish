@@ -36,7 +36,7 @@ public class RefsetTest {
     public void setUp() {
         Concept c = new Concept(1234);
         em.persist(c);        
-        r1 = Refset.getBuilder(c, "pubid_1", "title1", "description1", new RefsetPlan()).build();
+        r1 = Refset.getBuilder(c, "pubid_1", "title1", "description1", new Plan()).build();
         em.persist(r1);
         em.flush();
         em.clear();
@@ -144,7 +144,7 @@ public class RefsetTest {
         Refset r = em.createQuery("SELECT r FROM Refset r WHERE id=:id", Refset.class)
                 .setParameter("id", r1.getId())
                 .getSingleResult();
-        r.setId(45);
+        r.setId(45l);
         assertNotEquals(r1, r);
     }    
     
@@ -162,7 +162,7 @@ public class RefsetTest {
         Refset r = em.createQuery("SELECT r FROM Refset r WHERE id=:id", Refset.class)
                 .setParameter("id", r1.getId())
                 .getSingleResult();
-        r.setId(45);
+        r.setId(45l);
         assertNotEquals(r.hashCode(), r1.hashCode());
     }       
     

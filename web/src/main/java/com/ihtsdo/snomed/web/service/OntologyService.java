@@ -9,8 +9,9 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ihtsdo.snomed.exception.InvalidInputException;
+import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.InvalidInputException;
 
 @Service
 @Transactional (value = "transactionManager", readOnly = true)
@@ -112,19 +113,5 @@ public class OntologyService {
         public InvalidStatementsException(Throwable cause) {
             super(cause);
         }
-    }   
-    
-    
-    public static class OntologyNotFoundException extends Exception{
-        private static final long serialVersionUID = 1L;
-        private long ontologyId;
-        
-        public OntologyNotFoundException(long ontologyId){
-            this.ontologyId = ontologyId;
-        }
-
-        public long getOntologyId() {
-            return ontologyId;
-        }
-    }    
+    }      
 }

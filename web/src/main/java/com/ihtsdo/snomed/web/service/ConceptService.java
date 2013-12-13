@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
 
 @Service
 @Transactional (value = "transactionManager", readOnly = true)
@@ -38,7 +37,7 @@ public class ConceptService {
     }
     
     @Transactional
-    public Concept getConcept(long serialisedId, long ontologyId) throws ConceptNotFoundException{
+    public Concept getConcept(long serialisedId, long ontologyId) throws SimpleConceptNotFoundException{
         try {
             TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
 //                    "LEFT JOIN FETCH c.subjectOfStatements " +
@@ -55,7 +54,7 @@ public class ConceptService {
             c.getAllKindOfConcepts(true); //build the cache
             return c;
         } catch (NoResultException e) {
-            throw new ConceptNotFoundException(serialisedId, ontologyId);
+            throw new SimpleConceptNotFoundException(serialisedId, ontologyId);
         }
     }
     

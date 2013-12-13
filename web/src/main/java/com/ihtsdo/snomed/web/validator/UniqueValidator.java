@@ -10,7 +10,7 @@ import javax.validation.ConstraintValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.web.repository.PersistenceConstants;
+import com.ihtsdo.snomed.config.PersistenceConstants;
 
 public class UniqueValidator implements ConstraintValidator<Unique, Serializable>{
     private static final Logger LOG = LoggerFactory.getLogger( ConstraintValidator.class );

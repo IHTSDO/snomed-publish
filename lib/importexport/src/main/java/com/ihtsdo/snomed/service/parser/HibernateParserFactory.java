@@ -1,6 +1,6 @@
 package com.ihtsdo.snomed.service.parser;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 
 public class HibernateParserFactory  {
 

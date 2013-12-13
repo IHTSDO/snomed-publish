@@ -8,17 +8,17 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule.RuleType;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
+import com.ihtsdo.snomed.model.refset.BaseRule;
+import com.ihtsdo.snomed.model.refset.BaseRule.RuleType;
 
 public class RefsetPlanDtoTest {
 
     
     @Test
     public void shouldPassValidation(){
-        RefsetRuleDto terminal = RefsetRuleDto.getBuilder()
+        RuleDto terminal = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -26,16 +26,16 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
-                add(RefsetRuleDto.getBuilder()
+        PlanDto plan = PlanDto.getBuilder().
+                add(RuleDto.getBuilder()
                         .id(1L)
-                        .type(BaseRefsetRule.RuleType.LIST)
+                        .type(BaseRule.RuleType.LIST)
                         .concepts(Arrays.asList(
                                 new ConceptDto(1l), 
                                 new ConceptDto(2l)))
                         .build()).
                 add(terminal).
-                add(RefsetRuleDto.getBuilder()
+                add(RuleDto.getBuilder()
                         .id(3L)
                         .type(RuleType.UNION)
                         .left(1L)
@@ -54,7 +54,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnNullOrZeroId(){
-        RefsetRuleDto terminal = RefsetRuleDto.getBuilder()
+        RuleDto terminal = RuleDto.getBuilder()
                 .id(null)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -62,7 +62,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(terminal).
                 build();
         
@@ -80,7 +80,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnNullRuleReference(){
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -88,7 +88,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto right = RefsetRuleDto.getBuilder()
+        RuleDto right = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -96,14 +96,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(null)
                 .right(2L)
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(right).
                 add(union).
@@ -159,7 +159,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnReferencingUndeclaredRule(){
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -167,7 +167,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto right = RefsetRuleDto.getBuilder()
+        RuleDto right = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -175,14 +175,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(4L)
                 .right(2L)
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(right).
                 add(union).
@@ -238,7 +238,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnLeftAndRightOperandReferenceSameRule(){
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -246,14 +246,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.UNION)
                 .left(1L)
                 .right(1L)
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(union).
                 terminal(union.getId()).
@@ -275,7 +275,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnSelfReferencingRule(){
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -283,14 +283,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.UNION)
                 .left(1L)
                 .right(2L)
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(union).
                 terminal(union.getId()).
@@ -318,7 +318,7 @@ public class RefsetPlanDtoTest {
     
     @Test
     public void shouldFailOnRuleReferencedMoreThanOnce(){
-        RefsetRuleDto r1 = RefsetRuleDto.getBuilder()
+        RuleDto r1 = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -326,7 +326,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto r2 = RefsetRuleDto.getBuilder()
+        RuleDto r2 = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -334,7 +334,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetRuleDto r3 = RefsetRuleDto.getBuilder()
+        RuleDto r3 = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -342,28 +342,28 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(6l)))                        
                 .build();        
         
-        RefsetRuleDto union1 = RefsetRuleDto.getBuilder()
+        RuleDto union1 = RuleDto.getBuilder()
                 .id(4L)
                 .type(RuleType.UNION)
                 .left(r1.getId())
                 .right(r2.getId())
                 .build();
         
-        RefsetRuleDto union2 = RefsetRuleDto.getBuilder()
+        RuleDto union2 = RuleDto.getBuilder()
                 .id(5L)
                 .type(RuleType.UNION)
                 .left(r3.getId())
                 .right(r1.getId())
                 .build();        
 
-        RefsetRuleDto union3 = RefsetRuleDto.getBuilder()
+        RuleDto union3 = RuleDto.getBuilder()
                 .id(6L)
                 .type(RuleType.UNION)
                 .left(union1.getId())
                 .right(union2.getId())
                 .build();           
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(r1).
                 add(r2).
                 add(r3).
@@ -390,13 +390,13 @@ public class RefsetPlanDtoTest {
     @Test
     public void shouldFailOnEmptyConceptsList(){
         
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(new ArrayList<ConceptDto>())                        
                 .build();
         
-        RefsetRuleDto right = RefsetRuleDto.getBuilder()
+        RuleDto right = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -404,14 +404,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))                        
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(left.getId())
                 .right(right.getId())
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(right).
                 add(union).
@@ -443,7 +443,7 @@ public class RefsetPlanDtoTest {
     @Test
     public void shouldFailOnIllegalConceptId(){
         
-        RefsetRuleDto left = RefsetRuleDto.getBuilder()
+        RuleDto left = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -451,7 +451,7 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(2l)))                        
                 .build();
         
-        RefsetRuleDto right = RefsetRuleDto.getBuilder()
+        RuleDto right = RuleDto.getBuilder()
                 .id(2L)
                 .type(RuleType.LIST)
                 .concepts(Arrays.asList(
@@ -459,14 +459,14 @@ public class RefsetPlanDtoTest {
                         new ConceptDto(4l)))
                 .build();
         
-        RefsetRuleDto union = RefsetRuleDto.getBuilder()
+        RuleDto union = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(left.getId())
                 .right(right.getId())
                 .build();
         
-        RefsetPlanDto plan = RefsetPlanDto.getBuilder().
+        PlanDto plan = PlanDto.getBuilder().
                 add(left).
                 add(right).
                 add(union).

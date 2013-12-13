@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 
 public class Group {
     

@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
 @XmlRootElement(name="response")
@@ -32,7 +32,7 @@ public class RefsetPlanResponseDto {
     @XmlElement(name="error")
     private List<String> globalErrors = new ArrayList<>();
     
-    private RefsetPlanDto refsetPlan;
+    private PlanDto refsetPlan;
     private int code;
     private Status status;
     
@@ -87,11 +87,11 @@ public class RefsetPlanResponseDto {
     
     
     
-    public RefsetPlanDto getRefsetPlan() {
+    public PlanDto getRefsetPlan() {
         return refsetPlan;
     }
 
-    public void setRefsetPlan(RefsetPlanDto refsetPlan) {
+    public void setRefsetPlan(PlanDto refsetPlan) {
         this.refsetPlan = refsetPlan;
     }
 

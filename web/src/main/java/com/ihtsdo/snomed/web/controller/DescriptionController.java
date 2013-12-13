@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ihtsdo.snomed.exception.DescriptionNotFoundException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
 import com.ihtsdo.snomed.model.xml.XmlDescription;
-import com.ihtsdo.snomed.service.InvalidInputException;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
-import com.ihtsdo.snomed.web.exception.DescriptionNotFoundException;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
 @Controller

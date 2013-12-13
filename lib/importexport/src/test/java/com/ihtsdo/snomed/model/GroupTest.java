@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.service.parser.BaseTest;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;

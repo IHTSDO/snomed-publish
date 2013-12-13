@@ -1,10 +1,10 @@
 package com.ihtsdo.snomed.model.refset.rule;
 
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
-import com.ihtsdo.snomed.model.refset.RefsetRule;
+import com.ihtsdo.snomed.model.refset.BaseRule;
+import com.ihtsdo.snomed.model.refset.Rule;
 import com.ihtsdo.snomed.model.refset.Visitor;
 
-public abstract class BaseSetOperationRefsetRule extends BaseRefsetRule {
+public abstract class BaseSetOperationRefsetRule extends BaseRule {
     
     public static String LEFT_OPERAND  = "left";
     public static String RIGHT_OPERAND = "right";
@@ -20,21 +20,21 @@ public abstract class BaseSetOperationRefsetRule extends BaseRefsetRule {
         visitor.visit(this);
     }
     
-    public BaseSetOperationRefsetRule setLeftRule(RefsetRule rule){
+    public BaseSetOperationRefsetRule setLeftRule(Rule rule){
         this.getIncomingRules().put(LEFT_OPERAND, rule);
         return this;
     }
     
-    public BaseSetOperationRefsetRule setRightRule(RefsetRule rule){
+    public BaseSetOperationRefsetRule setRightRule(Rule rule){
         this.getIncomingRules().put(RIGHT_OPERAND, rule);
         return this;
     }
     
-    public RefsetRule getLeft(){
+    public Rule getLeft(){
         return getIncomingRules().get(LEFT_OPERAND);
     }
     
-    public RefsetRule getRight(){
+    public Rule getRight(){
         return getIncomingRules().get(RIGHT_OPERAND);
     }
 }

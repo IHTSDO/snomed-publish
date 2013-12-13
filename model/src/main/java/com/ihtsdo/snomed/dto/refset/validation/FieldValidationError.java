@@ -1,12 +1,12 @@
 package com.ihtsdo.snomed.dto.refset.validation;
 
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
 
 public class FieldValidationError extends GlobalValidationError{
-    public RefsetRuleDto rule;
+    public RuleDto rule;
     
-    public FieldValidationError(RefsetRuleDto rule, ValidationResult.Error error, String defaultMessage){
+    public FieldValidationError(RuleDto rule, ValidationResult.Error error, String defaultMessage){
         super(error, defaultMessage);
         this.rule = rule;
     }
@@ -45,22 +45,22 @@ public class FieldValidationError extends GlobalValidationError{
         return this;
     }    
 
-    public RefsetRuleDto getRule() {
+    public RuleDto getRule() {
         return rule;
     }
 
-    public void setRule(RefsetRuleDto rule) {
+    public void setRule(RuleDto rule) {
         this.rule = rule;
     }
     
-    public static Builder getBuilder(ValidationResult.Error error, RefsetRuleDto rule, String defaultMessage) {
+    public static Builder getBuilder(ValidationResult.Error error, RuleDto rule, String defaultMessage) {
         return new Builder(error, rule, defaultMessage);
     }    
 
     public static class Builder{
         private FieldValidationError built;
 
-        Builder(ValidationResult.Error error, RefsetRuleDto rule, String defaultMessage) {
+        Builder(ValidationResult.Error error, RuleDto rule, String defaultMessage) {
             built = new FieldValidationError(rule, error, defaultMessage);
         }
         

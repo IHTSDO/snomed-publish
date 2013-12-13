@@ -19,10 +19,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Statement;
-import com.ihtsdo.snomed.service.InvalidInputException;
 import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 

@@ -9,8 +9,9 @@
         <class>com.ihtsdo.snomed.model.Ontology</class>
         <class>com.ihtsdo.snomed.model.Description</class>
         <class>com.ihtsdo.snomed.model.refset.Refset</class>
-        <class>com.ihtsdo.snomed.model.refset.RefsetPlan</class>
-        <class>com.ihtsdo.snomed.model.refset.BaseRefsetRule</class>
+        <class>com.ihtsdo.snomed.model.refset.Plan</class>
+        <class>com.ihtsdo.snomed.model.refset.Snapshot</class>
+        <class>com.ihtsdo.snomed.model.refset.BaseRule</class>
         <class>com.ihtsdo.snomed.model.refset.rule.DifferenceRefsetRule</class>
         <class>com.ihtsdo.snomed.model.refset.rule.SymmetricDifferenceRefsetRule</class>
         <class>com.ihtsdo.snomed.model.refset.rule.IntersectionRefsetRule</class>

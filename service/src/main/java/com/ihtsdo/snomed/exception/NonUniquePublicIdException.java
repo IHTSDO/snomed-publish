@@ -1,8 +1,6 @@
 package com.ihtsdo.snomed.exception;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
-
-public class NonUniquePublicIdException extends InvalidInputException {
+public class NonUniquePublicIdException extends Exception {
 
     private static final long serialVersionUID = -8503497279533972065L;
 

@@ -34,7 +34,7 @@ public class RefsetDto {
     private String description;
     
     @NotNull(message="A plan must be associated with a refset")
-    private RefsetPlanDto plan = new RefsetPlanDto();
+    private PlanDto plan = new PlanDto();
     
     public RefsetDto(){}
     
@@ -126,11 +126,11 @@ public class RefsetDto {
         this.concept = concept;
     }
 
-    public RefsetPlanDto getPlan() {
+    public PlanDto getPlan() {
         return plan;
     }
 
-    public void setPlan(RefsetPlanDto plan) {
+    public void setPlan(PlanDto plan) {
         this.plan = plan;
     }
     
@@ -144,14 +144,14 @@ public class RefsetDto {
         this.conceptDisplayName = conceptDisplayName;
     }
 
-    public static Builder getBuilder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, RefsetPlanDto plan) {
+    public static Builder getBuilder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, PlanDto plan) {
         return new Builder(id, conceptId, conceptDisplayName, title, description, publicId, plan);
     }
     
     public static class Builder {
         private RefsetDto built;
 
-        Builder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, RefsetPlanDto plan) {
+        Builder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, PlanDto plan) {
             built = new RefsetDto();
             built.setConcept(conceptId);
             built.setDescription(description);

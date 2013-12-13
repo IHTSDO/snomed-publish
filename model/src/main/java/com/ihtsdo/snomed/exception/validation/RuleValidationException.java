@@ -1,40 +1,40 @@
 package com.ihtsdo.snomed.exception.validation;
 
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
 
 
 public class RuleValidationException extends ValidationException {
     private static final long serialVersionUID = -3620245059711682064L;
     
-    protected RefsetRuleDto ruleDto;
+    protected RuleDto ruleDto;
 
-    public RuleValidationException(RefsetRuleDto ruleDto) {
+    public RuleValidationException(RuleDto ruleDto) {
         super();
         this.ruleDto = ruleDto;
     }
 
-    public RuleValidationException(RefsetRuleDto ruleDto, String message) {
+    public RuleValidationException(RuleDto ruleDto, String message) {
         super(message);
         this.ruleDto = ruleDto;
     }
 
-    public RuleValidationException(RefsetRuleDto ruleDto, Throwable cause) {
+    public RuleValidationException(RuleDto ruleDto, Throwable cause) {
         super(cause);
         this.ruleDto = ruleDto;
     }
 
-    public RuleValidationException(RefsetRuleDto ruleDto, String message, Throwable cause) {
+    public RuleValidationException(RuleDto ruleDto, String message, Throwable cause) {
         super(message, cause);
         this.ruleDto = ruleDto;
     }
 
-    public RuleValidationException(RefsetRuleDto ruleDto, String message, Throwable cause,
+    public RuleValidationException(RuleDto ruleDto, String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.ruleDto = ruleDto;
     }
     
-    public RefsetRuleDto getRuleDto() {
+    public RuleDto getRuleDto() {
         return ruleDto;
     }    
 }

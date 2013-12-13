@@ -22,10 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.Ontology.Source;
-import com.ihtsdo.snomed.service.InvalidInputException;
 
 public class CanonicalHibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalHibernateParser.class );

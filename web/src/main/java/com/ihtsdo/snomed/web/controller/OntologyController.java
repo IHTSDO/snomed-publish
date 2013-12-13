@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.web.service.ConceptService;
 import com.ihtsdo.snomed.web.service.OntologyService;
-import com.ihtsdo.snomed.web.service.OntologyService.OntologyNotFoundException;
 
 @Controller
 @RequestMapping("/")

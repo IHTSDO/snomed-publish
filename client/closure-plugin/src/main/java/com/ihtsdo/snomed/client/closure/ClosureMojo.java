@@ -26,9 +26,9 @@ import org.hibernate.CacheMode;
 import org.slf4j.impl.StaticLoggerBinder;
 
 import com.google.common.base.Stopwatch;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.service.InvalidInputException;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;

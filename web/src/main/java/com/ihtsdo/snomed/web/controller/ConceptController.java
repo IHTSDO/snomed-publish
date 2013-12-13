@@ -43,7 +43,7 @@ import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlConcept;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
-import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.web.service.SimpleConceptNotFoundException;
 import com.ihtsdo.snomed.web.service.ConceptService;
 import com.ihtsdo.snomed.web.service.OntologyService;
 
@@ -129,7 +129,7 @@ public class ConceptController {
             @RequestParam(value="attributeOfStartIndex", defaultValue=INDEX_NOT_SPECIFIED_STRING, required=false) int attributeOfStartIndex,
             @RequestParam(value="attributeOfCount", defaultValue=INDEX_NOT_SPECIFIED_STRING, required=false) int attributeOfCount
             
-            ) throws ConceptNotFoundException
+            ) throws SimpleConceptNotFoundException
     {            
         Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
                 .setParameter("oid", ontologyId)
@@ -392,7 +392,7 @@ public class ConceptController {
     }
 
     private Concept getConcept(long ontologyId, long serialisedId)
-            throws ConceptNotFoundException {
+            throws SimpleConceptNotFoundException {
         Concept c = null;
         try {
             TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
@@ -404,13 +404,13 @@ public class ConceptController {
             c = getConceptQuery.getSingleResult();
             c.getAllKindOfConcepts(true); //build the cache
         } catch (NoResultException e) {
-            throw new ConceptNotFoundException(serialisedId, ontologyId);
+            throw new SimpleConceptNotFoundException(serialisedId, ontologyId);
         }
         return c;
     }
   
-    @ExceptionHandler(ConceptNotFoundException.class)
-    public ModelAndView handleConceptNotFoundException(HttpServletRequest request, ConceptNotFoundException exception){
+    @ExceptionHandler(SimpleConceptNotFoundException.class)
+    public ModelAndView handleConceptNotFoundException(HttpServletRequest request, SimpleConceptNotFoundException exception){
         ModelAndView modelAndView = new ModelAndView("concept.not.found");
         modelAndView.addObject("id", exception.getConceptId());
         modelAndView.addObject("ontologyId", exception.getOntologyId());

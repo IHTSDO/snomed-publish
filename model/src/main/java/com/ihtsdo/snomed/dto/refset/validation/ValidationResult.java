@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
 
 @XmlRootElement(name="validation-result")
 public class ValidationResult{
@@ -52,7 +52,7 @@ public class ValidationResult{
     }
 
     private boolean success = true;
-    private RefsetRuleDto terminal;
+    private RuleDto terminal;
     
     private List<GlobalValidationError> globalErrors = new ArrayList<>();
     private List<FieldValidationError> fieldErrors = new ArrayList<>();;
@@ -87,7 +87,7 @@ public class ValidationResult{
         return false;
     }
     
-    public ValidationResult addError(ValidationResult.Error error, RefsetRuleDto rule, String defaultMessage){
+    public ValidationResult addError(ValidationResult.Error error, RuleDto rule, String defaultMessage){
         setSuccess(false);
         fieldErrors.add(new FieldValidationError(rule, error, defaultMessage));
         return this;
@@ -125,11 +125,11 @@ public class ValidationResult{
         return success;
     }
    
-    public RefsetRuleDto getTerminal() {
+    public RuleDto getTerminal() {
         return terminal;
     }
 
-    public void setTerminal(RefsetRuleDto terminal) {
+    public void setTerminal(RuleDto terminal) {
         this.terminal = terminal;
     }
 
@@ -152,7 +152,7 @@ public class ValidationResult{
             built = new ValidationResult();
         }
 
-        public Builder terminal(RefsetRuleDto terminal){
+        public Builder terminal(RuleDto terminal){
             built.setTerminal(terminal);
             return this;
         }

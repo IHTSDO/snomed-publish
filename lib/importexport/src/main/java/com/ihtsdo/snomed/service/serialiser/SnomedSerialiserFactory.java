@@ -3,7 +3,7 @@ package com.ihtsdo.snomed.service.serialiser;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 
 public class SnomedSerialiserFactory  {
 

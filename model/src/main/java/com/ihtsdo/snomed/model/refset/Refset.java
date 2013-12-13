@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -34,7 +37,7 @@ public class Refset {
     
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     
     @NotNull
     @OneToOne
@@ -42,7 +45,11 @@ public class Refset {
         
     @NotNull
     @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
-    private RefsetPlan plan;
+    private Plan plan;
+    
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
+    private Set<Snapshot> snapshots;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -71,7 +78,7 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(Concept concept, String publicId, String title, String description, RefsetPlan plan){
+    public Refset update(Concept concept, String publicId, String title, String description, Plan plan){
         this.setConcept(concept);
         this.setPublicId(publicId);
         this.setTitle(title);
@@ -105,6 +112,9 @@ public class Refset {
     
     @Override
     public int hashCode(){
+        if (getId() == null){
+            return 0;
+        }
         return Longs.hashCode(getId());
     }
 
@@ -121,11 +131,11 @@ public class Refset {
     }    
     
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -162,11 +172,11 @@ public class Refset {
         this.description = description;
     }
     
-    public RefsetPlan getPlan() {
+    public Plan getPlan() {
         return plan;
     }
 
-    public void setPlan(RefsetPlan plan) {
+    public void setPlan(Plan plan) {
         this.plan = plan;
     }
 
@@ -194,26 +204,38 @@ public class Refset {
         this.version = version;
     }
     
-    public static Builder getBuilder(Concept concept, String publicId, String title, String description, RefsetPlan refsetPlan) {
-        return new Builder(concept, publicId, title, description, refsetPlan);
+    public static Builder getBuilder(Concept concept, String publicId, String title, String description, Plan plan) {
+        return new Builder(concept, publicId, title, description, plan);
     }
     
 
     public static class Builder {
         private Refset built;
 
-        Builder(Concept concept, String publicId, String title, String description, RefsetPlan refsetPlan) {
+        Builder(Concept concept, String publicId, String title, String description, Plan plan) {
             built = new Refset();
             built.publicId = publicId;
             built.title = title;
             built.description = description;
             built.concept = concept;
-            built.plan = refsetPlan;
+            built.plan = plan;
         }
 
         public Refset build() {
             return built;
         }
     }
+
+
+    public Set<Snapshot> getSnapshots() {
+        return snapshots;
+    }
+
+    public void setSnapshots(Set<Snapshot> snapshots) {
+        this.snapshots = snapshots;
+    }
+
+
+ 
 
 }

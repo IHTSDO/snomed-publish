@@ -25,8 +25,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Stopwatch;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.web.dto.SparqlQueryFormObject;
-import com.ihtsdo.snomed.web.exception.ConceptNotFoundException;
 import com.ihtsdo.snomed.web.model.SparqlResults;
 import com.ihtsdo.snomed.web.service.OntologyService;
 import com.ihtsdo.snomed.web.service.SparqlService;
@@ -48,7 +48,7 @@ public class SparqlController {
     public ModelAndView runSparqlQuery(ModelMap model, HttpServletRequest request, 
             @PathVariable long ontologyId, Principal principal,
             @ModelAttribute("sparql") SparqlQueryFormObject query) 
-                    throws ConceptNotFoundException, RestClientException, XPathExpressionException, 
+                    throws RefsetConceptNotFoundException, RestClientException, XPathExpressionException, 
                     URISyntaxException, ParserConfigurationException, SAXException, IOException
                     
     {   
@@ -81,7 +81,7 @@ public class SparqlController {
     
     @RequestMapping(value="/version/{ontologyId}/sparql", method = RequestMethod.GET)
     public ModelAndView displaySparqlQueryDialogue(ModelMap model, HttpServletRequest request, 
-            @PathVariable long ontologyId, Principal principal) throws ConceptNotFoundException
+            @PathVariable long ontologyId, Principal principal) throws RefsetConceptNotFoundException
     {
         //System.out.println("Rendering query page for ontology [" + ontologyId + "]");
         

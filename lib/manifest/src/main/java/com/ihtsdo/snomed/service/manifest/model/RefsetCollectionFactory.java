@@ -3,7 +3,7 @@ package com.ihtsdo.snomed.service.manifest.model;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.ihtsdo.snomed.service.InvalidInputException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 
 @Named
 public class RefsetCollectionFactory {
