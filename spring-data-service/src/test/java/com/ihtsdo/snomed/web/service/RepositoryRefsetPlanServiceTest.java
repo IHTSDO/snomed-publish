@@ -25,25 +25,27 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import test.com.ihtsdo.snomed.web.SpringProxyUtil;
+
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
-import com.ihtsdo.snomed.dto.refset.RefsetRuleDto;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
+import com.ihtsdo.snomed.dto.refset.RuleDto;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule;
-import com.ihtsdo.snomed.model.refset.BaseRefsetRule.RuleType;
-import com.ihtsdo.snomed.model.refset.RefsetPlan;
+import com.ihtsdo.snomed.model.refset.BaseRule;
+import com.ihtsdo.snomed.model.refset.BaseRule.RuleType;
+import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.rule.ListConceptsRefsetRule;
 import com.ihtsdo.snomed.model.refset.rule.UnionRefsetRule;
+import com.ihtsdo.snomed.repository.refset.PlanRepository;
+import com.ihtsdo.snomed.repository.refset.RuleRepository;
 import com.ihtsdo.snomed.service.ConceptService;
-import com.ihtsdo.snomed.service.RefsetPlanService;
-import com.ihtsdo.snomed.service.RefsetRuleService;
-import com.ihtsdo.snomed.web.repository.RefsetPlanRepository;
-import com.ihtsdo.snomed.web.repository.RefsetRuleRepository;
-import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
+import com.ihtsdo.snomed.service.refset.PlanService;
+import com.ihtsdo.snomed.service.refset.RepositoryPlanService;
+import com.ihtsdo.snomed.service.refset.RuleService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
@@ -51,38 +53,37 @@ import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
     TransactionalTestExecutionListener.class})
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml", 
-        "classpath:sds-spring-data.xml",
         "classpath:test-spring-data.xml"})
 public class RepositoryRefsetPlanServiceTest {
     
     private static final Long REFSET_PLAN_ID = 1L;
 
     @Inject
-    private RefsetPlanService planService;
+    private PlanService planService;
 
     @Mock
-    private RefsetPlanRepository refsetPlanRepositoryMock; 
+    private PlanRepository refsetPlanRepositoryMock; 
     
     @Mock
-    private RefsetRuleRepository refsetRuleRepositoryMock;
+    private RuleRepository refsetRuleRepositoryMock;
     
     @Mock
-    private RefsetRuleService refsetRuleServiceMock;
+    private RuleService refsetRuleServiceMock;
 
     @Mock
     private ConceptService conceptServiceMock;
 
-    private RefsetPlan refsetPlan;
-    private RefsetRuleDto listRuleDtoLeft;
-    private RefsetRuleDto listRuleDtoRight;
-    private RefsetRuleDto unionRuleDto;
-    private RefsetPlanDto refsetPlanDto;
+    private Plan plan;
+    private RuleDto listRuleDtoLeft;
+    private RuleDto listRuleDtoRight;
+    private RuleDto unionRuleDto;
+    private PlanDto planDto;
     private ListConceptsRefsetRule listRuleLeft;
     private ListConceptsRefsetRule listRuleRight;
     private UnionRefsetRule unionRule;
     private ConceptDto c1, c2, c3, c4, c5, c6;
-    private RefsetPlan updatedRefsetPlan;
-    private RefsetPlanDto updatedDtoRefsetPlan;
+    private Plan updatedRefsetPlan;
+    private PlanDto updatedDtoRefsetPlan;
     
     private ListConceptsRefsetRule newLeft;
 
@@ -95,23 +96,23 @@ public class RepositoryRefsetPlanServiceTest {
         MockitoAnnotations.initMocks(this);
         
         ReflectionTestUtils.setField(
-                ((RepositoryRefsetPlanService) SpringProxyUtil.unwrapProxy(planService)), 
-                "refsetPlanRepository", 
+                ((RepositoryPlanService) SpringProxyUtil.unwrapProxy(planService)), 
+                "planRepository", 
                 refsetPlanRepositoryMock);
         
         ReflectionTestUtils.setField(
-                ((RepositoryRefsetPlanService) SpringProxyUtil.unwrapProxy(planService)), 
-                "refsetRuleRepository", 
+                ((RepositoryPlanService) SpringProxyUtil.unwrapProxy(planService)), 
+                "ruleRepository", 
                 refsetRuleRepositoryMock);
         
         
         ReflectionTestUtils.setField(
-                ((RepositoryRefsetPlanService) SpringProxyUtil.unwrapProxy(planService)), 
-                "refsetRuleService", 
+                ((RepositoryPlanService) SpringProxyUtil.unwrapProxy(planService)), 
+                "ruleService", 
                 refsetRuleServiceMock);
         
         ReflectionTestUtils.setField(
-                ((RepositoryRefsetPlanService) SpringProxyUtil.unwrapProxy(planService)), 
+                ((RepositoryPlanService) SpringProxyUtil.unwrapProxy(planService)), 
                 "conceptService", 
                 conceptServiceMock);        
     }
@@ -129,26 +130,26 @@ public class RepositoryRefsetPlanServiceTest {
         c5 = ConceptDto.getBuilder().id(5L).build();
         c6 = ConceptDto.getBuilder().id(6L).build();
         
-        listRuleDtoLeft = RefsetRuleDto.getBuilder()
+        listRuleDtoLeft = RuleDto.getBuilder()
                 .id(-1L)
                 .type(RuleType.LIST)
                 .add(c1).add(c2).add(c3)
                 .build();
         
-        listRuleDtoRight = RefsetRuleDto.getBuilder()
+        listRuleDtoRight = RuleDto.getBuilder()
                 .id(-2L)
                 .add(c4).add(c5).add(c6)
                 .type(RuleType.LIST)
                 .build();
         
-        unionRuleDto = RefsetRuleDto.getBuilder()
+        unionRuleDto = RuleDto.getBuilder()
                 .id(-3L)
                 .type(RuleType.UNION)
                 .left(listRuleDtoLeft.getId())
                 .right(listRuleDtoRight.getId())
                 .build();
         
-        refsetPlanDto = RefsetPlanDto.getBuilder()
+        planDto = PlanDto.getBuilder()
                .terminal(unionRuleDto.getId())
                .id(REFSET_PLAN_ID)
                .add(listRuleDtoLeft)
@@ -208,28 +209,28 @@ public class RepositoryRefsetPlanServiceTest {
         updatedUnion.setLeftRule(updatedLeft);
         updatedUnion.setRightRule(updatedRight);
         
-        updatedRefsetPlan = RefsetPlan.getBuilder(updatedUnion).id(REFSET_PLAN_ID).build();      
+        updatedRefsetPlan = Plan.getBuilder(updatedUnion).id(REFSET_PLAN_ID).build();      
         
-        RefsetRuleDto updatedDtoLeft = RefsetRuleDto.getBuilder()
+        RuleDto updatedDtoLeft = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .add(uc11dto).add(uc12dto).add(uc13dto)
                 .build();
         
-        RefsetRuleDto updatedDtoRight = RefsetRuleDto.getBuilder()
+        RuleDto updatedDtoRight = RuleDto.getBuilder()
                 .id(2L)
                 .add(uc14dto).add(uc15dto).add(uc16dto)
                 .type(RuleType.LIST)
                 .build();
         
-        RefsetRuleDto updatedDtoUnion = RefsetRuleDto.getBuilder()
+        RuleDto updatedDtoUnion = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(updatedDtoLeft.getId())
                 .right(updatedDtoRight.getId())
                 .build();
         
-        updatedDtoRefsetPlan = RefsetPlanDto.getBuilder()
+        updatedDtoRefsetPlan = PlanDto.getBuilder()
                .terminal(updatedDtoUnion.getId())
                .id(REFSET_PLAN_ID)
                .add(updatedDtoLeft)
@@ -238,11 +239,11 @@ public class RepositoryRefsetPlanServiceTest {
                .build();
               
 
-        newLeft = (ListConceptsRefsetRule) BaseRefsetRule.getRuleInstanceFor(listRuleDtoLeft);
+        newLeft = (ListConceptsRefsetRule) BaseRule.getRuleInstanceFor(listRuleDtoLeft);
         newLeft.setId(1l);
-        newRight = (ListConceptsRefsetRule) BaseRefsetRule.getRuleInstanceFor(listRuleDtoRight);
+        newRight = (ListConceptsRefsetRule) BaseRule.getRuleInstanceFor(listRuleDtoRight);
         newRight.setId(2l);
-        newUnion = (UnionRefsetRule) BaseRefsetRule.getRuleInstanceFor(unionRuleDto);
+        newUnion = (UnionRefsetRule) BaseRule.getRuleInstanceFor(unionRuleDto);
         newUnion.setId(3l);
         
         listRuleLeft = new ListConceptsRefsetRule();
@@ -279,34 +280,34 @@ public class RepositoryRefsetPlanServiceTest {
         u.setLeftRule(l);
         u.setRightRule(r);        
         
-        refsetPlan = RefsetPlan.getBuilder(u).id(REFSET_PLAN_ID).build();        
+        plan = Plan.getBuilder(u).id(REFSET_PLAN_ID).build();        
     }
 
     @Test
     public void create() throws ValidationException {
-        RefsetPlan persisted = refsetPlan;
-        RefsetPlanDto created = refsetPlanDto;
+        Plan persisted = plan;
+        PlanDto created = planDto;
         
-        RefsetRuleDto eLeft = RefsetRuleDto.getBuilder()
+        RuleDto eLeft = RuleDto.getBuilder()
                 .id(1L)
                 .type(RuleType.LIST)
                 .add(c1).add(c2).add(c3)
                 .build();
         
-        RefsetRuleDto eRight = RefsetRuleDto.getBuilder()
+        RuleDto eRight = RuleDto.getBuilder()
                 .id(2L)
                 .add(c4).add(c5).add(c6)
                 .type(RuleType.LIST)
                 .build();
         
-        RefsetRuleDto eUnion = RefsetRuleDto.getBuilder()
+        RuleDto eUnion = RuleDto.getBuilder()
                 .id(3L)
                 .type(RuleType.UNION)
                 .left(eLeft.getId())
                 .right(eRight.getId())
                 .build();
         
-        RefsetPlanDto expected = RefsetPlanDto.getBuilder()
+        PlanDto expected = PlanDto.getBuilder()
                .terminal(eUnion.getId())
                .id(0l)
                .add(eLeft)
@@ -314,12 +315,12 @@ public class RepositoryRefsetPlanServiceTest {
                .add(eUnion)
                .build();        
         
-        when(refsetPlanRepositoryMock.save(any(RefsetPlan.class))).thenReturn(persisted);        
-        when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(newLeft, newRight, newUnion);
+        when(refsetPlanRepositoryMock.save(any(Plan.class))).thenReturn(persisted);        
+        when(refsetRuleRepositoryMock.save(any(BaseRule.class))).thenReturn(newLeft, newRight, newUnion);
                 
-        RefsetPlan returned = planService.create(created);
+        Plan returned = planService.create(created);
         
-        ArgumentCaptor<RefsetPlan> refsetPlanArgument = ArgumentCaptor.forClass(RefsetPlan.class);
+        ArgumentCaptor<Plan> refsetPlanArgument = ArgumentCaptor.forClass(Plan.class);
         verify(refsetPlanRepositoryMock, times(1)).save(refsetPlanArgument.capture());
 
         verifyNoMoreInteractions(refsetPlanRepositoryMock);
@@ -331,12 +332,12 @@ public class RepositoryRefsetPlanServiceTest {
     
     @Test
     public void delete() throws RefsetPlanNotFoundException {
-        RefsetPlan deleted = refsetPlan;
+        Plan deleted = plan;
         deleted.setId(REFSET_PLAN_ID);
         
         when(refsetPlanRepositoryMock.findOne(deleted.getId())).thenReturn(deleted);
         
-        RefsetPlan returned = planService.delete(REFSET_PLAN_ID);
+        Plan returned = planService.delete(REFSET_PLAN_ID);
         
         verify(refsetPlanRepositoryMock, times(1)).findOne(REFSET_PLAN_ID);
         verify(refsetPlanRepositoryMock, times(1)).delete(deleted);
@@ -347,11 +348,11 @@ public class RepositoryRefsetPlanServiceTest {
     
     @Test(expected = RefsetPlanNotFoundException.class)
     public void deleteWhenRefsetPlanIsNotFound() throws RefsetPlanNotFoundException {
-        RefsetPlan deleted = refsetPlan;
+        Plan deleted = plan;
         
         when(refsetPlanRepositoryMock.findOne(REFSET_PLAN_ID)).thenReturn(null);
         
-        RefsetPlan returned = planService.delete(REFSET_PLAN_ID);
+        Plan returned = planService.delete(REFSET_PLAN_ID);
         
         verify(refsetPlanRepositoryMock, times(1)).findOne(REFSET_PLAN_ID);
         verify(refsetPlanRepositoryMock, times(1)).delete(deleted);
@@ -362,45 +363,45 @@ public class RepositoryRefsetPlanServiceTest {
     
     @Test
     public void findById() {
-        when(refsetPlanRepositoryMock.findOne(REFSET_PLAN_ID)).thenReturn(refsetPlan);
-        RefsetPlan returned = planService.findById(REFSET_PLAN_ID);
+        when(refsetPlanRepositoryMock.findOne(REFSET_PLAN_ID)).thenReturn(plan);
+        Plan returned = planService.findById(REFSET_PLAN_ID);
         verify(refsetPlanRepositoryMock, times(1)).findOne(REFSET_PLAN_ID);
         verifyNoMoreInteractions(refsetPlanRepositoryMock);
-        assertEquals(refsetPlan, returned);
+        assertEquals(plan, returned);
     }
     
     @Test
     public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
 
-        when(refsetPlanRepositoryMock.save(any(RefsetPlan.class))).thenReturn(updatedRefsetPlan);
-        when(refsetPlanRepositoryMock.findOne(refsetPlan.getId())).thenReturn(refsetPlan);
-        when(refsetRuleRepositoryMock.save(any(BaseRefsetRule.class))).thenReturn(newLeft, newRight, newUnion);
+        when(refsetPlanRepositoryMock.save(any(Plan.class))).thenReturn(updatedRefsetPlan);
+        when(refsetPlanRepositoryMock.findOne(plan.getId())).thenReturn(plan);
+        when(refsetRuleRepositoryMock.save(any(BaseRule.class))).thenReturn(newLeft, newRight, newUnion);
 
-        RefsetPlan returned = planService.update(updatedDtoRefsetPlan);
+        Plan returned = planService.update(updatedDtoRefsetPlan);
         
-        ArgumentCaptor<RefsetPlan> refsetPlanArgument = ArgumentCaptor.forClass(RefsetPlan.class);
+        ArgumentCaptor<Plan> refsetPlanArgument = ArgumentCaptor.forClass(Plan.class);
         verify(refsetPlanRepositoryMock, times(1)).save(refsetPlanArgument.capture());
         verify(refsetPlanRepositoryMock, times(1)).findOne(updatedDtoRefsetPlan.getId());
-        verify(refsetRuleRepositoryMock, times(3)).save(any(BaseRefsetRule.class));
-        verify(refsetRuleServiceMock, times(1)).delete(refsetPlan.getTerminal().getId());
+        verify(refsetRuleRepositoryMock, times(3)).save(any(BaseRule.class));
+        verify(refsetRuleServiceMock, times(1)).delete(plan.getTerminal().getId());
                 
         verifyNoMoreInteractions(refsetPlanRepositoryMock);
         verifyNoMoreInteractions(refsetRuleServiceMock);
         verifyNoMoreInteractions(refsetRuleRepositoryMock);
         
-        assertEquals(updatedDtoRefsetPlan, RefsetPlanDto.parse(refsetPlanArgument.getValue()));
+        assertEquals(updatedDtoRefsetPlan, PlanDto.parse(refsetPlanArgument.getValue()));
         assertEquals(updatedRefsetPlan, returned);
     }
     
     @Test(expected = RefsetPlanNotFoundException.class)
     public void updateWhenRefsetIsNotFound() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
-        RefsetPlanDto updatedDto = refsetPlanDto;
+        PlanDto updatedDto = planDto;
         when(refsetPlanRepositoryMock.findOne(updatedDto.getId())).thenReturn(null);
         planService.update(updatedDto);
     }
 
-    public static void assertRefsetPlan(RefsetPlanDto expected, RefsetPlan actual) {
-        RefsetPlanDto parsedActual = RefsetPlanDto.parse(actual);
+    public static void assertRefsetPlan(PlanDto expected, Plan actual) {
+        PlanDto parsedActual = PlanDto.parse(actual);
         assertTrue(
                 (Objects.equal(expected.getRefsetRules(), parsedActual.getRefsetRules())) &&
                 (Objects.equal(expected.getTerminal(), parsedActual.getTerminal())));

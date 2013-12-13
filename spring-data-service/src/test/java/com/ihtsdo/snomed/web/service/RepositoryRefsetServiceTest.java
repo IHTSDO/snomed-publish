@@ -28,22 +28,25 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import test.com.ihtsdo.snomed.web.RefsetTestUtil;
+import test.com.ihtsdo.snomed.web.SpringProxyUtil;
+
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
-import com.ihtsdo.snomed.exception.ConceptNotFoundException;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
+import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.RefsetPlan;
-import com.ihtsdo.snomed.service.RefsetPlanService;
-import com.ihtsdo.snomed.service.RefsetService;
-import com.ihtsdo.snomed.web.repository.ConceptRepository;
-import com.ihtsdo.snomed.web.repository.RefsetRepository;
-import com.ihtsdo.snomed.web.testing.RefsetTestUtil;
-import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
+import com.ihtsdo.snomed.model.refset.Plan;
+import com.ihtsdo.snomed.repository.ConceptRepository;
+import com.ihtsdo.snomed.repository.refset.RefsetRepository;
+import com.ihtsdo.snomed.service.refset.PlanService;
+import com.ihtsdo.snomed.service.refset.RefsetService;
+import com.ihtsdo.snomed.service.refset.RepositoryRefsetService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
@@ -52,7 +55,6 @@ import com.ihtsdo.snomed.web.testing.SpringProxyUtil;
     /*,DbUnitTestExecutionListener.class*/ })
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml", 
-        "classpath:sds-spring-data.xml",
         "classpath:test-spring-data.xml"})
 public class RepositoryRefsetServiceTest {
 
@@ -75,7 +77,7 @@ public class RepositoryRefsetServiceTest {
     private ConceptRepository conceptMock;
     
     @Mock
-    RefsetPlanService planServiceMock;    
+    PlanService planServiceMock;    
 
     public RepositoryRefsetServiceTest() {
         concept = new Concept(1);
@@ -103,13 +105,13 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void create() throws ValidationException, ConceptNotFoundException{
-        RefsetDto created = RefsetTestUtil.createDto(null, concept.getSerialisedId(), PUBLIC_ID, TITLE, DESCRIPTION);
-        Refset persisted = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
+    public void create() throws ValidationException, RefsetConceptNotFoundException, NonUniquePublicIdException{
+        RefsetDto created = RefsetTestUtil.createRefsetDto(null, concept.getSerialisedId(), PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset persisted = RefsetTestUtil.createRefset(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         
         when(repoMock.save(any(Refset.class))).thenReturn(persisted);
-        when(planServiceMock.findById(any(Long.class))).thenReturn(new RefsetPlan());
-        when(planServiceMock.create(any(RefsetPlanDto.class))).thenReturn(new RefsetPlan());
+        when(planServiceMock.findById(any(Long.class))).thenReturn(new Plan());
+        when(planServiceMock.create(any(PlanDto.class))).thenReturn(new Plan());
         when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
 
         Refset returned = refsetService.create(created);
@@ -118,7 +120,7 @@ public class RepositoryRefsetServiceTest {
         verify(repoMock, times(1)).save(refsetArgument.capture());
         verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
         //verify(planServiceMock, times(1)).findById(any(Long.class));
-        verify(planServiceMock, times(1)).create(any(RefsetPlanDto.class));
+        verify(planServiceMock, times(1)).create(any(PlanDto.class));
         verifyNoMoreInteractions(repoMock);
         verifyNoMoreInteractions(conceptMock);
         verifyNoMoreInteractions(planServiceMock);
@@ -129,7 +131,7 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void delete() throws RefsetNotFoundException {
-        Refset deleted = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset deleted = RefsetTestUtil.createRefset(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         when(repoMock.findOne(REFSET_ID)).thenReturn(deleted);
         
         Refset returned = refsetService.delete(REFSET_ID);
@@ -166,7 +168,7 @@ public class RepositoryRefsetServiceTest {
     
     @Test
     public void findById() {
-        Refset refset = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset refset = RefsetTestUtil.createRefset(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         when(repoMock.findOne(REFSET_ID)).thenReturn(refset);
         
         Refset returned = refsetService.findById(REFSET_ID);
@@ -178,16 +180,16 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, ConceptNotFoundException{
-        RefsetDto updatedDto = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
-        Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, new RefsetPlan()).build();
+    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, RefsetConceptNotFoundException, NonUniquePublicIdException{
+        RefsetDto updatedDto = RefsetTestUtil.createRefsetDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
+        Refset updatedRefset = Refset.getBuilder(concept, PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, new Plan()).build();
         updatedRefset.setId(REFSET_ID);
-        Refset refsetOriginal = RefsetTestUtil.createModelObject(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
+        Refset refsetOriginal = RefsetTestUtil.createRefset(REFSET_ID, concept, PUBLIC_ID, TITLE, DESCRIPTION);
         
         when(repoMock.findOne(updatedDto.getId())).thenReturn(refsetOriginal);
         when(repoMock.save(any(Refset.class))).thenReturn(updatedRefset);
-        when(planServiceMock.findById(any(Long.class))).thenReturn(new RefsetPlan());
-        when(planServiceMock.update(any(RefsetPlanDto.class))).thenReturn(new RefsetPlan());
+        when(planServiceMock.findById(any(Long.class))).thenReturn(new Plan());
+        when(planServiceMock.update(any(PlanDto.class))).thenReturn(new Plan());
         when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
         
         Refset returned = refsetService.update(updatedDto);
@@ -196,7 +198,7 @@ public class RepositoryRefsetServiceTest {
         verify(repoMock, times(1)).save(any(Refset.class));
         verify(conceptMock, times(1)).findBySerialisedId(concept.getSerialisedId());
         verify(planServiceMock, times(1)).findById(any(Long.class));
-        verify(planServiceMock, times(1)).update(any(RefsetPlanDto.class));
+        verify(planServiceMock, times(1)).update(any(PlanDto.class));
         verifyNoMoreInteractions(repoMock);
         verifyNoMoreInteractions(conceptMock);
         verifyNoMoreInteractions(planServiceMock);
@@ -205,8 +207,8 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test(expected = RefsetNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, ConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException {
-        RefsetDto updated = RefsetTestUtil.createDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
+    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException {
+        RefsetDto updated = RefsetTestUtil.createRefsetDto(REFSET_ID, concept.getSerialisedId(), PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED);
         
         when(repoMock.findOne(updated.getId())).thenReturn(null);
 //        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
@@ -222,7 +224,7 @@ public class RepositoryRefsetServiceTest {
     private void assertRefset(RefsetDto expected, Refset actual) {
         assertNotNull(actual.getConcept());
         assertEquals((expected.getConcept() == null ? 0 : expected.getConcept()), actual.getConcept().getSerialisedId());
-        assertEquals((expected.getId() == null ? 0 : expected.getId()), actual.getId());
+        assertEquals((expected.getId() == null ? null : expected.getId()), actual.getId());
         assertEquals(expected.getPublicId(), actual.getPublicId());
         assertEquals(expected.getTitle(), actual.getTitle());
         assertEquals(expected.getDescription(), actual.getDescription());
