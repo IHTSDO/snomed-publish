@@ -52,7 +52,7 @@ public class Plan {
     @JoinTable(
         joinColumns = @JoinColumn(name="plan_id"),
         inverseJoinColumns = @JoinColumn(name="concept_id"),
-        uniqueConstraints=@UniqueConstraint(columnNames={"plan_id", "concept_id"}))
+        uniqueConstraints=@UniqueConstraint(columnNames={"refset_id", "concept_id"}))
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> concepts;
     
