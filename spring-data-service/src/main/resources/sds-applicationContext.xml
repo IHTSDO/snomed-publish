@@ -31,9 +31,9 @@
         system-properties-mode="OVERRIDE" 
         ignore-unresolvable="true"/>
     
-    <context:component-scan base-package="com.ihtsdo.snomed.web" />
+    <context:component-scan base-package="com.ihtsdo.snomed" />
     
-    <jpa:repositories base-package="com.ihtsdo.snomed.web.repository" entity-manager-factory-ref="entityManagerFactory" />
+    <jpa:repositories base-package="com.ihtsdo.snomed.repository" entity-manager-factory-ref="entityManagerFactory" />
     
     <!-- VALIDATOR -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"/>

@@ -51,6 +51,7 @@ import com.ihtsdo.snomed.service.refset.SnapshotService;
     TransactionalTestExecutionListener.class})
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml", 
+        "classpath:sds-spring-data.xml",
         "classpath:test-spring-data.xml"})
 public class RepositorySnapshotServiceTest {
     private static final Long   SNAPSHOT_ID         = Long.valueOf(5);

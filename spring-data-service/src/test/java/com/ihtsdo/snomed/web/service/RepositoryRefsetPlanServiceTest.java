@@ -53,6 +53,7 @@ import com.ihtsdo.snomed.service.refset.RuleService;
     TransactionalTestExecutionListener.class})
 @ContextConfiguration(locations = {
         "classpath:sds-applicationContext.xml", 
+        "classpath:sds-spring-data.xml",
         "classpath:test-spring-data.xml"})
 public class RepositoryRefsetPlanServiceTest {
     
