@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.web.testing;
+package test.com.ihtsdo.snomed.web;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Iterator;

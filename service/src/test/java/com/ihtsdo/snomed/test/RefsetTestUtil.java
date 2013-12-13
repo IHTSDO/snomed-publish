@@ -1,7 +1,7 @@
 package com.ihtsdo.snomed.test;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.RefsetPlanDto;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
 
 public class RefsetTestUtil {
 
@@ -13,7 +13,7 @@ public class RefsetTestUtil {
         dto.setPublicId(publicId);
         dto.setTitle(title);
         dto.setDescription(description);
-        dto.setPlan(new RefsetPlanDto());
+        dto.setPlan(new PlanDto());
 
         return dto;
     }

@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.web.testing;
+package test.com.ihtsdo.snomed.web;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;

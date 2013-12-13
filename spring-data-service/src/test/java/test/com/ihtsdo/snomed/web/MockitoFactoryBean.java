@@ -1,4 +1,4 @@
-package com.ihtsdo.snomed.web.testing;
+package test.com.ihtsdo.snomed.web;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.FactoryBean;
