@@ -1,0 +1,242 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.ihtsdo.snomed</groupId>
+    <artifactId>snomed-publish</artifactId>
+    <version>0.5</version>
+  </parent>
+  <packaging>war</packaging>
+  <artifactId>api</artifactId>
+  <name>api</name>
+  
+  <properties>
+    <jetty.servlets.version>9.0.4.v20130625</jetty.servlets.version>
+    <c3p0.version>0.9.1.2</c3p0.version>
+    <mchange-commons-java.version>0.2.2</mchange-commons-java.version>
+    <jsp.api.version>2.0</jsp.api.version>
+    <moxy.version>2.5.0</moxy.version>
+    <servlet.api.version>2.5</servlet.api.version>
+    <jetty.version>9.0.4.v20130625</jetty.version>
+  </properties>
+  
+  <build>
+    <finalName>api</finalName>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <plugins>
+    
+      <!-- JETTY -->
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.version}</version>
+        <configuration>
+          <webAppXml>src/main/resources/jetty.xml</webAppXml>
+        </configuration>
+        <dependencies>
+          <dependency>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-servlets</artifactId>
+              <version>${jetty.servlets.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      
+    </plugins>
+  </build>
+  
+  <dependencies>
+  
+    <dependency>
+      <groupId>com.ihtsdo.snomed</groupId>
+      <artifactId>spring-data-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>  
+
+    <dependency>
+	    <groupId>com.mangofactory</groupId>
+	    <artifactId>swagger-springmvc</artifactId>
+	    <version>0.6.5</version>
+	</dependency>
+    
+    <!-- JSR-330 Javax inject annotations -->
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>${javax.inject.version}</version>
+    </dependency>
+    
+    <!-- Better (?) JAXB implementation by Moxy. See jaxb.properties -->
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.moxy</artifactId>
+      <version>${moxy.version}</version>
+    </dependency>
+    
+    <!-- Apache Commons IO -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons.io.version}</version>
+    </dependency>
+    
+    <!-- Spring Core -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring MVC -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring Object-XML Mapping -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-oxm</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring AOP -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring JPA -->
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-jpa</artifactId>
+      <version>${spring.data.jpa.version}</version>
+    </dependency>
+    
+    <!-- Spring JDBC -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring ORM -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Spring Transactions -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    
+    <!-- Jackson JSON converter -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    
+    <!-- MySql Database -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql.connector.version}</version>
+    </dependency>
+    
+    <!-- Hibernate Core -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
+    
+    <!-- Hibernate EntityManager -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <version>${hibernate.version}</version>
+    </dependency>
+    
+    <!-- Hibernate Validator -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>${hibernate.validator.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.el</groupId>
+        <artifactId>javax.el-api</artifactId>
+        <version>${javax.el.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.web</groupId>
+        <artifactId>javax.el</artifactId>
+        <version>${javax.el.version}</version>
+    </dependency>
+    
+    <!-- C3P0 Connection Pooling -->
+    <!-- Note: Is BoneCP any better? -->
+    <dependency>
+      <groupId>c3p0</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>${c3p0.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>mchange-commons-java</artifactId>
+      <version>${mchange-commons-java.version}</version>
+    </dependency>
+    
+    
+    <!-- PROVIDED SCOPE -->
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>${servlet.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>${jsp.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- TEST SCOPE -->
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>commons-dbcp</groupId>
+        <artifactId>commons-dbcp</artifactId>
+        <version>${commons-dbcp.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+</project>

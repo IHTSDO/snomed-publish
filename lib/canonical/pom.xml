@@ -8,7 +8,7 @@
     </parent>
     <artifactId>canonical</artifactId>
     <packaging>jar</packaging>
-    <name>canonical</name>
+    <name>library/canonical</name>
     <dependencies>
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>

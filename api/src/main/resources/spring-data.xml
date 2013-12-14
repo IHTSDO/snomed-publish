@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:jpa="http://www.springframework.org/schema/data/jpa" 
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:repository="http://www.springframework.org/schema/data/repository"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+        http://www.springframework.org/schema/jdbc 
+        http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+        http://www.springframework.org/schema/cache
+        http://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.2.xsd
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+    <!-- Annotation driven transactions -->
+    <tx:annotation-driven/>
+    
+    <!-- Declare a snomed datasource that has pooling capabilities -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close"
+        p:driverClass="${database.driver}" p:jdbcUrl="${database.url}"
+        p:user="${database.user}" p:password="${database.password}"
+        p:acquireIncrement="5" p:idleConnectionTestPeriod="60" p:maxPoolSize="100"
+        p:maxStatements="1000" p:maxStatementsPerConnection="100" p:minPoolSize="10" />
+        
+    <!-- Declare an authentication/userdb datasource that has pooling capabilities -->
+    <bean id="dataSourceAuthentication" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+        destroy-method="close"
+        p:driverClass="${authentication.database.driver}" p:jdbcUrl="${authentication.database.url}"
+        p:user="${authentication.database.user}" p:password="${authentication.database.password}"
+        p:acquireIncrement="5" p:idleConnectionTestPeriod="60" p:maxPoolSize="100"
+        p:maxStatements="1000" p:maxStatementsPerConnection="100" p:minPoolSize="10" />
+
+    <!-- Hibernate doesn't support <exclude-unlisted-classes>false</exclude-unlisted-classes> under SE, -->
+    <!-- http://stackoverflow.com/questions/1780341/do-i-need-class-elements-in-persistence-xml -->
+    <!-- So we get rid of persistence.xml alltogether. Good riddance -->
+
+    <!-- Declare a JPA speciFactory for snomed -->
+    <!-- New in Spring 3.1, we can get rid of persistence.xml -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+        p:packagesToScan="com.ihtsdo.snomed.model"
+        p:dataSource-ref="dataSource"
+        p:jpaVendorAdapter-ref="hibernateVendor"
+        p:persistenceUnitName="hibernatePersistenceUnit"
+        p:jpaPropertyMap-ref="jpaPropertyMap" />
+    
+    <!-- Declare a JPA entityManagerFactory for authentication / userdb -->
+    <!-- New in Spring 3.1 -->
+    <bean id="entityManagerFactoryAuthentication" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+        p:packagesToScan="com.ihtsdo.snomed"
+        p:dataSource-ref="dataSourceAuthentication"
+        p:jpaVendorAdapter-ref="hibernateVendor"
+        p:jpaPropertyMap-ref="jpaPropertyMapAuthentication"
+        p:persistenceUnitName="hibernatePersistenceUnitAuthentication" />
+    
+    <!-- Properties from persistence.xml -->
+    <util:map id="jpaPropertyMap">        
+        <entry  key="hibernate.hbm2ddl.auto" value="update"/>
+        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+        <entry key="hibernate.connection.charSet" value="UTF-8"/>
+        <entry key="hibernate.format_sql" value="true"/>
+        <entry key="hibernate.show_sql" value="false"/>
+    </util:map>
+
+    <util:map id="jpaPropertyMapAuthentication">
+        <entry  key="hibernate.hbm2ddl.auto" value="update"/>
+        <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+        <entry key="hibernate.connection.charSet" value="UTF-8"/>
+        <entry key="hibernate.format_sql" value="true"/>
+        <entry key="hibernate.show_sql" value="true"/>
+    </util:map>
+
+    <bean id="hibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+        p:showSql="false"/>
+
+    <!-- Declare a transaction manager -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
+    
+    <!-- Declare a transaction manager for Authentication / userdb -->
+    <bean id="transactionManagerAuthentication" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactoryAuthentication" />
+    </bean>    
+
+</beans>

@@ -8,7 +8,7 @@
     </parent>
     <artifactId>jena-spike</artifactId>
     <packaging>jar</packaging>
-    <name>jena-spike</name>
+    <name>library/jena-spike</name>
     <description>A working implementation of generating RDF Schema using the Jena API. Way to slow for all of Snomed, See RdfSchemaSerialiser in lib/importexport instead</description>
     <build>
         <finalName>jena-spike</finalName>

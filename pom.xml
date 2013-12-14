@@ -21,10 +21,11 @@
     <url>http://build.sparklingideas.co.uk</url>
   </ciManagement>  
   <modules>
-    <module>lib</module>
     <module>model</module>
     <module>service</module>
     <module>spring-data-service</module>
+    <module>api</module>
+    <module>lib</module>
     <module>web</module>
   </modules>
   <properties>

@@ -50,9 +50,9 @@ public class Plan {
     
     @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
-        joinColumns = @JoinColumn(name="refset_id"),
+        joinColumns = @JoinColumn(name="plan_id"),
         inverseJoinColumns = @JoinColumn(name="concept_id"),
-        uniqueConstraints=@UniqueConstraint(columnNames={"refset_id", "concept_id"}))
+        uniqueConstraints=@UniqueConstraint(columnNames={"plan_id", "concept_id"}))
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> concepts;
     

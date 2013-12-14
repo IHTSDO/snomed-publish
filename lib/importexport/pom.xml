@@ -7,7 +7,7 @@
   </parent>
   <artifactId>importexport</artifactId>
   <packaging>jar</packaging>
-  <name>importexport</name>
+  <name>library/importexport</name>
     
   <dependencies>
         <dependency>

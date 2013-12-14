@@ -10,7 +10,7 @@
   </parent>
   <packaging>war</packaging>
   <artifactId>snomed-browser</artifactId>
-  <name>snomed-browser</name>
+  <name>web</name>
   
   <properties>
     <spring.security.version>3.1.4.RELEASE</spring.security.version>

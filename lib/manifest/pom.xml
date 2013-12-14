@@ -8,7 +8,7 @@
     </parent>
     <artifactId>manifest</artifactId>
     <packaging>jar</packaging>
-    <name>manifest</name>
+    <name>library/manifest</name>
     <description>Application for creating the manifest file to go with the release</description>
     <build>
         <finalName>manifest</finalName>

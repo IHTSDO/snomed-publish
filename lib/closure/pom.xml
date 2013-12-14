@@ -8,7 +8,7 @@
     </parent>
     <artifactId>closure</artifactId>
     <packaging>jar</packaging>
-    <name>closure</name>
+    <name>library/closure</name>
     <dependencies>
         
         <dependency>

@@ -58,8 +58,8 @@ import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 @Controller
 @RequestMapping("/api")
 @Transactional(value = "transactionManager")
-public class RefsetApiController {
-    private static final Logger LOG = LoggerFactory.getLogger(RefsetApiController.class);
+public class RefsetController {
+    private static final Logger LOG = LoggerFactory.getLogger(RefsetController.class);
 
     @Inject
     RefsetService refsetService;
