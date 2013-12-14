@@ -76,8 +76,6 @@ public class RefsetController {
     @Resource
     private MessageSource messageSource;
     
-    @PersistenceContext(unitName="hibernatePersistenceUnit")
-    EntityManager em;
     
     @Transactional
     @RequestMapping(value = "", 

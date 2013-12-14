@@ -26,7 +26,7 @@ public class RepositoryRuleService implements RuleService {
     protected RuleRepository ruleRepository; 
     
 //    @Inject 
-//    protected ConceptRepository conceptRepository;
+//    protected ConceptRepository descriptionRepository;
     
     @Inject
     protected ConceptService conceptService;

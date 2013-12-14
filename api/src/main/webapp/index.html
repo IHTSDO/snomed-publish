@@ -19,12 +19,13 @@
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: "http://api.sparklingideas.co.uk/api-docs",
+      url: window.location.origin + "/api-docs",
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
         if(console) {
           console.log("Loaded SwaggerUI")
+          console.log('url: ' + window.location.origin + "/api-docs");
         }
         $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
       },
@@ -53,7 +54,6 @@
 </head>
 
 <body>
-
 
 <div id="message-bar" class="swagger-ui-wrap">
   &nbsp;
