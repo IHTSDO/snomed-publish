@@ -56,7 +56,7 @@ import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/refsets")
 @Transactional(value = "transactionManager")
 public class RefsetController {
     private static final Logger LOG = LoggerFactory.getLogger(RefsetController.class);
@@ -80,7 +80,7 @@ public class RefsetController {
     EntityManager em;
     
     @Transactional
-    @RequestMapping(value = "refsets", 
+    @RequestMapping(value = "/", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -89,7 +89,7 @@ public class RefsetController {
     }    
         
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}", 
+    @RequestMapping(value = "{pubId}", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -98,7 +98,7 @@ public class RefsetController {
     }    
     
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}/concepts.json", 
+    @RequestMapping(value = "{pubId}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -107,7 +107,7 @@ public class RefsetController {
     }    
     
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}/snapshot/{snapshotId}/concepts.json", 
+    @RequestMapping(value = "{pubId}/snapshot/{snapshotId}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -132,7 +132,7 @@ public class RefsetController {
     }      
 
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}/plan.json", 
+    @RequestMapping(value = "{pubId}/plan.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -143,7 +143,7 @@ public class RefsetController {
     }    
 
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}", 
+    @RequestMapping(value = "{pubId}", 
             method = RequestMethod.DELETE, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -224,7 +224,7 @@ public class RefsetController {
     }
     
     @Transactional
-    @RequestMapping(value = "refsets/{pubId}/plan", method = RequestMethod.PUT, 
+    @RequestMapping(value = "{pubId}/plan", method = RequestMethod.PUT, 
     produces = {MediaType.APPLICATION_JSON_VALUE}, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
@@ -287,7 +287,7 @@ public class RefsetController {
     }
     
     @Transactional
-    @RequestMapping(value = "refsets/validate", method = RequestMethod.PUT, 
+    @RequestMapping(value = "validate", method = RequestMethod.PUT, 
     produces = {MediaType.APPLICATION_JSON_VALUE}, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
