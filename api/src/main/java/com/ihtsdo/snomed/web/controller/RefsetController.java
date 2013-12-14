@@ -80,7 +80,7 @@ public class RefsetController {
     EntityManager em;
     
     @Transactional
-    @RequestMapping(value = "/", 
+    @RequestMapping(value = "", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
