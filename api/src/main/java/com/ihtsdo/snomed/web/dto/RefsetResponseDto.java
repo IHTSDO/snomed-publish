@@ -44,12 +44,12 @@ public class RefsetResponseDto {
     private Status status;
     
     @XmlElementWrapper(name = "fieldErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     //@JsonSerialize(using = fieldErrorsSerialiser.class, as=String.class)
     private Map<String, List<String>> fieldErrors = new HashMap<>();
     
     @XmlElementWrapper(name = "globalErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     private List<String> globalErrors = new ArrayList<>();
     
     private RefsetDto refset;

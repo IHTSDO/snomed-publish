@@ -56,7 +56,7 @@ public class Plan {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Set<Concept> concepts;
     
-    @OneToOne(targetEntity=BaseRule.class, cascade=CascadeType.ALL)
+    @OneToOne(targetEntity=BaseRule.class, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     private Rule terminal;
     
     @NotNull
@@ -83,6 +83,20 @@ public class Plan {
         }
         return concepts;
     }
+    
+    @Transient
+    public final Set<Concept> refreshAndGetConcepts(){
+        refreshConceptsCache();
+        Set<Concept> concepts = null;
+        try {
+            concepts = getConcepts();
+        }
+        catch (ConceptsCacheNotBuiltException e) {
+            //will never happen
+        }
+        
+        return concepts;
+    }    
     
     @Transient
     public List<Rule> getRules(){

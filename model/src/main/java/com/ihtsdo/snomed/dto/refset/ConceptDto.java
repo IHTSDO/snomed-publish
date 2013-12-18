@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.dto.refset;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.model.Concept;
 
 
 public class ConceptDto {
@@ -72,6 +73,10 @@ public class ConceptDto {
 
     public static Builder getBuilder(){
         return new Builder();
+    }
+    
+    public static ConceptDto parse(Concept c){
+        return getBuilder().id(c.getSerialisedId()).displayName(c.getDisplayName()).build();
     }
     
     public static class Builder{

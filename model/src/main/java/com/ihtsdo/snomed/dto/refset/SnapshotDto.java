@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Snapshot;
 
 @XmlRootElement(name="snapshot")
 @JsonRootName("snapshot")
@@ -40,6 +42,27 @@ public class SnapshotDto {
     private Set<ConceptDto> conceptDtos = new HashSet<>();
     
     public SnapshotDto(){}
+
+    public static SnapshotDto parse(Snapshot snapshot){
+        return fillConcepts(snapshot, parseSansConcepts(snapshot));
+    }    
+    
+    public static SnapshotDto parseSansConcepts(Snapshot snapshot){
+        return SnapshotDto.getBuilder(snapshot.getId(), 
+                snapshot.getTitle(),
+                snapshot.getDescription(),
+                snapshot.getPublicId(),
+                null).build();
+    }
+    
+    private static SnapshotDto fillConcepts(Snapshot snap, SnapshotDto snapDto){
+        Set<ConceptDto> conceptDtos = new HashSet<ConceptDto>();
+        for (Concept c : snap.getConcepts()){
+            conceptDtos.add(ConceptDto.parse(c));
+        }
+        snapDto.setConceptDtos(conceptDtos);
+        return snapDto;
+    }
     
     public SnapshotDto(Long id, String publicId, String title, String description, Set<ConceptDto> concepts){
         this.id = id;

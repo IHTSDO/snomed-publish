@@ -44,8 +44,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleServletRequestBindingException(ServletRequestBindingException ex)   {
         return new ResponseEntity<String>(ex.getMessage(),HttpStatus.PRECONDITION_REQUIRED);
     }
-
     
+
     
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex)   {

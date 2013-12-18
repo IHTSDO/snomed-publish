@@ -1,6 +1,5 @@
 package com.ihtsdo.snomed.web.controller;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,8 +7,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -32,10 +29,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
-import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
-import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
+import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
@@ -54,6 +52,7 @@ import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
+import com.ihtsdo.snomed.web.dto.SnapshotResponseDto;
 
 @Controller
 @RequestMapping("/refsets")
@@ -71,7 +70,7 @@ public class RefsetController {
     PlanService planService;
     
     @Inject
-    RefsetErrorBuilder error;
+    RefsetErrorBuilder refsetErrorBuilder;
     
     @Resource
     private MessageSource messageSource;
@@ -82,75 +81,172 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<XmlRefsetShort> getAllRefsets() throws Exception {
+    public @ResponseBody List<XmlRefsetShort> getAllRefsets(){
         return getRefsetsDto();
     }    
         
     @Transactional
-    @RequestMapping(value = "{pubId}", 
+    @RequestMapping(value = "{refsetName}", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody RefsetDto getRefset(@PathVariable String pubId) throws Exception {
-        return getRefsetDto(pubId);
+    public @ResponseBody RefsetDto getRefset(@PathVariable String refsetName){
+        return getRefsetDto(refsetName);
     }    
     
     @Transactional
-    @RequestMapping(value = "{pubId}/concepts.json", 
+    @RequestMapping(value = "{refsetName}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody XmlRefsetConcepts getConcepts(@PathVariable String pubId) throws Exception {
-        return new XmlRefsetConcepts(getXmlConceptDtos(pubId));
-    }    
+    public @ResponseBody XmlRefsetConcepts getConcepts(@PathVariable String refsetName){
+        return new XmlRefsetConcepts(getXmlConceptDtos(refsetName));
+    }
     
     @Transactional
-    @RequestMapping(value = "{pubId}/snapshot/{snapshotId}/concepts.json", 
+    @RequestMapping(value = "{refsetName}/snapshots", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody XmlRefsetConcepts getSnapshotConcepts(@PathVariable String pubId, String snapshotId) throws Exception {
-        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}]", snapshotId, pubId);
+    public ResponseEntity<List<SnapshotDto>> getAllSnapshots(@PathVariable String refsetName){
+        LOG.debug("Received request for all snapshots for refset [{}]", refsetName);
         
-        Refset refset = refsetService.findByPublicId(pubId);
-        Snapshot snapshot = snapshotService.findByPublicId(snapshotId);
-        
-        if ((refset == null) || (snapshot == null) || !refset.getSnapshots().contains(snapshot)){
-            //error
-        }
-        
-        List<XmlRefsetConcept> xmlConcepts = new ArrayList<>();
-        for (Concept c : snapshot.getConcepts()){
-            xmlConcepts.add(new XmlRefsetConcept(c));
-        }
-        LOG.debug("returning xmlconcepts [{}]", xmlConcepts.size());
+        Refset refset = refsetService.findByPublicId(refsetName);
 
+        if (refset == null){
+            return new ResponseEntity<List<SnapshotDto>>(HttpStatus.NOT_FOUND);
+        }
         
-        return null;
-    }      
+        List<SnapshotDto> snapshots = new ArrayList<SnapshotDto>(refset.getSnapshots().size());
+        for (Snapshot snapshot : refset.getSnapshots()){
+            snapshots.add(SnapshotDto.parseSansConcepts(snapshot));
+        }
+        
+        return new ResponseEntity<List<SnapshotDto>>(snapshots, HttpStatus.OK);
+    }    
+    
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SnapshotDto>  getSnapshotWithConcepts(
+            @PathVariable String refsetName, 
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}]", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            return new ResponseEntity<SnapshotDto>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            return new ResponseEntity<SnapshotDto>(HttpStatus.NOT_FOUND);
+        }
+        
+        return new ResponseEntity<SnapshotDto>(SnapshotDto.parse(snapshot), HttpStatus.OK);
+    }
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapit", 
+            method = RequestMethod.POST, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SnapshotResponseDto> snapit(@PathVariable String refsetName,
+            @Valid @RequestBody SnapshotDto snapshotDto,
+            BindingResult bindingResult)
+    {
+        LOG.debug("Received request to create snapshot of refset [{}]", refsetName);
+
+        int returnCode = RefsetResponseDto.FAIL;
+        SnapshotResponseDto response = new SnapshotResponseDto();
+            
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+        }
+        
+        try {
+            SnapshotDto resultDto = refsetService.takeSnapshot(refsetName, snapshotDto);
+            response.setSnapshotDto(resultDto);
+            return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
+        }
+        catch (RefsetNotFoundException e) {
+            return new ResponseEntity<SnapshotResponseDto>(HttpStatus.NOT_FOUND);
+        }
+        catch (NonUniquePublicIdException e) {
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "publicId", snapshotDto.getPublicId(),
+                    false, null,null, "xml.response.error.publicid.not.unique"));            
+            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+        }
+    }    
 
     @Transactional
-    @RequestMapping(value = "{pubId}/plan.json", 
+    @RequestMapping(value = "{refsetName}/snapshots", 
+            method = RequestMethod.POST, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SnapshotResponseDto> importSnapshot(@PathVariable String refsetName,
+            @Valid @RequestBody SnapshotDto snapshotDto,
+            BindingResult bindingResult)
+    {
+        LOG.debug("Received request to create snapshot of refset [{}]", refsetName);
+
+        int returnCode = RefsetResponseDto.FAIL;
+        SnapshotResponseDto response = new SnapshotResponseDto();
+            
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+        }
+        
+        try {
+            SnapshotDto resultDto = refsetService.importSnapshot(refsetName, snapshotDto);
+            response.setSnapshotDto(resultDto);
+            return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
+        }
+        catch (RefsetNotFoundException e) {
+            return new ResponseEntity<SnapshotResponseDto>(HttpStatus.NOT_FOUND);
+        }
+        catch (NonUniquePublicIdException e) {
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "publicId", snapshotDto.getPublicId(),
+                    false, null,null, "xml.response.error.publicid.not.unique"));            
+            returnCode = RefsetResponseDto.FAIL_PUBLIC_ID_NOT_UNIQUE;
+        }
+        catch (ConceptIdNotFoundException e) {
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "concepts", e.getId(),
+                    false, null,null, "xml.response.error.concept.not.found"));
+            returnCode = RefsetResponseDto.FAIL_CONCEPT_NOT_FOUND;
+        }
+        return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);        
+    }        
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/plan", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody PlanDto getRefsetPlan(@PathVariable String pubId) throws Exception {
-        Refset refset = refsetService.findByPublicId(pubId);
+    public @ResponseBody PlanDto getRefsetPlan(@PathVariable String refsetName) {
+        Refset refset = refsetService.findByPublicId(refsetName);
         System.out.println("Found refset " + refset);
         return PlanDto.parse(refset.getPlan());
     }    
 
     @Transactional
-    @RequestMapping(value = "{pubId}", 
+    @RequestMapping(value = "{refsetName}", 
             method = RequestMethod.DELETE, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RefsetResponseDto> deleteRefset(HttpServletRequest request, @PathVariable String pubId){
-        LOG.debug("Received request to delete refset [{}]", pubId);
+    public ResponseEntity<RefsetResponseDto> deleteRefset(HttpServletRequest request, @PathVariable String refsetName){
+        LOG.debug("Received request to delete refset [{}]", refsetName);
         RefsetResponseDto response = new RefsetResponseDto();
-        response.setPublicId(pubId);
+        response.setPublicId(refsetName);
         try {
-            Refset deleted = refsetService.delete(pubId);
+            Refset deleted = refsetService.delete(refsetName);
             response.setRefset(
                 RefsetDto.getBuilder(
                     deleted.getId(), 
@@ -166,14 +262,14 @@ public class RefsetController {
             response.setStatus(Status.FAIL);
             response.setGlobalErrors(Arrays.asList(messageSource.getMessage(
                     "global.error.refset.not.found", 
-                    Arrays.asList(pubId).toArray(), 
+                    Arrays.asList(refsetName).toArray(), 
                     LocaleContextHolder.getLocale())));
             return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.PRECONDITION_FAILED);
         }
     }
 
     @Transactional
-    @RequestMapping(value = "refsets", method = RequestMethod.POST, 
+    @RequestMapping(value = "", method = RequestMethod.POST, 
     produces = {MediaType.APPLICATION_JSON_VALUE }, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
@@ -194,20 +290,20 @@ public class RefsetController {
         }
 
         if (bindingResult.hasErrors()) {
-            return new ResponseEntity<RefsetResponseDto>(error.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         }
 
         try {
             Refset created = refsetService.create(refsetDto);
             if (created == null){
-                return new ResponseEntity<RefsetResponseDto>(error.build(bindingResult, response, RefsetResponseDto.FAIL), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, RefsetResponseDto.FAIL), HttpStatus.INTERNAL_SERVER_ERROR);
             }
             return new ResponseEntity<RefsetResponseDto>(success(response, created, Status.CREATED, RefsetResponseDto.SUCCESS_CREATED), HttpStatus.CREATED);
         } catch (NonUniquePublicIdException e) {
             bindingResult.addError(new FieldError(
                     bindingResult.getObjectName(), "publicId", refsetDto.getPublicId(),
                     false, null,null, "xml.response.error.publicid.not.unique"));
-            return new ResponseEntity<RefsetResponseDto>(error.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         } catch (RefsetConceptNotFoundException e) {
             LOG.debug("Create refset failed", e);
             response.setStatus(Status.FAIL);
@@ -222,17 +318,17 @@ public class RefsetController {
     }
     
     @Transactional
-    @RequestMapping(value = "{pubId}/plan", method = RequestMethod.PUT, 
+    @RequestMapping(value = "{refsetName}/plan", method = RequestMethod.PUT, 
     produces = {MediaType.APPLICATION_JSON_VALUE}, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public ResponseEntity<RefsetPlanResponseDto> updateRefsetPlan(
             @Valid @RequestBody PlanDto planDto,
             BindingResult bindingResult, 
-            @PathVariable String pubId)
+            @PathVariable String refsetName)
     {
         LOG.debug("Controller received request to update refset plan {} for refset {}", 
-                planDto.toString(), pubId);
+                planDto.toString(), refsetName);
         
         RefsetPlanResponseDto response = new RefsetPlanResponseDto();
         response.setRefsetPlan(planDto);
@@ -241,7 +337,7 @@ public class RefsetController {
 
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<RefsetPlanResponseDto>(
-                    error.build(bindingResult, response, RefsetResponseDto.FAIL), 
+                    refsetErrorBuilder.build(bindingResult, response, RefsetResponseDto.FAIL), 
                     HttpStatus.NOT_ACCEPTABLE);
         }
         
@@ -253,7 +349,7 @@ public class RefsetController {
             return new ResponseEntity<RefsetPlanResponseDto>(response, HttpStatus.NOT_ACCEPTABLE);            
         }
         
-        Refset refset = refsetService.findByPublicId(pubId);        
+        Refset refset = refsetService.findByPublicId(refsetName);        
         if (refset == null){
             return new ResponseEntity<RefsetPlanResponseDto>(HttpStatus.NOT_FOUND);
         }
@@ -289,7 +385,8 @@ public class RefsetController {
     produces = {MediaType.APPLICATION_JSON_VALUE}, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
-    public ResponseEntity<RefsetPlanResponseDto> validateRefsetPlan(@Valid @RequestBody PlanDto planDto,BindingResult result){
+    public ResponseEntity<RefsetPlanResponseDto> validateRefsetPlan(@Valid @RequestBody PlanDto planDto,
+            BindingResult result){
         LOG.debug("Controller received request to validate refset {}", planDto.toString());
         RefsetPlanResponseDto response = new RefsetPlanResponseDto();
         response.setRefsetPlan(planDto);
@@ -298,7 +395,7 @@ public class RefsetController {
         
         if (result.hasErrors()) {
             return new ResponseEntity<RefsetPlanResponseDto>(
-                    error.build(result, response, RefsetResponseDto.FAIL), 
+                    refsetErrorBuilder.build(result, response, RefsetResponseDto.FAIL), 
                     HttpStatus.NOT_ACCEPTABLE);
         }
         
@@ -313,7 +410,7 @@ public class RefsetController {
         }
 
         return new ResponseEntity<RefsetPlanResponseDto>(
-                error.build(validationResult, response), 
+                refsetErrorBuilder.build(validationResult, response), 
                 HttpStatus.NOT_ACCEPTABLE);
     }
 
@@ -330,11 +427,10 @@ public class RefsetController {
         return response;
     }
 
-    private List<XmlRefsetConcept> getXmlConceptDtos(String pubId) throws ConceptsCacheNotBuiltException, MalformedURLException {
+    private List<XmlRefsetConcept> getXmlConceptDtos(String pubId){
         Refset refset = refsetService.findByPublicId(pubId);
         System.out.println("Found refset " + refset);
-        refset.getPlan().refreshConceptsCache();
-        Set<Concept> concepts = refset.getPlan().getConcepts();
+        Set<Concept> concepts = refset.getPlan().refreshAndGetConcepts();
         List<XmlRefsetConcept> xmlConcepts = new ArrayList<>();
         for (Concept c : concepts){
             xmlConcepts.add(new XmlRefsetConcept(c));
@@ -343,7 +439,7 @@ public class RefsetController {
         return xmlConcepts;
     }    
 
-    private List<XmlRefsetShort> getRefsetsDto() throws MalformedURLException {
+    private List<XmlRefsetShort> getRefsetsDto(){
         List<Refset> refsets = refsetService.findAll();
         List<XmlRefsetShort> xmlRefsetShorts = new ArrayList<>();
         for (Refset r : refsets){

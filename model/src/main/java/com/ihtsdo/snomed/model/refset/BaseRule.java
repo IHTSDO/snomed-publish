@@ -12,6 +12,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -84,7 +85,7 @@ public abstract class BaseRule implements Rule{
     @GeneratedValue(strategy=GenerationType.IDENTITY)    
     protected Long id;
     
-    @OneToMany(targetEntity=BaseRule.class, cascade=CascadeType.ALL)
+    @OneToMany(targetEntity=BaseRule.class, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn
     protected Map<String, Rule> incomingRules = new HashMap<String, Rule>();
     
@@ -115,7 +116,7 @@ public abstract class BaseRule implements Rule{
             throw new UnrecognisedRefsetRuleTypeException(ruleDto, "I've not been able to handle Rule of type " + ruleDto.getType() + " and class " + TYPE_CLASS_MAP.get(ruleDto.getType()));
         }
     }    
-
+    @Override
     public Set<Concept> generateConcepts(){
         Map<String, Set<Concept>> parentResults = new HashMap<>();
         for (String name : incomingRules.keySet()){

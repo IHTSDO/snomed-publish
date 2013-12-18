@@ -3,8 +3,10 @@ package com.ihtsdo.snomed.service.refset;
 import java.util.List;
 
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
+import com.ihtsdo.snomed.dto.refset.SnapshotDto;
+import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
@@ -31,5 +33,9 @@ public interface RefsetService {
     public abstract Refset delete(String publicId)
             throws RefsetNotFoundException;
 
-    Refset update(Refset refset);
+    public Refset update(Refset refset);
+
+    public SnapshotDto takeSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException;
+
+    public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException;
 }

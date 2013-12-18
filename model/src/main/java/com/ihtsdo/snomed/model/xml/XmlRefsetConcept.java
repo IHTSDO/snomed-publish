@@ -8,12 +8,17 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 
 @XmlRootElement(name="concept")
 public class XmlRefsetConcept {
+    private static final Logger LOG = LoggerFactory.getLogger(XmlRefsetConcept.class);
+
     @XmlTransient
     private long id;
     
@@ -27,12 +32,18 @@ public class XmlRefsetConcept {
     private long effectiveTime;
     private boolean active;
     
-    public XmlRefsetConcept(Concept c) throws MalformedURLException{
+    public XmlRefsetConcept(Concept c){
         setId(c.getSerialisedId());   
         setTitle(c.getFullySpecifiedName());
         setEffectiveTime(c.getEffectiveTime());
         setActive(c.isActive());
-        setHref(UrlBuilder.createConceptUrl(c));
+        try {
+            setHref(UrlBuilder.createConceptUrl(c));
+        }
+        catch (MalformedURLException e) {
+            LOG.error("Unable to build concept href url, setting null: " + e.getMessage(), e);
+            setHref(null);
+        }
     }
     
     public XmlRefsetConcept(){}

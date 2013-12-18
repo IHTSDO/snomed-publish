@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Objects;
-import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 
 @XmlRootElement(name="response")
 @JsonRootName("response")
@@ -44,15 +44,15 @@ public class SnapshotResponseDto {
     private Status status;
     
     @XmlElementWrapper(name = "fieldErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     //@JsonSerialize(using = fieldErrorsSerialiser.class, as=String.class)
     private Map<String, List<String>> fieldErrors = new HashMap<>();
     
     @XmlElementWrapper(name = "globalErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     private List<String> globalErrors = new ArrayList<>();
     
-    private RefsetDto refset;
+    private SnapshotDto snapshotDto;
     private String publicId;
     private int code;
     
@@ -64,7 +64,7 @@ public class SnapshotResponseDto {
                 .add("code", getCode())
                 .add("fieldErrors", getFieldErrors())
                 .add("globalErrors", getGlobalErrors())
-                .add("refset", getRefset())
+                .add("snapshotDto", getRefset())
                 .toString();
     }    
     
@@ -99,11 +99,11 @@ public class SnapshotResponseDto {
         this.globalErrors = globalErrors;
     }
 
-    public RefsetDto getRefset() {
-        return refset;
+    public SnapshotDto getRefset() {
+        return snapshotDto;
     }
-    public void setRefset(RefsetDto refset) {
-        this.refset = refset;
+    public void setSnapshotDto(SnapshotDto snapshotDto) {
+        this.snapshotDto = snapshotDto;
     }
     public Status getStatus() {
         return status;

@@ -1,9 +1,13 @@
 package com.ihtsdo.snomed.service.refset;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +17,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
-import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
-import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.SnapshotDto;
+import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Plan;
+import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
+import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
+import com.ihtsdo.snomed.service.ConceptService;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 //@Transactional (value = "transactionManager", readOnly = true)
@@ -47,6 +56,16 @@ public class RepositoryRefsetService implements RefsetService {
     
     @Inject
     SnapshotService snapshotService;
+    
+    @Inject
+    protected ConceptService conceptService;   
+    
+    
+    @Inject
+    protected SnapshotRepository snapshotRepository;   
+    
+    @PersistenceContext(unitName="hibernatePersistenceUnit") 
+    private EntityManager em;
     
     @PostConstruct
     public void init(){}
@@ -166,11 +185,82 @@ public class RepositoryRefsetService implements RefsetService {
         }
         refsetRepository.delete(deleted);
         return deleted;
-    }     
+    }    
+    
+    @Override
+    @Transactional(rollbackFor = RefsetNotFoundException.class)
+    public SnapshotDto takeSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException {
+        Refset refset = findByPublicId(refsetPublicId);
+        if (refset == null){
+            throw new RefsetNotFoundException(refsetPublicId);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotDto.getPublicId());
+        
+        if (snapshot != null){
+            throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
+        }
+        
+        Set<Concept> planConcepts = refset.getPlan().refreshAndGetConcepts();
+
+        em.detach(refset.getPlan());
+        
+        snapshot = Snapshot.getBuilder(
+                snapshotDto.getPublicId(), 
+                snapshotDto.getTitle(), 
+                snapshotDto.getDescription(), 
+                planConcepts).build();
+        
+        refset.addSnapshot(snapshot);
+        refset = refsetRepository.save(refset);
+        return SnapshotDto.parse(snapshot);
+    }
+    
+    @Override
+    @Transactional(rollbackFor = RefsetNotFoundException.class)
+    public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException {
+        Refset refset = findByPublicId(refsetPublicId);
+        if (refset == null){
+            throw new RefsetNotFoundException(refsetPublicId);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotDto.getPublicId());
+        
+        if (snapshot != null){
+            throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
+        }
+        
+        
+        
+        snapshot = Snapshot.getBuilder(
+                snapshotDto.getPublicId(), 
+                snapshotDto.getTitle(), 
+                snapshotDto.getDescription(), 
+                fillConcepts(snapshotDto.getConceptDtos())).build();
+        
+        refset.addSnapshot(snapshot);
+        refset = refsetRepository.save(refset);
+        return SnapshotDto.parse(snapshot);
+    }    
 
     private Sort sortByAscendingTitle() {
         return new Sort(Sort.Direction.ASC, "title");
     }
+    
+    private Set<Concept> fillConcepts(Set<ConceptDto> conceptDtos) throws ConceptIdNotFoundException  {
+        Set<Concept> concepts = new HashSet<Concept>();
+        if ((conceptDtos == null) || (conceptDtos.isEmpty())){
+            return concepts;
+        }
+        for (ConceptDto conceptDto : conceptDtos){
+            Concept c = conceptService.findBySerialisedId(conceptDto.getId());
+            if (c == null){
+                throw new ConceptIdNotFoundException(conceptDto.getId(), "Did not find concept with serialisedId " + conceptDto.getId());
+            }
+            concepts.add(c);
+        }
+        return concepts;
+    }      
 
 
 

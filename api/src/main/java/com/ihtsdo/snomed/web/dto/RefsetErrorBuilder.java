@@ -54,11 +54,6 @@ public class RefsetErrorBuilder {
             LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
         }
         
-//        LOG.error("Found errors: ");
-//        for (ObjectError error : result.getAllErrors()){
-//            LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
-//        }
-//        
         for (FieldError fError : result.getFieldErrors()){
             response.addFieldError(fError.getField(), resolveLocalizedErrorMessage(fError));
         }
@@ -82,6 +77,24 @@ public class RefsetErrorBuilder {
         response.setStatus(Status.FAIL);
         return response;
     }    
+    
+    
+    public SnapshotResponseDto build(BindingResult result, SnapshotResponseDto response, int returnCode) {
+        LOG.error("Found errors: ");
+        for (ObjectError error : result.getAllErrors()){
+            LOG.error("Error: {}", error.getObjectName() + " - " + error.getDefaultMessage());
+        }
+        
+        for (FieldError fError : result.getFieldErrors()){
+            response.addFieldError(fError.getField(), resolveLocalizedErrorMessage(fError));
+        }
+        for (ObjectError gError : result.getGlobalErrors()){
+            response.addGlobalError(resolveLocalizedErrorMessage(gError));
+        }
+        response.setCode(returnCode);
+        response.setStatus(com.ihtsdo.snomed.web.dto.SnapshotResponseDto.Status.FAIL);
+        return response;
+    }        
     
     private String resolveLocalizedErrorMessage(ObjectError error) {
         Locale currentLocale =  LocaleContextHolder.getLocale();

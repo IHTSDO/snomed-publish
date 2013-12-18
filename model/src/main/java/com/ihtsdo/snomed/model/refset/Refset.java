@@ -2,7 +2,8 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -49,7 +50,7 @@ public class Refset {
     
     @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
-    private Set<Snapshot> snapshots;
+    private Map<String, Snapshot> snapshotsMap;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -85,6 +86,18 @@ public class Refset {
         this.setDescription(description);
         this.setPlan(plan);
         return this;
+    }
+    
+    public Snapshot getSnapshot(String snapshotPublicId){
+        return getSnapshotsMap().get(snapshotPublicId);
+    }
+    
+    public Collection<Snapshot> getSnapshots(){
+        return getSnapshotsMap().values();
+    }
+    
+    public void addSnapshot(Snapshot snapshot){
+        getSnapshotsMap().put(snapshot.getPublicId(), snapshot);
     }
     
     @Override
@@ -227,15 +240,11 @@ public class Refset {
     }
 
 
-    public Set<Snapshot> getSnapshots() {
-        return snapshots;
+     Map<String, Snapshot> getSnapshotsMap() {
+        return snapshotsMap;
     }
 
-    public void setSnapshots(Set<Snapshot> snapshots) {
-        this.snapshots = snapshots;
+     void setSnapshotsMap(Map<String, Snapshot> snapshotsMap) {
+        this.snapshotsMap = snapshotsMap;
     }
-
-
- 
-
 }

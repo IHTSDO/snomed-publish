@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.model.refset.rule;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ public class SymmetricDifferenceRefsetRule extends BaseSetOperationRefsetRule{
     @Override
     protected Set<Concept> apply(Map<String, Set<Concept>> inputs) {
         assert(inputs.size() == 2);
-        return Sets.symmetricDifference(inputs.get(LEFT_OPERAND), inputs.get(RIGHT_OPERAND));
+        return Sets.symmetricDifference(inputs.get(LEFT_OPERAND), inputs.get(RIGHT_OPERAND)).
+                copyInto(new HashSet<Concept>());     
     }
 }

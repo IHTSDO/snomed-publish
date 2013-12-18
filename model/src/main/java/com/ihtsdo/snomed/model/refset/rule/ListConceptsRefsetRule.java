@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.JoinColumn;
@@ -25,7 +26,7 @@ import com.ihtsdo.snomed.model.Concept;
 public class ListConceptsRefsetRule extends SourceRefsetRule{ 
     public static final String NAME = ListConceptsRefsetRule.class.getName();
     
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
         joinColumns = @JoinColumn(name="addConceptsRefsetRule_id"),
         inverseJoinColumns = @JoinColumn(name="concept_id"),
@@ -72,7 +73,7 @@ public class ListConceptsRefsetRule extends SourceRefsetRule{
     public void addConcept(Concept c){
         getConcepts().add(c);
     }
-
+    
     public Set<Concept> getConcepts() {
         return concepts;
     }

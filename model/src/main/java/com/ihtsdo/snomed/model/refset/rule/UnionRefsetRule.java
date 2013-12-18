@@ -19,7 +19,8 @@ public class UnionRefsetRule extends BaseSetOperationRefsetRule{
         assert(inputs.size() == 2);
         return Sets.union(
                 inputs.get(LEFT_OPERAND) == null ?  new HashSet<Concept>() : inputs.get(LEFT_OPERAND),
-                inputs.get(RIGHT_OPERAND) == null ?  new HashSet<Concept>() : inputs.get(RIGHT_OPERAND));
+                inputs.get(RIGHT_OPERAND) == null ?  new HashSet<Concept>() : inputs.get(RIGHT_OPERAND)).
+            copyInto(new HashSet<Concept>());
     }
     
 //    public String toString(){

@@ -1,6 +1,5 @@
 package com.ihtsdo.snomed.model.xml;
 
-import java.net.MalformedURLException;
 import java.sql.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,7 +19,7 @@ public class XmlRefsetShort {
     private Date created;
     private Date lastModified;
     
-    public XmlRefsetShort(Refset r) throws MalformedURLException{
+    public XmlRefsetShort(Refset r){
         setId(r.getId());
         setConcept(new XmlRefsetConcept(r.getConcept()));
         setPublicId(r.getPublicId());

@@ -14,17 +14,24 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.Index;
+
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 
 @Entity
+@org.hibernate.annotations.Table(appliesTo = "Snapshot",
+        indexes={@Index(name="snapshotPublicIdAndRefsetIdIndex", columnNames={"publicId","refset_id"})})
+@Table(name = "Snapshot", 
+    uniqueConstraints = @UniqueConstraint(columnNames = {"publicId","refset_id"}))
 public class Snapshot {
     
     @Id

@@ -24,12 +24,12 @@ import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 public class RefsetPlanResponseDto {
 
     @XmlElementWrapper(name = "fieldErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     //@JsonSerialize(using = fieldErrorsSerialiser.class, as=String.class)
     private Map<String, List<String>> fieldErrors = new HashMap<>();
     
     @XmlElementWrapper(name = "globalErrors")
-    @XmlElement(name="error")
+    @XmlElement(name="refsetErrorBuilder")
     private List<String> globalErrors = new ArrayList<>();
     
     private PlanDto refsetPlan;
