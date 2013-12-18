@@ -9,3 +9,5 @@ dependency-reduced-pom.xml
 Servers/
 idea/
 libraries/
+*.iml
+.*
