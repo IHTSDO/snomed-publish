@@ -53,10 +53,5 @@
             <artifactId>commons-cli</artifactId>
             <version>${commons-cli.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.sonatype.aether</groupId>-->
-            <!--<artifactId>aether</artifactId>-->
-            <!--<version>1.13.1</version>-->
-        <!--</dependency>-->
     </dependencies>
 </project>
