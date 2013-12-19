@@ -7,15 +7,22 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.ihtsdo.snomed.web.controller.RefsetController;
+
 public class CorsFilter extends OncePerRequestFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(OncePerRequestFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
                                     throws ServletException, IOException {
 
         response.addHeader("Access-Control-Allow-Origin", "*");
+        
+        LOG.info("IN THE CORS FILTER CHAIN!!!");
 
         if (request.getHeader("Access-Control-Request-Method") != null && "OPTIONS".equals(request.getMethod())) {
             // CORS "pre-flight" request
