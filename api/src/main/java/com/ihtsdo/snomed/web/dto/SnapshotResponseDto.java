@@ -52,7 +52,7 @@ public class SnapshotResponseDto {
     @XmlElement(name="refsetErrorBuilder")
     private List<String> globalErrors = new ArrayList<>();
     
-    private SnapshotDto snapshotDto;
+    private SnapshotDto snapshot;
     private String publicId;
     private int code;
     
@@ -64,7 +64,7 @@ public class SnapshotResponseDto {
                 .add("code", getCode())
                 .add("fieldErrors", getFieldErrors())
                 .add("globalErrors", getGlobalErrors())
-                .add("snapshotDto", getRefset())
+                .add("snapshot", getSnapshot())
                 .toString();
     }    
     
@@ -99,12 +99,15 @@ public class SnapshotResponseDto {
         this.globalErrors = globalErrors;
     }
 
-    public SnapshotDto getRefset() {
-        return snapshotDto;
+
+    public SnapshotDto getSnapshot() {
+        return snapshot;
     }
-    public void setSnapshotDto(SnapshotDto snapshotDto) {
-        this.snapshotDto = snapshotDto;
+
+    public void setSnapshot(SnapshotDto snapshot) {
+        this.snapshot = snapshot;
     }
+
     public Status getStatus() {
         return status;
     }

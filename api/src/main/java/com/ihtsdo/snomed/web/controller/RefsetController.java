@@ -170,7 +170,7 @@ public class RefsetController {
         
         try {
             SnapshotDto resultDto = refsetService.takeSnapshot(refsetName, snapshotDto);
-            response.setSnapshotDto(resultDto);
+            response.setSnapshot(resultDto);
             return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
         }
         catch (RefsetNotFoundException e) {
@@ -204,7 +204,7 @@ public class RefsetController {
         
         try {
             SnapshotDto resultDto = refsetService.importSnapshot(refsetName, snapshotDto);
-            response.setSnapshotDto(resultDto);
+            response.setSnapshot(resultDto);
             return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
         }
         catch (RefsetNotFoundException e) {
