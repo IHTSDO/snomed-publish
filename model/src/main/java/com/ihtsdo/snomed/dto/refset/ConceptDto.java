@@ -76,7 +76,12 @@ public class ConceptDto {
     }
     
     public static ConceptDto parse(Concept c){
-        return getBuilder().id(c.getSerialisedId()).displayName(c.getDisplayName()).build();
+        return getBuilder()
+                .id(c.getSerialisedId())
+                .displayName(c.getDisplayName())
+                .active(c.isActive())
+                .effectiveTime(c.getEffectiveTime())
+                .build();
     }
     
     public static class Builder{
@@ -88,6 +93,16 @@ public class ConceptDto {
         
         public Builder id(Long id){
             built.setId(id);
+            return this;
+        }
+        
+        public Builder active(boolean active){
+            built.setActive(active);
+            return this;
+        }
+        
+        public Builder effectiveTime(long effectiveTime){
+            built.setEffectiveTime(effectiveTime);
             return this;
         }
 
