@@ -193,7 +193,7 @@
       console.log('find(searchString: \'' + searchString + '\', pageIndex: ' + pageIndex + ', pageSize: ' + pageSize + ')');
       return Ember.Deferred.promise(function(p) {
         var startIndex = (pageIndex - 1) * pageSize;
-        p.resolve($.getJSON("http://solr.snomedtools.com/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
+        p.resolve($.getJSON("https://solr.snomedtools.com/solr/concept/select?q=title:" + searchString + "&start=" + startIndex + "&rows=" + pageSize + "&wt=json&indent=true&json.wrf=?")
           .then(function(solr) {
               var returned = MyApp.SearchResults.create();
               returned.set('total', solr.response.numFound);
