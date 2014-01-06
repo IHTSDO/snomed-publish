@@ -54,10 +54,10 @@
 </script-->
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="//code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/jquery.js"></script>
 
 <!-- Bootstrap and Bootbox -->
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="/static/js/bootbox.js"></script>
 
 <!-- Ember, Handlebars -->
