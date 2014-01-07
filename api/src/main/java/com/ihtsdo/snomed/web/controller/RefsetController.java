@@ -164,6 +164,13 @@ public class RefsetController {
         int returnCode = RefsetResponseDto.FAIL;
         SnapshotResponseDto response = new SnapshotResponseDto();
             
+        Snapshot snapshot = snapshotService.findByPublicId(snapshotDto.getPublicId());
+        if (snapshot != null){
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "publicId", snapshotDto.getPublicId(),
+                    false, null,null, "xml.response.error.publicid.not.unique"));
+        }
+        
         if (bindingResult.hasErrors()){
             return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         }
