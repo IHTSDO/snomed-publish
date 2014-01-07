@@ -29,7 +29,7 @@
   TowTruckConfig_hubBase = "https://snomed.firebaseio.com/";
 </script>
 <script src="//cdn.firebase.com/v0/firebase.js"></script>
-<script src="/static/js/togetherjs.js"></script>
+<script src="/static/js/libs/togetherjs.js"></script>
 
 
 <!-- This Application -->
