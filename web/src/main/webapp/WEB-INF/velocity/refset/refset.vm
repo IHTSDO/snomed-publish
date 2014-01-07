@@ -26,7 +26,7 @@
     ]]#
     <div class="details">
 
-      <div class="refsetconcept"><a href="http://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></div>    
+      <div class="refsetconcept"><a href="https://browser.snomedtools.com/version/1/concept/${refset.concept.serialisedId}" target="_blank">$refset.concept.displayName</a></div>    
 
 
       <div class="editrefset">

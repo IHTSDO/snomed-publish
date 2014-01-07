@@ -82,7 +82,7 @@
     },
     actions:{
       click: function(concept){
-        $.get("http://browser.snomedtools.com/version/1/concept/" + concept.id);
+        $.get("https://browser.snomedtools.com/version/1/concept/" + concept.id);
       }
     }
   });

@@ -44,8 +44,8 @@
 <script>
   TowTruckConfig_hubBase = "https://snomed.firebaseio.com/";
 </script>
-<script src="https://cdn.firebase.com/v0/firebase.js"></script>
-<script src="http://firebase.github.io/togetherjs/togetherjs.js"></script>
+<script src="//cdn.firebase.com/v0/firebase.js"></script>
+<script src="/static/js/togetherjs.js"></script>
 
 
 <!-- Ember Console Tools -->
