@@ -1,6 +1,8 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -41,10 +43,24 @@ public class SnapshotDto {
     @JsonProperty("conceptDtos")
     private Set<ConceptDto> conceptDtos = new HashSet<>();
     
+    @XmlElementWrapper(name = "rules")
+    @XmlElement(name="rule")
+    @JsonProperty("rules")
+    private List<RuleDto> refsetRules = new ArrayList<>();   
+    
+    private Long terminal;
+    
     public SnapshotDto(){}
 
-    public static SnapshotDto parse(Snapshot snapshot){
-        return fillConcepts(snapshot, parseSansConcepts(snapshot));
+    public static SnapshotDto parse(Snapshot snapshot){        
+        SnapshotDto snapshotDto = parseSansConcepts(snapshot);
+        if (snapshot.getTerminal() != null){
+            PlanDto.RefsetPlanParser parser = new PlanDto.RefsetPlanParser();
+            snapshot.getTerminal().accept(parser);
+            snapshotDto.setRefsetRules(parser.getPlanDto().getRefsetRules());
+            snapshotDto.setTerminal(parser.getPlanDto().getTerminal());
+        }
+        return fillConcepts(snapshot, snapshotDto);
     }    
     
     public static SnapshotDto parseSansConcepts(Snapshot snapshot){
@@ -143,6 +159,22 @@ public class SnapshotDto {
 
     
     
+    public Long getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(Long terminal) {
+        this.terminal = terminal;
+    }
+
+    public List<RuleDto> getRefsetRules() {
+        return refsetRules;
+    }
+
+    public void setRefsetRules(List<RuleDto> refsetRules) {
+        this.refsetRules = refsetRules;
+    }
+
     public Set<ConceptDto> getConceptDtos() {
         return conceptDtos;
     }

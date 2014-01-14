@@ -1,0 +1,31 @@
+{
+    "preferences": [
+        {
+            "description": "This is where to find the script to inject",
+            "type": "string",
+            "name": "togetherjsJs",
+            "value": "https://togetherjs.mozillalabs.com/togetherjs.js",
+            "title": "togetherjs.js location"
+        },
+        {
+            "description": "Override the location of the hub",
+            "type": "string",
+            "name": "hubBase",
+            "value": "https://hub.togetherjs.mozillalabs.com",
+            "title": "Hub URL"
+        },
+        {
+            "description": "Domains on which to automatically start TogetherJS (comma-separated)",
+            "type": "string",
+            "name": "autoDomains",
+            "value": "",
+            "title": "Auto domains"
+        }
+    ],
+    "name": "togetherjs",
+    "license": "MPL 2.0",
+    "author": "",
+    "version": "0.1",
+    "fullName": "TogetherJS",
+    "description": "Runs TogetherJS"
+}

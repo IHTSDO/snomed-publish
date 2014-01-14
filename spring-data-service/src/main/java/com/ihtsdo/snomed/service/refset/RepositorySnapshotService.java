@@ -15,16 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
-import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
+import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Rule;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
-import com.ihtsdo.snomed.service.refset.PlanService;
-import com.ihtsdo.snomed.service.refset.SnapshotService;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 
@@ -99,18 +100,22 @@ public class RepositorySnapshotService implements SnapshotService {
 
     @Override
     @Transactional(rollbackFor={RefsetConceptNotFoundException.class})
-    public Snapshot create(SnapshotDto created) throws RefsetConceptNotFoundException, NonUniquePublicIdException{
+    public Snapshot create(SnapshotDto created) throws RefsetConceptNotFoundException, NonUniquePublicIdException, ValidationException{
         LOG.debug("Creating new snapshot [{}]", created.toString());
+        
+        PlanDto planDto = new PlanDto();
+        planDto.setRefsetRules(created.getRefsetRules());
+        planDto.setTerminal(created.getTerminal());
+        
+        Rule rule = planService.createRules(planDto);
         
         Snapshot snapshot = Snapshot.getBuilder(
                 created.getPublicId(), 
                 created.getTitle(), 
                 created.getDescription(),
-                fillConcepts(created.getConceptDtos())
-                ).build();        
-
-        System.out.println(snapshot.toString());
-        
+                fillConcepts(created.getConceptDtos()),
+                rule
+                ).build();
         try {
             return snapshotRepository.save(snapshot);
         } catch (DataIntegrityViolationException e) {

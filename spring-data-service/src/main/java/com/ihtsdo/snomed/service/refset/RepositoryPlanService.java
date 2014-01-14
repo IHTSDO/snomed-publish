@@ -106,7 +106,8 @@ public class RepositoryPlanService implements PlanService {
         return deleted;
     }  
     
-    private Rule createRules(PlanDto planDto) throws ValidationException
+    @Override
+    public Rule createRules(PlanDto planDto) throws ValidationException
             
     {
         if ((planDto.getRefsetRules() == null) || planDto.getRefsetRules().isEmpty()){

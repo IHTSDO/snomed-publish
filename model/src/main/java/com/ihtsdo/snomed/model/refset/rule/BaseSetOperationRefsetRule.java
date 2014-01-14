@@ -19,7 +19,25 @@ public abstract class BaseSetOperationRefsetRule extends BaseRule {
         }
         visitor.visit(this);
     }
+
+    @Override
+    public BaseSetOperationRefsetRule clone(){
+        Rule left = null;
+        Rule right = null;
+        if (getIncomingRules().get(LEFT_OPERAND) != null){
+            left = getIncomingRules().get(LEFT_OPERAND).clone();
+        }
+        if (getIncomingRules().get(RIGHT_OPERAND) != null){
+            right = getIncomingRules().get(RIGHT_OPERAND).clone();
+        }
+        BaseSetOperationRefsetRule setRule = cloneSet();
+        setRule.setLeftRule(left);
+        setRule.setLeftRule(right);
+        return setRule;
+    }
     
+    protected abstract BaseSetOperationRefsetRule cloneSet();
+
     public BaseSetOperationRefsetRule setLeftRule(Rule rule){
         this.getIncomingRules().put(LEFT_OPERAND, rule);
         return this;

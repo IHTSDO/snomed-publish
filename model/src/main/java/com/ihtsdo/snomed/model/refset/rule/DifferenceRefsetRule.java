@@ -20,4 +20,9 @@ public class DifferenceRefsetRule extends BaseSetOperationRefsetRule{
         assert(inputs.size() == 2);
         return Sets.difference(inputs.get(LEFT_OPERAND), inputs.get(RIGHT_OPERAND)).copyInto(new HashSet<Concept>());
     }
+
+    @Override
+    protected BaseSetOperationRefsetRule cloneSet() {
+        return new DifferenceRefsetRule();
+    }
 }

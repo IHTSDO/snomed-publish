@@ -169,6 +169,9 @@ public abstract class BaseRule implements Rule{
                 .toString();
     }
     
+    @Override
+    public abstract BaseRule clone();
+    
     public Long getId() {
         return id;
     }

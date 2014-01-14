@@ -38,6 +38,7 @@ import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
+import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
@@ -117,9 +118,9 @@ public class RepositorySnapshotServiceTest {
     public RepositorySnapshotServiceTest() {}
     
     @Test
-    public void create() throws RefsetConceptNotFoundException, NonUniquePublicIdException{
+    public void create() throws RefsetConceptNotFoundException, NonUniquePublicIdException, ValidationException{
         SnapshotDto created = SnapshotDto.getBuilder(null, TITLE, DESCRIPTION, PUBLIC_ID, conceptDtos).build();
-        Snapshot persisted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts).build();
+        Snapshot persisted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
         
         when(repoMock.save(any(Snapshot.class))).thenReturn(persisted);
 
@@ -138,7 +139,7 @@ public class RepositorySnapshotServiceTest {
     
     @Test
     public void delete() throws SnapshotNotFoundException{
-        Snapshot deleted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts).build();
+        Snapshot deleted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
 
         when(repoMock.findOne(SNAPSHOT_ID)).thenReturn(deleted);
         
@@ -176,7 +177,7 @@ public class RepositorySnapshotServiceTest {
     
     @Test
     public void findById() {
-        Snapshot snapshot = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts).build();
+        Snapshot snapshot = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
 
         when(repoMock.findOne(SNAPSHOT_ID)).thenReturn(snapshot);
         
@@ -192,9 +193,9 @@ public class RepositorySnapshotServiceTest {
     public void update() throws NonUniquePublicIdException, SnapshotNotFoundException, RefsetConceptNotFoundException{
         
         SnapshotDto updatedDto = SnapshotDto.getBuilder(SNAPSHOT_ID, TITLE_UPDATED, DESCRIPTION_UPDATED, PUBLIC_ID_UPDATED, conceptDtosUpdated).build();
-        Snapshot updated = Snapshot.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, conceptsUpdated).build();
+        Snapshot updated = Snapshot.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, conceptsUpdated, null).build();
         updated.setId(SNAPSHOT_ID);
-        Snapshot original = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts).build();
+        Snapshot original = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
         original.setId(SNAPSHOT_ID);
         
         when(repoMock.findOne(updatedDto.getId())).thenReturn(original);

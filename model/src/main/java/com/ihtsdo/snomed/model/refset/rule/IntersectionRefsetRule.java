@@ -21,4 +21,10 @@ public class IntersectionRefsetRule extends BaseSetOperationRefsetRule{
         return Sets.intersection(inputs.get(LEFT_OPERAND), inputs.get(RIGHT_OPERAND)).
                 copyInto(new HashSet<Concept>());
     }
+
+    @Override
+    protected BaseSetOperationRefsetRule cloneSet() {
+        return new IntersectionRefsetRule();
+    }
+    
 }

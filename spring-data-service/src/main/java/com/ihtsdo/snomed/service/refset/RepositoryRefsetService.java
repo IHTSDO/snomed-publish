@@ -209,7 +209,8 @@ public class RepositoryRefsetService implements RefsetService {
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
-                planConcepts).build();
+                planConcepts,
+                refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
         refset = refsetRepository.save(refset);
@@ -236,7 +237,8 @@ public class RepositoryRefsetService implements RefsetService {
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
-                fillConcepts(snapshotDto.getConceptDtos())).build();
+                fillConcepts(snapshotDto.getConceptDtos()),
+                refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
         refset = refsetRepository.save(refset);

@@ -23,6 +23,11 @@ public class UnionRefsetRule extends BaseSetOperationRefsetRule{
             copyInto(new HashSet<Concept>());
     }
     
+    @Override
+    protected BaseSetOperationRefsetRule cloneSet() {
+        return new UnionRefsetRule();
+    }    
+    
 //    public String toString(){
 //        String set1 = getIncomingRules().get(LEFT_OPERAND) == null ? "empty" : "not empty";
 //        String set2 = getIncomingRules().get(SET_2) == null ? "empty" : "not empty";

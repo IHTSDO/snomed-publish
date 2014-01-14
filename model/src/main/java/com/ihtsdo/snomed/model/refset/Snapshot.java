@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.Calendar;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -70,6 +72,9 @@ public class Snapshot {
     
     @Version
     private long version = 0;
+    
+    @OneToOne(targetEntity=BaseRule.class, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    private Rule terminal;    
     
     public void update(String publicId, String title, String description, Set<Concept> concepts){
         setPublicId(publicId);
@@ -188,20 +193,29 @@ public class Snapshot {
         return concepts;
     }
 
-    public static Builder getBuilder(String publicId, String title, String description, Set<Concept> concepts) {
-        return new Builder(publicId, title, description, concepts);
+    public Rule getTerminal() {
+        return terminal;
+    }
+
+    public void setTerminal(Rule terminal) {
+        this.terminal = terminal;
+    }
+
+    public static Builder getBuilder(String publicId, String title, String description, Set<Concept> concepts, Rule terminal) {
+        return new Builder(publicId, title, description, concepts, terminal);
     }
     
 
     public static class Builder {
         private Snapshot built;
 
-        Builder(String publicId, String title, String description, Set<Concept> concepts) {
+        Builder(String publicId, String title, String description, Set<Concept> concepts, Rule terminal) {
             built = new Snapshot();
             built.title = title;
             built.publicId = publicId;
             built.description = description;
             built.concepts = concepts;
+            built.terminal = terminal;
         }
 
         public Snapshot build() {

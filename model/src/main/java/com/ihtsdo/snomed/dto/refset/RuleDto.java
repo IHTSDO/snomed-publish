@@ -20,14 +20,12 @@ import com.ihtsdo.snomed.model.refset.BaseRule.RuleType;
 public class RuleDto {
     
     @Transient
-    @XmlTransient
     @JsonIgnore
     public boolean isSetOperation(){
         return BaseRule.SET_OPERATIONS.contains(getType());
     }
     
     @Transient
-    @XmlTransient
     @JsonIgnore    
     public boolean isListOperation(){
         return getType() == RuleType.LIST;
@@ -35,7 +33,6 @@ public class RuleDto {
     
     
     @Transient
-    @XmlTransient
     @JsonIgnore    
     public static boolean isPersisted(long id){
         if (id > 0){

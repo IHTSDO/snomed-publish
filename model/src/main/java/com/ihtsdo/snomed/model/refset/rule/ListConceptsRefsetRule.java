@@ -39,6 +39,13 @@ public class ListConceptsRefsetRule extends SourceRefsetRule{
         assert(inputs.size() == 0);
         return getConcepts();
     }
+    
+    @Override
+    public ListConceptsRefsetRule clone(){
+        ListConceptsRefsetRule rule = new ListConceptsRefsetRule();
+        rule.setConcepts(new HashSet<Concept>(this.getConcepts()));
+        return rule;
+    }
 
     @Override
     public boolean equals(Object o){

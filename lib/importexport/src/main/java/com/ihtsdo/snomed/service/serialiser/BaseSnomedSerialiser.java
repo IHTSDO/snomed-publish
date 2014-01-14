@@ -12,6 +12,7 @@ import com.ihtsdo.snomed.model.Statement;
 
 abstract class BaseSnomedSerialiser implements SnomedSerialiser{
     protected static final char DELIMITER = '\t';
+    protected static final String LINE_ENDING = "\r\n";
     
     protected Writer writer;
     protected Map<String, Object> properties = new HashMap<>();

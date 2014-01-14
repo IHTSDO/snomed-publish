@@ -39,7 +39,7 @@ public class SnapshotTest {
         Concept c = new Concept(1234);
         em.persist(c);
         //ConceptDto cDto = ConceptDto.getBuilder().id(c.getId()).build();
-        s1 = Snapshot.getBuilder("pubid_1", "title1", "description1", new HashSet<Concept>(Arrays.asList(c))).build();
+        s1 = Snapshot.getBuilder("pubid_1", "title1", "description1", new HashSet<Concept>(Arrays.asList(c)), null).build();
         em.persist(s1);
         em.flush();
         em.clear();

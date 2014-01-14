@@ -20,4 +20,10 @@ public class SymmetricDifferenceRefsetRule extends BaseSetOperationRefsetRule{
         return Sets.symmetricDifference(inputs.get(LEFT_OPERAND), inputs.get(RIGHT_OPERAND)).
                 copyInto(new HashSet<Concept>());     
     }
+    
+    @Override
+    protected BaseSetOperationRefsetRule cloneSet() {
+        return new SymmetricDifferenceRefsetRule();
+    }    
+    
 }

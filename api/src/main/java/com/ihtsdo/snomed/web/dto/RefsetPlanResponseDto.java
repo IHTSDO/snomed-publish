@@ -1,6 +1,5 @@
 package com.ihtsdo.snomed.web.dto;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,10 +10,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
@@ -107,17 +102,17 @@ public class RefsetPlanResponseDto {
 
 
 
-    private class fieldErrorsSerialiser extends JsonSerializer<Map<String, List<String>>>{
-
-        @Override
-        public void serialize(Map<String, List<String>> errors,JsonGenerator arg1, SerializerProvider arg2)
-                throws IOException, JsonProcessingException 
-        {
-
-            
-        }
-        
-    }
+//    private class fieldErrorsSerialiser extends JsonSerializer<Map<String, List<String>>>{
+//
+//        @Override
+//        public void serialize(Map<String, List<String>> errors,JsonGenerator arg1, SerializerProvider arg2)
+//                throws IOException, JsonProcessingException 
+//        {
+//
+//            
+//        }
+//        
+//    }
     
 
 }

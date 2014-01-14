@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -48,6 +50,9 @@ import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.service.refset.PlanService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.SnapshotService;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
@@ -59,6 +64,8 @@ import com.ihtsdo.snomed.web.dto.SnapshotResponseDto;
 @Transactional(value = "transactionManager")
 public class RefsetController {
     private static final Logger LOG = LoggerFactory.getLogger(RefsetController.class);
+    
+    public static final String RF2_MIME_TYPE = "application/vnd.ihtsdo.snomed.rf2.terminology.concept+txt";    
 
     @Inject
     RefsetService refsetService;
@@ -127,15 +134,15 @@ public class RefsetController {
     
     
     @Transactional
-    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}", 
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SnapshotDto>  getSnapshotWithConcepts(
+    public ResponseEntity<SnapshotDto>  getSnapshotWithConceptsAsJson(
             @PathVariable String refsetName, 
             @PathVariable String snapshotName) throws Exception 
     {
-        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}]", snapshotName, refsetName);
+        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in json format", snapshotName, refsetName);
         
         Refset refset = refsetService.findByPublicId(refsetName);
         if (refset == null){
@@ -149,6 +156,98 @@ public class RefsetController {
         
         return new ResponseEntity<SnapshotDto>(SnapshotDto.parse(snapshot), HttpStatus.OK);
     }
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.xml", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<SnapshotDto>  getSnapshotWithConceptsAsXml(
+            @PathVariable String refsetName, 
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in xml format", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            return new ResponseEntity<SnapshotDto>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            return new ResponseEntity<SnapshotDto>(HttpStatus.NOT_FOUND);
+        }
+        
+        return new ResponseEntity<SnapshotDto>(SnapshotDto.parse(snapshot), HttpStatus.OK);
+    }    
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.txt", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String>  getSnapshotWithConceptsAsList(
+            @PathVariable String refsetName, 
+            HttpServletResponse servletResponse,
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in list format", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+        
+        List<Long> concepts = new ArrayList<Long>(snapshot.getConcepts().size());
+        
+        for (Concept c : snapshot.getConcepts()){
+            concepts.add(c.getSerialisedId());
+        }
+        String conceptsString = concepts.toString();
+        conceptsString = conceptsString.substring(1);
+        conceptsString = conceptsString.substring(0, conceptsString.length() - 1);
+        return new ResponseEntity<String>(conceptsString, HttpStatus.OK);
+    }        
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.rf2", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.TEXT_PLAIN_VALUE)
+    public void getSnapshotWithConceptsAsRf2(
+            @PathVariable String refsetName, 
+            HttpServletResponse servletResponse,
+            Writer responseWriter,
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in list format", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+            //return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+            return;
+            //return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+        
+        SnomedSerialiser serialiser = SnomedSerialiserFactory.getSerialiser(Form.RF2, responseWriter);
+        for (Concept c : snapshot.getConcepts()){
+            serialiser.write(c);
+        }
+        servletResponse.setStatus(HttpStatus.OK.value());
+        //servletResponse.setContentType(RF2_MIME_TYPE);
+    }    
     
     @Transactional
     @RequestMapping(value = "{refsetName}/snapit", 

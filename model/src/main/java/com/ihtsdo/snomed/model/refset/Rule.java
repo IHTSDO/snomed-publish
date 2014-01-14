@@ -10,4 +10,5 @@ public interface Rule extends Visitable{
     public Long getId();
     public Rule append(String inputName, Rule rule);
     public Rule prepend(String inputName, Rule rule);
+    public Rule clone();
 }

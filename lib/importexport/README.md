@@ -24,7 +24,7 @@ Library for importing and exporting Snomed data in various formats. The parsers 
   <tr>
     <td>CHILD_PARENT</td>
     <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/parser/ChildParentHibernateParser.java">ChildParentHibernateParser</a></td>
-  </tr>      
+  </tr>        
 </table>
 
 ##Available Serialisers
@@ -46,6 +46,10 @@ Library for importing and exporting Snomed data in various formats. The parsers 
     <td>RDF_SCHEMA_XML</td>
     <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/RdfSchemaSerialiser.java">RdfSchemaSerialiser</a></td>
   </tr>    
+  <tr>
+    <td>CONCEPT_RF2</td>
+    <td><a href="../importexport/src/main/java/com/ihtsdo/snomed/service/serialiser/ConceptRf2Serialiser.java">ConceptRf2Serialiser</a></td>
+  </tr>        
 </table>
 
 

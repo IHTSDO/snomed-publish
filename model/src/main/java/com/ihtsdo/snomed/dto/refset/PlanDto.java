@@ -290,7 +290,7 @@ public class PlanDto {
         return planDto;
     }
     
-    private static class RefsetPlanParser implements Visitor{
+    public static class RefsetPlanParser implements Visitor{
         private PlanDto built = new PlanDto();
         
         public PlanDto getPlanDto(){

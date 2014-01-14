@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ihtsdo.snomed.web.controller.RefsetController;
-
 public class CorsFilter extends OncePerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(OncePerRequestFilter.class);
 
