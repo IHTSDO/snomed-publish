@@ -59,7 +59,8 @@
             </list>
         </property>
     </bean>
-
+    
+	<bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"></bean>
     
     <!-- ################### Message Converters ################### -->
 

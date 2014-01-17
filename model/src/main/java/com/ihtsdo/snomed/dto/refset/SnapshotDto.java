@@ -23,32 +23,32 @@ import com.ihtsdo.snomed.model.refset.Snapshot;
 @JsonRootName("snapshot")
 public class SnapshotDto {
     
-    private Long id;
+    protected Long id;
     
     @NotNull(message="Public ID can not be empty")
     @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
-    private String publicId;
+    protected String publicId;
     
     @NotNull(message="validation.title.not.empty")
     @Size(min=4, max=50, message="validation.title.wrong.size")
-    private String title;
+    protected String title;
     
     @NotNull(message="Description can not be empty")
     @Size(min=4, message="Description must be longer than 4 characters")
-    private String description;
+    protected String description;
     
     @XmlElementWrapper(name = "conceptDtos")
     @XmlElement(name="concept")
     @JsonProperty("conceptDtos")
-    private Set<ConceptDto> conceptDtos = new HashSet<>();
+    protected Set<ConceptDto> conceptDtos = new HashSet<>();
     
     @XmlElementWrapper(name = "rules")
     @XmlElement(name="rule")
     @JsonProperty("rules")
-    private List<RuleDto> refsetRules = new ArrayList<>();   
+    protected List<RuleDto> refsetRules = new ArrayList<>();   
     
-    private Long terminal;
+    protected Long terminal;
     
     public SnapshotDto(){}
 

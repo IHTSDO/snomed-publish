@@ -13,13 +13,17 @@
   <name>api</name>
   
   <properties>
-    <jetty.servlets.version>9.0.4.v20130625</jetty.servlets.version>
+    <!--jetty.servlets.version>9.0.4.v20130625</jetty.servlets.version-->
+    <jetty.servlets.version>9.1.0.v20131115</jetty.servlets.version>
     <c3p0.version>0.9.1.2</c3p0.version>
     <mchange-commons-java.version>0.2.2</mchange-commons-java.version>
     <jsp.api.version>2.0</jsp.api.version>
     <moxy.version>2.5.0</moxy.version>
     <servlet.api.version>2.5</servlet.api.version>
-    <jetty.version>9.0.4.v20130625</jetty.version>
+    <!--jetty.version>9.0.4.v20130625</jetty.version-->
+    <jetty.version>9.1.0.v20131115</jetty.version>
+    <commons.fileupload>1.3</commons.fileupload>
+    <commons.io>1.3.2</commons.io>
   </properties>
   
   <build>
@@ -143,6 +147,18 @@
       <artifactId>spring-tx</artifactId>
       <version>${spring.version}</version>
     </dependency>
+    
+  	<!-- File Upload -->
+    <dependency>
+		<groupId>commons-fileupload</groupId>
+		<artifactId>commons-fileupload</artifactId>
+		<version>${commons.fileupload}</version>
+	</dependency> 
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-io</artifactId>
+		<version>${commons.io}</version>
+	</dependency>	
     
     <!-- Jackson JSON converter -->
     <dependency>

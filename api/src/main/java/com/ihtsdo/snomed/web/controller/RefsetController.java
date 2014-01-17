@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +54,7 @@ import com.ihtsdo.snomed.service.refset.SnapshotService;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
+import com.ihtsdo.snomed.web.dto.ImportSnapshotDto;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetPlanResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
@@ -296,10 +298,10 @@ public class RefsetController {
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SnapshotResponseDto> importSnapshot(@PathVariable String refsetName,
-            @Valid @RequestBody SnapshotDto snapshotDto,
+            @Valid @ModelAttribute ImportSnapshotDto snapshotDto,
             BindingResult bindingResult)
     {
-        LOG.debug("Received request to create snapshot of refset [{}]", refsetName);
+        LOG.debug("Received request to import snapshot of refset [{}]", refsetName);
 
         int returnCode = RefsetResponseDto.FAIL;
         SnapshotResponseDto response = new SnapshotResponseDto();
