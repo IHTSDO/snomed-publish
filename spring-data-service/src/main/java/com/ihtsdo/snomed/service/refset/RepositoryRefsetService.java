@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
@@ -28,6 +29,7 @@ import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Snapshot;
@@ -201,15 +203,13 @@ public class RepositoryRefsetService implements RefsetService {
             throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
         }
         
-        Set<Concept> planConcepts = refset.getPlan().refreshAndGetConcepts();
-
         em.detach(refset.getPlan());
         
         snapshot = Snapshot.getBuilder(
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
-                planConcepts,
+                Member.createFromConcepts(refset.getPlan().refreshAndGetConcepts()),
                 refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
@@ -237,7 +237,7 @@ public class RepositoryRefsetService implements RefsetService {
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
-                fillConcepts(snapshotDto.getConceptDtos()),
+                fillMembers(snapshotDto.getMemberDtos()),
                 refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
@@ -249,19 +249,28 @@ public class RepositoryRefsetService implements RefsetService {
         return new Sort(Sort.Direction.ASC, "title");
     }
     
-    private Set<Concept> fillConcepts(Set<ConceptDto> conceptDtos) throws ConceptIdNotFoundException  {
-        Set<Concept> concepts = new HashSet<Concept>();
-        if ((conceptDtos == null) || (conceptDtos.isEmpty())){
-            return concepts;
+    private Set<Member> fillMembers(Set<MemberDto> memberDtos) throws ConceptIdNotFoundException  {
+        Set<Member> members = new HashSet<Member>();
+        if ((memberDtos == null) || (memberDtos.isEmpty())){
+            return members;
         }
-        for (ConceptDto conceptDto : conceptDtos){
-            Concept c = conceptService.findBySerialisedId(conceptDto.getId());
-            if (c == null){
-                throw new ConceptIdNotFoundException(conceptDto.getId(), "Did not find concept with serialisedId " + conceptDto.getId());
+        for (MemberDto memberDto : memberDtos){
+            Concept component = conceptService.findBySerialisedId(memberDto.getComponent().getId());
+            if (component == null){
+                throw new ConceptIdNotFoundException(memberDto.getComponent().getId(), 
+                		"Did not find component concept with serialisedId " + memberDto.getComponent().getId());
             }
-            concepts.add(c);
+            Concept module = null;
+            if (memberDto.getModule() != null){
+                module = conceptService.findBySerialisedId(memberDto.getModule().getId());
+                if (module == null){
+                    throw new ConceptIdNotFoundException(memberDto.getComponent().getId(), 
+                    		"Did not find module concept with serialisedId " + memberDto.getComponent().getId());
+                }
+            }
+            members.add(Member.getBuilder(module, component).build());
         }
-        return concepts;
+        return members;
     }      
 
 

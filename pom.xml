@@ -29,6 +29,7 @@
     <module>web</module>
   </modules>
   <properties>
+    <junit.thread.count>8</junit.thread.count>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.version>3.2.6.RELEASE</spring.version>
     <spring.data.jpa.version>1.3.4.RELEASE</spring.data.jpa.version>
@@ -128,6 +129,7 @@
           </reportSet>
         </reportSets>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>

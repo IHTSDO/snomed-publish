@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 
 @XmlRootElement(name="import")
@@ -27,8 +27,8 @@ public class ImportSnapshotDto extends SnapshotDto {
 	
 	public ImportSnapshotDto() {}
 
-	public ImportSnapshotDto(Long id, String publicId, String title, String description, Set<ConceptDto> concepts) {
-		super(id, publicId, title, description, concepts);
+	public ImportSnapshotDto(Long id, String publicId, String title, String description, Set<MemberDto> members) {
+		super(id, publicId, title, description, members);
 	}
 
 	public MultipartFile getFile() {

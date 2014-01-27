@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 
 @XmlRootElement(name="snapshot")
@@ -38,10 +38,10 @@ public class SnapshotDto {
     @Size(min=4, message="Description must be longer than 4 characters")
     protected String description;
     
-    @XmlElementWrapper(name = "conceptDtos")
-    @XmlElement(name="concept")
-    @JsonProperty("conceptDtos")
-    protected Set<ConceptDto> conceptDtos = new HashSet<>();
+    @XmlElementWrapper(name = "memberDtos")
+    @XmlElement(name="member")
+    @JsonProperty("memberDtos")
+    protected Set<MemberDto> memberDtos = new HashSet<>();
     
     @XmlElementWrapper(name = "rules")
     @XmlElement(name="rule")
@@ -53,17 +53,18 @@ public class SnapshotDto {
     public SnapshotDto(){}
 
     public static SnapshotDto parse(Snapshot snapshot){        
-        SnapshotDto snapshotDto = parseSansConcepts(snapshot);
+        SnapshotDto snapshotDto = parseSansMembers(snapshot);
         if (snapshot.getTerminal() != null){
             PlanDto.RefsetPlanParser parser = new PlanDto.RefsetPlanParser();
             snapshot.getTerminal().accept(parser);
             snapshotDto.setRefsetRules(parser.getPlanDto().getRefsetRules());
             snapshotDto.setTerminal(parser.getPlanDto().getTerminal());
         }
-        return fillConcepts(snapshot, snapshotDto);
-    }    
+        return fillMembers(snapshot, snapshotDto);
+    }  
     
-    public static SnapshotDto parseSansConcepts(Snapshot snapshot){
+
+    public static SnapshotDto parseSansMembers(Snapshot snapshot){
         return SnapshotDto.getBuilder(snapshot.getId(), 
                 snapshot.getTitle(),
                 snapshot.getDescription(),
@@ -71,21 +72,21 @@ public class SnapshotDto {
                 null).build();
     }
     
-    private static SnapshotDto fillConcepts(Snapshot snap, SnapshotDto snapDto){
-        Set<ConceptDto> conceptDtos = new HashSet<ConceptDto>();
-        for (Concept c : snap.getConcepts()){
-            conceptDtos.add(ConceptDto.parse(c));
+    private static SnapshotDto fillMembers(Snapshot snap, SnapshotDto snapDto){
+        Set<MemberDto> memberDtos = new HashSet<>();
+        for (Member m : snap.getMembers()){
+            memberDtos.add(MemberDto.parse(m));
         }
-        snapDto.setConceptDtos(conceptDtos);
+        snapDto.setMemberDtos(memberDtos);
         return snapDto;
     }
     
-    public SnapshotDto(Long id, String publicId, String title, String description, Set<ConceptDto> concepts){
+    public SnapshotDto(Long id, String publicId, String title, String description, Set<MemberDto> members){
         this.id = id;
         this.publicId = publicId;
         this.title = title;
         this.description = description;
-        this.conceptDtos = concepts;
+        this.memberDtos = members;
     }
     
     @Override
@@ -95,7 +96,7 @@ public class SnapshotDto {
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
-                .add("conceptDtos", getConceptDtos() == null ? 0 : getConceptDtos().size())
+                .add("conceptDtos", getMemberDtos() == null ? 0 : getMemberDtos().size())
                 .toString();
     }
     
@@ -106,7 +107,7 @@ public class SnapshotDto {
             if (Objects.equal(dto.getId(), getId()) &&
                     (Objects.equal(dto.getTitle(), getTitle())) &&
                     (Objects.equal(dto.getDescription(), getDescription())) &&
-                    (Objects.equal(dto.getConceptDtos(), getConceptDtos())) &&
+                    (Objects.equal(dto.getMemberDtos(), getMemberDtos())) &&
                     (Objects.equal(dto.getPublicId(), getPublicId()))){
                 return true;
             }
@@ -175,28 +176,28 @@ public class SnapshotDto {
         this.refsetRules = refsetRules;
     }
 
-    public Set<ConceptDto> getConceptDtos() {
-        return conceptDtos;
-    }
+    public Set<MemberDto> getMemberDtos() {
+		return memberDtos;
+	}
 
-    public void setConceptDtos(Set<ConceptDto> conceptDtos) {
-        this.conceptDtos = conceptDtos;
-    }
+	public void setMemberDtos(Set<MemberDto> memberDtos) {
+		this.memberDtos = memberDtos;
+	}
 
-    public static Builder getBuilder(Long id, String title, String description, String publicId, Set<ConceptDto> concepts) {
-        return new Builder(id, title, description, publicId, concepts);
+	public static Builder getBuilder(Long id, String title, String description, String publicId, Set<MemberDto> members) {
+        return new Builder(id, title, description, publicId, members);
     }
     
     public static class Builder {
         private SnapshotDto built;
 
-        Builder(Long id, String title, String description, String publicId, Set<ConceptDto> concepts) {
+        Builder(Long id, String title, String description, String publicId, Set<MemberDto> members) {
             built = new SnapshotDto();
             built.setDescription(description);
             built.setId(id);
             built.setPublicId(publicId);
             built.setTitle(title);
-            built.setConceptDtos(concepts);
+            built.setMemberDtos(members);
         }
         
         public SnapshotDto build(){

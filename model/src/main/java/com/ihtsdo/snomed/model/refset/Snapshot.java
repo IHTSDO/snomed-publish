@@ -10,9 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -27,7 +25,6 @@ import org.hibernate.annotations.Index;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
-import com.ihtsdo.snomed.model.Concept;
 
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Snapshot",
@@ -40,13 +37,8 @@ public class Snapshot {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToMany(fetch=FetchType.EAGER)
-    @JoinTable(
-        joinColumns = @JoinColumn(name="snapshot_id"),
-        inverseJoinColumns = @JoinColumn(name="concept_id"),
-        uniqueConstraints = @UniqueConstraint(columnNames={"snapshot_id", "concept_id"}))
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Set<Concept> concepts;
+    @OneToMany(cascade=CascadeType.ALL)
+    private Set<Member> members;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -76,11 +68,11 @@ public class Snapshot {
     @OneToOne(targetEntity=BaseRule.class, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     private Rule terminal;    
     
-    public void update(String publicId, String title, String description, Set<Concept> concepts){
+    public void update(String publicId, String title, String description, Set<Member> members){
         setPublicId(publicId);
         setTitle(title);
         setDescription(description);
-        setConcepts(concepts);
+        setMembers(members);
     }
     
     public Snapshot() {}
@@ -185,15 +177,15 @@ public class Snapshot {
         this.publicId = publicId;
     }
 
-    public void setConcepts(Set<Concept> concepts){
-        this.concepts = concepts;
-    }
-    
-    public Set<Concept> getConcepts(){
-        return concepts;
-    }
+    public Set<Member> getMembers() {
+		return members;
+	}
 
-    public Rule getTerminal() {
+	public void setMembers(Set<Member> members) {
+		this.members = members;
+	}
+
+	public Rule getTerminal() {
         return terminal;
     }
 
@@ -201,20 +193,20 @@ public class Snapshot {
         this.terminal = terminal;
     }
 
-    public static Builder getBuilder(String publicId, String title, String description, Set<Concept> concepts, Rule terminal) {
-        return new Builder(publicId, title, description, concepts, terminal);
+    public static Builder getBuilder(String publicId, String title, String description, Set<Member> members, Rule terminal) {
+        return new Builder(publicId, title, description, members, terminal);
     }
     
 
     public static class Builder {
         private Snapshot built;
 
-        Builder(String publicId, String title, String description, Set<Concept> concepts, Rule terminal) {
+        Builder(String publicId, String title, String description, Set<Member> members, Rule terminal) {
             built = new Snapshot();
             built.title = title;
             built.publicId = publicId;
             built.description = description;
-            built.concepts = concepts;
+            built.members = members;
             built.terminal = terminal;
         }
 

@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.web.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -34,12 +35,14 @@ import test.com.ihtsdo.snomed.web.RefsetTestUtil;
 import test.com.ihtsdo.snomed.web.SpringProxyUtil;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
-import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
@@ -65,10 +68,10 @@ public class RepositorySnapshotServiceTest {
     Concept c1, c2, c3, c4;
     ConceptDto cd1, cd2, cd3, cd4;
     
-    private Set<Concept>        concepts = new HashSet<Concept>();
-    private Set<Concept>        conceptsUpdated = new HashSet<Concept>();
-    private Set<ConceptDto>     conceptDtos = new HashSet<ConceptDto>();
-    private Set<ConceptDto>     conceptDtosUpdated = new HashSet<ConceptDto>();
+    private Set<Member>        members = new HashSet<>();
+    private Set<Member>        membersUpdated = new HashSet<>();
+    private Set<MemberDto>     memberDtos = new HashSet<>();
+    private Set<MemberDto>     memberDtosUpdated = new HashSet<>();
 
     @Inject
     private SnapshotService snapshotService;
@@ -103,11 +106,11 @@ public class RepositorySnapshotServiceTest {
         cd3 = new ConceptDto(c3.getSerialisedId());
         cd4 = new ConceptDto(c4.getSerialisedId());
         
-        concepts.addAll(Arrays.asList(c1, c2));
-        conceptsUpdated.addAll(Arrays.asList(c3, c4));
+        members.addAll(Member.createFromConcepts(Arrays.asList(c1, c2)));
+        membersUpdated.addAll(Member.createFromConcepts(Arrays.asList(c3, c4)));
         
-        conceptDtos.addAll(Arrays.asList(cd1, cd2));
-        conceptDtosUpdated.addAll(Arrays.asList(cd3, cd4));
+        memberDtos.addAll(MemberDto.createFromConcepts(Arrays.asList(cd1, cd2)));
+        memberDtosUpdated.addAll(MemberDto.createFromConcepts(Arrays.asList(cd3, cd4)));
         
         when(conceptMock.findBySerialisedId(c1.getSerialisedId())).thenReturn(c1);
         when(conceptMock.findBySerialisedId(c2.getSerialisedId())).thenReturn(c2);
@@ -119,8 +122,8 @@ public class RepositorySnapshotServiceTest {
     
     @Test
     public void create() throws RefsetConceptNotFoundException, NonUniquePublicIdException, ValidationException{
-        SnapshotDto created = SnapshotDto.getBuilder(null, TITLE, DESCRIPTION, PUBLIC_ID, conceptDtos).build();
-        Snapshot persisted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
+        SnapshotDto created = SnapshotDto.getBuilder(null, TITLE, DESCRIPTION, PUBLIC_ID, memberDtos).build();
+        Snapshot persisted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, members, null).build();
         
         when(repoMock.save(any(Snapshot.class))).thenReturn(persisted);
 
@@ -128,8 +131,7 @@ public class RepositorySnapshotServiceTest {
 
         ArgumentCaptor<Snapshot> refsetArgument = ArgumentCaptor.forClass(Snapshot.class);
         verify(repoMock, times(1)).save(refsetArgument.capture());
-        verify(conceptMock, times(1)).findBySerialisedId(c1.getSerialisedId());
-        verify(conceptMock, times(1)).findBySerialisedId(c2.getSerialisedId());
+        verify(conceptMock, times(2)).findBySerialisedId(anyLong());
         verifyNoMoreInteractions(repoMock);
         verifyNoMoreInteractions(conceptMock);
 
@@ -139,7 +141,7 @@ public class RepositorySnapshotServiceTest {
     
     @Test
     public void delete() throws SnapshotNotFoundException{
-        Snapshot deleted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
+        Snapshot deleted = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, members, null).build();
 
         when(repoMock.findOne(SNAPSHOT_ID)).thenReturn(deleted);
         
@@ -177,7 +179,7 @@ public class RepositorySnapshotServiceTest {
     
     @Test
     public void findById() {
-        Snapshot snapshot = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
+        Snapshot snapshot = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, members, null).build();
 
         when(repoMock.findOne(SNAPSHOT_ID)).thenReturn(snapshot);
         
@@ -192,10 +194,10 @@ public class RepositorySnapshotServiceTest {
     @Test
     public void update() throws NonUniquePublicIdException, SnapshotNotFoundException, RefsetConceptNotFoundException{
         
-        SnapshotDto updatedDto = SnapshotDto.getBuilder(SNAPSHOT_ID, TITLE_UPDATED, DESCRIPTION_UPDATED, PUBLIC_ID_UPDATED, conceptDtosUpdated).build();
-        Snapshot updated = Snapshot.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, conceptsUpdated, null).build();
+        SnapshotDto updatedDto = SnapshotDto.getBuilder(SNAPSHOT_ID, TITLE_UPDATED, DESCRIPTION_UPDATED, PUBLIC_ID_UPDATED, memberDtosUpdated).build();
+        Snapshot updated = Snapshot.getBuilder(PUBLIC_ID_UPDATED, TITLE_UPDATED, DESCRIPTION_UPDATED, membersUpdated, null).build();
         updated.setId(SNAPSHOT_ID);
-        Snapshot original = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, concepts, null).build();
+        Snapshot original = Snapshot.getBuilder(PUBLIC_ID, TITLE, DESCRIPTION, members, null).build();
         original.setId(SNAPSHOT_ID);
         
         when(repoMock.findOne(updatedDto.getId())).thenReturn(original);
@@ -215,14 +217,14 @@ public class RepositorySnapshotServiceTest {
     
     @Test(expected = SnapshotNotFoundException.class)
     public void updateWhenRefsetIsNotFound() throws NonUniquePublicIdException, SnapshotNotFoundException, RefsetConceptNotFoundException {        
-        SnapshotDto updatedDto = SnapshotDto.getBuilder(SNAPSHOT_ID, TITLE_UPDATED, DESCRIPTION_UPDATED, PUBLIC_ID_UPDATED, conceptDtosUpdated).build();
+        SnapshotDto updatedDto = SnapshotDto.getBuilder(SNAPSHOT_ID, TITLE_UPDATED, DESCRIPTION_UPDATED, PUBLIC_ID_UPDATED, memberDtosUpdated).build();
         when(repoMock.findOne(updatedDto.getId())).thenReturn(null);
         snapshotService.update(updatedDto);
     }
 
     private void assertSnapshot(SnapshotDto expected, Snapshot actual) {
         SnapshotDto actualDto = RefsetTestUtil.createSnapshotDto(actual.getId(), actual.getPublicId(), actual.getTitle(), 
-                actual.getDescription(), RefsetTestUtil.createConceptDtos(actual.getConcepts()));
+                actual.getDescription(), RefsetTestUtil.createConceptDtos(actual.getMembers()));
         
         assertEquals(expected, actualDto);
     }

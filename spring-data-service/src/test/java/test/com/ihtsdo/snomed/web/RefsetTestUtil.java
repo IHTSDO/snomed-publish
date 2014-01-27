@@ -4,11 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
+import com.ihtsdo.snomed.model.refset.Refset;
 
 /**
  * An utility class which contains useful methods for unit testing person related functions.
@@ -41,18 +43,18 @@ public class RefsetTestUtil {
         dto.setPublicId(publicId);
         dto.setTitle(title);
         dto.setDescription(description);
-        dto.setConceptDtos(concepts);
+        dto.setMemberDtos(MemberDto.createFromConcepts(concepts));
         
         return dto;
     }   
     
-    public static Set<ConceptDto> createConceptDtos(Set<Concept> source){
+    public static Set<ConceptDto> createConceptDtos(Set<Member> source){
         if ((source == null) || (source.size() == 0)){
             return new HashSet<ConceptDto>();
         }
         Set<ConceptDto> conceptDtos = new HashSet<ConceptDto>(source.size());
-        for (Concept c : source){
-            conceptDtos.add(new ConceptDto(c.getSerialisedId()));
+        for (Member m : source){
+            conceptDtos.add(new ConceptDto(m.getComponent().getSerialisedId()));
         }
         return conceptDtos;
     }

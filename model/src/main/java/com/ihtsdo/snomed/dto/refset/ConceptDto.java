@@ -76,6 +76,9 @@ public class ConceptDto {
     }
     
     public static ConceptDto parse(Concept c){
+    	if (c == null){
+    		return null;
+    	}
         return getBuilder()
                 .id(c.getSerialisedId())
                 .displayName(c.getDisplayName())

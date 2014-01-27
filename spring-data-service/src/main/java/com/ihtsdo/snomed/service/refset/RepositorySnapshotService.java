@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
@@ -22,6 +22,7 @@ import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Rule;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
@@ -89,7 +90,7 @@ public class RepositorySnapshotService implements SnapshotService {
                 updated.getPublicId(),
                 updated.getTitle(),
                 updated.getDescription(),
-                fillConcepts(updated.getConceptDtos()));
+                fillMembers(updated.getMemberDtos()));
 
         try {
             return snapshotRepository.save(snapshot);
@@ -113,7 +114,7 @@ public class RepositorySnapshotService implements SnapshotService {
                 created.getPublicId(), 
                 created.getTitle(), 
                 created.getDescription(),
-                fillConcepts(created.getConceptDtos()),
+                fillMembers(created.getMemberDtos()),
                 rule
                 ).build();
         try {
@@ -147,19 +148,19 @@ public class RepositorySnapshotService implements SnapshotService {
         return deleted;
     }    
     
-    private Set<Concept> fillConcepts(Set<ConceptDto> conceptDtos) throws RefsetConceptNotFoundException {
-        Set<Concept> concepts = new HashSet<Concept>();
-        if ((conceptDtos == null) || (conceptDtos.isEmpty())){
-            return concepts;
+    private Set<Member> fillMembers(Set<MemberDto> memberDtos) throws RefsetConceptNotFoundException {
+        Set<Member> members = new HashSet<>();
+        if ((memberDtos == null) || (memberDtos.isEmpty())){
+            return members;
         }
-        for (ConceptDto conceptDto : conceptDtos){
-            Concept c = conceptService.findBySerialisedId(conceptDto.getId());
+        for (MemberDto memberDto : memberDtos){
+            Concept c = conceptService.findBySerialisedId(memberDto.getComponent().getId());
             if (c == null){
-                throw new RefsetConceptNotFoundException(conceptDto, "Did not find concept with serialisedId " + conceptDto.getId());
+                throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
             }
-            concepts.add(c);
+            members.add(Member.getBuilder(null, c).build());
         }
-        return concepts;
+        return members;
     }        
 
     private Sort sortByAscendingTitle() {
