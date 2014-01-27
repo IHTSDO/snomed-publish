@@ -56,9 +56,9 @@ public class MemberDto {
         	 MemberDto r = (MemberDto) o;
              if (Objects.equal(r.getComponent(), getComponent()) &&
             		 Objects.equal(r.getModule(), getModule()) &&
-            		 Objects.equal(r.getSerialisedId(), getSerialisedId()) &&
-            		 Objects.equal(r.getEffective(), getEffective()) &&
-            		 Objects.equal(r.isActive(), isActive()))
+            		 Objects.equal(r.getSerialisedId(), getSerialisedId()) );// &&
+            		 //Objects.equal(r.getEffective(), getEffective()) &&
+            		 //Objects.equal(r.isActive(), isActive()))
              {
                  return true;
              }
@@ -81,8 +81,8 @@ public class MemberDto {
      public int hashCode(){
     	 return java.util.Objects.hash(
     			 getSerialisedId(),
-    			 getEffective(),
-    			 isActive(),
+    			 //getEffective(),
+    			 //isActive(),
     			 getComponent(),
     			 getModule());
      }   

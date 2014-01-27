@@ -96,7 +96,7 @@ public class SnapshotDto {
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
-                .add("conceptDtos", getMemberDtos() == null ? 0 : getMemberDtos().size())
+                .add("memberDtos", getMemberDtos() == null ? 0 : getMemberDtos().size())
                 .toString();
     }
     
