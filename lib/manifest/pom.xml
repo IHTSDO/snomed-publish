@@ -25,10 +25,7 @@
             </configuration>
           </plugin>
       </plugins>
-    </build>
-    <properties>
-        <org.eclipse.persistence.moxy.version>2.5.0</org.eclipse.persistence.moxy.version>
-    </properties>    
+    </build>    
     <dependencies>
         <dependency>
             <groupId>com.ihtsdo.snomed</groupId>

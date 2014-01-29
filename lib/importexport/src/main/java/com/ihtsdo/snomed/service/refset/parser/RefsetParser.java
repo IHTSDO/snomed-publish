@@ -16,4 +16,5 @@ public interface RefsetParser {
 	public Set<MemberDto> parse(Reader reader) throws IOException, InvalidInputException;
 	
 	public RefsetParser parseMode(Mode parseMode);
+
 }

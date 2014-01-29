@@ -37,6 +37,25 @@
             <artifactId>hibernate-jpa-2.0-api</artifactId>
             <version>${hibernate-jpa-2.version}</version>
         </dependency>        
+        
+	    <!-- Jackson JSON converter -->
+	    <dependency>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+	      <artifactId>jackson-databind</artifactId>
+	      <version>${jackson.databind.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+	      <artifactId>jackson-core</artifactId>
+	      <version>${jackson.version}</version>
+	    </dependency>        
+	    
+        <!-- Better (?) JAXB implementation by Moxy. See jaxb.properties -->
+        <dependency>
+           <groupId>org.eclipse.persistence</groupId>
+           <artifactId>org.eclipse.persistence.moxy</artifactId>
+           <version>${org.eclipse.persistence.moxy.version}</version>
+        </dependency>        	    
 
         <!-- Test Scope -->
 

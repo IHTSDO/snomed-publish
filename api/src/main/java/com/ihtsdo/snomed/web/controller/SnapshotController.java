@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ihtsdo.snomed.dto.refset.MemberDto;
+import com.ihtsdo.snomed.dto.refset.MembersDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidInputException;
@@ -91,11 +93,11 @@ public class SnapshotController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SnapshotDto>  getSnapshotWithConceptsAsJson(
+    public ResponseEntity<SnapshotDto>  getSnapshotWithMembersAsJson(
             @PathVariable String refsetName, 
             @PathVariable String snapshotName) throws Exception 
     {
-        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in json format", snapshotName, refsetName);
+        LOG.debug("Received request for snapshot [{}] for refset [{}] in json format", snapshotName, refsetName);
         
         Refset refset = refsetService.findByPublicId(refsetName);
         if (refset == null){
@@ -115,11 +117,11 @@ public class SnapshotController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_XML_VALUE)
-    public ResponseEntity<SnapshotDto>  getSnapshotWithConceptsAsXml(
+    public ResponseEntity<SnapshotDto>  getSnapshotWithMembersAsXml(
             @PathVariable String refsetName, 
             @PathVariable String snapshotName) throws Exception 
     {
-        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in xml format", snapshotName, refsetName);
+        LOG.debug("Received request for snapshot [{}] for refset [{}] in xml format", snapshotName, refsetName);
         
         Refset refset = refsetService.findByPublicId(refsetName);
         if (refset == null){
@@ -132,6 +134,53 @@ public class SnapshotController {
         }
         
         return new ResponseEntity<SnapshotDto>(SnapshotDto.parse(snapshot), HttpStatus.OK);
+    }    
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.json", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<MemberDto>>  getSnapshotMembersOnlyAsJson(
+            @PathVariable String refsetName, 
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for members of snapshot [{}] for refset [{}] in json format", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        List<MemberDto> members = new ArrayList<>(SnapshotDto.parse(snapshot).getMemberDtos());
+        return new ResponseEntity<>(members, HttpStatus.OK);
+    }    
+    
+    @Transactional
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.xml", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_XML_VALUE)
+    public ResponseEntity<MembersDto>  getSnapshotMembersOnlyAsXml(
+            @PathVariable String refsetName, 
+            @PathVariable String snapshotName) throws Exception 
+    {
+        LOG.debug("Received request for members of snapshot [{}] for refset [{}] in xml format", snapshotName, refsetName);
+        
+        Refset refset = refsetService.findByPublicId(refsetName);
+        if (refset == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        Snapshot snapshot = refset.getSnapshot(snapshotName);
+        if (snapshot == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(new MembersDto(new ArrayList<>(SnapshotDto.parse(snapshot).getMemberDtos())), HttpStatus.OK);
     }    
 
     /*
@@ -171,17 +220,17 @@ public class SnapshotController {
     
     
 	@Transactional
-    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.rf2", 
+    @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.rf2", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.TEXT_PLAIN_VALUE)
-    public void getSnapshotWithConceptsAsRf2(
+    public void getSnapshotMembersOnlyAsRf2(
             @PathVariable String refsetName, 
             HttpServletResponse servletResponse,
             Writer responseWriter,
             @PathVariable String snapshotName) throws Exception 
     {
-        LOG.debug("Received request for concepts of snapshot [{}] for refset [{}] in rf2 format", snapshotName, refsetName);
+        LOG.debug("Received request for members of snapshot [{}] for refset [{}] in rf2 format", snapshotName, refsetName);
         
         Refset refset = refsetService.findByPublicId(refsetName);
         if (refset == null){
@@ -271,7 +320,15 @@ public class SnapshotController {
             return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         }
         
-        if (importSnapshotDto.isRf2()){
+        if (importSnapshotDto.isRf2() || importSnapshotDto.isJson() || importSnapshotDto.isXml()){
+        	Parser parser;
+        	if (importSnapshotDto.isJson()){
+        		parser = Parser.JSON;
+        	}else if (importSnapshotDto.isRf2()){
+        		parser = Parser.RF2;
+        	}else{
+        		parser = Parser.XML;
+        	}
         	MultipartFile file = importSnapshotDto.getFile();
         	try (Reader reader = new InputStreamReader(new BufferedInputStream(file.getInputStream()))){
         		SnapshotDto snapshotDto = SnapshotDto.getBuilder(
@@ -279,14 +336,14 @@ public class SnapshotController {
         				importSnapshotDto.getTitle(), 
         				importSnapshotDto.getDescription(),
         				importSnapshotDto.getPublicId(),
-        				RefsetParserFactory.getParser(Parser.RF2).parseMode(Mode.FORGIVING).parse(reader)).build();
+        				RefsetParserFactory.getParser(parser).parseMode(Mode.FORGIVING).parse(reader)).build();
         		
         		SnapshotDto createdDto = refsetService.importSnapshot(refsetName, snapshotDto);
         		
         		response.setSnapshot(createdDto);
                 return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
         	} catch (InvalidInputException e) {
-				LOG.error("If the parser is running in FORGIVING mode, this should not happen");
+				LOG.error("If the parser is running in FORGIVING mode, this should not happen", e);
 				return new ResponseEntity<SnapshotResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
 			} catch (IOException e) {
 				LOG.error("Inable to read file named [" + importSnapshotDto.getFile().getName() + "]");

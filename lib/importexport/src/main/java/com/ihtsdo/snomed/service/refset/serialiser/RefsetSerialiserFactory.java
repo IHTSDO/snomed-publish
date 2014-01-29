@@ -11,13 +11,15 @@ public class RefsetSerialiserFactory {
     public static RefsetSerialiserFactory instance;
     
     public enum Form{
-        RF2;
+        RF2, JSON;
     }
     
     public static RefsetSerialiser getSerialiser(Form form, Writer writer) throws IOException{
         switch (form){
             case RF2:
                 return new Rf2Serialiser(writer);
+            case JSON:
+            	return new JsonSerialiser(writer);
             default:
                 throw new InvalidInputException("RefsetSerialiser " + form + " not found");
         }
