@@ -16,7 +16,11 @@ import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 public class ImportSnapshotDto extends SnapshotDto {
 
 	public enum Type {
-		USE_EXTENSION, JSON, XML, LIST, RF2;
+		USE_EXTENSION, JSON, XML, RF2;
+	}
+
+	public boolean isUseExtension(){
+		return getFileType() == Type.USE_EXTENSION;
 	}
 	
 	public boolean isRf2(){
@@ -30,11 +34,7 @@ public class ImportSnapshotDto extends SnapshotDto {
 	public boolean isXml(){
 		return getFileType() == Type.XML;
 	}	
-	
-	public boolean isList(){
-		return getFileType() == Type.LIST;
-	}	
-	
+
 	@NotNull(message="You must select a file")
 	private MultipartFile file;
 	

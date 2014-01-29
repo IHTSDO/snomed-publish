@@ -316,61 +316,78 @@ public class SnapshotController {
                     false, null,null, "xml.response.error.publicid.not.unique"));
         }
         
+        Parser parser = getParser(importSnapshotDto);
+        if (parser == null){
+        	bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "fileType", importSnapshotDto.getFileType(),
+                    false, null,new Object[]{importSnapshotDto.getFileType()}, "xml.response.error.filetype.not.recognised"));
+        }
+        
         if (bindingResult.hasErrors()){
             return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         }
-        
-        if (importSnapshotDto.isRf2() || importSnapshotDto.isJson() || importSnapshotDto.isXml()){
-        	Parser parser;
-        	if (importSnapshotDto.isJson()){
-        		parser = Parser.JSON;
-        	}else if (importSnapshotDto.isRf2()){
-        		parser = Parser.RF2;
-        	}else{
-        		parser = Parser.XML;
-        	}
-        	MultipartFile file = importSnapshotDto.getFile();
-        	try (Reader reader = new InputStreamReader(new BufferedInputStream(file.getInputStream()))){
-        		SnapshotDto snapshotDto = SnapshotDto.getBuilder(
-        				0L, 
-        				importSnapshotDto.getTitle(), 
-        				importSnapshotDto.getDescription(),
-        				importSnapshotDto.getPublicId(),
-        				RefsetParserFactory.getParser(parser).parseMode(Mode.FORGIVING).parse(reader)).build();
-        		
-        		SnapshotDto createdDto = refsetService.importSnapshot(refsetName, snapshotDto);
-        		
-        		response.setSnapshot(createdDto);
-                return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
-        	} catch (InvalidInputException e) {
-				LOG.error("If the parser is running in FORGIVING mode, this should not happen", e);
-				return new ResponseEntity<SnapshotResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-			} catch (IOException e) {
-				LOG.error("Inable to read file named [" + importSnapshotDto.getFile().getName() + "]");
-				return new ResponseEntity<SnapshotResponseDto>(HttpStatus.BAD_REQUEST);
-			} catch (NonUniquePublicIdException e) {
-				// Allready take care of above, but...
-	            bindingResult.addError(new FieldError(
-	                    bindingResult.getObjectName(), "publicId", importSnapshotDto.getPublicId(),
-	                    false, null,new Object[]{importSnapshotDto.getPublicId()}, "xml.response.error.publicid.not.unique"));
-	            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);	            
-			} catch (RefsetNotFoundException e) {
-				LOG.error("Inable to find refset named [" + refsetName + "]");
-				return new ResponseEntity<SnapshotResponseDto>(HttpStatus.BAD_REQUEST);
-			} catch (ConceptIdNotFoundException e) {
-				LOG.error("Inable to find concept with serialised id [" + e.getId());
-	            bindingResult.addError(new FieldError(
-	                    bindingResult.getObjectName(), "memberDtos", importSnapshotDto.getMemberDtos(),
-	                    false, null,new Object[]{e.getId()}, "xml.response.error.concept.not.found"));
-	            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);	            
-			
-			}        	
-        }
 
-        //handle json + handle xml
-        //handle list        
-        
-        LOG.error("We have not handled filetype [" + importSnapshotDto.getFileType() + "]");
-        return new ResponseEntity<SnapshotResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	MultipartFile file = importSnapshotDto.getFile();
+    	try (Reader reader = new InputStreamReader(new BufferedInputStream(file.getInputStream()))){
+    		SnapshotDto snapshotDto = SnapshotDto.getBuilder(
+    				0L, 
+    				importSnapshotDto.getTitle(), 
+    				importSnapshotDto.getDescription(),
+    				importSnapshotDto.getPublicId(),
+    				RefsetParserFactory.getParser(parser).parseMode(Mode.FORGIVING).parse(reader)).build();
+    		
+    		SnapshotDto createdDto = refsetService.importSnapshot(refsetName, snapshotDto);
+    		
+    		response.setSnapshot(createdDto);
+            return new ResponseEntity<SnapshotResponseDto>(response, HttpStatus.CREATED);
+    	} catch (InvalidInputException e) {
+			LOG.error("If the parser is running in FORGIVING mode, this should not happen", e);
+			return new ResponseEntity<SnapshotResponseDto>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (IOException e) {
+			LOG.error("Inable to read file named [" + importSnapshotDto.getFile().getName() + "]");
+			return new ResponseEntity<SnapshotResponseDto>(HttpStatus.BAD_REQUEST);
+		} catch (NonUniquePublicIdException e) {
+			// Allready take care of above, but...
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "publicId", importSnapshotDto.getPublicId(),
+                    false, null,new Object[]{importSnapshotDto.getPublicId()}, "xml.response.error.publicid.not.unique"));
+            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);	            
+		} catch (RefsetNotFoundException e) {
+			LOG.error("Inable to find refset named [" + refsetName + "]");
+			return new ResponseEntity<SnapshotResponseDto>(HttpStatus.BAD_REQUEST);
+		} catch (ConceptIdNotFoundException e) {
+			LOG.error("Inable to find concept with serialised id [" + e.getId());
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "memberDtos", importSnapshotDto.getMemberDtos(),
+                    false, null,new Object[]{e.getId()}, "xml.response.error.concept.not.found"));
+            return new ResponseEntity<SnapshotResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);	            
+		
+		}
+    }
+    
+    private Parser getParser(ImportSnapshotDto importSnapshotDto){
+    	LOG.info("Determining parser for file type [" + importSnapshotDto.getFileType() + "]");
+        Parser parser = null;
+        if (importSnapshotDto.isUseExtension()){
+        	String name = importSnapshotDto.getFile().getOriginalFilename();
+        	String extension = name.substring(name.lastIndexOf('.') + 1, name.length()).toUpperCase();
+        	LOG.info("Determining parser based on file extension [" + extension + "]");
+        	if (extension.equals("JSON")){
+        		parser = Parser.JSON;
+        	}else if (extension.equals("XML")){
+        		parser = Parser.XML;
+        	}else if (extension.equals("TXT")){
+        		parser = Parser.RF2;
+        	}else if (extension.equals("RF2")){
+        		parser = Parser.RF2;
+        	}
+        }else if (importSnapshotDto.isRf2()){
+        	parser = Parser.RF2;
+        }else if (importSnapshotDto.isJson()){
+        	parser = Parser.JSON;
+        }else if (importSnapshotDto.isXml()){
+        	parser = Parser.XML;
+        }
+		return parser;
     }
 }

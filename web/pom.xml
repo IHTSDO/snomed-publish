@@ -13,7 +13,7 @@
   <name>web</name>
   
   <properties>
-    <spring.security.version>3.1.4.RELEASE</spring.security.version>
+    <spring.security.version>3.2.0.RELEASE</spring.security.version>
     <jstl.version>1.2</jstl.version>
     <taglibs.standard.version>1.1.2</taglibs.standard.version>
     <jetty.servlets.version>9.0.4.v20130625</jetty.servlets.version>
@@ -25,7 +25,7 @@
     <servlet.api.version>2.5</servlet.api.version>
     <jetty.version>9.0.4.v20130625</jetty.version>
     <velocity.version>1.7</velocity.version>
-	<velocity.tools.version>2.0</velocity.tools.version>
+	  <velocity.tools.version>2.0</velocity.tools.version>
   </properties>
   
   <build>
@@ -118,11 +118,12 @@
     </dependency>
 
     <!-- HTTPClient -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>${http.client.version}</version>
-    </dependency>
+	<dependency>
+		<groupId>org.apache.httpcomponents</groupId>
+		<artifactId>httpclient</artifactId>
+		<version>4.3.2</version>
+	</dependency>
+            
     
     <!-- Spring Core -->
     <dependency>
@@ -134,9 +135,14 @@
     <!-- Spring MVC -->
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
+      <artifactId>spring-web</artifactId>
       <version>${spring.version}</version>
-    </dependency>
+    </dependency>    
+<!--     <dependency> -->
+<!--       <groupId>org.springframework</groupId> -->
+<!--       <artifactId>spring-webmvc</artifactId> -->
+<!--       <version>${spring.version}</version> -->
+<!--     </dependency> -->
     
     <!-- Spring Velocity -->
     <dependency>
@@ -306,10 +312,10 @@
     <!-- PROVIDED SCOPE -->
     
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>${servlet.api.version}</version>
-      <scope>provided</scope>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

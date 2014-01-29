@@ -33,10 +33,11 @@
             <version>${hibernate.validator.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <version>${hibernate-jpa-2.version}</version>
-        </dependency>        
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.1-api</artifactId>
+          <version>1.0.0.Final</version>
+        </dependency>
+                    
         
 	    <!-- Jackson JSON converter -->
 	    <dependency>
