@@ -255,18 +255,32 @@ public class RepositoryRefsetService implements RefsetService {
             return members;
         }
         for (MemberDto memberDto : memberDtos){
-            Concept component = conceptService.findBySerialisedId(memberDto.getComponent().getId());
-            if (component == null){
-                throw new ConceptIdNotFoundException(memberDto.getComponent().getId(), 
-                		"Did not find component concept with serialisedId " + memberDto.getComponent().getId());
-            }
+
+        	Concept component = null;
+			try {
+				component = conceptService.findBySerialisedId(memberDto.getComponent().getIdAsLong());
+	            if (component == null){
+	                throw new ConceptIdNotFoundException(memberDto.getComponent().getId(), 
+	                		"Did not find component concept with serialisedId " + memberDto.getComponent().getId());
+	            }
+			} catch (NumberFormatException e) {
+                throw new ConceptIdNotFoundException(null, 
+                		"Did not find component concept with serialisedId " + memberDto.getComponent().getId(), e);
+			}
+
             Concept module = null;
             if (memberDto.getModule() != null){
-                module = conceptService.findBySerialisedId(memberDto.getModule().getId());
-                if (module == null){
-                    throw new ConceptIdNotFoundException(memberDto.getComponent().getId(), 
-                    		"Did not find module concept with serialisedId " + memberDto.getComponent().getId());
-                }
+                try {
+					module = conceptService.findBySerialisedId(memberDto.getModule().getIdAsLong());
+	                if (module == null){
+	                    throw new ConceptIdNotFoundException(memberDto.getModule().getId(), 
+	                    		"Did not find module concept with serialisedId " + memberDto.getModule().getId());
+	                }
+                } catch (NumberFormatException e) {
+                    throw new ConceptIdNotFoundException(null, 
+                    		"Did not find module concept with serialisedId " + memberDto.getModule().getId(), e);
+				}
+
             }
             members.add(Member.getBuilder(module, component).build());
         }

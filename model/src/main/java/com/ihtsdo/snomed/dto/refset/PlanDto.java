@@ -157,7 +157,7 @@ public class PlanDto {
                     build());
         }
         for (ConceptDto concept : rule.getConcepts()){
-            if ((concept.getId() == null) || (concept.getId() <= 0)){
+            if ((concept.getId() == null) || (concept.getIdAsLong() <= 0)){
                 result.addError(
                     FieldValidationError.getBuilder(
                             ValidationResult.Error.INVALID_CONCEPT_ID,

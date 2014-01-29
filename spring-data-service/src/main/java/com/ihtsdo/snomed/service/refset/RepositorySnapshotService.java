@@ -154,11 +154,15 @@ public class RepositorySnapshotService implements SnapshotService {
             return members;
         }
         for (MemberDto memberDto : memberDtos){
-            Concept c = conceptService.findBySerialisedId(memberDto.getComponent().getId());
-            if (c == null){
-                throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
-            }
-            members.add(Member.getBuilder(null, c).build());
+            try {
+				Concept c = conceptService.findBySerialisedId(memberDto.getComponent().getIdAsLong());
+				if (c == null){
+				    throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
+				}
+				members.add(Member.getBuilder(null, c).build());
+			} catch (NumberFormatException e) {
+				throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
+			}
         }
         return members;
     }        

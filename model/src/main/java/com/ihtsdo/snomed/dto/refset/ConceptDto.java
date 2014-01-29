@@ -1,7 +1,7 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 
 
@@ -9,11 +9,18 @@ public class ConceptDto {
 
     public ConceptDto(){}
     
-    public ConceptDto(Long id){
+    public ConceptDto(String id){
         this.id = id;
     }
     
-    private Long id;
+    public ConceptDto(Long id){
+    	if (id == null){
+    		return;
+    	}
+    	this.id = Long.toString(id);
+    }    
+    
+    private String id;
     private String title;
     private boolean active;
     private long effectiveTime;
@@ -38,13 +45,20 @@ public class ConceptDto {
     
     @Override
     public int hashCode(){
-        return Longs.hashCode(getId());
+        return getId() == null ? 0 : getId().hashCode();
     } 
     
-    public Long getId() {
+    
+    @JsonIgnore
+    public Long getIdAsLong() throws NumberFormatException{
+    	if (getId() == null) return null;
+        return new Long(getId());
+    }
+    
+    public String getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
     public String getTitle() {
@@ -80,7 +94,7 @@ public class ConceptDto {
     		return null;
     	}
         return getBuilder()
-                .id(c.getSerialisedId())
+                .id(Long.toString(c.getSerialisedId()))
                 .displayName(c.getDisplayName())
                 .active(c.isActive())
                 .effectiveTime(c.getEffectiveTime())
@@ -94,10 +108,16 @@ public class ConceptDto {
             built = new ConceptDto();
         }
         
-        public Builder id(Long id){
+        public Builder id(String id){
             built.setId(id);
             return this;
         }
+        
+        public Builder id(Long id){
+        	if (id == null) return this;
+            built.setId(id.toString());
+            return this;
+        }        
         
         public Builder active(boolean active){
             built.setActive(active);

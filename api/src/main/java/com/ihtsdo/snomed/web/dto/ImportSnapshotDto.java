@@ -19,6 +19,22 @@ public class ImportSnapshotDto extends SnapshotDto {
 		USE_EXTENSION, JSON, XML, LIST, RF2;
 	}
 	
+	public boolean isRf2(){
+		return getFileType() == Type.RF2;
+	}
+
+	public boolean isJson(){
+		return getFileType() == Type.JSON;
+	}	
+	
+	public boolean isXml(){
+		return getFileType() == Type.XML;
+	}	
+	
+	public boolean isList(){
+		return getFileType() == Type.LIST;
+	}	
+	
 	@NotNull(message="You must select a file")
 	private MultipartFile file;
 	

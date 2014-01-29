@@ -58,7 +58,7 @@ public class RuleDto {
     public List<Long> conceptIds(){
         List<Long> ids = new ArrayList<>(getConcepts().size());
         for (ConceptDto c : getConcepts()){
-            ids.add(c.getId());
+            ids.add(c.getIdAsLong());
         }
         return ids;
     }

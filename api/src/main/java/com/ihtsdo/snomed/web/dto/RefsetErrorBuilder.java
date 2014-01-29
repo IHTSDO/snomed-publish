@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.web.dto;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.inject.Named;
@@ -39,7 +40,7 @@ public class RefsetErrorBuilder {
         for (FieldValidationError e : result.getFieldErrors()){
             LOG.error("Error: {}", e.getDefaultMessage());
             response.addFieldError(
-                    e.getRule().getId().toString(), 
+                    Objects.toString(e.getRule() == null ? null : e.getRule().getId()), 
                     resolveLocalizedErrorMessage(
                             e.key(), 
                             e.getDefaultMessage()));

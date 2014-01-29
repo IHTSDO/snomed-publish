@@ -50,8 +50,7 @@ public class MemberDto {
     
 	
     @Override
-     public boolean equals(Object o){
-    	System.out.println("In equals!!");
+    public boolean equals(Object o){
          if (o instanceof MemberDto){
         	 MemberDto r = (MemberDto) o;
              if (Objects.equal(r.getComponent(), getComponent()) &&
@@ -139,6 +138,10 @@ public class MemberDto {
         return new Builder(0L, "", module, component, new Date(), true);
     }
 
+    public static Builder getBuilder(String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
+        return new Builder(null, serialisedId, module, component, effective, active);
+    }    
+    
     public static Builder getBuilder(Long id, String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
         return new Builder(id, serialisedId, module, component, effective, active);
     }

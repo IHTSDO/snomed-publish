@@ -19,7 +19,6 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 
 @Entity

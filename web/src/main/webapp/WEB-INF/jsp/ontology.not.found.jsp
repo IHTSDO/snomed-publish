@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/css/styles.css?v=1.0">
 </head>
 <body id="notfound">
-    <img src="/img/404.png"/>
+    <img src="/static/img/404.png"/>
     <h1>Ontology <span class="id"><c:out value="${id}"/></span> not found!</h1>
 </body>
 </html>

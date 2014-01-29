@@ -179,11 +179,16 @@ public class RepositoryPlanService implements PlanService {
     
     private void updateConcepts(RuleDto ruleDto, Rule rule) throws ConceptNotFoundValidationException {
         for (ConceptDto conceptDto : ruleDto.getConcepts()){
-            Concept c = conceptService.findBySerialisedId(conceptDto.getId());
-            if (c == null){
-                throw new ConceptNotFoundValidationException(ruleDto, conceptDto, "Did not find concept with serialisedId " + conceptDto.getId() + " for rule DTO " + rule.getId());
-            }
-            ((ListConceptsRefsetRule)rule).addConcept(c);
+            
+			try {
+				Concept c = conceptService.findBySerialisedId(conceptDto.getIdAsLong());
+	            if (c == null){
+	                throw new ConceptNotFoundValidationException(ruleDto, conceptDto, "Did not find concept with serialisedId " + conceptDto.getId() + " for rule DTO " + rule.getId());
+	            }
+	            ((ListConceptsRefsetRule)rule).addConcept(c);
+			} catch (NumberFormatException e) {
+				throw new ConceptNotFoundValidationException(ruleDto, conceptDto, "Did not find concept with serialisedId " + conceptDto.getId() + " for rule DTO " + rule.getId());
+			}            
         }
     }     
         
