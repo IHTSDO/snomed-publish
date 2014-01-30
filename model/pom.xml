@@ -88,10 +88,11 @@
         
         <!-- Hibernate JPA2 Implementation -->
         <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.0-api</artifactId>
+          <version>${hibernate-jpa-2.version}</version>
         </dependency>
+
                     
 
         <!-- Hibernate Core -->

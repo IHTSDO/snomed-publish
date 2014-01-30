@@ -79,6 +79,7 @@
       <version>${project.version}</version>
     </dependency>  
 
+	<!-- Swagger -->
     <dependency>
 	    <groupId>com.mangofactory</groupId>
 	    <artifactId>swagger-springmvc</artifactId>
@@ -113,12 +114,29 @@
       <version>${spring.version}</version>
     </dependency>
     
-    <!-- Spring Web -->
+    <!-- Spring Web MVC -->
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <artifactId>spring-webmvc</artifactId>
       <version>${spring.version}</version>
     </dependency>
+    
+    <!-- Spring Data Rest -->
+	<dependency>
+	  <groupId>org.springframework.data</groupId>
+	  <artifactId>spring-data-rest-webmvc</artifactId>
+<!--  	  <version>2.0.0.RC1</version> -->
+ 	  <version>1.1.0.M1</version>
+		<!-- version>1.0.0.RC2</version-->
+	</dependency>
+ 	  
+ 	  <!-- Spring Data Commons -->
+<!-- 	<dependency> -->
+<!-- 	    <groupId>org.springframework.data</groupId> -->
+<!-- 	    <artifactId>spring-data-commons</artifactId> -->
+<!-- 	    <version>1.7.0.M1</version> -->
+<!-- 	</dependency>  	   -->
+ 	  
     
     <!-- Spring Object-XML Mapping -->
     <dependency>
@@ -275,4 +293,6 @@
     </dependency>
 
   </dependencies>
+  
+  
 </project>

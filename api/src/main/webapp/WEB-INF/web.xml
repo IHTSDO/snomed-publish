@@ -38,7 +38,10 @@
         </param-value>
 	</context-param>
 
-
+        <!-- Closes logback cleanly -->
+<!--         <listener> -->
+<!--                 <listener-class>ch.qos.logback.classic.selector.servlet.ContextDetachingSCL</listener-class> -->
+<!--         </listener> -->
 
     <filter>
         <filter-name>OpenEntityManagerInViewFilter</filter-name>
@@ -62,7 +65,16 @@
     </filter-mapping>
     
     
-    
+    <!-- REST exporter -->
+<!--     <servlet> -->
+<!--             <servlet-name>exporter</servlet-name> -->
+<!--             <servlet-class>org.springframework.data.rest.webmvc.RepositoryRestDispatcherServlet</servlet-class> -->
+<!--             <load-on-startup>1</load-on-startup> -->
+<!--     </servlet> -->
+<!--     <servlet-mapping> -->
+<!--         <servlet-name>exporter</servlet-name> -->
+<!--         <url-pattern>/rest/*</url-pattern> -->
+<!-- 	</servlet-mapping> -->
     
 
 	<servlet>
