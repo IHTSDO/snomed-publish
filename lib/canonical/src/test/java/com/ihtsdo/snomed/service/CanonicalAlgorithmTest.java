@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public class CanonicalAlgorithmTest {
@@ -54,20 +54,20 @@ public class CanonicalAlgorithmTest {
         cB.setPrimitive(true);
         cC.setPrimitive(true);
         
-        Ontology o = new Ontology();
+        OntologyVersion o = new OntologyVersion();
         o.setConcepts(new HashSet<Concept>(Arrays.asList(c2, c2, c3, c4, c5, cA, cB, cC, cp1, cp2, cp3)));
         o.setIsKindOfPredicate(new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID));
-        c1.setOntology(o);
-        c2.setOntology(o);
-        c3.setOntology(o);
-        c4.setOntology(o);
-        c5.setOntology(o);
-        cA.setOntology(o);
-        cB.setOntology(o);
-        cC.setOntology(o);
-        cp1.setOntology(o);
-        cp2.setOntology(o);
-        cp3.setOntology(o);
+        c1.setOntologyVersion(o);
+        c2.setOntologyVersion(o);
+        c3.setOntologyVersion(o);
+        c4.setOntologyVersion(o);
+        c5.setOntologyVersion(o);
+        cA.setOntologyVersion(o);
+        cB.setOntologyVersion(o);
+        cC.setOntologyVersion(o);
+        cp1.setOntologyVersion(o);
+        cp2.setOntologyVersion(o);
+        cp3.setOntologyVersion(o);
 
         algorithm = new CanonicalAlgorithm();
     }

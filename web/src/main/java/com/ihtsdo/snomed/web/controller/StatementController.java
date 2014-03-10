@@ -30,14 +30,13 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ihtsdo.snomed.exception.DescriptionNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.exception.StatementNotFoundException;
-import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Ontology.Source;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlStatement;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
-import com.ihtsdo.snomed.web.service.SimpleConceptNotFoundException;
 import com.ihtsdo.snomed.web.service.OntologyService;
+import com.ihtsdo.snomed.web.service.SimpleConceptNotFoundException;
 
 @Controller
 @RequestMapping("/version/{ontologyId}/triple")
@@ -68,7 +67,7 @@ public class StatementController {
     public ModelAndView tripleDetails(@PathVariable long ontologyId, @PathVariable long serialisedId, ModelMap model,
             HttpServletRequest request) throws DescriptionNotFoundException
     {            
-        Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
+        OntologyVersion o = em.createQuery("SELECT o FROM OntologyVersion o WHERE o.id=:oid", OntologyVersion.class)
                 .setParameter("oid", ontologyId)
                 .getSingleResult();
         Statement s = getStatement(ontologyId, serialisedId);
@@ -76,7 +75,7 @@ public class StatementController {
         model.addAttribute("servletPath", request.getServletPath());
         model.addAttribute("ontologies", ontologyService.getAll());
         model.addAttribute("ontologyId", ontologyId);
-        if (o.getSource().equals(Source.RF2)){
+        if (o.getSource().equals(com.ihtsdo.snomed.model.OntologyVersion.Source.RF2)){
             return new ModelAndView("statement");
         }else {
             throw new InvalidInputException("Only RF2 ontologies supports this view");

@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.dto.refset.validation.FieldValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.GlobalValidationError;
 import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
@@ -77,8 +76,11 @@ public class PlanDto {
     
     @Override
     public int hashCode(){
-        return Longs.hashCode(getId());
-    } 
+        return java.util.Objects.hash(
+                getId(),
+                getTerminal(),
+                getRefsetRules());
+    }
     
     public ValidationResult validate() {
         LOG.debug("parsing refset plan dto: " + this);

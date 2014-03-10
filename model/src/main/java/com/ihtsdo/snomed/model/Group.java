@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 
@@ -74,8 +75,8 @@ public class Group {
         public boolean equals(Object o){
             if (o instanceof StatementWrapperForAttributeCompare){
                 StatementWrapperForAttributeCompare r = (StatementWrapperForAttributeCompare) o;            
-                if (r.statement.getPredicate().equals(this.statement.getPredicate()) &&
-                    r.statement.getObject().equals(this.statement.getObject()))
+                if (Objects.equal(r.statement.getPredicate(), this.statement.getPredicate()) &&
+                    Objects.equal(r.statement.getObject(), this.statement.getObject()))
                 {
                     return true;
                 }

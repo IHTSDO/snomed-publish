@@ -38,14 +38,14 @@ import com.google.common.primitives.Longs;
 
 //uniqueConstraints={
 //@UniqueConstraint(name="uniqueSerialisedId", columnNames={
-//  "serialisedId", "ontology_id"
+//  "serialisedId", "ontologyVersion_id"
 //}),
 
 
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Concept",
         indexes={@Index(name="conceptSerialisedIdIndex", columnNames={"serialisedId"}),
-                 @Index(name="conceptSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontology_id"})})
+                 @Index(name="conceptSerialisedIdAndOntologyVersionIndex", columnNames={"serialisedId", "ontologyVersion_id"})})
 public class Concept {
     protected static final String ATTRIBUTE = "attribute";
     private static final Logger LOG = LoggerFactory.getLogger( Concept.class );
@@ -80,7 +80,7 @@ public class Concept {
     //@Index(name="conceptSerialisedIdIndex")
     private long serialisedId;
     @OneToOne 
-    private Ontology ontology;
+    private OntologyVersion ontologyVersion;
     @OneToMany(mappedBy="about")  
     private Set<Description> description;
     private String fullySpecifiedName;
@@ -136,7 +136,7 @@ public class Concept {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("serialisedId", getSerialisedId())
-                .add("ontology", getOntology() == null ? null : getOntology().getId())
+                .add("ontologyVersion", getOntology() == null ? null : getOntology().getId())
                 .add("descriptions", getDescription() == null ? 0 : getDescription().size())
                 .add("statusId(rf1)", getStatusId())
                 .add("fullySpecifiedName(rf1)", getFullySpecifiedName())
@@ -391,11 +391,11 @@ public class Concept {
     public Set<Statement> getObjectOfStatements(){
         return objectOfStatements;
     }
-    public Ontology getOntology() {
-        return ontology;
+    public OntologyVersion getOntology() {
+        return ontologyVersion;
     }
-    public void setOntology(Ontology ontology) {
-        this.ontology = ontology;
+    public void setOntologyVersion(OntologyVersion ontologyVersion) {
+        this.ontologyVersion = ontologyVersion;
     }
 //    public String getType() {
 //        return type;

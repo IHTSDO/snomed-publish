@@ -2,6 +2,8 @@ package com.ihtsdo.snomed.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.sql.Date;
+
 import javax.persistence.Persistence;
 
 import org.junit.After;
@@ -18,6 +20,7 @@ import com.ihtsdo.snomed.service.parser.HibernateParser;
 public class OntologyTest extends BaseTest{
     private static final Logger LOG = LoggerFactory.getLogger(OntologyTest.class);
 
+
     @BeforeClass
     public static void beforeClass(){
         LOG.info("Initialising database");
@@ -27,7 +30,9 @@ public class OntologyTest extends BaseTest{
     
     @AfterClass
     public static void afterClass(){
-        emf.close();
+        if (emf != null){
+            emf.close();
+        }
     }    
     
     @After
@@ -44,19 +49,19 @@ public class OntologyTest extends BaseTest{
 
     @Test
     public void shouldReturnIsKindOfPredicate() {
-        Ontology o = new Ontology();
-        Concept c = new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
-        o.addConcept(c);
-        c.setOntology(o);
-        em.persist(c);
+        Ontology o = CreateOntologyUtil.createOntology();
+
+        o.getFlavours().iterator().next().getVersions().iterator().next().addConcept(new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID));        
+        
         em.persist(o);
         em.flush();
         em.clear();
         
-        c = em.createQuery("SELECT c FROM Concept c where c.id=1", Concept.class).getSingleResult();
-        o = em.createQuery("SELECT o FROM Ontology o where o.id=1", Ontology.class).getSingleResult();
-        
-        assertEquals(c, o.getIsKindOfPredicate());
-    }    
+        Concept c = em.createQuery("SELECT c FROM Concept c where c.id=1", Concept.class).getSingleResult();
+        OntologyVersion ov = em.createQuery("SELECT o FROM OntologyVersion o where o.id=1", OntologyVersion.class).getSingleResult();
+        assertEquals(c, ov.getIsKindOfPredicate());
+    }
+
+   
 
 }

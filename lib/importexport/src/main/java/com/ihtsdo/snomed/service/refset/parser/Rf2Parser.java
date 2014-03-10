@@ -43,7 +43,8 @@ public class Rf2Parser extends BaseRefsetParser {
 	                String effectiveString = splitIt.next();
 	                boolean active = stringToBoolean(splitIt.next()); 
 	                Long moduleId = new Long(splitIt.next());
-	                Long refsetId = new Long(splitIt.next()); //not used!
+	                @SuppressWarnings("unused")
+                    Long refsetId = new Long(splitIt.next()); //not used!
 	                Long componentId = new Long(splitIt.next());
 	                
 	                members.add(

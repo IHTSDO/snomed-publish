@@ -10,22 +10,22 @@ import com.ihtsdo.snomed.model.refset.Plan;
  */
 public class RefsetTestUtil {
 
-    public static RefsetDto createDto(Long id, Long concept, String publicId, String title, String description) {
-        RefsetDto dto = new RefsetDto();
-
-        dto.setId(id);
-        dto.setPublicId(publicId);
-        dto.setTitle(title);
-        dto.setDescription(description);
-        dto.setConcept(concept);
-        
-        return dto;
-    }
-
-    public static Refset createModelObject(Long id, Concept concept, String publicId, String title, String description) {
-        Refset model = Refset.getBuilder(concept, publicId, title, description, new Plan()).build();
-        model.setId(id);
-        return model;
-    }
+//    public static RefsetDto createDto(Long id, Long concept, String publicId, String title, String description) {
+//        RefsetDto dto = new RefsetDto();
+//
+//        dto.setId(id);
+//        dto.setPublicId(publicId);
+//        dto.setTitle(title);
+//        dto.setDescription(description);
+//        dto.setConcept(concept);
+//        
+//        return dto;
+//    }
+//
+//    public static Refset createModelObject(Long id, Concept concept, String publicId, String title, String description) {
+//        Refset model = Refset.getBuilder(concept, publicId, title, description, new Plan()).build();
+//        model.setId(id);
+//        return model;
+//    }
 }
 

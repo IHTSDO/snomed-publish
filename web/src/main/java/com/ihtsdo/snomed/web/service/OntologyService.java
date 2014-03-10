@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 
 @Service
 @Transactional (value = "transactionManager", readOnly = true)
@@ -34,8 +35,8 @@ public class OntologyService {
     }
     
     @Transactional
-    public List<Ontology> getAll(){
-        return em.createQuery("SELECT o FROM Ontology o", Ontology.class).getResultList();
+    public List<OntologyVersion> getAll(){
+        return em.createQuery("SELECT o FROM OntologyVersion o", OntologyVersion.class).getResultList();
     }
     
 //    @Transactional

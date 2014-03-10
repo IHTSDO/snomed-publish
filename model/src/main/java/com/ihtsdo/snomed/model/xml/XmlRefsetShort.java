@@ -21,7 +21,7 @@ public class XmlRefsetShort {
     
     public XmlRefsetShort(Refset r){
         setId(r.getId());
-        setConcept(new XmlRefsetConcept(r.getConcept()));
+        setConcept(new XmlRefsetConcept(r.getRefsetConcept()));
         setPublicId(r.getPublicId());
         setTitle(r.getTitle());
         setDescription(r.getDescription());
@@ -103,7 +103,4 @@ public class XmlRefsetShort {
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
-    
-    
-
 }

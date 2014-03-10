@@ -1,28 +1,42 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.util.Objects;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.model.refset.Refset.Source;
+import com.ihtsdo.snomed.model.refset.Refset.Type;
 
 @XmlRootElement(name="refset")
 @JsonRootName("refset")
 public class RefsetDto {
-    
+    	
     private Long id;
     
-    @NotNull(message="You must select a concept")
-    private Long concept;
+    @NotNull(message="You must select a type")
+    private Type type;
     
-    private String conceptDisplayName;
-
-    @NotNull(message="Public ID can not be empty")
-    @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
+    @NotNull(message="You must select a source")
+    private Source source;
+    
+    @NotNull(message="You must select a snomed release")
+    private SnomedReleaseDto snomedRelease;
+    
+    @Valid
+    @NotNull(message="You must select a refset concept")
+    private ConceptDto refsetConcept;
+    
+    @NotNull(message="You must select a module")
+    private ConceptDto moduleConcept;    
+    
+    @NotNull(message="Internet Address can not be empty")
+    @Size(min=2, max=20, message="Internet Address must be between 2 and 50 characters")
+    @Pattern(regexp="[a-zA-Z0-9_]+", message="Internet Address may contain characters, numbers, and underscores only")
     private String publicId;
     
     @NotNull(message="validation.title.not.empty")
@@ -35,25 +49,17 @@ public class RefsetDto {
     
     @NotNull(message="A plan must be associated with a refset")
     private PlanDto plan = new PlanDto();
-    
-    public RefsetDto(){}
-    
-    public RefsetDto(Long id, Long concept, String publicId, String title, String description){
-        this.concept = concept;
-        this.id = id;
-        this.publicId = publicId;
-        this.title = title;
-        this.description = description;
-    }
-    
-
-    
+        
     @Override
     public String toString(){
-        return Objects.toStringHelper(this)
+        return com.google.common.base.Objects.toStringHelper(this)
                 .add("id", getId())
+                .add("source", getSource())
+                .add("type", getType())
+                .add("snomedRelease", getSnomedRelease())
+                .add("refsetConcept", getRefsetConcept())
+                .add("moduleConcept", getModuleConcept())
                 .add("title", getTitle())
-                .add("concept", getConcept())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
                 .add("plan", getPlan())
@@ -64,11 +70,17 @@ public class RefsetDto {
     public boolean equals(Object o){
         if (o instanceof RefsetDto){
             RefsetDto dto = (RefsetDto) o;
-            if (Objects.equal(dto.getId(), getId()) &&
-                    (Objects.equal(dto.getTitle(), getTitle())) &&
-                    (Objects.equal(dto.getDescription(), getDescription())) &&
-                    (Objects.equal(dto.getConcept(), getConcept())) &&
-                    (Objects.equal(dto.getPublicId(), getPublicId()))){
+            if (
+        		Objects.equals(dto.getId(), getId()) &&
+        		Objects.equals(dto.getSource(), getSource()) &&
+        		Objects.equals(dto.getType(), getType()) &&
+        		Objects.equals(dto.getSnomedRelease(), getSnomedRelease()) &&
+        		Objects.equals(dto.getRefsetConcept(), getRefsetConcept()) &&
+                Objects.equals(dto.getModuleConcept(), getModuleConcept()) &&
+                Objects.equals(dto.getTitle(), getTitle()) &&
+                Objects.equals(dto.getDescription(), getDescription()) &&
+                Objects.equals(dto.getPublicId(), getPublicId()) &&
+                Objects.equals(dto.getPlan(), getPlan())){
                 return true;
             }
         }
@@ -77,13 +89,17 @@ public class RefsetDto {
     
     @Override
     public int hashCode(){
-        if (id != null){
-            return Longs.hashCode(id);
-        }else if (publicId != null){
-            return publicId.hashCode();
-        }else{
-            return 1; //delegate to equals method
-        }
+        return Objects.hash(
+        		getId(),
+        		getSource(),
+        		getType(),
+        		getSnomedRelease(),
+        		getRefsetConcept(),
+        		getModuleConcept(),
+        		getTitle(),
+        		getDescription(),
+        		getPublicId(),
+        		getPlan());
     }
 
     public String getPublicId() {
@@ -118,14 +134,6 @@ public class RefsetDto {
         this.id = id;
     }
 
-    public Long getConcept() {
-        return concept;
-    }
-
-    public void setConcept(Long concept) {
-        this.concept = concept;
-    }
-
     public PlanDto getPlan() {
         return plan;
     }
@@ -134,37 +142,74 @@ public class RefsetDto {
         this.plan = plan;
     }
     
-    
-    
-    public String getConceptDisplayName() {
-        return conceptDisplayName;
-    }
+    public Type getType() {
+		return type;
+	}
 
-    public void setConceptDisplayName(String conceptDisplayName) {
-        this.conceptDisplayName = conceptDisplayName;
-    }
+	public void setType(Type type) {
+		this.type = type;
+	}
 
-    public static Builder getBuilder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, PlanDto plan) {
-        return new Builder(id, conceptId, conceptDisplayName, title, description, publicId, plan);
+	public Source getSource() {
+		return source;
+	}
+
+	public void setSource(Source source) {
+		this.source = source;
+	}
+
+	public SnomedReleaseDto getSnomedRelease() {
+		return snomedRelease;
+	}
+
+	public void setSnomedRelease(SnomedReleaseDto snomedRelease) {
+		this.snomedRelease = snomedRelease;
+	}
+
+	public ConceptDto getRefsetConcept() {
+		return refsetConcept;
+	}
+
+	public void setRefsetConcept(ConceptDto refsetConcept) {
+		this.refsetConcept = refsetConcept;
+	}
+
+	public ConceptDto getModuleConcept() {
+		return moduleConcept;
+	}
+
+	public void setModuleConcept(ConceptDto moduleConcept) {
+		this.moduleConcept = moduleConcept;
+	}
+
+	public static Builder getBuilder(Long id, Source source, Type type, SnomedReleaseDto snomedRelease,
+			ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
+			String publicId, PlanDto plan) {
+        return new Builder(id, source, type, snomedRelease, refsetConcept, moduleConcept, 
+        		title, description, publicId, plan);
     }
     
     public static class Builder {
         private RefsetDto built;
 
-        Builder(Long id, Long conceptId, String conceptDisplayName, String title, String description, String publicId, PlanDto plan) {
+        Builder(Long id, Source source, Type type, SnomedReleaseDto snomedRelease,
+    			ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
+    			String publicId, PlanDto plan) {
             built = new RefsetDto();
-            built.setConcept(conceptId);
-            built.setDescription(description);
             built.setId(id);
-            built.setPlan(plan);
-            built.setPublicId(publicId);
+            built.setSource(source);
+            built.setType(type);
+            built.setSnomedRelease(snomedRelease);
+            built.setRefsetConcept(refsetConcept);
+            built.setModuleConcept(moduleConcept);
             built.setTitle(title);
-            built.setConceptDisplayName(conceptDisplayName);
+            built.setDescription(description);
+            built.setPublicId(publicId);
+            built.setPlan(plan);
         }
         
         public RefsetDto build(){
             return built;
         }
     }
-
 }

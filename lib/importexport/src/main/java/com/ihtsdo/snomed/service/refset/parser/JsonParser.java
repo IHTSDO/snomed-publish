@@ -6,16 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 
 public class JsonParser extends BaseRefsetParser {
-	private static final Logger LOG = LoggerFactory.getLogger( RefsetParser.class );
+	//private static final Logger LOG = LoggerFactory.getLogger( RefsetParser.class );
 	private final ObjectMapper mapper = new ObjectMapper();
 	
 	@Override

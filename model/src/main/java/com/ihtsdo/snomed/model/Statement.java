@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -20,7 +21,7 @@ import com.google.common.primitives.Longs;
 @Entity(name="Statement")
 @org.hibernate.annotations.Table(appliesTo = "Statement",
 indexes={@Index(name="statementSerialisedIdIndex", columnNames={"serialisedId"}),
-         @Index(name="statementSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontology_id"})})
+         @Index(name="statementSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontologyVersion_id"})})
 public class Statement {
     
     public static final long SERIALISED_ID_NOT_DEFINED = -1l;
@@ -31,12 +32,12 @@ public class Statement {
     @Id 
     private long id;
     @OneToOne
-    private Ontology ontology;
-    @OneToOne(fetch=FetchType.LAZY)
+    private OntologyVersion ontologyVersion;
+    @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
     private Concept subject;
-    @OneToOne(fetch=FetchType.LAZY)
+    @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
     private Concept predicate;
-    @OneToOne(fetch=FetchType.LAZY) 
+    @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.PERSIST) 
     private Concept object; 
     
     @Index(name="statementSerialisedIdIndex")
@@ -66,7 +67,7 @@ public class Statement {
         return Objects.toStringHelper(this)
             .add("id", getId())
             .add("serialisedId", getSerialisedId())
-            .add("ontology", getOntology() == null ? null : getOntology().getId())
+            .add("ontologyVersion", getOntologyVersion() == null ? null : getOntologyVersion().getId())
             .add("subject", getSubject() == null ? null : getSubject().getSerialisedId())
             .add("predicate", getPredicate() == null ? null : getPredicate().getSerialisedId())
             .add("object", getObject() == null ? null : getObject().getSerialisedId())
@@ -130,9 +131,9 @@ public class Statement {
             Statement r = (Statement) o;
             
             if ((r.getSerialisedId() == SERIALISED_ID_NOT_DEFINED) || (this.getSerialisedId() == SERIALISED_ID_NOT_DEFINED)){
-                return (r.getSubject().equals(this.getSubject())
-                        && r.getObject().equals(this.getObject())
-                        && r.getPredicate().equals(this.getPredicate()));
+                return (Objects.equal(r.getSubject(), this.getSubject())
+                        && Objects.equal(r.getObject(), this.getObject())
+                        && Objects.equal(r.getPredicate(), this.getPredicate()));
             }
             
             if (r.getSerialisedId() == this.getSerialisedId()){
@@ -173,18 +174,21 @@ public class Statement {
     }
     public void setSubject(Concept subject) {
         this.subject = subject;
+        subject.addSubjectOfStatement(this);
     }
     public Concept getPredicate() {
         return predicate;
     }
     public void setPredicate(Concept predicate) {
         this.predicate = predicate;
+        predicate.addPredicateOfStatement(this);
     }
     public Concept getObject() {
         return object;
     }
     public void setObject(Concept object) {
         this.object = object;
+        object.addObjectOfStatement(this);
     }
     public int getCharacteristicTypeIdentifier() {
         return characteristicTypeIdentifier;
@@ -204,11 +208,11 @@ public class Statement {
     public void setGroupId(int groupId) {
         this.groupId = groupId;
     }
-    public Ontology getOntology() {
-        return ontology;
+    public OntologyVersion getOntologyVersion() {
+        return ontologyVersion;
     }
-    public void setOntology(Ontology ontology) {
-        this.ontology = ontology;
+    public void setOntologyVersion(OntologyVersion ontologyVersion) {
+        this.ontologyVersion = ontologyVersion;
     }
     public long getSerialisedId() {
         return serialisedId;

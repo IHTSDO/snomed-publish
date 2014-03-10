@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Ontology.Source;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.OntologyVersion.Source;
 
 public class CanonicalHibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalHibernateParser.class );
@@ -41,16 +41,16 @@ public class CanonicalHibernateParser extends HibernateParser{
     
     @Override
     protected void populateStatements(final InputStream stream, EntityManager em, 
-            final Ontology ontology) throws IOException 
+            final OntologyVersion ontologyVersion) throws IOException 
     {
         LOG.info("Populating statements");
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Statement (serialisedid, subject_id, predicate_id, object_id, groupId, characteristicTypeIdentifier, refinability, effectiveTime, active, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Statement (serialisedid, subject_id, predicate_id, object_id, groupId, characteristicTypeIdentifier, refinability, effectiveTime, active, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -74,7 +74,7 @@ public class CanonicalHibernateParser extends HibernateParser{
                             ps.setInt(7,  DEFAULT_STATEMENT_REFINABILITY);
                             ps.setInt(8, DEFAULT_STATEMENT_EFFECTIVE_TIME);
                             ps.setBoolean(9, DEFAULT_STATEMENT_ACTIVE);
-                            ps.setLong(10, ontology.getId());
+                            ps.setLong(10, ontologyVersion.getId());
                             ps.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
@@ -97,14 +97,14 @@ public class CanonicalHibernateParser extends HibernateParser{
 
     @Override
     protected void populateConcepts(InputStream stream, EntityManager em,
-            Ontology ontology) throws IOException {
+            OntologyVersion ontologyVersion) throws IOException {
         throw new UnsupportedOperationException("Not supported");
     }
 
 
     @Override
     protected void populateConceptsFromStatements(final InputStream stream,
-            EntityManager em, final Ontology ontology) throws IOException 
+            EntityManager em, final OntologyVersion ontologyVersion) throws IOException 
     {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -112,7 +112,7 @@ public class CanonicalHibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontologyVersion_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -143,7 +143,7 @@ public class CanonicalHibernateParser extends HibernateParser{
                     
                     for (Concept c : concepts){
                         ps.setLong(1, c.getSerialisedId());
-                        ps.setLong(2, ontology.getId());
+                        ps.setLong(2, ontologyVersion.getId());
                         ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
                         ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
                         ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
@@ -159,18 +159,18 @@ public class CanonicalHibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
+        setKindOfPredicate(em, ontologyVersion);
     }
 
     @Override
     protected void populateDescriptions(InputStream stream, EntityManager em,
-            Ontology ontology) throws IOException {
+            OntologyVersion ontologyVersion) throws IOException {
         throw new UnsupportedOperationException("Not supported");
     }
     
     @Override
     protected void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, 
-            final InputStream descriptionsStream, EntityManager em, final Ontology ontology) throws IOException{
+            final InputStream descriptionsStream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException{
         throw new UnsupportedOperationException("Not supported");
     }
 }

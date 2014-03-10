@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -27,9 +28,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
@@ -99,13 +103,21 @@ public class RefsetController {
         response.setPublicId(refsetName);
         try {
             Refset deleted = refsetService.delete(refsetName);
+            
             response.setRefset(
                 RefsetDto.getBuilder(
-                    deleted.getId(), 
-                    (deleted.getConcept() == null) ? 0 : deleted.getConcept().getSerialisedId(),
-                    (deleted.getConcept() == null) ? null : deleted.getConcept().getDisplayName(),
-                    deleted.getTitle(), deleted.getDescription(), deleted.getPublicId(), 
-                    PlanDto.parse(deleted.getPlan())).build());
+                        deleted.getId(),
+                        deleted.getSource(), 
+                        deleted.getType(), 
+                        SnomedReleaseDto.getBuilder(deleted.getSnomedRelease().getId(), new Date()).build(),
+                        ConceptDto.parse(deleted.getRefsetConcept()),
+                        ConceptDto.parse(deleted.getModuleConcept()),
+                        deleted.getTitle(),
+                        deleted.getDescription(), 
+                        deleted.getPublicId(), 
+                        PlanDto.parse(deleted.getPlan())).build()
+                    );
+
             response.setCode(RefsetResponseDto.SUCCESS_DELETED);
             response.setStatus(Status.DELETED);
             return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.OK);
@@ -164,6 +176,10 @@ public class RefsetController {
             LOG.debug("Create refset failed", e);
             response.setStatus(Status.FAIL);
             response.setCode(RefsetResponseDto.FAIL_VALIDATION);
+        } catch (OntologyNotFoundException e) {
+            LOG.debug("Create refset failed", e);
+            response.setStatus(Status.FAIL);
+            response.setCode(RefsetResponseDto.FAIL_VALIDATION);
         } 
         
         return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.NOT_ACCEPTABLE);
@@ -171,11 +187,20 @@ public class RefsetController {
       
     
     private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
-        response.setRefset(RefsetDto.getBuilder(updated.getId(), 
-                (updated.getConcept() == null) ? 0 : updated.getConcept().getSerialisedId(),
-                (updated.getConcept() == null) ? null : updated.getConcept().getDisplayName(),
-                updated.getTitle(), updated.getDescription(), updated.getPublicId(), 
-                PlanDto.parse(updated.getPlan())).build());
+        response.setRefset(
+                RefsetDto.getBuilder(
+                        updated.getId(),
+                        updated.getSource(), 
+                        updated.getType(), 
+                        SnomedReleaseDto.getBuilder(updated.getSnomedRelease().getId(), new Date()).build(),
+                        ConceptDto.parse(updated.getRefsetConcept()),
+                        ConceptDto.parse(updated.getModuleConcept()),
+                        updated.getTitle(),
+                        updated.getDescription(), 
+                        updated.getPublicId(), 
+                        PlanDto.parse(updated.getPlan())).build()
+                    );
+        
         response.setStatus(status);
         response.setCode(returnCode);
         return response;
@@ -204,14 +229,17 @@ public class RefsetController {
  
     private RefsetDto getRefsetDto(String pubId) {
         Refset refset = refsetService.findByPublicId(pubId);
-        System.out.println("Found refset " + refset);
-        RefsetDto refsetDto = RefsetDto.getBuilder(refset.getId(), 
-                (refset.getConcept() == null) ? 0 : refset.getConcept().getSerialisedId(),
-                (refset.getConcept() == null) ? null : refset.getConcept().getDisplayName(),
-                refset.getTitle(), refset.getDescription(), refset.getPublicId(), 
-                PlanDto.parse(refset.getPlan())).build();
-        System.out.println("Returning refsetDto " + refsetDto);
 
-        return refsetDto;
+        return RefsetDto.getBuilder(
+                refset.getId(),
+                refset.getSource(), 
+                refset.getType(), 
+                SnomedReleaseDto.getBuilder(refset.getSnomedRelease().getId(), new Date()).build(),
+                ConceptDto.parse(refset.getRefsetConcept()),
+                ConceptDto.parse(refset.getModuleConcept()),
+                refset.getTitle(),
+                refset.getDescription(), 
+                refset.getPublicId(), 
+                PlanDto.parse(refset.getPlan())).build();
     }
 }

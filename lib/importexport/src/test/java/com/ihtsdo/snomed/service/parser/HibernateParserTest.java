@@ -23,41 +23,53 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.Statement;
+import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 public class HibernateParserTest extends BaseTest{
     private static final Logger LOG = LoggerFactory.getLogger(HibernateParserTest.class);
 
-    private HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
-
+    protected static HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1).setParseMode(Mode.STRICT);    
+    
     @BeforeClass
-    public static void beforeClass(){
+    public static void beforeClass() throws IOException{
         LOG.info("Initialising database");
         emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
-        em = emf.createEntityManager();        
+        em = emf.createEntityManager();
     }
     
     @AfterClass
     public static void afterClass(){
-        em.close();
         emf.close();
-    }    
-    
-    @After
-    public void tearDown() throws Exception {
-        em.getTransaction().rollback();
     }
     
     @Before
     public void setUp() throws Exception {
         em.getTransaction().begin();
+        ontologyVersion = parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
         em.getTransaction().setRollbackOnly();   
-    }       
+    } 
+    
+    @After
+    public void tearDown() throws Exception {
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
+        Ontology o = em.merge(ontologyVersion.getFlavour().getOntology());
+        em.remove(o);
+        em.getTransaction().commit();  
+    }    
     
     @Test
     public void shouldPopulateSubjectOfStatementBidirectionalField() throws IOException{
-        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+        parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,                
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
 
         Query query = em.createQuery("SELECT r FROM Statement r");
@@ -74,10 +86,13 @@ public class HibernateParserTest extends BaseTest{
 
     @Test
     public void shouldPopulateKindOfAndParentOfBidirectionalFieldsForIsAStatements() throws IOException{
-        parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_IS_KIND_OF_CONCEPTS),
+        parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,                
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_IS_KIND_OF_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_IS_KIND_OF_STATEMENTS), em);
 
-        TypedQuery<Statement> query = em.createQuery("SELECT r FROM Statement r WHERE r.ontology.id=1", Statement.class);
+        TypedQuery<Statement> query = em.createQuery("SELECT r FROM Statement r", Statement.class);
         List<Statement> statements = (List<Statement>) query.getResultList();
 
         Statement r1000 = null;
@@ -105,23 +120,31 @@ public class HibernateParserTest extends BaseTest{
 
     @Test
     public void shouldCreateOntologyDatabaseEntryWithAllDataPointsOnImport() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+        parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,                
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
 
-        assertNotNull(ontology);
-        assertEquals(5, ontology.getStatements().size());
-        assertEquals(1, ontology.getId());
-        assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
+        
+        OntologyVersion o2 = em.merge(ontologyVersion);
+        assertNotNull(o2);
+        assertEquals(5, o2.getStatements().size());
+        //assertEquals(new Long(1), ontologyVersion.getId());
+        assertEquals(DEFAULT_TAGGED_ON_DATE, o2.getTaggedOn());
         Statement r = new Statement();
         r.setSerialisedId((100000028));
-        assertTrue(ontology.getStatements().contains(r));
+        assertTrue(o2.getStatements().contains(r));
     }
     
     @Test
     public void shouldCreateConceptSerialisedIdMapToDatabaseIdForOntology() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+        OntologyVersion ontologyVersion = parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,                
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
-        Map<Long, Long> map = parser.createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        Map<Long, Long> map = parser.createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         
         assertEquals(8, map.keySet().size());
         for (Long value : map.values()){
@@ -142,11 +165,14 @@ public class HibernateParserTest extends BaseTest{
     
     @Test
     public void shouldSetKindOfPredicate() throws IOException{
-        Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
+        OntologyVersion ontologyVersion = parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,                
+                ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
         
-        assertNotNull(ontology.getIsKindOfPredicate());
-        assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontology.getIsKindOfPredicate().getSerialisedId());
+        assertNotNull(ontologyVersion.getIsKindOfPredicate());
+        assertEquals(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID, ontologyVersion.getIsKindOfPredicate().getSerialisedId());
     }
     
 

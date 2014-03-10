@@ -28,8 +28,8 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Ontology.Source;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.OntologyVersion.Source;
 
 public class Rf2HibernateParser extends HibernateParser{
     private static final Logger LOG = LoggerFactory.getLogger( Rf2HibernateParser.class );
@@ -44,7 +44,7 @@ public class Rf2HibernateParser extends HibernateParser{
     }
     
     @Override
-    protected void populateConcepts(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException{
+    protected void populateConcepts(final InputStream stream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException{
         LOG.info("Populating concepts");
         Stopwatch stopwatch = new Stopwatch().start();
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -54,7 +54,7 @@ public class Rf2HibernateParser extends HibernateParser{
         final Map<Long, Long> conceptIdToDefinitionStatusIdMap = new HashMap<Long, Long>();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, effectiveTime, active, primitive, statusId, version, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, effectiveTime, active, primitive, statusId, version, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -79,7 +79,7 @@ public class Rf2HibernateParser extends HibernateParser{
                             ps.setBoolean(4, DEFAULT_CONCEPT_PRIMITIVE);
                             ps.setInt(5, DEFAULT_CONCEPT_STATUS_ID);
                             ps.setInt(6, DEFAULT_VERSION);
-                            ps.setLong(7, ontology.getId());
+                            ps.setLong(7, ontologyVersion.getId());
                             ps.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
@@ -98,28 +98,28 @@ public class Rf2HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
-        populateModuleAndDefinitionStatus(em, ontology, conceptIdToModuleIdMap, conceptIdToDefinitionStatusIdMap);        
+        setKindOfPredicate(em, ontologyVersion);
+        populateModuleAndDefinitionStatus(em, ontologyVersion, conceptIdToModuleIdMap, conceptIdToDefinitionStatusIdMap);        
         stopwatch.stop();
         LOG.info("Completed concepts import in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }
     
-    private void populateModuleAndDefinitionStatus(EntityManager em, final Ontology ontology, 
+    private void populateModuleAndDefinitionStatus(EntityManager em, final OntologyVersion ontologyVersion, 
             final Map<Long, Long> conceptIdToModuleIdMap, final Map<Long, Long> conceptIdToDefinitionStatusIdMap){
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         LOG.debug("{} concepts to update", map.keySet().size());
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("UPDATE Concept SET module_id=?, status_id=? WHERE id=? AND ontology_id=?");
+                PreparedStatement ps = connection.prepareStatement("UPDATE Concept SET module_id=?, status_id=? WHERE id=? AND ontologyVersion_id=?");
                 for (long serialisedId : map.keySet()){
                     try{
                         ps.setLong(1, map.get(conceptIdToModuleIdMap.get(serialisedId)));
                         ps.setLong(2, map.get(conceptIdToDefinitionStatusIdMap.get(serialisedId)));
                         ps.setLong(3, map.get(serialisedId));
-                        ps.setLong(4, ontology.getId());
+                        ps.setLong(4, ontologyVersion.getId());
                         ps.addBatch();
                     }
                     catch (Exception e){
@@ -135,18 +135,18 @@ public class Rf2HibernateParser extends HibernateParser{
     
     @Override
     protected void populateDescriptions(final InputStream stream, final EntityManager em, 
-            final Ontology ontology) throws IOException
+            final OntologyVersion ontologyVersion) throws IOException
     {
         LOG.info("Populating descriptions");
         Stopwatch stopwatch = new Stopwatch().start();
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO Description (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, descriptionTypeId, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO Description (serialisedId, effectiveTime, active, module_id, about_id, languageCode, type_id, term, caseSignificance_id, initialCapitalStatus, status, descriptionTypeId, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -201,7 +201,7 @@ public class Rf2HibernateParser extends HibernateParser{
                             psInsert.setInt(10, DEFAULT_DESCRIPTION_INITIAL_CAPITAL_STATUS);
                             psInsert.setInt(11, DEFAULT_DESCRIPTION_STATUS);
                             psInsert.setInt(12, DEFAULT_DESCRIPTION_TYPE_ID);
-                            psInsert.setLong(13, ontology.getId());//ontologyid
+                            psInsert.setLong(13, ontologyVersion.getId());//ontologyid
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
@@ -236,7 +236,7 @@ public class Rf2HibernateParser extends HibernateParser{
 
     @Override
     protected void populateConceptsFromStatements(final InputStream stream, EntityManager em, 
-            final Ontology ontology) throws IOException 
+            final OntologyVersion ontologyVersion) throws IOException 
     {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -244,7 +244,7 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontologyVersion_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -282,7 +282,7 @@ public class Rf2HibernateParser extends HibernateParser{
                     }
                     for (Concept c : concepts){
                         ps.setLong(1, c.getSerialisedId());
-                        ps.setLong(2, ontology.getId());
+                        ps.setLong(2, ontologyVersion.getId());
                         ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
                         ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
                         ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
@@ -299,11 +299,11 @@ public class Rf2HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
+        setKindOfPredicate(em, ontologyVersion);
     }
     
     protected void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, 
-            final InputStream descriptionsStream, EntityManager em, final Ontology ontology) throws IOException
+            final InputStream descriptionsStream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException
     {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
@@ -311,7 +311,7 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontologyVersion_id, primitive, statusId, active, effectiveTime, version) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader brc = new BufferedReader(new InputStreamReader(statementsStream))){
                     int currentLine = 1;
@@ -388,7 +388,7 @@ public class Rf2HibernateParser extends HibernateParser{
                 } 
                 for (Concept c : concepts){
                     ps.setLong(1, c.getSerialisedId());
-                    ps.setLong(2, ontology.getId());
+                    ps.setLong(2, ontologyVersion.getId());
                     ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
                     ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
                     ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
@@ -402,23 +402,23 @@ public class Rf2HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
+        setKindOfPredicate(em, ontologyVersion);
     }
     
     
     @Override
     protected void populateStatements(final InputStream stream, final EntityManager em, 
-            final Ontology ontology) throws IOException 
+            final OntologyVersion ontologyVersion) throws IOException 
     {
         LOG.info("Populating statements");
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO Statement (serialisedId, effectiveTime, active, module_id, subject_id, object_id, groupId, predicate_id, characteristicType_id, modifier_id, characteristicTypeIdentifier, refinability, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO Statement (serialisedId, effectiveTime, active, module_id, subject_id, object_id, groupId, predicate_id, characteristicType_id, modifier_id, characteristicTypeIdentifier, refinability, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -486,7 +486,7 @@ public class Rf2HibernateParser extends HibernateParser{
                             }                            
                             psInsert.setInt(11, DEFAULT_STATEMENT_CHARACTERISTIC_TYPE_IDENTIFIER);
                             psInsert.setInt(12, DEFAULT_STATEMENT_REFINABILITY);
-                            psInsert.setLong(13, ontology.getId());
+                            psInsert.setLong(13, ontologyVersion.getId());
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);

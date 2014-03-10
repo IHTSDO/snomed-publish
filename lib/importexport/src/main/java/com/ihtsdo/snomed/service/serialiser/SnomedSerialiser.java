@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public interface SnomedSerialiser {
@@ -15,12 +15,12 @@ public interface SnomedSerialiser {
     
     public abstract SnomedSerialiser header() throws IOException;
     public abstract SnomedSerialiser footer() throws IOException;
-    public abstract void write (Ontology o, Collection<Statement> statements) throws IOException, ParseException;
+    public abstract void write (OntologyVersion o, Collection<Statement> statements) throws IOException, ParseException;
     public abstract void write (Collection<Statement> statements) throws IOException, ParseException;
     public abstract void write(Statement statement) throws IOException, ParseException;
     public abstract void write(Concept c) throws IOException, ParseException;
     public abstract void write(Description d) throws IOException, ParseException;
-    void write(Ontology o) throws IOException, ParseException;
+    void write(OntologyVersion o) throws IOException, ParseException;
     public abstract SnomedSerialiser property(String key, Object value);
     
 }

@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.exception.ProgrammingException;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.Manifest;
 import com.ihtsdo.snomed.service.manifest.model.ManifestFileFactory;
@@ -41,9 +41,9 @@ public class FileSystemParser {
     }
 
     //@Transactional
-    public Manifest parse(File root, Ontology ontology, EntityManager em){
+    public Manifest parse(File root, OntologyVersion ontologyVersion, EntityManager em){
         Manifest manifest = new Manifest(root);
-        parseFolder(manifest, ontology, em);
+        parseFolder(manifest, ontologyVersion, em);
         return manifest;
     }
     
@@ -57,7 +57,7 @@ public class FileSystemParser {
 //    }
     
     //@Transactional
-    private ManifestFolder parseFolder(ManifestFolder parent, Ontology o, EntityManager em){
+    private ManifestFolder parseFolder(ManifestFolder parent, OntologyVersion o, EntityManager em){
         LOG.info("Parsing folder '{}'", parent.getName());
         for (File child : parent.getFile().listFiles()){
             if (child.isDirectory()){

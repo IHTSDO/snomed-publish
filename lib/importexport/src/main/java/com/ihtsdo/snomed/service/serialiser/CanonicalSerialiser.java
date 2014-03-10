@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public class CanonicalSerialiser extends BaseSnomedSerialiser{
@@ -34,7 +34,7 @@ public class CanonicalSerialiser extends BaseSnomedSerialiser{
     }
     
     @Override
-    public void write (Ontology o, Collection<Statement> statements) throws IOException{
+    public void write (OntologyVersion o, Collection<Statement> statements) throws IOException{
         Iterator<Statement> rIt = statements.iterator();
         int counter = 1;
         while (rIt.hasNext()){
@@ -96,7 +96,7 @@ public class CanonicalSerialiser extends BaseSnomedSerialiser{
 //                  " concept c3" +
 //                      " on s.object_id=c3.id" +
 //              " where" +
-//                  " s.ontology_id=2" +
+//                  " s.ontologyVersion_id=2" +
 //              " order by" +
 //                  " s.id");
 //          while(rs.next()){

@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -20,26 +21,25 @@ import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
-@Table(
-    name = "Ontology", 
-    uniqueConstraints = {
-            @UniqueConstraint(columnNames = {"publicId"})
-    })
+@Table( uniqueConstraints = @UniqueConstraint(columnNames = {"ontology_id", "publicId"}))
 @Entity
-public class Ontology {
+public class OntologyFlavour {
 
     @Id 
-    @GeneratedValue(strategy=GenerationType.IDENTITY)    
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
+    
+    @NotNull
+    private String publicId;
     
     @NotNull
     private String label;
     
-    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="ontology")
-    private Set<OntologyFlavour> flavours = new HashSet<>();
+    @ManyToOne(fetch=FetchType.LAZY)
+    private Ontology ontology;
     
-    @NotNull
-    private String publicId;
+    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="flavour")
+    private Set<OntologyVersion> versions = new HashSet<>();
     
     @NotNull
     private Date creationTime;
@@ -47,8 +47,7 @@ public class Ontology {
     @NotNull
     private Date modificationTime;
     
-    @Version
-    private long version = 0;
+    @Version private long version = 0;
 
     @Override
     public String toString(){
@@ -56,7 +55,7 @@ public class Ontology {
                 .add("id", getId())
                 .add("publicId", getPublicId())
                 .add("label", getLabel())
-                .add("flavours", getFlavours())
+                .add("versions", getVersions())
                 .toString();
     }
     
@@ -66,18 +65,18 @@ public class Ontology {
                 //getId(),
                 getPublicId(),
                 getLabel(),
-                getFlavours());
+                getVersions());
     }
     
     @Override
-    public boolean equals(Object o){
-        if (o instanceof Ontology){
-            Ontology ontology = (Ontology) o;
+    public boolean equals(Object of){
+        if (of instanceof OntologyFlavour){
+            OntologyFlavour flavour = (OntologyFlavour) of;
             if (
-                //Objects.equals(ontology.getId(), getId()) &&
-                Objects.equals(ontology.getPublicId(), getPublicId()) &&
-                Objects.equals(ontology.getLabel(), getLabel()) &&
-                Objects.equals(ontology.getFlavours(), getFlavours())){
+                //Objects.equals(flavour.getId(), getId()) &&
+                Objects.equals(flavour.getPublicId(), getPublicId()) &&
+                Objects.equals(flavour.getLabel(), getLabel()) &&
+                Objects.equals(flavour.getVersions(), getVersions())){
                 return true;
             }
         }
@@ -94,21 +93,20 @@ public class Ontology {
         Date now = new Date(Calendar.getInstance().getTime().getTime());
         creationTime = now;
         modificationTime = now;
+    }     
+    
+    public OntologyFlavour addVersion(OntologyVersion ov){
+        getVersions().add(ov);
+        ov.setFlavour(this);
+        return this;
     }
     
-    public Set<OntologyFlavour> addFlavour(OntologyFlavour flavour) {
-        getFlavours().add(flavour);
-        flavour.setOntology(this);
-        return flavours;
+    public Set<OntologyVersion> getVersions() {
+        return versions;
     }
 
-    
-    public Set<OntologyFlavour> getFlavours() {
-        return flavours;
-    }
-
-    public void setFlavours(Set<OntologyFlavour> flavours) {
-        this.flavours = flavours;
+    public void setVersions(Set<OntologyVersion> versions) {
+        this.versions = versions;
     }
 
     public Long getId() {
@@ -158,7 +156,14 @@ public class Ontology {
     public void setVersion(long version) {
         this.version = version;
     }
-    
+
+    public Ontology getOntology() {
+        return ontology;
+    }
+
+    public void setOntology(Ontology ontology) {
+        this.ontology = ontology;
+    }
     
     
 }

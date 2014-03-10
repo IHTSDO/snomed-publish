@@ -22,8 +22,11 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.test.RefsetTestUtil;
+import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
+import com.ihtsdo.snomed.model.refset.Refset;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { 
@@ -40,7 +43,18 @@ public class RefsetPlanDtoTest {
     
     @Before
     public void setUp() {    
-        successDto = RefsetTestUtil.createDto(null, 1234l, "pub11", "title1", "description1");
+        
+        successDto = RefsetDto.getBuilder(
+                null, 
+                Refset.Source.LIST, 
+                Refset.Type.CONCEPT, 
+                new SnomedReleaseDto(1l), 
+                new ConceptDto(1234l), 
+                new ConceptDto(2345l), 
+                "title1", 
+                "description1", 
+                "pub11", 
+                new PlanDto()).build();
     }
     
     @Test
@@ -50,8 +64,8 @@ public class RefsetPlanDtoTest {
     }
 
     @Test
-    public void testConceptIsNull(){
-        successDto.setConcept(null);
+    public void testRefsetConceptIsNull(){
+        successDto.setRefsetConcept(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
         assertMessage(violations);
@@ -82,8 +96,8 @@ public class RefsetPlanDtoTest {
     }
     
     @Test
-    public void testMissingConcept(){
-        successDto.setConcept(null);
+    public void testMissingRefsetConcept(){
+        successDto.setRefsetConcept(null);
         Set<ConstraintViolation<RefsetDto>> violations = validator.validate(successDto);
         assertEquals(1, violations.size());
         assertMessage(violations);

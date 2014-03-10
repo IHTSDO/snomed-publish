@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Splitter;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.Refset;
 import com.ihtsdo.snomed.service.manifest.model.RefsetModule;
@@ -50,7 +50,7 @@ public class RefsetCollectionParser {
     }
     
 
-    public void buildCache(EntityManager em, Ontology o) {
+    public void buildCache(EntityManager em, OntologyVersion o) {
         conceptMap = new HashMap<>();
         TypedQuery<Concept> conceptQuery = em.createQuery("SELECT c FROM Concept c " +
                 //"LEFT JOIN FETCH c.description " +
@@ -66,7 +66,7 @@ public class RefsetCollectionParser {
    
     //@Transactional
     protected void parseFirstFourItems(String line, int lineNumber, 
-            BaseRefsetCollection refsetCollection, Ontology o, TypedQuery<Concept> getConceptQuery)
+            BaseRefsetCollection refsetCollection, OntologyVersion o, TypedQuery<Concept> getConceptQuery)
     {
         Iterable<String> split = Splitter.on('\t').split(line);
         Iterator<String> splitIt = split.iterator();
@@ -110,18 +110,18 @@ public class RefsetCollectionParser {
     }
     
     //@Transactional
-    public BaseRefsetCollection parse(InputStream iStream, Ontology o, BaseRefsetCollection refsetCollection, EntityManager em){
+    public BaseRefsetCollection parse(InputStream iStream, OntologyVersion ov, BaseRefsetCollection refsetCollection, EntityManager em){
         //EntityManager em = emf.createEntityManager();
         
         TypedQuery<Concept> getConceptQuery = em.createQuery("SELECT c FROM Concept c " +
                 //"LEFT JOIN FETCH c.description " +
-                "WHERE c.serialisedId=:serialisedId AND c.ontology.id=:ontologyId", 
+                "WHERE c.serialisedId=:serialisedId AND c.ontologyVersion.id=:ontologyVersionId", 
                 Concept.class);
         getConceptQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
         getConceptQuery.setHint("org.hibernate.readOnly", Boolean.TRUE);
         getConceptQuery.setHint("org.hibernate.cacheMode", CacheMode.GET);
         
-        getConceptQuery.setParameter("ontologyId", o.getId());
+        getConceptQuery.setParameter("ontologyVersionId", ov.getId());
         
         try (BufferedReader br = new BufferedReader(new InputStreamReader(iStream))){
             int currentLine = 1;
@@ -135,7 +135,7 @@ public class RefsetCollectionParser {
                     line = br.readLine();
                     continue;
                 }
-                parseFirstFourItems(line, currentLine, refsetCollection, o, getConceptQuery);
+                parseFirstFourItems(line, currentLine, refsetCollection, ov, getConceptQuery);
                 line = br.readLine();
             }
             LOG.info("Parsed " + (currentLine - 1) + " lines");

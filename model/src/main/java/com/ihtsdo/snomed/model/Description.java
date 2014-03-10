@@ -20,7 +20,7 @@ import com.google.common.primitives.Longs;
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Description",
 indexes={@Index(name="descriptionSerialisedIdIndex", columnNames={"serialisedId"}),
-         @Index(name="descriptionSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontology_id"})})
+         @Index(name="descriptionSerialisedIdAndOntologyIndex", columnNames={"serialisedId", "ontologyVersion_id"})})
 public class Description {
     
     private static final int RF1_PREFERRED_TERM_ID = 1;
@@ -40,7 +40,7 @@ public class Description {
     private String languageCode;
     @XmlTransient
     @OneToOne 
-    private Ontology ontology;
+    private OntologyVersion ontologyVersion;
     
     //RF1
     private int status;
@@ -70,9 +70,9 @@ public class Description {
 
     public boolean isFullySpecifiedName(){
         if (getOntology().isRf2()){
-            return CoreMetadataConcepts.isFullySpecifiedName(type);
+            return CoreMetadataConcepts.isFullySpecifiedName(getType());
         }else{
-            return descriptionTypeId == RF1_FULLY_SPECIFIED_NAME_ID;
+            return getDescriptionTypeId() == RF1_FULLY_SPECIFIED_NAME_ID;
         }
     }
     
@@ -101,7 +101,7 @@ public class Description {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("internalId", getSerialisedId())
-                .add("ontology", getOntology() == null ? null : getOntology().getId())
+                .add("ontologyVersion", getOntology() == null ? null : getOntology().getId())
                 .add("term", getTerm())
                 .add("about", getAbout() == null ? null : getAbout().getSerialisedId())
                 .add("languageCode", getLanguageCode())
@@ -239,12 +239,12 @@ public class Description {
         this.serialisedId = serialisedId;
     }
 
-    public Ontology getOntology() {
-        return ontology;
+    public OntologyVersion getOntology() {
+        return ontologyVersion;
     }
 
-    public void setOntology(Ontology ontology) {
-        this.ontology = ontology;
+    public void setOntologyVersion(OntologyVersion ontologyVersion) {
+        this.ontologyVersion = ontologyVersion;
     }
 
 

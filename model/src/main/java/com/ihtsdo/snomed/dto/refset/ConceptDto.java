@@ -1,10 +1,15 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.model.Concept;
 
-
+@XmlRootElement(name="concept")
+@JsonRootName("concept")
 public class ConceptDto {
 
     public ConceptDto(){}
@@ -20,7 +25,9 @@ public class ConceptDto {
     	this.id = Long.toString(id);
     }    
     
+    @NotNull(message="You must specify a concept id")
     private String id;
+    
     private String title;
     private boolean active;
     private long effectiveTime;

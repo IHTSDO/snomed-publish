@@ -1,22 +1,20 @@
 package com.ihtsdo.snomed.test;
 
-import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.PlanDto;
 
 public class RefsetTestUtil {
 
-    public static RefsetDto createDto(Long id, Long concept, String publicId, String title, String description) {
-        RefsetDto dto = new RefsetDto();
-        
-        dto.setConcept(concept);
-        dto.setId(id);
-        dto.setPublicId(publicId);
-        dto.setTitle(title);
-        dto.setDescription(description);
-        dto.setPlan(new PlanDto());
-
-        return dto;
-    }
+//    public static RefsetDto createDto(Long id, Long concept, String publicId, String title, String description) {
+//        RefsetDto dto = new RefsetDto();
+//        
+//        dto.setConcept(concept);
+//        dto.setId(id);
+//        dto.setPublicId(publicId);
+//        dto.setTitle(title);
+//        dto.setDescription(description);
+//        dto.setPlan(new PlanDto());
+//
+//        return dto;
+//    }
 
 //    public static Refset createModelObject(Long id, String publicId, String title, String description) {
 //        Refset model = Refset.getBuilder(publicId, title, description).build();

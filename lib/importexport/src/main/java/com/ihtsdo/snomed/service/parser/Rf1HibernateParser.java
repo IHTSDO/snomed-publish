@@ -27,8 +27,8 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Ontology.Source;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.OntologyVersion.Source;
 
 public class Rf1HibernateParser extends HibernateParser{
     static final Logger LOG = LoggerFactory.getLogger( Rf1HibernateParser.class );
@@ -44,18 +44,18 @@ public class Rf1HibernateParser extends HibernateParser{
     
     @Override
     protected void populateDescriptions(final InputStream stream, final EntityManager em, 
-            final Ontology ontology) throws IOException
+            final OntologyVersion ontologyVersion) throws IOException
     {
         LOG.info("Populating descriptions");
         Stopwatch stopwatch = new Stopwatch().start();
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psInsert = connection.prepareStatement(
-                        "INSERT INTO Description (serialisedId, status, about_id, term, initialCapitalStatus, descriptionTypeId, languageCode, effectiveTime, active, ontology_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        "INSERT INTO Description (serialisedId, status, about_id, term, initialCapitalStatus, descriptionTypeId, languageCode, effectiveTime, active, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -86,7 +86,7 @@ public class Rf1HibernateParser extends HibernateParser{
                             psInsert.setString(7, splitIt.next());//language code
                             psInsert.setInt(8, DEFAULT_DESCRIPTION_EFFECTIVETIME); //description type id
                             psInsert.setBoolean(9, DEFAULT_DESCRIPTION_ACTIVE);
-                            psInsert.setLong(10, ontology.getId());//ontologyid
+                            psInsert.setLong(10, ontologyVersion.getId());//ontologyid
                             psInsert.addBatch();
                         } catch (NumberFormatException e) {
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
@@ -120,14 +120,14 @@ public class Rf1HibernateParser extends HibernateParser{
     }
     
     @Override
-    protected void populateConcepts(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateConcepts(final InputStream stream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, statusId, fullySpecifiedName, ctv3id, snomedId, primitive ,ontology_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, statusId, fullySpecifiedName, ctv3id, snomedId, primitive ,ontologyVersion_id, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = br.readLine();
@@ -157,7 +157,7 @@ public class Rf1HibernateParser extends HibernateParser{
                             ps.setString(4, splitIt.next()); //ctv3id
                             ps.setString(5, splitIt.next()); //snomedid
                             ps.setBoolean(6, stringToBoolean(splitIt.next())); // primitive
-                            ps.setLong(7, ontology.getId()); //ontologyid
+                            ps.setLong(7, ontologyVersion.getId()); //ontologyid
                             ps.setBoolean(8, DEFAULT_CONCEPT_ACTIVE);
                             ps.setInt(9, DEFAULT_VERSION);
                             ps.setInt(10, DEFAULT_CONCEPT_EFFECTIVE_TIME);
@@ -179,18 +179,18 @@ public class Rf1HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
+        setKindOfPredicate(em, ontologyVersion);
     }
     
     @Override
-    protected void populateConceptsFromStatements(final InputStream stream, EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateConceptsFromStatements(final InputStream stream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException {
         LOG.info("Populating concepts");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontology_id, primitive, statusId, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, ontologyVersion_id, primitive, statusId, active, version, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 Set<Concept> concepts = new HashSet<Concept>();
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
@@ -221,7 +221,7 @@ public class Rf1HibernateParser extends HibernateParser{
                     }
                     for (Concept c : concepts){
                         ps.setLong(1, c.getSerialisedId());
-                        ps.setLong(2, ontology.getId());
+                        ps.setLong(2, ontologyVersion.getId());
                         ps.setBoolean(3, DEFAULT_CONCEPT_PRIMITIVE);
                         ps.setInt(4, DEFAULT_CONCEPT_STATUS_ID);
                         ps.setBoolean(5, DEFAULT_CONCEPT_ACTIVE);
@@ -237,24 +237,24 @@ public class Rf1HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
-        setKindOfPredicate(em, ontology);
+        setKindOfPredicate(em, ontologyVersion);
     }
     
     @Override
-    protected void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, final InputStream descriptionsStream, EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateConceptsFromStatementsAndDescriptions(final InputStream statementsStream, final InputStream descriptionsStream, EntityManager em, final OntologyVersion ontologyVersion) throws IOException {
         throw new UnsupportedOperationException("Not supported");
     }            
 
     @Override
-    protected void populateStatements(final InputStream stream, final EntityManager em, final Ontology ontology) throws IOException {
+    protected void populateStatements(final InputStream stream, final EntityManager em, final OntologyVersion ontologyVersion) throws IOException {
         LOG.info("Populating statements");
-        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontology, em);
+        final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO Statement (serialisedId, subject_id, predicate_id, object_id, characteristicTypeIdentifier, refinability, groupId, ontology_id, active, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                PreparedStatement psInsert = connection.prepareStatement("INSERT INTO Statement (serialisedId, subject_id, predicate_id, object_id, characteristicTypeIdentifier, refinability, groupId, ontologyVersion_id, active, effectiveTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 try (@SuppressWarnings("resource") BufferedReader br = new BufferedReader(new InputStreamReader(stream))){
                     int currentLine = 1;
                     String line = null;
@@ -299,7 +299,7 @@ public class Rf1HibernateParser extends HibernateParser{
                             psInsert.setInt(5, Integer.parseInt(splitIt.next())); //characteristic type
                             psInsert.setInt(6, Integer.parseInt(splitIt.next())); //refinability
                             psInsert.setInt(7, Integer.parseInt(splitIt.next())); // group
-                            psInsert.setLong(8, ontology.getId()); //ontology id
+                            psInsert.setLong(8, ontologyVersion.getId()); //ontology id
                             psInsert.setBoolean(9, DEFAULT_STATEMENT_ACTIVE);//active
                             psInsert.setInt(10, DEFAULT_STATEMENT_EFFECTIVE_TIME); //effectiveTime
                             psInsert.addBatch();

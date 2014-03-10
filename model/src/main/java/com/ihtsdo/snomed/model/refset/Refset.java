@@ -25,24 +25,47 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Index;
 
-import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.OntologyVersion;
 
 @Entity
-@org.hibernate.annotations.Table(appliesTo = "Refset",
+@org.hibernate.annotations.Table(
+        appliesTo = "Refset",
         indexes={@Index(name="refsetPublicIdIndex", columnNames={"publicId"})})
-@Table(name = "Refset", 
-uniqueConstraints = @UniqueConstraint(columnNames = {"publicId"}))
+@Table(
+        name = "Refset", 
+        uniqueConstraints = @UniqueConstraint(columnNames = {"publicId"}))
 public class Refset {
+    
+    public enum Source {
+        LIST, RULES;
+    }
+    
+    public enum Type {
+        CONCEPT, DESCRIPTION, STATEMENT;
+    }    
     
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
     @NotNull
+    private Source source;
+    
+    @NotNull
+    private Type type;
+    
+    @NotNull
     @OneToOne
-    private Concept concept;
+    private OntologyVersion snomedRelease;
+    
+    @NotNull
+    @OneToOne
+    private Concept refsetConcept;    
+    
+    @NotNull
+    @OneToOne
+    private Concept moduleConcept;    
         
     @NotNull
     @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
@@ -79,12 +102,20 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(Concept concept, String publicId, String title, String description, Plan plan){
-        this.setConcept(concept);
-        this.setPublicId(publicId);
+    public Refset update(Source source, Type type, OntologyVersion snomedRelease,
+            Concept refsetConcept, Concept moduleConcept, String title, String description, 
+            String publicId, Plan plan)
+    {
+        this.setSource(source);
+        this.setType(type);
+        this.setSnomedRelease(snomedRelease);
+        this.setRefsetConcept(refsetConcept);
+        this.setModuleConcept(moduleConcept);
         this.setTitle(title);
         this.setDescription(description);
+        this.setPublicId(publicId);
         this.setPlan(plan);
+        
         return this;
     }
     
@@ -113,9 +144,13 @@ public class Refset {
     
     @Override
     public String toString(){
-        return Objects.toStringHelper(this)
+        return com.google.common.base.Objects.toStringHelper(this)
                 .add("id", getId())
-                .add("concept", getConcept().getId())
+                .add("source", getSource())
+                .add("type", getType())
+                .add("snomedRelease", getSnomedRelease())
+                .add("refsetConcept", getRefsetConcept())
+                .add("moduleConcept", getModuleConcept())
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
@@ -125,10 +160,17 @@ public class Refset {
     
     @Override
     public int hashCode(){
-        if (getId() == null){
-            return 0;
-        }
-        return Longs.hashCode(getId());
+        return java.util.Objects.hash(
+                getId(),
+                getSource(),
+                getType(),
+                getSnomedRelease(),
+                getRefsetConcept(),
+                getModuleConcept(),
+                getTitle(),
+                getDescription(),
+                getPublicId(),
+                getPlan());
     }
 
     @PreUpdate
@@ -141,8 +183,7 @@ public class Refset {
         Date now = new Date(Calendar.getInstance().getTime().getTime());
         creationTime = now;
         modificationTime = now;
-    }    
-    
+    } 
 
     public Long getId() {
         return id;
@@ -152,21 +193,52 @@ public class Refset {
         this.id = id;
     }
     
-
-    public Concept getConcept() {
-        return concept;
-    }
-
-    public void setConcept(Concept concept) {
-        this.concept = concept;
-    }
-
     public String getPublicId() {
         return publicId;
     }
 
     public void setPublicId(String publicId) {
         this.publicId = publicId;
+    }
+    
+    public Source getSource() {
+        return source;
+    }
+
+    public void setSource(Source source) {
+        this.source = source;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public OntologyVersion getSnomedRelease() {
+        return snomedRelease;
+    }
+
+    public void setSnomedRelease(OntologyVersion snomedRelease) {
+        this.snomedRelease = snomedRelease;
+    }
+
+    public Concept getRefsetConcept() {
+        return refsetConcept;
+    }
+
+    public void setRefsetConcept(Concept refsetConcept) {
+        this.refsetConcept = refsetConcept;
+    }
+
+    public Concept getModuleConcept() {
+        return moduleConcept;
+    }
+
+    public void setModuleConcept(Concept moduleConcept) {
+        this.moduleConcept = moduleConcept;
     }
 
     public String getTitle() {
@@ -216,29 +288,6 @@ public class Refset {
     public void setVersion(long version) {
         this.version = version;
     }
-    
-    public static Builder getBuilder(Concept concept, String publicId, String title, String description, Plan plan) {
-        return new Builder(concept, publicId, title, description, plan);
-    }
-    
-
-    public static class Builder {
-        private Refset built;
-
-        Builder(Concept concept, String publicId, String title, String description, Plan plan) {
-            built = new Refset();
-            built.publicId = publicId;
-            built.title = title;
-            built.description = description;
-            built.concept = concept;
-            built.plan = plan;
-        }
-
-        public Refset build() {
-            return built;
-        }
-    }
-
 
      Map<String, Snapshot> getSnapshotsMap() {
         return snapshotsMap;
@@ -247,4 +296,44 @@ public class Refset {
      void setSnapshotsMap(Map<String, Snapshot> snapshotsMap) {
         this.snapshotsMap = snapshotsMap;
     }
+     
+     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
+             Concept refsetConcept, Concept moduleConcept, String title, String description, 
+             String publicId, Plan plan) {
+         return new Builder(id, source, type, snomedRelease, refsetConcept, moduleConcept, 
+                 title, description, publicId, plan);
+     }
+     
+     public static Builder getBuilder(Source source, Type type, OntologyVersion snomedRelease,
+             Concept refsetConcept, Concept moduleConcept, String title, String description, 
+             String publicId, Plan plan) {
+         return new Builder(null, source, type, snomedRelease, refsetConcept, moduleConcept, 
+                 title, description, publicId, plan);
+     }     
+     
+     
+     public static class Builder {
+         private Refset built;
+
+         Builder(Long id, Source source, Type type, OntologyVersion snomedRelease,
+                 Concept refsetConcept, Concept moduleConcept, String title, String description, 
+                 String publicId, Plan plan) {
+             built = new Refset();
+             built.setId(id);
+             built.setSource(source);
+             built.setType(type);
+             built.setSnomedRelease(snomedRelease);
+             built.setRefsetConcept(refsetConcept);
+             built.setModuleConcept(moduleConcept);
+             built.setTitle(title);
+             built.setDescription(description);
+             built.setPublicId(publicId);
+             built.setPlan(plan);
+         }
+         
+         public Refset build(){
+             return built;
+         }
+     }
+     
 }

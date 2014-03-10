@@ -18,7 +18,7 @@ public class OntologyTest {
 
     @Test
     public void shouldReturnIsKindOfPredicate() {
-        Ontology o = new Ontology();
+        OntologyVersion o = new OntologyVersion();
         Concept c = new Concept(Concept.IS_KIND_OF_RELATIONSHIP_TYPE_ID);
         o.addConcept(c);
         assertEquals(c, o.getIsKindOfPredicate());
@@ -26,7 +26,7 @@ public class OntologyTest {
     
     @Test(expected=IllegalStateException.class)
     public void shouldReturnIsKindOfPredicateFail() {
-        Ontology o = new Ontology();
+        OntologyVersion o = new OntologyVersion();
         Concept c = new Concept(1);
         o.addConcept(c);
         assertEquals(c, o.getIsKindOfPredicate());

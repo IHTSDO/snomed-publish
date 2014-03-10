@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.web.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -35,6 +37,7 @@ import org.xml.sax.SAXException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.web.model.SparqlResults;
 import com.ihtsdo.snomed.web.model.SparqlResults.Binding;
@@ -51,6 +54,14 @@ import com.ihtsdo.snomed.web.model.SparqlResults.Binding;
 //        "classpath:test-spring-data.xml"})
 //@Transactional
 public class SparqlServiceTest {
+    
+    static Date DEFAULT_TAGGED_ON;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON = new Date(utilDate.getTime());        
+    }    
     
     String validQuery = 
         "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
@@ -72,7 +83,7 @@ public class SparqlServiceTest {
     @PersistenceContext(unitName="hibernatePersistenceUnit")
     EntityManager em;
     
-    private Ontology ontology;
+    private OntologyVersion ontology;
     
     private Set<String> variables = new HashSet<>(Arrays.asList("s", "p", "o"));
 
@@ -84,7 +95,8 @@ public class SparqlServiceTest {
     }
     
     private void initDatabase(){
-        ontology = new Ontology();
+        ontology = new OntologyVersion();
+        ontology.setTaggedOn(DEFAULT_TAGGED_ON);
         em.persist(ontology);
         
         Statement s1 = new Statement(4576818021l);
@@ -131,27 +143,27 @@ public class SparqlServiceTest {
         ontology.addConcept(c9);
         ontology.addConcept(c10);
         
-        s1.setOntology(ontology);
-        s2.setOntology(ontology);
-        s3.setOntology(ontology);
-        s4.setOntology(ontology);
-        s5.setOntology(ontology);
-        s6.setOntology(ontology);
-        s7.setOntology(ontology);
-        s8.setOntology(ontology);
-        s9.setOntology(ontology);
-        s10.setOntology(ontology);
+        s1.setOntologyVersion(ontology);
+        s2.setOntologyVersion(ontology);
+        s3.setOntologyVersion(ontology);
+        s4.setOntologyVersion(ontology);
+        s5.setOntologyVersion(ontology);
+        s6.setOntologyVersion(ontology);
+        s7.setOntologyVersion(ontology);
+        s8.setOntologyVersion(ontology);
+        s9.setOntologyVersion(ontology);
+        s10.setOntologyVersion(ontology);
         
-        c1.setOntology(ontology);
-        c2.setOntology(ontology);
-        c3.setOntology(ontology);
-        c4.setOntology(ontology);
-        c5.setOntology(ontology);
-        c6.setOntology(ontology);
-        c7.setOntology(ontology);
-        c8.setOntology(ontology);
-        c9.setOntology(ontology);
-        c10.setOntology(ontology);
+        c1.setOntologyVersion(ontology);
+        c2.setOntologyVersion(ontology);
+        c3.setOntologyVersion(ontology);
+        c4.setOntologyVersion(ontology);
+        c5.setOntologyVersion(ontology);
+        c6.setOntologyVersion(ontology);
+        c7.setOntologyVersion(ontology);
+        c8.setOntologyVersion(ontology);
+        c9.setOntologyVersion(ontology);
+        c10.setOntologyVersion(ontology);
         
         em.persist(s1);
         em.persist(s2);

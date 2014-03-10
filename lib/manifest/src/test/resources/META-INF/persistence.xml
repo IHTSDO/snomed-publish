@@ -7,6 +7,8 @@
         <class>com.ihtsdo.snomed.model.Concept</class>
         <class>com.ihtsdo.snomed.model.Statement</class>
         <class>com.ihtsdo.snomed.model.Ontology</class>
+        <class>com.ihtsdo.snomed.model.OntologyFlavour</class>
+        <class>com.ihtsdo.snomed.model.OntologyVersion</class>
         <class>com.ihtsdo.snomed.model.Description</class>
         <class>com.ihtsdo.snomed.model.refset.Refset</class>
         <class>com.ihtsdo.snomed.model.refset.Plan</class>

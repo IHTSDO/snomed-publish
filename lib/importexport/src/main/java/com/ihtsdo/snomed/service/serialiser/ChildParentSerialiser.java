@@ -16,7 +16,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public class ChildParentSerialiser extends BaseSnomedSerialiser{
@@ -27,7 +27,7 @@ public class ChildParentSerialiser extends BaseSnomedSerialiser{
     }
     
     @Override
-    public void write(Ontology o, Collection<Statement> statements) throws IOException{
+    public void write(OntologyVersion o, Collection<Statement> statements) throws IOException{
         List<Statement> sortedList = new ArrayList<Statement>(statements);
         Collections.sort(sortedList, bySubjectAndObject);
         Iterator<Statement> rIt = sortedList.iterator();
@@ -111,7 +111,7 @@ public class ChildParentSerialiser extends BaseSnomedSerialiser{
 //                  " concept c3" +
 //                      " on s.object_id=c3.id" +
 //              " where" +
-//                  " s.ontology_id=2" +
+//                  " s.ontologyVersion_id=2" +
 //              " order by" +
 //                  " s.id");
 //          while(rs.next()){

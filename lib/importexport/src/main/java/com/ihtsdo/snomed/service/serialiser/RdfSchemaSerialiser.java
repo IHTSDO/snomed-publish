@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     private final Logger LOG = LoggerFactory.getLogger(RdfSchemaSerialiser.class);
     
-    private final String NS_ONTOLOGY_VARIABLE = "__ONTOLOGY_ID__";
+    private final String NS_ONTOLOGY_VARIABLE = "__ontologyVersion_id__";
     private final String NS_CONCEPT = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
     private final String NS_TRIPLE = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
     private final String NS_DESCRIPTION = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
@@ -47,7 +47,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     }
     
     @Override
-    public void write(Ontology o, Collection<Statement> statements) throws IOException, ParseException {
+    public void write(OntologyVersion o, Collection<Statement> statements) throws IOException, ParseException {
         LOG.debug("Exporting to RDF/XML");
         Stopwatch stopwatch = new Stopwatch().start();
 
@@ -60,7 +60,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
 
     @Override
     public void write(Statement statement) throws IOException, ParseException {
-        write(statement.getOntology(), statement);
+        write(statement.getOntologyVersion(), statement);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         writer.write("</rdf:Description>\n");
     }
 
-    private void printBody(Ontology o, Collection<Statement> statements) throws IOException, ParseException{
+    private void printBody(OntologyVersion o, Collection<Statement> statements) throws IOException, ParseException{
         int counter = 1;
         
         for (Statement s : statements){
@@ -160,14 +160,14 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         }
     }
 
-    private void write(Ontology o, Statement s) throws IOException, ParseException {
+    private void write(OntologyVersion o, Statement s) throws IOException, ParseException {
         parse(o, s.getSubject());
         parse(o, s.getObject());
         parse(o, s.getPredicate());
         writeStatement(o, s);
     }
 
-    private void parse(Ontology o, Concept c) throws IOException,
+    private void parse(OntologyVersion o, Concept c) throws IOException,
             ParseException {
         if (!isParsed(c)){
             writeConcept(o, parsed(c));
@@ -180,7 +180,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         }
     }
 
-    protected void writeConcept(Ontology o, Concept c)
+    protected void writeConcept(OntologyVersion o, Concept c)
             throws IOException, ParseException {
         writer.write("<rdf:Description rdf:about=\"" + getConceptName(c.getSerialisedId(), o) + "\">\n");
         if (c.isPredicate()){
@@ -215,7 +215,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         writer.write("</rdf:Description>\n");
     }
 
-    protected void writeDescription(Ontology o, Description d) throws IOException, ParseException {
+    protected void writeDescription(OntologyVersion o, Description d) throws IOException, ParseException {
         writer.write("<rdf:Description rdf:about=\"" + getDescriptionName(d.getSerialisedId(), o) + "\">\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n");
         writer.write("<sn:module rdf:resource=\"" + getConceptName(d.getModule().getSerialisedId(), o) + "\"/>\n");
@@ -231,7 +231,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         writer.write("</rdf:Description>\n");
     }
 
-    protected void writeStatement(Ontology o, Statement s) throws IOException, ParseException {
+    protected void writeStatement(OntologyVersion o, Statement s) throws IOException, ParseException {
         if ( ! isTrue(OPTIONS_RDF_INCLUDE_ISA_STATEMENT)){
             //modelled as subProperty and SubClass. See writeConcept. But you do lose all the 
             //reification data for the isA statements (!)
@@ -256,15 +256,15 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     }
         
 
-    private String getDescriptionName(long id, Ontology o){
+    private String getDescriptionName(long id, OntologyVersion o){
         return NS_DESCRIPTION.replace(NS_ONTOLOGY_VARIABLE, Long.toString(o.getId())) + id;
     }
 
-    private String getConceptName(long id, Ontology o){
+    private String getConceptName(long id, OntologyVersion o){
         return NS_CONCEPT.replace(NS_ONTOLOGY_VARIABLE, Long.toString(o.getId())) + id;
     }
     
-    private String getTripleName(long id, Ontology o) {
+    private String getTripleName(long id, OntologyVersion o) {
         return NS_TRIPLE.replace(NS_ONTOLOGY_VARIABLE, Long.toString(o.getId())) + id;
     }
 

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
+import java.sql.Date;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -20,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.service.manifest.model.BaseRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.MimetypeProperties;
 import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
@@ -30,17 +31,26 @@ import com.ihtsdo.snomed.service.manifest.model.RefsetCollectionFactory;
 @Transactional
 public class RefsetCollectionParserTest {
 
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }    
+    
     @Inject private RefsetCollectionParser refsetCollectionParser;
     @Inject private RefsetCollectionFactory refsetCollectionFactory;
     @Inject private MimetypeProperties mimetypeProperties;
     @PersistenceContext private EntityManager em;
     
-    private Ontology ontology;
+    private OntologyVersion ontologyVersion;
     private File file;
     
     @Before
     public void init() throws URISyntaxException{
-        ontology = new Ontology();
+        ontologyVersion = new OntologyVersion();
+        ontologyVersion.setTaggedOn(DEFAULT_TAGGED_ON_DATE);
         
         file = new File(this.getClass().getClassLoader().getResource("SnomedCT_Release_INT_20120731/refset/der2_cRefset_LanguageSnapshot-en_INT_20120731.txt").toURI());
         if (!file.exists()){
@@ -62,17 +72,17 @@ public class RefsetCollectionParserTest {
         refsetId2.setFullySpecifiedName("Great britain english language reference set (Foundation metadata concept)");
         refsetId3.setFullySpecifiedName("Icd-9-cm equivalence complex map reference set (Foundation metadata concept)");
 
-        moduleConcept.setOntology(ontology);
-        refsetId1.setOntology(ontology);
-        refsetId2.setOntology(ontology);
-        refsetId3.setOntology(ontology);
+        moduleConcept.setOntologyVersion(ontologyVersion);
+        refsetId1.setOntologyVersion(ontologyVersion);
+        refsetId2.setOntologyVersion(ontologyVersion);
+        refsetId3.setOntologyVersion(ontologyVersion);
                 
-        ontology.addConcept(refsetId1);
-        ontology.addConcept(refsetId2);
-        ontology.addConcept(refsetId3);
-        ontology.addConcept(moduleConcept);
+        ontologyVersion.addConcept(refsetId1);
+        ontologyVersion.addConcept(refsetId2);
+        ontologyVersion.addConcept(refsetId3);
+        ontologyVersion.addConcept(moduleConcept);
         
-        em.persist(ontology);
+        em.persist(ontologyVersion);
         em.persist(refsetId1);
         em.persist(refsetId2);
         em.persist(refsetId3);
@@ -85,7 +95,7 @@ public class RefsetCollectionParserTest {
         BaseRefsetCollection refsetCollection = refsetCollectionFactory
                 .getRefsetCollection(mimetypeProperties.getMimetype(file.getName()));
         
-        refsetCollectionParser.parse(new FileInputStream(file), ontology, refsetCollection, em);
+        refsetCollectionParser.parse(new FileInputStream(file), ontologyVersion, refsetCollection, em);
         
         assertEquals(1, refsetCollection.getModules().size());
         assertEquals(2, refsetCollection.getModule(900000000000207008l).getRefsets().size());

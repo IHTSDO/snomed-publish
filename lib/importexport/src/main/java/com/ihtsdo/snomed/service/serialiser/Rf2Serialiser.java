@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 public class Rf2Serialiser extends BaseSnomedSerialiser {
@@ -28,7 +28,7 @@ public class Rf2Serialiser extends BaseSnomedSerialiser {
     }
 
     @Override
-    public void write(Ontology o, Collection<Statement> statements) throws IOException, ParseException {
+    public void write(OntologyVersion o, Collection<Statement> statements) throws IOException, ParseException {
         throw new UnsupportedOperationException();
     }
 

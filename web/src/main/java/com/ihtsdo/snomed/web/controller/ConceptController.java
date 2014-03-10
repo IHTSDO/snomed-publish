@@ -37,15 +37,14 @@ import com.google.common.collect.Ordering;
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.Ontology;
-import com.ihtsdo.snomed.model.Ontology.Source;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlConcept;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
-import com.ihtsdo.snomed.web.service.SimpleConceptNotFoundException;
 import com.ihtsdo.snomed.web.service.ConceptService;
 import com.ihtsdo.snomed.web.service.OntologyService;
+import com.ihtsdo.snomed.web.service.SimpleConceptNotFoundException;
 
 @Controller
 @RequestMapping("/")
@@ -131,7 +130,7 @@ public class ConceptController {
             
             ) throws SimpleConceptNotFoundException
     {            
-        Ontology o = em.createQuery("SELECT o FROM Ontology o WHERE o.id=:oid", Ontology.class)
+        OntologyVersion o = em.createQuery("SELECT o FROM OntologyVersion o WHERE o.id=:oid", OntologyVersion.class)
                 .setParameter("oid", ontologyId)
                 .getSingleResult();
         
@@ -384,7 +383,7 @@ public class ConceptController {
             LOG.debug("Concept: {}", c);
             LOG.debug("kindOf: {}", c.getKindOfs().size());
         }
-        if (o.getSource().equals(Source.RF2)){
+        if (o.getSource().equals(com.ihtsdo.snomed.model.OntologyVersion.Source.RF2)){
             return new ModelAndView("concept.rf2");
         }else {
             return new ModelAndView("concept");

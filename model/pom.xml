@@ -18,7 +18,7 @@
     
         <plugins>
         <!-- Parallell JUNIT Execution -->
-          <plugin>
+          <!-- plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.16</version>
@@ -26,7 +26,7 @@
               <parallel>classes</parallel>
               <threadCount>4</threadCount>          
             </configuration>
-          </plugin>
+          </plugin-->
       </plugins>
 
         <!-- mvn hibernate3:hbm2ddl -->

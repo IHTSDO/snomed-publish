@@ -3,6 +3,7 @@ package com.ihtsdo.snomed.client.importer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
+import com.ihtsdo.snomed.model.SnomedFlavours.SnomedFlavour;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 
@@ -56,29 +58,33 @@ public class ImportMain {
         LOG.info("Overall program completion in " + overAllstopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
     }    
     
-    protected void runProgram(File conceptFile, File triplesFile, File descriptionFile, Properties properties,
-            HibernateParserFactory.Parser parser, String name) throws IOException
+    protected void runProgram(File conceptFile, File triplesFile, File descriptionFile, 
+            Properties properties, HibernateParserFactory.Parser parser, Date version,
+            SnomedFlavour flavour) throws IOException
     {
         try{
             initDb(properties);
             HibernateParser hibParser = HibernateParserFactory.getParser(parser);
-//            Ontology o = null;
+//            OntologyVersion o = null;
             if (descriptionFile != null){
                 hibParser.populateDbWithDescriptions(
-                        name, 
+                        flavour,
+                        version,
                         new FileInputStream(conceptFile), 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(descriptionFile), 
                         em);
             } else if (conceptFile != null){
                 hibParser.populateDb(
-                        name, 
+                        flavour,
+                        version, 
                         new FileInputStream(conceptFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
                 hibParser.populateDbFromStatementsOnly(
-                        name, 
+                        flavour,
+                        version,
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
                         em);

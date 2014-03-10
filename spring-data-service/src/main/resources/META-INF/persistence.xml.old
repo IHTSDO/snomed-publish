@@ -3,7 +3,7 @@
         <class>com.ihtsdo.snomed.model.Description</class>
         <class>com.ihtsdo.snomed.model.Concept</class>
         <class>com.ihtsdo.snomed.model.Statement</class>
-        <class>com.ihtsdo.snomed.model.Ontology</class>
+        <class>com.ihtsdo.snomed.model.OntologyVersion</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.hbm2ddl.auto" value="validate" />

@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 
 abstract class BaseSnomedSerialiser implements SnomedSerialiser{
@@ -22,7 +22,7 @@ abstract class BaseSnomedSerialiser implements SnomedSerialiser{
     }
 
     @Override
-    public void write(Ontology o) throws IOException, ParseException {
+    public void write(OntologyVersion o) throws IOException, ParseException {
         write (o, o.getStatements());
     }
     

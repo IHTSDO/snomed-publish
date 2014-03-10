@@ -23,17 +23,20 @@ import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.ConceptRepository;
+import com.ihtsdo.snomed.repository.OntologyRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
@@ -51,6 +54,9 @@ public class RepositoryRefsetService implements RefsetService {
     RefsetRepository refsetRepository;
     
     @Inject
+    OntologyRepository ontologyRepository;    
+    
+    @Inject
     PlanService planService;
     
     @Inject
@@ -61,8 +67,7 @@ public class RepositoryRefsetService implements RefsetService {
     
     @Inject
     protected ConceptService conceptService;   
-    
-    
+
     @Inject
     protected SnapshotRepository snapshotRepository;   
     
@@ -111,17 +116,32 @@ public class RepositoryRefsetService implements RefsetService {
     }
     @Override
     @Transactional(rollbackFor = {RefsetNotFoundException.class, RefsetConceptNotFoundException.class, ValidationException.class, RefsetPlanNotFoundException.class, RefsetTerminalRuleNotFoundException.class})
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException{
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException{
         LOG.debug("Updating refset with information: " + updated);
+        
         Refset refset = refsetRepository.findOne(updated.getId());
         if (refset == null) {
             throw new RefsetNotFoundException("No refset found with id: " + updated.getId());
         }
-        Concept concept = conceptRepository.findBySerialisedId(updated.getConcept());
-        if (concept == null){
-            throw new RefsetConceptNotFoundException(new ConceptDto(updated.getConcept()), "No concept found with id: " + updated.getConcept());
+        
+        
+        OntologyVersion snomedRelease = ontologyRepository.findOne(updated.getSnomedRelease().getId());
+        if (snomedRelease == null){
+            throw new OntologyNotFoundException(updated.getSnomedRelease().getId());
         }
         
+        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, updated.getRefsetConcept().getIdAsLong());
+        if (refsetConcept == null){
+            throw new RefsetConceptNotFoundException(new ConceptDto(updated.getRefsetConcept().getIdAsLong()), 
+                    "No concept found with id: " + updated.getRefsetConcept().getIdAsLong());
+        }
+        
+        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, updated.getModuleConcept().getIdAsLong());
+        if (moduleConcept == null){
+            throw new RefsetConceptNotFoundException(new ConceptDto(updated.getModuleConcept().getIdAsLong()), 
+                    "No concept found with id: " + updated.getModuleConcept().getIdAsLong());
+        }
+
         Plan plan = planService.findById(updated.getPlan().getId());
         if (plan == null){
             planService.create(updated.getPlan());
@@ -129,7 +149,17 @@ public class RepositoryRefsetService implements RefsetService {
             planService.update(updated.getPlan());
         }
         
-        refset.update(concept, updated.getPublicId(), updated.getTitle(), updated.getDescription(), plan);
+        refset.update(
+                updated.getSource(), 
+                updated.getType(), 
+                snomedRelease, 
+                refsetConcept, 
+                moduleConcept, 
+                updated.getTitle(), 
+                updated.getDescription(), 
+                updated.getPublicId(), 
+                plan);
+        
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
@@ -138,16 +168,28 @@ public class RepositoryRefsetService implements RefsetService {
     }   
 
     @Override
-    @Transactional(rollbackFor={RefsetConceptNotFoundException.class, ValidationException.class})
-    public Refset create(RefsetDto created) throws RefsetConceptNotFoundException, 
+    @Transactional(rollbackFor={RefsetConceptNotFoundException.class, ValidationException.class, OntologyNotFoundException.class})
+    public Refset create(RefsetDto created) throws RefsetConceptNotFoundException, OntologyNotFoundException,
         ValidationException, NonUniquePublicIdException
     {
         LOG.debug("Creating new refset [{}]", created.toString());
         
-        Concept concept = conceptRepository.findBySerialisedId(created.getConcept());
-        if (concept == null){
-            throw new RefsetConceptNotFoundException(new ConceptDto(created.getConcept()), "No concept found with id: " + created.getConcept());
-        }        
+        OntologyVersion snomedRelease = ontologyRepository.findOne(created.getSnomedRelease().getId());
+        if (snomedRelease == null){
+            throw new OntologyNotFoundException(created.getSnomedRelease().getId());
+        }
+        
+        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, created.getRefsetConcept().getIdAsLong());
+        if (refsetConcept == null){
+            throw new RefsetConceptNotFoundException(new ConceptDto(created.getRefsetConcept().getIdAsLong()), 
+                    "No concept found with id: " + created.getRefsetConcept().getIdAsLong());
+        }
+        
+        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, created.getModuleConcept().getIdAsLong());
+        if (moduleConcept == null){
+            throw new RefsetConceptNotFoundException(new ConceptDto(created.getModuleConcept().getIdAsLong()), 
+                    "No concept found with id: " + created.getModuleConcept().getIdAsLong());
+        }
 
         if (created.getPlan() == null){
             created.setPlan(new PlanDto());
@@ -155,9 +197,17 @@ public class RepositoryRefsetService implements RefsetService {
 
         Plan plan = planService.create(created.getPlan());
 
-        Refset refset = Refset.getBuilder(concept, created.getPublicId(), created.getTitle(), created.getDescription(),
-                plan).build();        
-        
+        Refset refset = Refset.getBuilder(
+                created.getSource(), 
+                created.getType(), 
+                snomedRelease, 
+                refsetConcept, 
+                moduleConcept, 
+                created.getTitle(), 
+                created.getDescription(), 
+                created.getPublicId(), 
+                plan).build();
+
         try {
             return refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
@@ -230,8 +280,6 @@ public class RepositoryRefsetService implements RefsetService {
         if (snapshot != null){
             throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
         }
-        
-        
         
         snapshot = Snapshot.getBuilder(
                 snapshotDto.getPublicId(), 

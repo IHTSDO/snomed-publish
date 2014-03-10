@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.sql.Date;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.service.manifest.model.CrossmapRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.LanguageRefsetCollection;
 import com.ihtsdo.snomed.service.manifest.model.Manifest;
@@ -32,6 +33,14 @@ import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser.Mode;
 @Transactional
 public class FileSystemParserTest {
 
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }    
+    
     private static final String DER2_IISSSC_REFSET_COMPLEX_MAP_SNAPSHOT_INT_20120731_TXT = "der2_iissscRefset_ComplexMapSnapshot_INT_20120731.txt";
 
     private static final String DER2_C_REFSET_LANGUAGE_SNAPSHOT_EN_INT_20120731_TXT = "der2_cRefset_LanguageSnapshot-en_INT_20120731.txt";
@@ -43,7 +52,7 @@ public class FileSystemParserTest {
     
     File root;
     Manifest manifest;
-    Ontology ontology;
+    OntologyVersion ontologyVersion;
     
     @BeforeTransaction
     public void initTransaction(){
@@ -52,7 +61,8 @@ public class FileSystemParserTest {
 
     @Before
     public void init() throws URISyntaxException{
-        ontology = new Ontology();
+        ontologyVersion = new OntologyVersion();
+        ontologyVersion.setTaggedOn(DEFAULT_TAGGED_ON_DATE);
         
         root = new File(this.getClass().getClassLoader().getResource("SnomedCT_Release_INT_20120731").toURI());
         if (!root.exists()){
@@ -74,17 +84,17 @@ public class FileSystemParserTest {
         refsetId2.setFullySpecifiedName("Great britain english language reference set (Foundation metadata concept)");
         refsetId3.setFullySpecifiedName("Icd-9-cm equivalence complex map reference set (Foundation metadata concept)");
 
-        moduleConcept.setOntology(ontology);
-        refsetId1.setOntology(ontology);
-        refsetId2.setOntology(ontology);
-        refsetId3.setOntology(ontology);
+        moduleConcept.setOntologyVersion(ontologyVersion);
+        refsetId1.setOntologyVersion(ontologyVersion);
+        refsetId2.setOntologyVersion(ontologyVersion);
+        refsetId3.setOntologyVersion(ontologyVersion);
                 
-        ontology.addConcept(refsetId1);
-        ontology.addConcept(refsetId2);
-        ontology.addConcept(refsetId3);
-        ontology.addConcept(moduleConcept);
+        ontologyVersion.addConcept(refsetId1);
+        ontologyVersion.addConcept(refsetId2);
+        ontologyVersion.addConcept(refsetId3);
+        ontologyVersion.addConcept(moduleConcept);
         
-        em.persist(ontology);
+        em.persist(ontologyVersion);
         em.persist(refsetId1);
         em.persist(refsetId2);
         em.persist(refsetId3);
@@ -97,7 +107,7 @@ public class FileSystemParserTest {
     
     @Test
     public void shouldCreateAllFilesAndFolders(){
-        manifest = parser.parse(root, ontology, em);
+        manifest = parser.parse(root, ontologyVersion, em);
         
         assertEquals(2, manifest.getManifestFolders().size());
         assertEquals(0, manifest.getManifestFiles().size());
@@ -119,7 +129,7 @@ public class FileSystemParserTest {
     @Test
     public void shouldCreateRefsetManifestFilesForRefsets(){
         parser.setParsemode(Mode.STRICT);
-        manifest = parser.parse(root, ontology, em);
+        manifest = parser.parse(root, ontologyVersion, em);
         assertEquals("application/vnd.ihtsdo.snomed.refset.language+txt", 
                 manifest.getManifestFolder("refset")
                 .getManifestFile(DER2_C_REFSET_LANGUAGE_SNAPSHOT_EN_INT_20120731_TXT)
@@ -150,7 +160,7 @@ public class FileSystemParserTest {
     @Test
     public void shouldSetModules(){
         parser.setParsemode(RefsetCollectionParser.Mode.STRICT);
-        manifest = parser.parse(root, ontology, em);
+        manifest = parser.parse(root, ontologyVersion, em);
         
         assertEquals(900000000000207008l, manifest
                 .getManifestFolder("refset")
@@ -184,7 +194,7 @@ public class FileSystemParserTest {
     @Test
     public void shouldSetRefsets(){
         parser.setParsemode(RefsetCollectionParser.Mode.STRICT);
-        manifest = parser.parse(root, ontology, em);
+        manifest = parser.parse(root, ontologyVersion, em);
         
         assertEquals(2, 
                 manifest

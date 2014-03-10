@@ -1,9 +1,7 @@
 package com.ihtsdo.snomed.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Persistence;
@@ -19,15 +17,14 @@ import org.slf4j.LoggerFactory;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.service.parser.BaseTest;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
-import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
-import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DescriptionTest  extends BaseTest{
     private static final Logger LOG = LoggerFactory.getLogger(DescriptionTest.class);
 
     Concept c1,c2,c3,c4;
-    
-    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1);
     
     @BeforeClass
     public static void beforeClass(){
@@ -267,6 +264,12 @@ public class DescriptionTest  extends BaseTest{
 
     @Test
     public void shouldGetCorrectGroupFromMultipleStatementsTrue() throws InvalidInputException{
+
+        Ontology o = CreateOntologyUtil.createOntology();
+        o.setPublicId("ANOTHER_ONTOLOGY");
+
+        OntologyVersion ov = o.getFlavours().iterator().next().getVersions().iterator().next();        
+        
         Concept c = new Concept(123);
         Concept p1 = new Concept(999);
         Concept o1 = new Concept(666);
@@ -285,23 +288,30 @@ public class DescriptionTest  extends BaseTest{
         s1.setObject(o2);
         s1.setGroupId(2);
 
-        c.addSubjectOfStatement(s);
-        c.addSubjectOfStatement(s1);
+        //c.addSubjectOfStatement(s);
+        //c.addSubjectOfStatement(s1);
         
-        em.persist(c);
-        em.persist(p1);
-        em.persist(o1);
-        em.persist(p2);
-        em.persist(o2);
-        em.persist(s);
-        em.persist(s1);
+        ov.addStatement(s1);
+        ov.addStatement(s);
+        
+        em.persist(o);
+        
+        //em.persist(c);
+        //em.persist(p1);
+        //em.persist(o1);
+        //em.persist(p2);
+        //em.persist(o2);
+        //em.persist(s);
+        //em.persist(s1);
         em.flush();
         em.clear();
         
         c = em.createQuery("SELECT c FROM Concept c where c.serialisedId=123", Concept.class).getSingleResult();
-        s = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
-        s1 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();
+        List<Statement> foundStatements = em.createQuery("SELECT s FROM Statement s", Statement.class).getResultList();
         
-        assertTrue(new Group(Arrays.asList(s1, s)).equals(c.getGroup(s)));
+        //s = em.createQuery("SELECT s FROM Statement s where s.id=1", Statement.class).getSingleResult();
+        //s1 = em.createQuery("SELECT s FROM Statement s where s.id=2", Statement.class).getSingleResult();
+        
+        assertTrue(new Group(foundStatements).equals(c.getGroup(foundStatements.get(0))));
     }
 }

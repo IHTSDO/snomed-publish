@@ -1,18 +1,30 @@
 package com.ihtsdo.snomed.service.parser;
 
+import java.sql.Date;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
+import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
-public class BaseTest {
+
+public abstract class BaseTest {
     
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(BaseTest.class);
     
-    protected static final String DEFAULT_ONTOLOGY_NAME = "Test";
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
     
     private static final String DATA_FOLDER = "data/";
     
@@ -44,6 +56,10 @@ public class BaseTest {
 
     protected static EntityManagerFactory emf = null;
     protected static EntityManager em = null;
+
+    protected static OntologyVersion ontologyVersion;
+
+
 
 
 }

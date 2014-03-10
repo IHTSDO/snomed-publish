@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
@@ -134,7 +134,7 @@ public class RdfSchemaSerialiserTest {
         statements.add(r1);
         statements.add(r2);
         
-        Ontology o = new Ontology(1L);
+        OntologyVersion o = new OntologyVersion(1L);
         o.addStatement(r1);
         o.addStatement(r2);
     }

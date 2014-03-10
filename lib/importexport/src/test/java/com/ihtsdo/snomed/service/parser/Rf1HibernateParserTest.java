@@ -24,6 +24,8 @@ import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
@@ -31,38 +33,44 @@ import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 public class Rf1HibernateParserTest extends BaseTest{
     private static final Logger LOG = LoggerFactory.getLogger(Rf1HibernateParserTest.class);
 
-    HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1).setParseMode(Mode.STRICT);
-    
-    
+    protected static HibernateParser parser = HibernateParserFactory.getParser(Parser.RF1).setParseMode(Mode.STRICT);    
+
     @BeforeClass
-    public static void beforeClass(){
+    public static void beforeClass() throws IOException{
         LOG.info("Initialising database");
         emf = Persistence.createEntityManagerFactory(HibernateParser.ENTITY_MANAGER_NAME_FROM_PERSISTENCE_XML);
-        em = emf.createEntityManager();        
+        em = emf.createEntityManager();
     }
     
     @AfterClass
     public static void afterClass(){
-        em.close();
         emf.close();
-    }    
-    
-    @After
-    public void tearDown() throws Exception {
-        em.getTransaction().rollback();
     }
     
     @Before
     public void setUp() throws Exception {
         em.getTransaction().begin();
+        ontologyVersion = parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
         em.getTransaction().setRollbackOnly();   
-    }
+    } 
+    
+    @After
+    public void tearDown() throws Exception {
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
+        Ontology o = em.merge(ontologyVersion.getFlavour().getOntology());
+        em.remove(o);
+        em.getTransaction().commit();  
+    }    
+    
 
     @Test
     public void dbShouldHave5StatementsAfterPopulateStatements() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
-        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
+        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, ontologyVersion);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -74,8 +82,8 @@ public class Rf1HibernateParserTest extends BaseTest{
   
     @Test
     public void dbShouldHave8ConceptsAfterPopulateConcepts() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -87,8 +95,8 @@ public class Rf1HibernateParserTest extends BaseTest{
     
     @Test
     public void dbShouldHave8ConceptsAfterPopulateConceptsFromStatements() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConceptsFromStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConceptsFromStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, ontologyVersion);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -100,18 +108,18 @@ public class Rf1HibernateParserTest extends BaseTest{
     
     @Test(expected=UnsupportedOperationException.class)
     public void dbShouldThrowEXceptionForPopulateConceptsFromStatementsAndDescriptions() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         parser.populateConceptsFromStatementsAndDescriptions(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS),
-                em, o);
+                em, ontologyVersion);
     }     
     
     @Test
     public void dbShouldHave23DescriptionsAfterPopulateDescriptions() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
-        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
+        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS), em, ontologyVersion);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -124,12 +132,12 @@ public class Rf1HibernateParserTest extends BaseTest{
 
     @Test
     public void dbShouldStoreAllStatementDataPoints() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
-        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
+        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em, ontologyVersion);
 
         Statement r = em.createQuery(
-                "SELECT r FROM Statement r where r.ontology.id=1 AND r.serialisedId=" + 100000028, 
+                "SELECT r FROM Statement r where r.serialisedId=" + 100000028, 
                 Statement.class).getSingleResult();        
 
         assertNull(r.getCharacteristicType());
@@ -150,10 +158,10 @@ public class Rf1HibernateParserTest extends BaseTest{
 
     @Test
     public void dbShouldStoreAllDataPointsForConcepts() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
         
-        TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c where c.ontology.id=1 AND c.serialisedId=" + 280844000, Concept.class);
+        TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c where c.serialisedId=" + 280844000, Concept.class);
         Concept c = query.getSingleResult();
 
         assertNotNull(c);
@@ -168,17 +176,17 @@ public class Rf1HibernateParserTest extends BaseTest{
         assertEquals (HibernateParser.DEFAULT_CONCEPT_ACTIVE, c.isActive());
         assertEquals (HibernateParser.DEFAULT_CONCEPT_EFFECTIVE_TIME, c.getEffectiveTime());
         assertEquals (HibernateParser.DEFAULT_CONCEPT_PRIMITIVE, c.isPrimitive());
-        assertEquals (1, c.getOntology().getId());
+        //assertEquals (new Long(1), c.getOntology().getId());
     }
     
     @Test
     public void dbShouldStoreAllDataPointsForDescription() throws IOException{
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, o);
-        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), em, ontologyVersion);
+        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS), em, ontologyVersion);
         
         Description d = em.createQuery(
-                "SELECT d FROM Description d where d.ontology.id=1 AND d.serialisedId=" + 418668015, 
+                "SELECT d FROM Description d where d.serialisedId=" + 418668015, 
                 Description.class).getSingleResult();
         
         assertNull(d.getModule());
@@ -199,8 +207,9 @@ public class Rf1HibernateParserTest extends BaseTest{
     
     @Test
     public void shouldPopulateDb() throws IOException{
-        Ontology ontology = parser.populateDb(
-                DEFAULT_ONTOLOGY_NAME, 
+        parser.populateDb(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
         
@@ -220,21 +229,23 @@ public class Rf1HibernateParserTest extends BaseTest{
             long result = em.createQuery(criteriaQuery).getSingleResult();
             assertEquals(5, result);
         }
+        OntologyVersion o2 = em.merge(ontologyVersion);
         {//1 ontology
-            assertNotNull(ontology);
-            assertEquals(5, ontology.getStatements().size());
-            assertEquals(8, ontology.getConcepts().size());
-            assertEquals(1, ontology.getId());
-            assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
-            assertTrue(ontology.getStatements().contains(new Statement(100000028)));
+            assertNotNull(o2);
+            assertEquals(5, o2.getStatements().size());
+            assertEquals(8, o2.getConcepts().size());
+            //assertEquals(new Long(1), ontologyVersion.getId());
+            assertEquals(DEFAULT_TAGGED_ON_DATE, o2.getTaggedOn());
+            assertTrue(o2.getStatements().contains(new Statement(100000028)));
         }
     }
     
     
     @Test
     public void shouldPopulateDbFromStatementsOnly() throws IOException{
-        Ontology ontology = parser.populateDbFromStatementsOnly(
-                DEFAULT_ONTOLOGY_NAME, 
+        parser.populateDbFromStatementsOnly(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS), em);
         
@@ -254,21 +265,23 @@ public class Rf1HibernateParserTest extends BaseTest{
             long result = em.createQuery(criteriaQuery).getSingleResult();
             assertEquals(5, result);
         }
+        OntologyVersion o2 = em.merge(ontologyVersion);
         {//1 ontology
-            assertNotNull(ontology);
-            assertEquals(5, ontology.getStatements().size());
-            assertEquals(8, ontology.getConcepts().size());
-            assertEquals(1, ontology.getId());
-            assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
+            assertNotNull(o2);
+            assertEquals(5, o2.getStatements().size());
+            assertEquals(8, o2.getConcepts().size());
+            //assertEquals(new Long(1), ontologyVersion.getId());
+            assertEquals(DEFAULT_TAGGED_ON_DATE, o2.getTaggedOn());
             Statement r = new Statement(100000028);
-            assertTrue(ontology.getStatements().contains(r));
+            assertTrue(o2.getStatements().contains(r));
         }
     }
     
     @Test(expected=UnsupportedOperationException.class)
     public void shouldThrowExceptionsForPopulateDbFromStatementsAndDescriptionsOnly() throws IOException{
         parser.populateDbFromStatementsAndDescriptionsOnly(
-                DEFAULT_ONTOLOGY_NAME, 
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE,
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS),
@@ -278,7 +291,9 @@ public class Rf1HibernateParserTest extends BaseTest{
     
     @Test
     public void shouldPopulateDbWithDescriptions() throws IOException{
-        Ontology ontology = parser.populateDbWithDescriptions(DEFAULT_ONTOLOGY_NAME, 
+        parser.populateDbWithDescriptions(
+                SnomedFlavours.INTERNATIONAL,
+                DEFAULT_TAGGED_ON_DATE, 
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS), em);        
@@ -306,26 +321,27 @@ public class Rf1HibernateParserTest extends BaseTest{
             long result = em.createQuery(criteriaQuery).getSingleResult();
             assertEquals(23, result);
         }
+        OntologyVersion o2 = em.merge(ontologyVersion);
         {//1 ontology
-            assertNotNull(ontology);
-            assertEquals(5, ontology.getStatements().size());
-            assertEquals(8, ontology.getConcepts().size());
-            assertEquals(23, ontology.getDescriptions().size());
-            assertEquals(1, ontology.getId());
-            assertEquals(DEFAULT_ONTOLOGY_NAME, ontology.getName());
-            assertTrue(ontology.getStatements().contains(new Statement(100000028)));
-            assertTrue(ontology.getDescriptions().contains(new Description(418668015)));
-            assertTrue(ontology.getConcepts().contains(new Concept(280844000)));
+            assertNotNull(o2);
+            assertEquals(5, o2.getStatements().size());
+            assertEquals(8, o2.getConcepts().size());
+            assertEquals(23, o2.getDescriptions().size());
+            //assertEquals(new Long(1), o2.getId());
+            assertEquals(DEFAULT_TAGGED_ON_DATE, o2.getTaggedOn());
+            assertTrue(o2.getStatements().contains(new Statement(100000028)));
+            assertTrue(o2.getDescriptions().contains(new Description(418668015)));
+            assertTrue(o2.getConcepts().contains(new Concept(280844000)));
         }      
     }       
 
     @Test
     public void shouldSkipRowAndContinueDbPopulationAfterParseErrorWhenForgivingMode() throws IOException{
         parser.setParseMode(Mode.FORGIVING);
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
-        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS_ERROR), em, o);
-        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS_ERROR), em, o);
-        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS_ERROR), em, o);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
+        parser.populateConcepts(ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS_ERROR), em, ontologyVersion);
+        parser.populateStatements(ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS_ERROR), em, ontologyVersion);
+        parser.populateDescriptions(ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS_ERROR), em, ontologyVersion);
 
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Long> conceptCriteriaQuery = criteriaBuilder.createQuery(Long.class);
@@ -349,42 +365,42 @@ public class Rf1HibernateParserTest extends BaseTest{
     @Test(expected=InvalidInputException.class)
     public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateConcepts() throws IOException{
         parser.setParseMode(Mode.STRICT);
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         parser.populateConcepts(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS_ERROR), 
-                em, o);
+                em, ontologyVersion);
     }
     
     @Test(expected=InvalidInputException.class)
     public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateConceptsFromStatements() throws IOException{
         parser.setParseMode(Mode.STRICT);
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         parser.populateConceptsFromStatements(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS_ERROR), 
-                em, o);
+                em, ontologyVersion);
     }    
 
     @Test(expected=InvalidInputException.class)
     public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateStatements() throws IOException{
         parser.setParseMode(Mode.STRICT);
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         parser.populateConcepts(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), 
-                em, o);
+                em, ontologyVersion);
         parser.populateStatements(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_STATEMENTS_ERROR),
-                em, o);        
+                em, ontologyVersion);        
     }
     
     @Test(expected=InvalidInputException.class)
     public void shouldThrowExceptionAfterParseErrorWhenStrictModeForPopulateDescriptions() throws IOException{
         parser.setParseMode(Mode.STRICT);
-        Ontology o = parser.createOntology(em, DEFAULT_ONTOLOGY_NAME);
+        parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         parser.populateConcepts(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_CONCEPTS), 
-                em, o);
+                em, ontologyVersion);
         parser.populateStatements(
                 ClassLoader.getSystemResourceAsStream(TEST_RF1_DESCRIPTIONS_ERROR),
-                em, o);        
+                em, ontologyVersion);
     }      
 }
