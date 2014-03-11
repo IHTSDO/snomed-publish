@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.service.DiffAlgorithmFactory;
 import com.ihtsdo.snomed.service.DiffAlgorithmFactory.DiffStrategy;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
@@ -33,6 +35,14 @@ public class DiffMain {
     private EntityManagerFactory emf  = null;
     private EntityManager em          = null;
 
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }    
+    
     private void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
         if ((db != null) && (!db.isEmpty())){
@@ -71,45 +81,51 @@ public class DiffMain {
             HibernateParser baseParser = HibernateParserFactory.getParser(baseParserFormat);
             HibernateParser compareParser = HibernateParserFactory.getParser(compareParserFormat);
 
-            Ontology baseOntology = null;
+            OntologyVersion baseOntologyVersion = null;
             if (baseDescriptionsFile != null){
-                baseOntology = baseParser.populateDbWithDescriptions(
-                        "Base Ontology", 
+                baseOntologyVersion = baseParser.populateDbWithDescriptions(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(baseConceptsFile), 
                         new FileInputStream(baseTriplesFile), 
                         new FileInputStream(baseDescriptionsFile), 
                         em);
             } else if (baseConceptsFile != null){
-                baseOntology = baseParser.populateDb(
-                        "Base Ontology", 
+                baseOntologyVersion = baseParser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(baseConceptsFile), 
                         new FileInputStream(baseTriplesFile), 
                         em);                        
             } else {
-                baseOntology = baseParser.populateDbFromStatementsOnly(
-                        "Base Ontology",
+                baseOntologyVersion = baseParser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(baseTriplesFile), 
                         new FileInputStream(baseTriplesFile), 
                         em);
             }
             
-            Ontology compareOntology = null;
+            OntologyVersion compareOntologyVersion = null;
             if (compareDescriptionsFile != null){
-                compareOntology = compareParser.populateDbWithDescriptions(
-                        "Compare-to Ontology", 
+                compareOntologyVersion = compareParser.populateDbWithDescriptions(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(compareConceptsFile), 
                         new FileInputStream(compareTriplesFile), 
                         new FileInputStream(compareDescriptionsFile), 
                         em);
             } else if (baseConceptsFile != null){
-                compareOntology = compareParser.populateDb(
-                        "Compare-to Ontology", 
+                compareOntologyVersion = compareParser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(compareConceptsFile), 
                         new FileInputStream(compareTriplesFile), 
                         em);                        
             } else {
-                compareOntology = compareParser.populateDbFromStatementsOnly(
-                        "Compare-to Ontology",
+                compareOntologyVersion = compareParser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(compareTriplesFile), 
                         new FileInputStream(compareTriplesFile), 
                         em);
@@ -119,8 +135,8 @@ public class DiffMain {
                     FileWriter missingFw = new FileWriter(missingFile); BufferedWriter missingBw = new BufferedWriter(missingFw);){
 
                 DiffAlgorithmFactory.getAlgorithm(strategy).diff(
-                        baseOntology, 
-                        compareOntology, 
+                        baseOntologyVersion, 
+                        compareOntologyVersion, 
                         SnomedSerialiserFactory.getSerialiser(outputFormat, extraFw), 
                         SnomedSerialiserFactory.getSerialiser(outputFormat, missingFw), em);
             }            

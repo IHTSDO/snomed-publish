@@ -25,7 +25,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiser;
 
@@ -33,7 +33,7 @@ class SubjectPredicateObjectDiff implements DiffAlgorithm{
 
     private static final Logger LOG = LoggerFactory.getLogger( SubjectPredicateObjectDiff.class );
 
-    public void diff(Ontology base, Ontology compare, SnomedSerialiser extrasSerialiser, 
+    public void diff(OntologyVersion base, OntologyVersion compare, SnomedSerialiser extrasSerialiser, 
             SnomedSerialiser missingSerialiser, EntityManager em) throws IOException, ParseException
     {
         LOG.info("Getting all base statements");
@@ -76,7 +76,7 @@ class SubjectPredicateObjectDiff implements DiffAlgorithm{
         }
     }
     
-    public Set<SubjectPredicateObject> getSubjectPredicateObject(final Ontology o, EntityManager em){
+    public Set<SubjectPredicateObject> getSubjectPredicateObject(final OntologyVersion o, EntityManager em){
         final Set<SubjectPredicateObject> subjectPredicateObjectSet = new HashSet<SubjectPredicateObject>();
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();

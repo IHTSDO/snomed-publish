@@ -41,7 +41,7 @@ public class StatementTest extends BaseTest{
     @Before
     public void setUp() throws Exception {
         em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();
+        //em.getTransaction().setRollbackOnly();
     }
 
     

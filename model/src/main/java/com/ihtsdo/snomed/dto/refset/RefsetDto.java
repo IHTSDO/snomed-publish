@@ -1,5 +1,8 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 import javax.validation.Valid;
@@ -8,31 +11,36 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.refset.Refset.Source;
 import com.ihtsdo.snomed.model.refset.Refset.Type;
 
 @XmlRootElement(name="refset")
 @JsonRootName("refset")
 public class RefsetDto {
-    	
-    private Long id;
+    
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
     
     @NotNull(message="You must select a type")
     private Type type;
     
     @NotNull(message="You must select a source")
     private Source source;
-    
-    @NotNull(message="You must select a snomed release")
-    private SnomedReleaseDto snomedRelease;
-    
+        
     @Valid
     @NotNull(message="You must select a refset concept")
     private ConceptDto refsetConcept;
     
     @NotNull(message="You must select a module")
-    private ConceptDto moduleConcept;    
+    private ConceptDto moduleConcept;
+    
+    @NotNull(message="You must select a default Snomed extension")
+    private OntologyFlavour snomedExtension;
+    
+    @NotNull(message="You must select a default Snomed release date")
+    private String snomedReleaseDate;
     
     @NotNull(message="Internet Address can not be empty")
     @Size(min=2, max=20, message="Internet Address must be between 2 and 50 characters")
@@ -53,12 +61,12 @@ public class RefsetDto {
     @Override
     public String toString(){
         return com.google.common.base.Objects.toStringHelper(this)
-                .add("id", getId())
                 .add("source", getSource())
                 .add("type", getType())
-                .add("snomedRelease", getSnomedRelease())
                 .add("refsetConcept", getRefsetConcept())
                 .add("moduleConcept", getModuleConcept())
+                .add("snomedExtension", getSnomedExtension())
+                .add("snomedReleaseDate", getSnomedReleaseDate())
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
@@ -71,12 +79,12 @@ public class RefsetDto {
         if (o instanceof RefsetDto){
             RefsetDto dto = (RefsetDto) o;
             if (
-        		Objects.equals(dto.getId(), getId()) &&
         		Objects.equals(dto.getSource(), getSource()) &&
         		Objects.equals(dto.getType(), getType()) &&
-        		Objects.equals(dto.getSnomedRelease(), getSnomedRelease()) &&
         		Objects.equals(dto.getRefsetConcept(), getRefsetConcept()) &&
                 Objects.equals(dto.getModuleConcept(), getModuleConcept()) &&
+                Objects.equals(dto.getSnomedExtension(), getSnomedExtension()) &&
+                Objects.equals(dto.getSnomedReleaseDate(), getSnomedReleaseDate()) &&
                 Objects.equals(dto.getTitle(), getTitle()) &&
                 Objects.equals(dto.getDescription(), getDescription()) &&
                 Objects.equals(dto.getPublicId(), getPublicId()) &&
@@ -90,16 +98,21 @@ public class RefsetDto {
     @Override
     public int hashCode(){
         return Objects.hash(
-        		getId(),
         		getSource(),
         		getType(),
-        		getSnomedRelease(),
+        		getSnomedExtension(),
+        		getSnomedReleaseDate(),
         		getRefsetConcept(),
         		getModuleConcept(),
         		getTitle(),
         		getDescription(),
         		getPublicId(),
         		getPlan());
+    }
+    
+    @JsonIgnore
+    public Date getSnomedReleaseDateAsDate() throws ParseException{
+        return new java.sql.Date(dateFormat.parse(getSnomedReleaseDate()).getTime());
     }
 
     public String getPublicId() {
@@ -126,14 +139,6 @@ public class RefsetDto {
         this.description = description;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public PlanDto getPlan() {
         return plan;
     }
@@ -158,14 +163,6 @@ public class RefsetDto {
 		this.source = source;
 	}
 
-	public SnomedReleaseDto getSnomedRelease() {
-		return snomedRelease;
-	}
-
-	public void setSnomedRelease(SnomedReleaseDto snomedRelease) {
-		this.snomedRelease = snomedRelease;
-	}
-
 	public ConceptDto getRefsetConcept() {
 		return refsetConcept;
 	}
@@ -181,33 +178,54 @@ public class RefsetDto {
 	public void setModuleConcept(ConceptDto moduleConcept) {
 		this.moduleConcept = moduleConcept;
 	}
+	
 
-	public static Builder getBuilder(Long id, Source source, Type type, SnomedReleaseDto snomedRelease,
-			ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
+
+    public OntologyFlavour getSnomedExtension() {
+        return snomedExtension;
+    }
+
+    public void setSnomedExtension(OntologyFlavour snomedExtension) {
+        this.snomedExtension = snomedExtension;
+    }
+
+    public String getSnomedReleaseDate() {
+        return snomedReleaseDate;
+    }
+
+    public void setSnomedReleaseDate(String snomedReleaseDate) {
+        this.snomedReleaseDate = snomedReleaseDate;
+    }
+   
+
+    public static Builder getBuilder(Source source, Type type, OntologyFlavour snomedExtension,
+            Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
 			String publicId, PlanDto plan) {
-        return new Builder(id, source, type, snomedRelease, refsetConcept, moduleConcept, 
+        return new Builder(source, type, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
         		title, description, publicId, plan);
     }
     
     public static class Builder {
         private RefsetDto built;
-
-        Builder(Long id, Source source, Type type, SnomedReleaseDto snomedRelease,
-    			ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
-    			String publicId, PlanDto plan) {
+        
+        public Builder(Source source, Type type,
+                OntologyFlavour snomedExtension, Date snomedReleaseDate,
+                ConceptDto refsetConcept, ConceptDto moduleConcept,
+                String title, String description, String publicId, PlanDto plan) 
+        {
             built = new RefsetDto();
-            built.setId(id);
             built.setSource(source);
             built.setType(type);
-            built.setSnomedRelease(snomedRelease);
             built.setRefsetConcept(refsetConcept);
             built.setModuleConcept(moduleConcept);
+            built.setSnomedExtension(snomedExtension);
+            built.setSnomedReleaseDate(dateFormat.format(snomedReleaseDate));
             built.setTitle(title);
             built.setDescription(description);
             built.setPublicId(publicId);
             built.setPlan(plan);
         }
-        
+
         public RefsetDto build(){
             return built;
         }

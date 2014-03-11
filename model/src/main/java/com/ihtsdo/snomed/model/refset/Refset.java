@@ -57,7 +57,7 @@ public class Refset {
     
     @NotNull
     @OneToOne
-    private OntologyVersion snomedRelease;
+    private OntologyVersion ontologyVersion;
     
     @NotNull
     @OneToOne
@@ -102,13 +102,13 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(Source source, Type type, OntologyVersion snomedRelease,
+    public Refset update(Source source, Type type, OntologyVersion ontologyVersion,
             Concept refsetConcept, Concept moduleConcept, String title, String description, 
             String publicId, Plan plan)
     {
         this.setSource(source);
         this.setType(type);
-        this.setSnomedRelease(snomedRelease);
+        this.setOntologyVersion(ontologyVersion);
         this.setRefsetConcept(refsetConcept);
         this.setModuleConcept(moduleConcept);
         this.setTitle(title);
@@ -148,7 +148,7 @@ public class Refset {
                 .add("id", getId())
                 .add("source", getSource())
                 .add("type", getType())
-                .add("snomedRelease", getSnomedRelease())
+                .add("ontologyVersion", ontologyVersion)
                 .add("refsetConcept", getRefsetConcept())
                 .add("moduleConcept", getModuleConcept())
                 .add("title", getTitle())
@@ -164,7 +164,7 @@ public class Refset {
                 getId(),
                 getSource(),
                 getType(),
-                getSnomedRelease(),
+                getOntologyVersion(),
                 getRefsetConcept(),
                 getModuleConcept(),
                 getTitle(),
@@ -215,14 +215,6 @@ public class Refset {
 
     public void setType(Type type) {
         this.type = type;
-    }
-
-    public OntologyVersion getSnomedRelease() {
-        return snomedRelease;
-    }
-
-    public void setSnomedRelease(OntologyVersion snomedRelease) {
-        this.snomedRelease = snomedRelease;
     }
 
     public Concept getRefsetConcept() {
@@ -297,7 +289,15 @@ public class Refset {
         this.snapshotsMap = snapshotsMap;
     }
      
-     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
+     public OntologyVersion getOntologyVersion() {
+        return ontologyVersion;
+    }
+
+    public void setOntologyVersion(OntologyVersion ontologyVersion) {
+        this.ontologyVersion = ontologyVersion;
+    }
+
+    public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
              Concept refsetConcept, Concept moduleConcept, String title, String description, 
              String publicId, Plan plan) {
          return new Builder(id, source, type, snomedRelease, refsetConcept, moduleConcept, 
@@ -315,14 +315,14 @@ public class Refset {
      public static class Builder {
          private Refset built;
 
-         Builder(Long id, Source source, Type type, OntologyVersion snomedRelease,
+         Builder(Long id, Source source, Type type, OntologyVersion ontologyVersion,
                  Concept refsetConcept, Concept moduleConcept, String title, String description, 
                  String publicId, Plan plan) {
              built = new Refset();
              built.setId(id);
              built.setSource(source);
              built.setType(type);
-             built.setSnomedRelease(snomedRelease);
+             built.setOntologyVersion(ontologyVersion);
              built.setRefsetConcept(refsetConcept);
              built.setModuleConcept(moduleConcept);
              built.setTitle(title);

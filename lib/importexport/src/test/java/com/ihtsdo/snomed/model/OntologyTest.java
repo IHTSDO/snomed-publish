@@ -1,9 +1,5 @@
 package com.ihtsdo.snomed.model;
 
-import static org.junit.Assert.assertEquals;
-
-import java.sql.Date;
-
 import javax.persistence.Persistence;
 
 import org.junit.After;
@@ -16,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.service.parser.BaseTest;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
+
+import static org.junit.Assert.assertEquals;
 
 public class OntologyTest extends BaseTest{
     private static final Logger LOG = LoggerFactory.getLogger(OntologyTest.class);
@@ -43,7 +41,7 @@ public class OntologyTest extends BaseTest{
     @Before
     public void setUp() throws Exception {
         em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();
+        //em.getTransaction().setRollbackOnly();
     }
 
 

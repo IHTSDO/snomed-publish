@@ -46,7 +46,7 @@ public class GroupTest extends BaseTest{
         ontologyVersion = parser.createOntologyVersion(em, SnomedFlavours.INTERNATIONAL, DEFAULT_TAGGED_ON_DATE);
         em.getTransaction().commit();
         em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();
+        //em.getTransaction().setRollbackOnly();
     }
 
     @After

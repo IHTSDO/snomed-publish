@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
@@ -33,6 +35,14 @@ public class RdfsExportMain {
     private EntityManager em          = null;
     
 
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
+    
     private void initDb(String db){
         Map<String, Object> overrides = new HashMap<String, Object>();
         
@@ -69,23 +79,26 @@ public class RdfsExportMain {
         try{
             initDb(db);
             HibernateParser hibParser = HibernateParserFactory.getParser(inputFormat);
-            Ontology o = null;
+            OntologyVersion ontologyVersion = null;
             if (descriptionsFile != null){
-                o = hibParser.populateDbWithDescriptions(
-                        "Jena import", 
+                ontologyVersion = hibParser.populateDbWithDescriptions(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(conceptsFile), 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(descriptionsFile), 
                         em);
             } else if (conceptsFile != null){
-                o = hibParser.populateDb(
-                        "Jena import", 
+                ontologyVersion = hibParser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(conceptsFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
-                o = hibParser.populateDbFromStatementsOnly(
-                        "Jena import",
+                ontologyVersion = hibParser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
                         em);
@@ -93,7 +106,7 @@ public class RdfsExportMain {
             
             if (outputFile != null){
                 try (OutputStreamWriter ow = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outputFile)))){
-                	 SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(o);
+                	 SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(ontologyVersion);
                 }
             }
             

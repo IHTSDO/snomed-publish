@@ -1,8 +1,5 @@
 package com.ihtsdo.snomed.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -15,20 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.ihtsdo.snomed.dto.refset.SnomedDto;
-import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
-import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.model.xml.XmlConcept;
 import com.ihtsdo.snomed.model.xml.XmlDescription;
 import com.ihtsdo.snomed.model.xml.XmlStatement;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.DescriptionService;
-import com.ihtsdo.snomed.service.OntologyService;
+import com.ihtsdo.snomed.service.OntologyVersionService;
 import com.ihtsdo.snomed.service.StatementService;
 
 @Controller
@@ -47,24 +40,7 @@ public class SnomedController {
     StatementService statementService;
     
     @Inject
-    OntologyService ontologyService;
-    
-    @Transactional
-    @RequestMapping(value = "releases", 
-            method = RequestMethod.GET, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody SnomedDto getAllSnomedReleases(){
-        List<OntologyVersion> ontologyVersions = ontologyService.findAll();
-        List<SnomedReleaseDto> releases = new ArrayList<>();
-        for (OntologyVersion o : ontologyVersions){
-            releases.add(SnomedReleaseDto.parse(o));
-        }
-        SnomedDto snomedDto = new SnomedDto();
-        snomedDto.setReleases(releases);
-        return snomedDto;
-    }
-            
+    OntologyVersionService ontologyVersionService;    
     
     @Transactional
     @RequestMapping(value = "concept/{id}", 

@@ -48,6 +48,8 @@ public class OntologyFlavour {
     private Date modificationTime;
     
     @Version private long version = 0;
+    
+    public OntologyFlavour(){}
 
     @Override
     public String toString(){

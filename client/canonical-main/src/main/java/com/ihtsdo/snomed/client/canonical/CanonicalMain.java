@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
@@ -30,11 +32,16 @@ import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
-public class CanonicalMain {
-    
+public class CanonicalMain {    
     private static final Logger LOG = LoggerFactory.getLogger( CanonicalMain.class );
     
-    private static final String DEFAULT_ONTOLOGY_NAME = "LongForm";
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
     
     private   EntityManagerFactory emf           = null;
     private   EntityManager em                   = null;
@@ -71,16 +78,20 @@ public class CanonicalMain {
     protected void runProgram(String conceptFile, String triplesFile, String outputFile, String db, String show) throws IOException, java.text.ParseException{
         try{
             initDb(db);  
-            Ontology ontology = null;
+            OntologyVersion ontologyVersion = null;
             if (conceptFile != null){
-                ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = parser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE, 
                         new FileInputStream(conceptFile), new FileInputStream(triplesFile), em);
             }else{
-                ontology = parser.populateDbFromStatementsOnly(DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = parser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE,                         
                         new FileInputStream(triplesFile), new FileInputStream(triplesFile), em);
             }
                 
-            List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();
+            List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontologyVersion.getId(), Concept.class).getResultList();
 
             writeOut(outputFile, runAlgorithm(show, concepts));
         }finally{

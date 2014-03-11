@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ihtsdo.snomed.model.OntologyVersion;
-import com.ihtsdo.snomed.service.parser.HibernateParser.Mode;
-import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 
 
 public abstract class BaseTest {

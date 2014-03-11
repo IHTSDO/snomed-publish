@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
@@ -36,8 +38,15 @@ public class ClosureMain {
     
     private static final Logger LOG = LoggerFactory.getLogger( ClosureMain.class );
     
-    private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
     public static final int DEFAULT_PAGE_SIZE = 450000;
+    
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
+    
     
     private   EntityManagerFactory emf              = null;
     private   EntityManager em                      = null;
@@ -96,7 +105,7 @@ public class ClosureMain {
     {
         try {
             initDb(dbLocation);
-            Ontology o = null;
+            OntologyVersion ontologyVersion = null;
             HibernateParser hibParser = HibernateParserFactory.getParser(type);
             
            //statement + description: not implemented
@@ -112,26 +121,28 @@ public class ClosureMain {
 //            } else 
             if (conceptsFile != null){
                 //statement + concept
-                o = hibParser.populateDb(
-                        DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = hibParser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE,  
                         new FileInputStream(conceptsFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
                 //statement
-                o = hibParser.populateDbFromStatementsOnly(
-                        DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = hibParser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE,   
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
                         em);
             }             
             
-            if (o == null){
+            if (ontologyVersion == null){
                 throw new InvalidInputException("Parsing failed");
             }
             
             TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
-            query.setParameter("ontologyId", o.getId());
+            query.setParameter("ontologyId", ontologyVersion.getId());
             query.setHint("org.hibernate.cacheable", Boolean.TRUE);
             query.setHint("org.hibernate.readOnly", Boolean.TRUE);
             query.setHint("org.hibernate.cacheMode", CacheMode.GET);

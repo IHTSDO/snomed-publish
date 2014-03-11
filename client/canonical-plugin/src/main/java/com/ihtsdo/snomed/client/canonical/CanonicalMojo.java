@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +30,8 @@ import org.slf4j.impl.StaticLoggerBinder;
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.CanonicalAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
@@ -56,7 +58,14 @@ public class CanonicalMojo extends AbstractMojo{
     @Parameter
     private String show;
     
-    private static final String DEFAULT_ONTOLOGY_NAME = "LongForm";
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
+    
     public static final String SHOW_ALL = "ALL";
     
     private   EntityManagerFactory emf           = null;
@@ -92,7 +101,9 @@ public class CanonicalMojo extends AbstractMojo{
         testInputs();
         try{
             initDb();  
-            Ontology ontology = parser.populateDb(DEFAULT_ONTOLOGY_NAME, 
+            OntologyVersion ontology = parser.populateDb(
+                    SnomedFlavours.INTERNATIONAL,
+                    DEFAULT_TAGGED_ON_DATE, 
                     new FileInputStream(conceptFile), new FileInputStream(relationshipFile), em);
 
             List<Concept> concepts = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=" + ontology.getId(), Concept.class).getResultList();

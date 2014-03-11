@@ -1,13 +1,7 @@
 package com.ihtsdo.snomed.web.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
+import java.sql.Date;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +22,13 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import test.com.ihtsdo.snomed.web.RefsetTestUtil;
 import test.com.ihtsdo.snomed.web.SpringProxyUtil;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
+import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
@@ -42,15 +37,28 @@ import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.repository.ConceptRepository;
-import com.ihtsdo.snomed.repository.OntologyRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
+import com.ihtsdo.snomed.service.OntologyVersionService;
 import com.ihtsdo.snomed.service.refset.PlanService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.RepositoryRefsetService;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
@@ -71,7 +79,11 @@ public class RepositoryRefsetServiceTest {
     private static final String DESCRIPTION_UPDATED = "BarUpdated";
     private final Concept refsetConcept;
     private final Concept moduleConcept = new Concept(333L);
-    private final OntologyVersion ontologyVersion = new OntologyVersion(1L);
+    
+    
+    private static Ontology o = RefsetTestUtil.createOntology();
+    private static OntologyFlavour of = o.getFlavours().iterator().next();
+    private static OntologyVersion ov = of.getVersions().iterator().next();
     
     @Inject
     private RefsetService refsetService;
@@ -83,7 +95,7 @@ public class RepositoryRefsetServiceTest {
     private ConceptRepository conceptRepoMock;
     
     @Mock
-    private OntologyRepository ontologyRepoMock;
+    private OntologyVersionService ontologyVersionServiceMock;
     
     
     @Mock
@@ -100,8 +112,8 @@ public class RepositoryRefsetServiceTest {
         
         ReflectionTestUtils.setField(
                 ((RepositoryRefsetService) SpringProxyUtil.unwrapProxy(refsetService)), 
-                "ontologyRepository", 
-                ontologyRepoMock);
+                "ontologyVersionService", 
+                ontologyVersionServiceMock);
         
         ReflectionTestUtils.setField(
                 ((RepositoryRefsetService) SpringProxyUtil.unwrapProxy(refsetService)), 
@@ -120,13 +132,13 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void create() throws ValidationException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException{
+    public void create() throws ValidationException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException{
         
         RefsetDto created = RefsetDto.getBuilder(
-                null, 
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                new SnomedReleaseDto(1l), 
+                of,
+                ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 
                 TITLE,
@@ -137,7 +149,7 @@ public class RepositoryRefsetServiceTest {
         Refset persisted = Refset.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT,  
-                ontologyVersion, 
+                ov, 
                 refsetConcept, 
                 moduleConcept, 
                 TITLE, 
@@ -148,21 +160,29 @@ public class RepositoryRefsetServiceTest {
         when(refsetRepoMock.save(any(Refset.class))).thenReturn(persisted);
         when(planServiceMock.findById(any(Long.class))).thenReturn(new Plan());
         when(planServiceMock.create(any(PlanDto.class))).thenReturn(new Plan());
-        when(ontologyRepoMock.findOne(ontologyVersion.getId())).thenReturn(ontologyVersion);
-        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ontologyVersion, refsetConcept.getSerialisedId())).thenReturn(refsetConcept);
-        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ontologyVersion, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
+        
+        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId())).thenReturn(refsetConcept);
+        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
+        
+        when(ontologyVersionServiceMock.findByFlavourAndTaggedOn(
+                created.getSnomedExtension().getPublicId(), 
+                created.getSnomedReleaseDateAsDate())).thenReturn(ov);
 
         Refset returned = refsetService.create(created);
 
         ArgumentCaptor<Refset> refsetArgument = ArgumentCaptor.forClass(Refset.class);
         verify(refsetRepoMock, times(1)).save(refsetArgument.capture());
-        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ontologyVersion, refsetConcept.getSerialisedId());
-        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ontologyVersion, moduleConcept.getSerialisedId());
+        //verify(refsetRepoMock, times(1)).findByPublicId(created.getPublicId());
+        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId());
+        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId());
         //verify(planServiceMock, times(1)).findById(any(Long.class));
         verify(planServiceMock, times(1)).create(any(PlanDto.class));
+        verify(ontologyVersionServiceMock, times(1)).findByFlavourAndTaggedOn(
+                created.getSnomedExtension().getPublicId(), created.getSnomedReleaseDateAsDate());
         verifyNoMoreInteractions(refsetRepoMock);
         verifyNoMoreInteractions(conceptRepoMock);
         verifyNoMoreInteractions(planServiceMock);
+        verifyNoMoreInteractions(ontologyVersionServiceMock);
 
         assertRefset(created, refsetArgument.getValue());
         assertEquals(persisted, returned);
@@ -175,7 +195,7 @@ public class RepositoryRefsetServiceTest {
                 REFSET_ID,
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT,  
-                ontologyVersion, 
+                ov, 
                 refsetConcept, 
                 moduleConcept, 
                 TITLE, 
@@ -224,7 +244,7 @@ public class RepositoryRefsetServiceTest {
                 REFSET_ID,
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT,  
-                ontologyVersion, 
+                ov, 
                 refsetConcept, 
                 moduleConcept, 
                 TITLE, 
@@ -243,13 +263,13 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException{
+    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException{
                 
         RefsetDto updatedDto = RefsetDto.getBuilder(
-                REFSET_ID, 
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                new SnomedReleaseDto(1l), 
+                of, 
+                ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 
                 TITLE_UPDATED,
@@ -261,7 +281,7 @@ public class RepositoryRefsetServiceTest {
         Refset updatedRefset = Refset.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT,  
-                ontologyVersion, 
+                ov, 
                 refsetConcept, 
                 moduleConcept, 
                 TITLE_UPDATED, 
@@ -276,7 +296,7 @@ public class RepositoryRefsetServiceTest {
                 REFSET_ID,
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT,  
-                ontologyVersion, 
+                ov, 
                 refsetConcept, 
                 moduleConcept, 
                 TITLE, 
@@ -284,37 +304,46 @@ public class RepositoryRefsetServiceTest {
                 PUBLIC_ID, 
                 new Plan()).build();        
         
-        when(refsetRepoMock.findOne(updatedDto.getId())).thenReturn(refsetOriginal);
-        when(refsetRepoMock.save(any(Refset.class))).thenReturn(updatedRefset);
+        //when(refsetRepoMock.findOne(updatedDto.getId())).thenReturn(refsetOriginal);
+        when(refsetRepoMock.findByPublicId(updatedDto.getPublicId())).thenReturn(refsetOriginal);
+        when(refsetRepoMock.save(refsetOriginal)).thenReturn(updatedRefset);
         when(planServiceMock.findById(any(Long.class))).thenReturn(new Plan());
         when(planServiceMock.update(any(PlanDto.class))).thenReturn(new Plan());
-        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ontologyVersion, refsetConcept.getSerialisedId())).thenReturn(refsetConcept);
-        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ontologyVersion, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
-        when(ontologyRepoMock.findOne(ontologyVersion.getId())).thenReturn(ontologyVersion);
+        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId())).thenReturn(refsetConcept);
+        when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
+        when(ontologyVersionServiceMock.findByFlavourAndTaggedOn(
+                eq(SnomedFlavours.INTERNATIONAL.getPublicIdString()), 
+                eq(ov.getTaggedOn()))).thenReturn(ov);
         
         Refset returned = refsetService.update(updatedDto);
         
-        verify(refsetRepoMock, times(1)).findOne(updatedDto.getId());
+        //verify(refsetRepoMock, times(1)).findOne(updatedDto.getId());
         verify(refsetRepoMock, times(1)).save(any(Refset.class));
-        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ontologyVersion, refsetConcept.getSerialisedId());
-        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ontologyVersion, moduleConcept.getSerialisedId());
+        verify(refsetRepoMock, times(1)).findByPublicId(updatedDto.getPublicId());
+        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId());
+        verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId());
         verify(planServiceMock, times(1)).findById(any(Long.class));
         verify(planServiceMock, times(1)).update(any(PlanDto.class));
+
+        verify(ontologyVersionServiceMock, times(1)).findByFlavourAndTaggedOn(
+                updatedDto.getSnomedExtension().getPublicId(), updatedDto.getSnomedReleaseDateAsDate());        
+        
         verifyNoMoreInteractions(refsetRepoMock);
         verifyNoMoreInteractions(conceptRepoMock);
         verifyNoMoreInteractions(planServiceMock);
+        verifyNoMoreInteractions(ontologyVersionServiceMock);
         
         assertRefset(updatedDto, returned);
     }
     
     @Test(expected = RefsetNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException {
+    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException {
 
         RefsetDto updated = RefsetDto.getBuilder(
-                REFSET_ID, 
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                new SnomedReleaseDto(1l), 
+                of,
+                ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 
                 TITLE_UPDATED,
@@ -322,7 +351,7 @@ public class RepositoryRefsetServiceTest {
                 PUBLIC_ID_UPDATED,
                 new PlanDto()).build();        
         
-        when(refsetRepoMock.findOne(updated.getId())).thenReturn(null);
+        //when(refsetRepoMock.findOne(updated.getId())).thenReturn(null);
 //        when(conceptMock.findBySerialisedId(concept.getSerialisedId())).thenReturn(concept);
 
         refsetService.update(updated);
@@ -336,7 +365,7 @@ public class RepositoryRefsetServiceTest {
     private void assertRefset(RefsetDto expected, Refset actual) {
         assertNotNull(actual.getRefsetConcept());
         assertEquals((expected.getRefsetConcept() == null ? 0 : expected.getRefsetConcept().getIdAsLong()), actual.getRefsetConcept().getSerialisedId());
-        assertEquals((expected.getId() == null ? null : expected.getId()), actual.getId());
+        //assertEquals((expected.getId() == null ? null : expected.getId()), actual.getId());
         assertEquals(expected.getPublicId(), actual.getPublicId());
         assertEquals(expected.getTitle(), actual.getTitle());
         assertEquals(expected.getDescription(), actual.getDescription());

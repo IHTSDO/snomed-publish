@@ -52,7 +52,7 @@ public class ChildParentHibernateParserTest extends BaseTest{
         em.getTransaction().commit();        
         
         em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();   
+        //em.getTransaction().setRollbackOnly();   
     } 
     
     @After

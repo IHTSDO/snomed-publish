@@ -1,5 +1,6 @@
 package com.ihtsdo.snomed.service.refset;
 
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
+import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
@@ -36,10 +38,10 @@ import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.ConceptRepository;
-import com.ihtsdo.snomed.repository.OntologyRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
+import com.ihtsdo.snomed.service.OntologyVersionService;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 //@Transactional (value = "transactionManager", readOnly = true)
@@ -54,7 +56,7 @@ public class RepositoryRefsetService implements RefsetService {
     RefsetRepository refsetRepository;
     
     @Inject
-    OntologyRepository ontologyRepository;    
+    OntologyVersionService ontologyVersionService;    
     
     @Inject
     PlanService planService;
@@ -116,27 +118,21 @@ public class RepositoryRefsetService implements RefsetService {
     }
     @Override
     @Transactional(rollbackFor = {RefsetNotFoundException.class, RefsetConceptNotFoundException.class, ValidationException.class, RefsetPlanNotFoundException.class, RefsetTerminalRuleNotFoundException.class})
-    public Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException{
+    public Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException{
         LOG.debug("Updating refset with information: " + updated);
         
-        Refset refset = refsetRepository.findOne(updated.getId());
+        Refset refset = refsetRepository.findByPublicId(updated.getPublicId());
         if (refset == null) {
-            throw new RefsetNotFoundException("No refset found with id: " + updated.getId());
+            throw new RefsetNotFoundException("No refset found with public id: " + updated.getPublicId());
         }
         
-        
-        OntologyVersion snomedRelease = ontologyRepository.findOne(updated.getSnomedRelease().getId());
-        if (snomedRelease == null){
-            throw new OntologyNotFoundException(updated.getSnomedRelease().getId());
-        }
-        
-        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, updated.getRefsetConcept().getIdAsLong());
+        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(refset.getOntologyVersion(), updated.getRefsetConcept().getIdAsLong());
         if (refsetConcept == null){
             throw new RefsetConceptNotFoundException(new ConceptDto(updated.getRefsetConcept().getIdAsLong()), 
                     "No concept found with id: " + updated.getRefsetConcept().getIdAsLong());
         }
         
-        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, updated.getModuleConcept().getIdAsLong());
+        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(refset.getOntologyVersion(), updated.getModuleConcept().getIdAsLong());
         if (moduleConcept == null){
             throw new RefsetConceptNotFoundException(new ConceptDto(updated.getModuleConcept().getIdAsLong()), 
                     "No concept found with id: " + updated.getModuleConcept().getIdAsLong());
@@ -149,10 +145,18 @@ public class RepositoryRefsetService implements RefsetService {
             planService.update(updated.getPlan());
         }
         
+        OntologyVersion ontologyVersion = null;
+        try {
+            ontologyVersion = ontologyVersionService.findByFlavourAndTaggedOn(
+                    updated.getSnomedExtension().getPublicId(), updated.getSnomedReleaseDateAsDate());
+        } catch (ParseException e1) {
+            throw new InvalidSnomedDateFormatException(updated.getSnomedReleaseDate(), e1);
+        }
+
         refset.update(
                 updated.getSource(), 
                 updated.getType(), 
-                snomedRelease, 
+                ontologyVersion,
                 refsetConcept, 
                 moduleConcept, 
                 updated.getTitle(), 
@@ -170,22 +174,26 @@ public class RepositoryRefsetService implements RefsetService {
     @Override
     @Transactional(rollbackFor={RefsetConceptNotFoundException.class, ValidationException.class, OntologyNotFoundException.class})
     public Refset create(RefsetDto created) throws RefsetConceptNotFoundException, OntologyNotFoundException,
-        ValidationException, NonUniquePublicIdException
+        ValidationException, NonUniquePublicIdException, InvalidSnomedDateFormatException
     {
         LOG.debug("Creating new refset [{}]", created.toString());
         
-        OntologyVersion snomedRelease = ontologyRepository.findOne(created.getSnomedRelease().getId());
-        if (snomedRelease == null){
-            throw new OntologyNotFoundException(created.getSnomedRelease().getId());
+        OntologyVersion ontologyVersion = null;
+        try {
+            ontologyVersion = ontologyVersionService.findByFlavourAndTaggedOn(
+                    created.getSnomedExtension().getPublicId(), created.getSnomedReleaseDateAsDate());
+        } catch (ParseException e1) {
+            throw new InvalidSnomedDateFormatException(created.getSnomedReleaseDate(), e1);
         }
+
         
-        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, created.getRefsetConcept().getIdAsLong());
+        Concept refsetConcept = conceptRepository.findByOntologyVersionAndSerialisedId(ontologyVersion, created.getRefsetConcept().getIdAsLong());
         if (refsetConcept == null){
             throw new RefsetConceptNotFoundException(new ConceptDto(created.getRefsetConcept().getIdAsLong()), 
                     "No concept found with id: " + created.getRefsetConcept().getIdAsLong());
         }
         
-        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(snomedRelease, created.getModuleConcept().getIdAsLong());
+        Concept moduleConcept = conceptRepository.findByOntologyVersionAndSerialisedId(ontologyVersion, created.getModuleConcept().getIdAsLong());
         if (moduleConcept == null){
             throw new RefsetConceptNotFoundException(new ConceptDto(created.getModuleConcept().getIdAsLong()), 
                     "No concept found with id: " + created.getModuleConcept().getIdAsLong());
@@ -200,7 +208,7 @@ public class RepositoryRefsetService implements RefsetService {
         Refset refset = Refset.getBuilder(
                 created.getSource(), 
                 created.getType(), 
-                snomedRelease, 
+                ontologyVersion,
                 refsetConcept, 
                 moduleConcept, 
                 created.getTitle(), 

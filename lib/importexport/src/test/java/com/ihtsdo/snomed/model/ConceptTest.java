@@ -1,6 +1,5 @@
 package com.ihtsdo.snomed.model;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +45,7 @@ public class ConceptTest  extends BaseTest{
     @Before
     public void setUp() throws Exception {
         em.getTransaction().begin();
-        em.getTransaction().setRollbackOnly();
+        //em.getTransaction().setRollbackOnly();
         
         c1 = new Concept(1);
         c2 = new Concept(2);

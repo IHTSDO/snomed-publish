@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Date;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,8 @@ import org.slf4j.impl.StaticLoggerBinder;
 import com.google.common.base.Stopwatch;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.service.TransitiveClosureAlgorithm;
 import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
@@ -39,7 +41,6 @@ import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 @Mojo(name="generate-transitive-closure")
 public class ClosureMojo extends AbstractMojo{
-    private static final String DEFAULT_ONTOLOGY_NAME = "Transitive Closure Input";
     
     @Parameter String conceptsFile;
     @Parameter String triplesFile;
@@ -51,6 +52,13 @@ public class ClosureMojo extends AbstractMojo{
     private   EntityManagerFactory emf             = null;
     private   EntityManager em                     = null;    
     private   TransitiveClosureAlgorithm algorithm = new TransitiveClosureAlgorithm();
+    
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }    
     
     private void initDb(){
         Map<String, Object> overrides = new HashMap<String, Object>();
@@ -81,7 +89,7 @@ public class ClosureMojo extends AbstractMojo{
         try {
             initDb();
             
-            Ontology o = null;
+            OntologyVersion ontologyVersion = null;
             HibernateParser hibParser = HibernateParserFactory.getParser(Parser.valueOf(parserType));
 //            if (descriptionsFile != null){
 //                o = hibParser.populateDbWithDescriptions(
@@ -92,25 +100,27 @@ public class ClosureMojo extends AbstractMojo{
 //                        em);
 //            } else 
                 if (conceptsFile != null){
-                o = hibParser.populateDb(
-                        DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = hibParser.populateDb(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE,   
                         new FileInputStream(conceptsFile), 
                         new FileInputStream(triplesFile), 
                         em);                        
             } else {
-                o = hibParser.populateDbFromStatementsOnly(
-                        DEFAULT_ONTOLOGY_NAME, 
+                ontologyVersion = hibParser.populateDbFromStatementsOnly(
+                        SnomedFlavours.INTERNATIONAL,
+                        DEFAULT_TAGGED_ON_DATE,    
                         new FileInputStream(triplesFile), 
                         new FileInputStream(triplesFile), 
                         em);
             }             
             
-            if (o == null){
+            if (ontologyVersion == null){
                 throw new InvalidInputException("Parsing failed");
             }
             
             TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
-            query.setParameter("ontologyId", o.getId());
+            query.setParameter("ontologyId", ontologyVersion.getId());
             query.setHint("org.hibernate.cacheable", Boolean.TRUE);
             query.setHint("org.hibernate.readOnly", Boolean.TRUE);
             query.setHint("org.hibernate.cacheMode", CacheMode.GET);

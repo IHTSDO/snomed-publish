@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.google.common.base.Stopwatch;
-import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.service.manifest.model.Manifest;
 import com.ihtsdo.snomed.service.manifest.parser.FileSystemParser;
 import com.ihtsdo.snomed.service.manifest.parser.RefsetCollectionParser.Mode;
@@ -40,6 +42,15 @@ import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 
 public class ManifestMain {
     private static final Logger LOG = LoggerFactory.getLogger( ManifestMain.class );
+
+    protected static final Date DEFAULT_TAGGED_ON_DATE;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON_DATE = new Date(utilDate.getTime());        
+    }
+    
     
     private EntityManagerFactory emf  = null;
     private EntityManager em          = null;
@@ -105,7 +116,7 @@ public class ManifestMain {
             
             createManifestFolder(manifestFolder);
             
-            Ontology o = loadSnomedData(conceptFile, descriptionFile, parser);
+            OntologyVersion o = loadSnomedData(conceptFile, descriptionFile, parser);
 
             Manifest manifest = fsParser.setParsemode(Mode.STRICT).parse(releaseFolder, o, em);
             
@@ -138,13 +149,14 @@ public class ManifestMain {
 		}
 	}
 
-	private Ontology loadSnomedData(File conceptFile, File descriptionFile,
+	private OntologyVersion loadSnomedData(File conceptFile, File descriptionFile,
 			HibernateParserFactory.Parser parser) throws IOException,
 			FileNotFoundException {
 	    LOG.info("Populating concepts and descriptions");
 		HibernateParser hibParser = HibernateParserFactory.getParser(parser);
-		Ontology o = hibParser.populateConceptAndDescriptions(
-		        "manifest ontology", 
+		OntologyVersion o = hibParser.populateConceptAndDescriptions(
+		        SnomedFlavours.INTERNATIONAL,
+		        DEFAULT_TAGGED_ON_DATE,
 		        new FileInputStream(conceptFile), 
 		        new FileInputStream(descriptionFile), 
 		        em);

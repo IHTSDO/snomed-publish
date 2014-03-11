@@ -99,6 +99,9 @@ public abstract class HibernateParser {
         }
 
         OntologyVersion ontologyVersion = createOntologyVersion(em, snomedFlavour, taggedOn);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
+        
         populateConcepts(conceptsStream, em, ontologyVersion);
         populateStatements(statementStream, em, ontologyVersion);
         createIsKindOfHierarchy(em, ontologyVersion);
@@ -125,6 +128,9 @@ public abstract class HibernateParser {
         }
 
         OntologyVersion ontologyVersion = createOntologyVersion(em, snomedFlavour, taggedOn);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();        
+        
         populateConcepts(conceptsStream, em, ontologyVersion);
         populateDescriptions(descriptionStream, em, ontologyVersion);
         //createIsKindOfHierarchy(em, ontology);
@@ -152,7 +158,11 @@ public abstract class HibernateParser {
             doCommit=true;
         }
         
+        
         OntologyVersion ontologyVersion = createOntologyVersion(em, snomedFlavour, taggedOn);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
+
         
         populateConcepts(conceptsStream, em, ontologyVersion);
         populateDescriptions(descriptionStream, em, ontologyVersion);
@@ -181,6 +191,10 @@ public abstract class HibernateParser {
         }
         
         OntologyVersion ontologyVersion = createOntologyVersion(em, snomedFlavour, taggedOn);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
+        
+        
         populateConceptsFromStatements(statementStream, em, ontologyVersion);
         populateStatements(statementStreamAgain, em, ontologyVersion);
         createIsKindOfHierarchy(em, ontologyVersion);
@@ -207,6 +221,9 @@ public abstract class HibernateParser {
         }
         
         OntologyVersion ontologyVersion = createOntologyVersion(em, snomedFlavour, taggedOn);
+        em.getTransaction().commit();        
+        em.getTransaction().begin();
+        
         populateConceptsFromStatementsAndDescriptions(statementStream, descriptionStream, em, ontologyVersion);
         populateStatements(statementStreamAgain, em, ontologyVersion);
         populateDescriptions(descriptionStreamAgain, em, ontologyVersion);

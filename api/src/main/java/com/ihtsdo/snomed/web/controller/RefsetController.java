@@ -2,7 +2,6 @@ package com.ihtsdo.snomed.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
+import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
@@ -106,10 +105,10 @@ public class RefsetController {
             
             response.setRefset(
                 RefsetDto.getBuilder(
-                        deleted.getId(),
                         deleted.getSource(), 
                         deleted.getType(), 
-                        SnomedReleaseDto.getBuilder(deleted.getSnomedRelease().getId(), new Date()).build(),
+                        deleted.getOntologyVersion().getFlavour(),
+                        deleted.getOntologyVersion().getTaggedOn(),
                         ConceptDto.parse(deleted.getRefsetConcept()),
                         ConceptDto.parse(deleted.getModuleConcept()),
                         deleted.getTitle(),
@@ -180,6 +179,11 @@ public class RefsetController {
             LOG.debug("Create refset failed", e);
             response.setStatus(Status.FAIL);
             response.setCode(RefsetResponseDto.FAIL_VALIDATION);
+        } catch (InvalidSnomedDateFormatException e) {
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), "snomedReleaseDate", refsetDto.getSnomedReleaseDate(),
+                    false, null,null, "xml.response.error.invalid.date.format"));
+            return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         } 
         
         return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.NOT_ACCEPTABLE);
@@ -189,10 +193,10 @@ public class RefsetController {
     private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
         response.setRefset(
                 RefsetDto.getBuilder(
-                        updated.getId(),
                         updated.getSource(), 
                         updated.getType(), 
-                        SnomedReleaseDto.getBuilder(updated.getSnomedRelease().getId(), new Date()).build(),
+                        updated.getOntologyVersion().getFlavour(),
+                        updated.getOntologyVersion().getTaggedOn(),
                         ConceptDto.parse(updated.getRefsetConcept()),
                         ConceptDto.parse(updated.getModuleConcept()),
                         updated.getTitle(),
@@ -228,18 +232,18 @@ public class RefsetController {
     }    
  
     private RefsetDto getRefsetDto(String pubId) {
-        Refset refset = refsetService.findByPublicId(pubId);
+        Refset found = refsetService.findByPublicId(pubId);
 
         return RefsetDto.getBuilder(
-                refset.getId(),
-                refset.getSource(), 
-                refset.getType(), 
-                SnomedReleaseDto.getBuilder(refset.getSnomedRelease().getId(), new Date()).build(),
-                ConceptDto.parse(refset.getRefsetConcept()),
-                ConceptDto.parse(refset.getModuleConcept()),
-                refset.getTitle(),
-                refset.getDescription(), 
-                refset.getPublicId(), 
-                PlanDto.parse(refset.getPlan())).build();
+                found.getSource(), 
+                found.getType(), 
+                found.getOntologyVersion().getFlavour(),
+                found.getOntologyVersion().getTaggedOn(),
+                ConceptDto.parse(found.getRefsetConcept()),
+                ConceptDto.parse(found.getModuleConcept()),
+                found.getTitle(),
+                found.getDescription(), 
+                found.getPublicId(), 
+                PlanDto.parse(found.getPlan())).build();
     }
 }

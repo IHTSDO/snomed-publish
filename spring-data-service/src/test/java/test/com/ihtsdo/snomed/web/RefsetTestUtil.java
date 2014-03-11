@@ -1,11 +1,17 @@
 package test.com.ihtsdo.snomed.web;
 
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyFlavour;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
+import com.ihtsdo.snomed.model.SnomedOntology;
 import com.ihtsdo.snomed.model.refset.Member;
 
 /**
@@ -13,6 +19,29 @@ import com.ihtsdo.snomed.model.refset.Member;
  */
 public class RefsetTestUtil {
 
+    static Date DEFAULT_TAGGED_ON;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON = new Date(utilDate.getTime());        
+    }    
+        
+    
+    public static Ontology createOntology() {
+        OntologyVersion ov = new OntologyVersion();
+        ov.setTaggedOn(DEFAULT_TAGGED_ON);
+        OntologyFlavour of = new OntologyFlavour();
+        of.setPublicId(SnomedFlavours.INTERNATIONAL.getPublicIdString());
+        of.setLabel(SnomedFlavours.INTERNATIONAL.getLabel());
+        Ontology o = new Ontology();
+        o.setLabel(SnomedOntology.LABEL);
+        o.setPublicId(SnomedOntology.PUBLIC_ID);
+        o.addFlavour(of);
+        of.addVersion(ov);
+        return o;
+    }     
+    
 //    public static RefsetDto createRefsetDto(Long id, Long concept, String publicId, String title, String description) {
 //        RefsetDto dto = new RefsetDto();
 //

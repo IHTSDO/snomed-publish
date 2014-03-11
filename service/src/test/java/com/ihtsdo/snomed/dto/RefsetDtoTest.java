@@ -1,10 +1,5 @@
 package com.ihtsdo.snomed.dto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Locale;
 import java.util.Set;
 
@@ -25,8 +20,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.SnomedReleaseDto;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyFlavour;
+import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.test.RefsetTestUtil;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { 
@@ -44,11 +47,15 @@ public class RefsetDtoTest {
     @Before
     public void setUp() {
         
+        Ontology o = RefsetTestUtil.createOntology();
+        OntologyFlavour of = o.getFlavours().iterator().next();
+        OntologyVersion ov = of.getVersions().iterator().next();
+        
         successDto = RefsetDto.getBuilder(
-                null, 
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                new SnomedReleaseDto(1l), 
+                of,
+                ov.getTaggedOn(),
                 new ConceptDto(1234l), 
                 new ConceptDto(2345l), 
                 "title1", 
