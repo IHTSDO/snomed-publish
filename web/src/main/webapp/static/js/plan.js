@@ -97,7 +97,7 @@ Handlebars.registerHelper('bindings', function(options) {
       return '../' + this.get('publicId') + '.json';
     }.property('publicId'),
     conceptUrl: function(){
-      return 'http://browser.snomedtools.com/version/1/concept/' + this.get('concept');
+      return '/version/1/concept/' + this.get('concept');
     }.property(),
     rules: function (){
       console.log('in rules');

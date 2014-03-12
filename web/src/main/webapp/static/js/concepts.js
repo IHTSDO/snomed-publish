@@ -6,7 +6,7 @@ Handlebars.registerHelper('conceptUrl', function(options) {
 
   console.log('in concept url helper, concept is: ' + JSON.stringify(concept));
   
-  return 'http://browser.snomedtools.com/version/1/concept/' + concept.get('id');
+  return '/version/1/concept/' + concept.get('id');
 
   return bind;
 });

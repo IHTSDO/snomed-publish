@@ -12,7 +12,7 @@
   <title>Snomed SPARQL query</title>
   <meta name="description" content="Snomed browser">
   <meta name="author" content="Henrik Pettersen, Sparkling Ideas">
-  <link rel="stylesheet" href="http://browser.snomedtools.com/static/css/styles.css?v=1.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=1.0">
   <script type="text/javascript">
   function changeOntology(value) {
       var redirect;
@@ -40,7 +40,7 @@
 </head>
 <body id="sparql">
   <div id="company" class="clearfix">
-    <img class="logo" src="http://browser.snomedtools.com/static/img/logo.symbol.png"/>
+    <img class="logo" src="/static/img/logo.symbol.png"/>
     <h1>SNOMED Clinical Terms</h1>
     <div id="navigation">
       <div id="logout">
@@ -149,17 +149,17 @@
                   <c:choose>
                     <c:when test="${b.isConcept()}">
                       <div class="concept binding">
-                        <a href="http://browser.snomedtools.com/version/1/concept/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getDisplayName()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="/version/1/concept/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getDisplayName()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isStatement()}">
                       <div class="statement concept binding">
-                        <a href="http://browser.snomedtools.com/version/1/statement/<c:url value="${o.getSerialisedId()}"/>">Statement</a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="/version/1/statement/<c:url value="${o.getSerialisedId()}"/>">Statement</a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isDescription()}">
                       <div class="description concept binding">
-                        <a href="http://browser.snomedtools.com/version/1/description/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
+                        <a href="/version/1/description/<c:url value="${o.getSerialisedId()}"/>"><c:out value="${o.getTerm()}"/></a><div class="id">[<c:out value="${o.getSerialisedId()}"/>]</div>
                       </div>
                     </c:when>
                     <c:when test="${b.isDatatype()}">

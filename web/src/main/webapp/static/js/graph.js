@@ -27,7 +27,7 @@ MyApp.ApplicationRoute = Ember.Route.extend({
   actions:{
     click: function(concept){
       console.log('nothing handled click event!')
-      //window.location.assign("http://browser.snomedtools.com/version/1/concept/" + concept.id);
+      //window.location.assign("/version/1/concept/" + concept.id);
     }
   },
 });
@@ -426,13 +426,13 @@ MyApp.SingleResult = Ember.Object.extend({
   value: null,
   url: function(){
     if (this.get('isConcept')){
-      return "http://browser.snomedtools.com/version/1/concept/" + this.get('concept.id');
+      return "/version/1/concept/" + this.get('concept.id');
     }
     if (this.get('isDescription')){
-      return "http://browser.snomedtools.com/version/1/description/" + this.get('description.id');
+      return "/version/1/description/" + this.get('description.id');
     }
     if (this.get('isStatement')){
-      return "http://browser.snomedtools.com/version/1/statement/" + this.get('statement.id');
+      return "/version/1/statement/" + this.get('statement.id');
     }else{
       return "error!";
     }

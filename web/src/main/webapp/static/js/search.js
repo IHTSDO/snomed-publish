@@ -16,7 +16,7 @@ MyApp.ApplicationRoute = Ember.Route.extend({
   },
   actions:{
     click: function(concept){
-      window.location.assign("http://browser.snomedtools.com/version/1/concept/" + concept.id);
+      window.location.assign("/version/1/concept/" + concept.id);
     }
   },
 }); 

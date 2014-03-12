@@ -266,7 +266,7 @@ MyApp.TextSearchModalView = Ember.View.extend({
     active: null,
     effectiveTime: null,
     url: function(){
-      return "http://browser.snomedtools.com/version/1/concept/" + this.get('id') 
+      return "/version/1/concept/" + this.get('id')
     }.property('id')
   });
 

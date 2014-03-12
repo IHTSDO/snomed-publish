@@ -13,7 +13,7 @@ MyApp.Router.map(function() {
 MyApp.ApplicationRoute = Ember.Route.extend({
   actions: {
     click: function(concept){
-      window.open('http://browser.snomedtools.com/version/1/concept/' + concept.get('id'));
+      window.open('/version/1/concept/' + concept.get('id'));
       return false;
     },
   },
