@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,7 +47,7 @@ public class OntologyVersion {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     private OntologyFlavour flavour;
     
     @NotNull
@@ -57,13 +58,13 @@ public class OntologyVersion {
     @Enumerated
     private Source source = Source.UNKNOWN;
     
-    @OneToMany(mappedBy="ontologyVersion", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="ontologyVersion", cascade=CascadeType.ALL)
     private Set<Statement> statements = new HashSet<>();
 
-    @OneToMany(mappedBy="ontologyVersion", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="ontologyVersion", cascade=CascadeType.ALL)
     private Set<Concept> concepts = new HashSet<>();
 
-    @OneToMany(mappedBy="ontologyVersion", cascade=CascadeType.ALL)
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="ontologyVersion", cascade=CascadeType.ALL)
     private Set<Description> descriptions = new HashSet<>();
     
     @NotNull private Date creationTime;
@@ -91,9 +92,10 @@ public class OntologyVersion {
                 add("id", getId()).
                 add("source", getSource()).
                 add("taggedOn", getTaggedOn()).
-                add("statements", getStatements() == null ? 0 : getStatements().size()).
-                add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
-                add("descriptions", getDescriptions() == null ? 0 : getDescriptions().size()).
+                add("status", getStatus()).
+                //add("statements", getStatements() == null ? 0 : getStatements().size()).
+                //add("concepts", getConcepts() == null ? 0 : getConcepts().size()).
+                //add("descriptions", getDescriptions() == null ? 0 : getDescriptions().size()).
                 add("isA", (isKindOfPredicate == null) ? "not set" : "set").toString();
     }
 
@@ -104,10 +106,12 @@ public class OntologyVersion {
             if (
                 //java.util.Objects.equals(version.getId(), getId()) &&
                 java.util.Objects.equals(version.getSource(), getSource()) &&
-                java.util.Objects.equals(version.getStatements(), getStatements()) &&
-                java.util.Objects.equals(version.getConcepts(), getConcepts()) &&
-                java.util.Objects.equals(version.getTaggedOn(), getTaggedOn()) &&
-                java.util.Objects.equals(version.getDescriptions(), getDescriptions()))
+                java.util.Objects.equals(version.getStatus(), getStatus()) &&
+                //java.util.Objects.equals(version.getStatements(), getStatements()) &&
+                //java.util.Objects.equals(version.getConcepts(), getConcepts()) &&
+                java.util.Objects.equals(version.getTaggedOn(), getTaggedOn()) )//&&
+                //java.util.Objects.equals(version.getDescriptions(), getDescriptions()))
+               
             {
                 return true;
             }

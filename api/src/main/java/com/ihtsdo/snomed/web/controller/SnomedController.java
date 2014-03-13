@@ -1,5 +1,8 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.sql.Date;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -12,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ihtsdo.snomed.dto.refset.OntologyFlavourDto;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Description;
 import com.ihtsdo.snomed.model.Statement;
@@ -41,6 +46,24 @@ public class SnomedController {
     
     @Inject
     OntologyVersionService ontologyVersionService;    
+
+    @Transactional
+    @RequestMapping(value = "extensions", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<OntologyFlavourDto> getAllSnomedExtensions(){
+        return null;
+    }
+         
+    @Transactional
+    @RequestMapping(value = "extension/{publicId}", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<Date> getAllSnomedReleasesForExtension(String publicId){
+        return null;
+    }    
     
     @Transactional
     @RequestMapping(value = "concept/{id}", 

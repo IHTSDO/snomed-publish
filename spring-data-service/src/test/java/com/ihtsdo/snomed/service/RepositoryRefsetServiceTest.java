@@ -1,6 +1,5 @@
-package com.ihtsdo.snomed.web.service;
+package com.ihtsdo.snomed.service;
 
-import java.sql.Date;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,9 @@ import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
+import com.ihtsdo.snomed.exception.OntologyVersionNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
@@ -40,7 +41,6 @@ import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.Ontology;
 import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.OntologyVersion;
-import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.repository.ConceptRepository;
@@ -54,7 +54,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -132,12 +131,12 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void create() throws ValidationException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException{
+    public void create() throws ValidationException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException{
         
         RefsetDto created = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                of,
+                of.getPublicId(),
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 
@@ -165,7 +164,7 @@ public class RepositoryRefsetServiceTest {
         when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
         
         when(ontologyVersionServiceMock.findByFlavourAndTaggedOn(
-                created.getSnomedExtension().getPublicId(), 
+                created.getSnomedExtension(), 
                 created.getSnomedReleaseDateAsDate())).thenReturn(ov);
 
         Refset returned = refsetService.create(created);
@@ -178,7 +177,7 @@ public class RepositoryRefsetServiceTest {
         //verify(planServiceMock, times(1)).findById(any(Long.class));
         verify(planServiceMock, times(1)).create(any(PlanDto.class));
         verify(ontologyVersionServiceMock, times(1)).findByFlavourAndTaggedOn(
-                created.getSnomedExtension().getPublicId(), created.getSnomedReleaseDateAsDate());
+                created.getSnomedExtension(), created.getSnomedReleaseDateAsDate());
         verifyNoMoreInteractions(refsetRepoMock);
         verifyNoMoreInteractions(conceptRepoMock);
         verifyNoMoreInteractions(planServiceMock);
@@ -263,12 +262,12 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test
-    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException{
+    public void update() throws ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, RefsetNotFoundException, RefsetConceptNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, ParseException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException{
                 
         RefsetDto updatedDto = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                of, 
+                of.getPublicId(), 
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 
@@ -312,8 +311,8 @@ public class RepositoryRefsetServiceTest {
         when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId())).thenReturn(refsetConcept);
         when(conceptRepoMock.findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId())).thenReturn(moduleConcept);
         when(ontologyVersionServiceMock.findByFlavourAndTaggedOn(
-                eq(SnomedFlavours.INTERNATIONAL.getPublicIdString()), 
-                eq(ov.getTaggedOn()))).thenReturn(ov);
+                updatedDto.getSnomedExtension(), 
+                updatedDto.getSnomedReleaseDateAsDate())).thenReturn(ov);
         
         Refset returned = refsetService.update(updatedDto);
         
@@ -326,7 +325,7 @@ public class RepositoryRefsetServiceTest {
         verify(planServiceMock, times(1)).update(any(PlanDto.class));
 
         verify(ontologyVersionServiceMock, times(1)).findByFlavourAndTaggedOn(
-                updatedDto.getSnomedExtension().getPublicId(), updatedDto.getSnomedReleaseDateAsDate());        
+                updatedDto.getSnomedExtension(), updatedDto.getSnomedReleaseDateAsDate());        
         
         verifyNoMoreInteractions(refsetRepoMock);
         verifyNoMoreInteractions(conceptRepoMock);
@@ -337,12 +336,12 @@ public class RepositoryRefsetServiceTest {
     }
     
     @Test(expected = RefsetNotFoundException.class)
-    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException {
+    public void updateWhenRefsetIsNotFound() throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException {
 
         RefsetDto updated = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
-                of,
+                of.getPublicId(),
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
                 ConceptDto.parse(moduleConcept), 

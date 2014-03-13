@@ -1,8 +1,10 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -18,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,13 +27,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.LocaleResolver;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
+import com.ihtsdo.snomed.exception.OntologyVersionNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
@@ -48,7 +52,6 @@ import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
 
 @Controller
 @RequestMapping("/refsets")
-@Transactional(value = "transactionManager")
 public class RefsetController {
     private static final Logger LOG = LoggerFactory.getLogger(RefsetController.class);
     
@@ -60,11 +63,13 @@ public class RefsetController {
     @Inject
     RefsetErrorBuilder refsetErrorBuilder;
     
+    @Inject
+    LocaleResolver localeResolver;
+    
     @Resource
     private MessageSource messageSource;
     
     
-    @Transactional
     @RequestMapping(value = "", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
@@ -73,7 +78,6 @@ public class RefsetController {
         return getRefsetsDto();
     }    
         
-    @Transactional
     @RequestMapping(value = "{refsetName}", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
@@ -82,7 +86,6 @@ public class RefsetController {
         return getRefsetDto(refsetName);
     }    
     
-    @Transactional
     @RequestMapping(value = "{refsetName}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
@@ -91,7 +94,6 @@ public class RefsetController {
         return new XmlRefsetConcepts(getXmlConceptDtos(refsetName));
     }
     
-    @Transactional
     @RequestMapping(value = "{refsetName}", 
             method = RequestMethod.DELETE, 
             consumes=MediaType.ALL_VALUE,
@@ -107,7 +109,7 @@ public class RefsetController {
                 RefsetDto.getBuilder(
                         deleted.getSource(), 
                         deleted.getType(), 
-                        deleted.getOntologyVersion().getFlavour(),
+                        deleted.getOntologyVersion().getFlavour().getPublicId(),
                         deleted.getOntologyVersion().getTaggedOn(),
                         ConceptDto.parse(deleted.getRefsetConcept()),
                         ConceptDto.parse(deleted.getModuleConcept()),
@@ -131,13 +133,12 @@ public class RefsetController {
         }
     }
 
-    @Transactional
     @RequestMapping(value = "", method = RequestMethod.POST, 
     produces = {MediaType.APPLICATION_JSON_VALUE }, 
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public ResponseEntity<RefsetResponseDto> createRefset(@Valid @RequestBody RefsetDto refsetDto, 
-            BindingResult bindingResult)
+            BindingResult bindingResult, HttpServletRequest request)
     {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
@@ -165,7 +166,7 @@ public class RefsetController {
         } catch (NonUniquePublicIdException e) {
             bindingResult.addError(new FieldError(
                     bindingResult.getObjectName(), "publicId", refsetDto.getPublicId(),
-                    false, null,null, "xml.response.error.publicid.not.unique"));
+                    false, null, null, "xml.response.error.publicid.not.unique"));
             return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
         } catch (RefsetConceptNotFoundException e) {
             LOG.debug("Create refset failed", e);
@@ -182,9 +183,30 @@ public class RefsetController {
         } catch (InvalidSnomedDateFormatException e) {
             bindingResult.addError(new FieldError(
                     bindingResult.getObjectName(), "snomedReleaseDate", refsetDto.getSnomedReleaseDate(),
-                    false, null,null, "xml.response.error.invalid.date.format"));
+                    false, new String[] {e.getDateString()},null, "xml.response.error.invalid.date.format"));
             return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
-        } 
+        } catch (OntologyVersionNotFoundException e) {
+            String releaseDateString = DateFormat.getDateInstance(DateFormat.LONG, request.getLocale()).format(e.getReleaseDate());            
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), 
+                    "snomedExtension", refsetDto.getSnomedReleaseDate(),
+                    false, null, null,
+                    messageSource.getMessage(
+                            "xml.response.error.snomed.version.not.found", 
+                            new String[] {e.getFlavour().getLabel(), releaseDateString},
+                            Locale.UK)));
+            return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+        } catch (OntologyFlavourNotFoundException e) {
+            bindingResult.addError(new FieldError(
+                    bindingResult.getObjectName(), 
+                    "snomedExtension", refsetDto.getSnomedReleaseDate(),
+                    false, null, null, 
+                    messageSource.getMessage(
+                            "xml.response.error.snomed.flavour.not.found", 
+                            new String[] {e.getFlavourPublicIdString()},
+                            Locale.UK)));
+            return new ResponseEntity<RefsetResponseDto>(refsetErrorBuilder.build(bindingResult, response, returnCode), HttpStatus.NOT_ACCEPTABLE);
+        }
         
         return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.NOT_ACCEPTABLE);
     }
@@ -195,7 +217,7 @@ public class RefsetController {
                 RefsetDto.getBuilder(
                         updated.getSource(), 
                         updated.getType(), 
-                        updated.getOntologyVersion().getFlavour(),
+                        updated.getOntologyVersion().getFlavour().getPublicId(),
                         updated.getOntologyVersion().getTaggedOn(),
                         ConceptDto.parse(updated.getRefsetConcept()),
                         ConceptDto.parse(updated.getModuleConcept()),
@@ -237,7 +259,7 @@ public class RefsetController {
         return RefsetDto.getBuilder(
                 found.getSource(), 
                 found.getType(), 
-                found.getOntologyVersion().getFlavour(),
+                found.getOntologyVersion().getFlavour().getPublicId(),
                 found.getOntologyVersion().getTaggedOn(),
                 ConceptDto.parse(found.getRefsetConcept()),
                 ConceptDto.parse(found.getModuleConcept()),

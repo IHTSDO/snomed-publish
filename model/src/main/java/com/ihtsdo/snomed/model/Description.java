@@ -4,8 +4,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,7 +41,7 @@ public class Description {
     private Concept about;
     private String languageCode;
     @XmlTransient
-    @OneToOne 
+    @OneToOne(fetch=FetchType.LAZY)
     private OntologyVersion ontologyVersion;
     
     //RF1

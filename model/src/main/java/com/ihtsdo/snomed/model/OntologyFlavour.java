@@ -38,7 +38,7 @@ public class OntologyFlavour {
     @ManyToOne(fetch=FetchType.LAZY)
     private Ontology ontology;
     
-    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="flavour")
+    @OneToMany(cascade=CascadeType.ALL, fetch = FetchType.LAZY, mappedBy="flavour")
     private Set<OntologyVersion> versions = new HashSet<>();
     
     @NotNull

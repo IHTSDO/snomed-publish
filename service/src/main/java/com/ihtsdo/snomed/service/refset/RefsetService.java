@@ -7,7 +7,9 @@ import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
+import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
+import com.ihtsdo.snomed.exception.OntologyVersionNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
@@ -25,9 +27,9 @@ public interface RefsetService {
 
     public abstract Refset findByPublicId(String publicId);
 
-    public abstract Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException;
+    public abstract Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException;
 
-    public abstract Refset create(RefsetDto created) throws RefsetConceptNotFoundException, ValidationException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException;
+    public abstract Refset create(RefsetDto created) throws RefsetConceptNotFoundException, ValidationException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException;
 
     
     public abstract Refset delete(Long refsetId) throws RefsetNotFoundException;

@@ -9,8 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -79,9 +81,9 @@ public class Concept {
     
     //@Index(name="conceptSerialisedIdIndex")
     private long serialisedId;
-    @OneToOne 
+    @OneToOne(fetch=FetchType.LAZY)
     private OntologyVersion ontologyVersion;
-    @OneToMany(mappedBy="about")  
+    @OneToMany(mappedBy="about", fetch=FetchType.LAZY)  
     private Set<Description> description;
     private String fullySpecifiedName;
     
@@ -105,11 +107,11 @@ public class Concept {
     
     
     //STATEMENTS
-    @OneToMany(mappedBy="subject") 
+    @OneToMany(mappedBy="subject", fetch=FetchType.LAZY) 
     private Set<Statement> subjectOfStatements = new HashSet<Statement>(); 
-    @OneToMany(mappedBy="object")
+    @OneToMany(mappedBy="object", fetch=FetchType.LAZY)
     private Set<Statement> objectOfStatements = new HashSet<Statement>();    
-    @OneToMany(mappedBy="predicate")
+    @OneToMany(mappedBy="predicate", fetch=FetchType.LAZY)
     private Set<Statement> predicateOfStatements = new HashSet<Statement>();
     
     

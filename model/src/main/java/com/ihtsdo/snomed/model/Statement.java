@@ -31,7 +31,7 @@ public class Statement {
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Id 
     private long id;
-    @OneToOne
+    @OneToOne(fetch=FetchType.LAZY)
     private OntologyVersion ontologyVersion;
     @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.PERSIST)
     private Concept subject;

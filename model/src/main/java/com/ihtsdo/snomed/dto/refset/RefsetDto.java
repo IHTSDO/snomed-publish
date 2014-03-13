@@ -13,7 +13,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.refset.Refset.Source;
 import com.ihtsdo.snomed.model.refset.Refset.Type;
 
@@ -37,7 +36,7 @@ public class RefsetDto {
     private ConceptDto moduleConcept;
     
     @NotNull(message="You must select a default Snomed extension")
-    private OntologyFlavour snomedExtension;
+    private String snomedExtension;
     
     @NotNull(message="You must select a default Snomed release date")
     private String snomedReleaseDate;
@@ -178,14 +177,12 @@ public class RefsetDto {
 	public void setModuleConcept(ConceptDto moduleConcept) {
 		this.moduleConcept = moduleConcept;
 	}
-	
 
-
-    public OntologyFlavour getSnomedExtension() {
+    public String getSnomedExtension() {
         return snomedExtension;
     }
 
-    public void setSnomedExtension(OntologyFlavour snomedExtension) {
+    public void setSnomedExtension(String snomedExtension) {
         this.snomedExtension = snomedExtension;
     }
 
@@ -198,7 +195,7 @@ public class RefsetDto {
     }
    
 
-    public static Builder getBuilder(Source source, Type type, OntologyFlavour snomedExtension,
+    public static Builder getBuilder(Source source, Type type, String snomedExtension,
             Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
 			String publicId, PlanDto plan) {
         return new Builder(source, type, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
@@ -209,7 +206,7 @@ public class RefsetDto {
         private RefsetDto built;
         
         public Builder(Source source, Type type,
-                OntologyFlavour snomedExtension, Date snomedReleaseDate,
+                String snomedExtension, Date snomedReleaseDate,
                 ConceptDto refsetConcept, ConceptDto moduleConcept,
                 String title, String description, String publicId, PlanDto plan) 
         {

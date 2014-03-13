@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedOntology;
 import com.ihtsdo.snomed.repository.OntologyVersionRepository;
 
 @Transactional (value = "transactionManager", readOnly = true)
@@ -36,7 +37,7 @@ public class RepositoryOntologyVersionService implements OntologyVersionService 
     public OntologyVersion findByFlavourAndTaggedOn(String flavourPublicId,
             Date taggedOn) {
         LOG.debug("Retrieving Ontology Version with flavour [{}] and version date of [{}]", flavourPublicId, taggedOn);
-        return ontologyVersionRepository.findByFlavourAndTaggedOn(flavourPublicId, taggedOn);
+        return ontologyVersionRepository.findByFlavourAndTaggedOn(flavourPublicId, taggedOn,  SnomedOntology.PUBLIC_ID);
     }
     
     
