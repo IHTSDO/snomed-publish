@@ -81,7 +81,7 @@
         <entry key="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
         <entry key="hibernate.connection.charSet" value="UTF-8"/>
         <entry key="hibernate.format_sql" value="true"/>
-        <entry key="hibernate.show_sql" value="true"/>
+        <entry key="hibernate.show_sql" value="false"/>
     </util:map>
 
     <bean id="hibernateVendor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
