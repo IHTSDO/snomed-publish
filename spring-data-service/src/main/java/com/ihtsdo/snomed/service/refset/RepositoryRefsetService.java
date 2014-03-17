@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -347,19 +348,31 @@ public class RepositoryRefsetService implements RefsetService {
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
-                fillMembers(snapshotDto.getMemberDtos()),
+                fillMembers(snapshotDto.getMemberDtos(), refset.getModuleConcept()),
                 refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
         refset = refsetRepository.save(refset);
         return SnapshotDto.parse(snapshot);
     }    
+    
+    @Override
+    public Refset addMembers(Set<MemberDto> members, String publicId)
+            throws RefsetNotFoundException, ConceptIdNotFoundException {
+        
+        LOG.debug("Adding {} new members to refset {}", members.size(), publicId);
+        
+        Refset refset = findByPublicId(publicId);
+        refset.addMembers(fillMembers(members, refset.getModuleConcept()));
+        return refset;
+    }      
+    
 
     private Sort sortByAscendingTitle() {
         return new Sort(Sort.Direction.ASC, "title");
     }
     
-    private Set<Member> fillMembers(Set<MemberDto> memberDtos) throws ConceptIdNotFoundException  {
+    private Set<Member> fillMembers(Set<MemberDto> memberDtos, Concept defaultModule) throws ConceptIdNotFoundException  {
         Set<Member> members = new HashSet<Member>();
         if ((memberDtos == null) || (memberDtos.isEmpty())){
             return members;
@@ -392,22 +405,18 @@ public class RepositoryRefsetService implements RefsetService {
 				}
 
             }
-            members.add(Member.getBuilder(module, component).build());
+            members.add(Member.
+                    getBuilder(module == null ? defaultModule : module, component).
+                    publicId(memberDto.getPublicId() == null ? generatePublicId() : memberDto.getPublicId()).
+                    build());
         }
         return members;
     }
 
-    @Override
-    public Refset addMembers(Set<MemberDto> members, String publicId)
-            throws RefsetNotFoundException, ConceptIdNotFoundException {
-        
-        LOG.debug("Adding {} new members to refset {}", members.size(), publicId);
-        
-        Refset refset = findByPublicId(publicId);
-        refset.addMembers(fillMembers(members));
-        return refset;
-    }      
-
+    private String generatePublicId(){
+        return UUID.randomUUID().toString();
+    }
+    
     
 
 

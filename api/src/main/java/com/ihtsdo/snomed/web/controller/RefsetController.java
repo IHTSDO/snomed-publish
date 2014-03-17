@@ -32,6 +32,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.MemberDto;
+import com.ihtsdo.snomed.dto.refset.MembersDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
@@ -44,10 +45,12 @@ import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
+import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
@@ -62,6 +65,9 @@ public class RefsetController {
 
     @Inject
     RefsetService refsetService;
+    
+    @Inject
+    MemberService memberService;    
         
     @Inject
     RefsetErrorBuilder refsetErrorBuilder;
@@ -95,12 +101,34 @@ public class RefsetController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addMembers(@Valid @RequestBody Set<MemberDto> members, 
-            BindingResult bindingResult, @PathVariable String refsetName, HttpServletRequest request) 
+            BindingResult bindingResult, @PathVariable String refsetName) 
                     throws RefsetNotFoundException, ConceptIdNotFoundException
     {
-        LOG.debug("Controller received request to ad new members to refset [{}]", refsetName);
+        LOG.debug("Controller received request to add new members to refset [{}]", refsetName);
         refsetService.addMembers(members, refsetName);
     }
+    
+    @RequestMapping(value = "{refsetName}/members", 
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseBody   
+    @ResponseStatus(HttpStatus.OK)
+    public MembersDto getMembers(@PathVariable String refsetName) 
+                    throws RefsetNotFoundException, ConceptIdNotFoundException
+    {
+        LOG.debug("Controller received request to retrieve members for refset [{}]", refsetName);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName);
+        
+        List<MemberDto> memberDtos = new ArrayList<MemberDto>();
+        for (Member m : members){
+            memberDtos.add(MemberDto.parse(m));
+        }
+        return new MembersDto(memberDtos);
+        
+    }
+    
+        
     
     
     @RequestMapping(value = "{refsetName}/concepts.json", 

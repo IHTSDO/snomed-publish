@@ -38,7 +38,7 @@ public class Member {
     
     @OneToOne
 	private Concept module;
-	
+	    
     @OneToOne 
 	private Concept component;
 	
@@ -65,12 +65,13 @@ public class Member {
     public boolean equals(Object o){
         if (o instanceof Member){
         	Member r = (Member) o;
-            if (Objects.equal(r.getComponent(), this.getComponent()) &&
+            if (Objects.equal(r.getComponent(), this.getComponent()) //&&
                     //Hibernate converts util data to timestamp, so stright equals don't work
-                Objects.equal(r.getEffective().toString(), this.getEffective().toString()) &&
-                Objects.equal(r.getModule(), this.getModule()) &&
-                r.isActive() == this.isActive() &&
-                Objects.equal(r.getPublicId(), this.getPublicId()))
+                //Objects.equal(r.getEffective().toString(), this.getEffective().toString()) &&
+                //Objects.equal(r.getModule(), this.getModule()) &&
+                //r.isActive() == this.isActive()// &&
+                //Objects.equal(r.getPublicId(), this.getPublicId())
+                )
             {
                 return true;
             }
@@ -81,6 +82,7 @@ public class Member {
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
+                .add("publicId", getPublicId())
                 .add("id", getId())
                 .add("effective", getEffective())
                 .add("isActive", isActive())
@@ -92,12 +94,13 @@ public class Member {
     @Override
     public int hashCode(){
    	 return java.util.Objects.hash(
-   			 getPublicId(),
+   			 //getPublicId(),
    			 //Hibernate converts util data to timestamp, so stright equals don't work
-   			 (getEffective() == null) ? getEffective().toString() : null,
-   			 isActive(),
-   			 getComponent(),
-   			 getModule());
+   			 //(getEffective() == null) ? getEffective().toString() : null,
+   			 //isActive(),
+   			 getComponent()//,
+   			 //getModule()
+   			 );
     }   
 
     @PreUpdate
@@ -159,7 +162,7 @@ public class Member {
 	public void setComponent(Concept component) {
 		this.component = component;
 	}
-	
+
     public static Builder getBuilder(Concept module, Concept component) {
         return new Builder(module, component);
     }
@@ -187,8 +190,8 @@ public class Member {
             built.setModule(module);
             return this;
         }
-        public Builder serialisedId(String serialisedId){
-            built.setPublicId(serialisedId);
+        public Builder publicId(String publicId){
+            built.setPublicId(publicId);
             return this;
         }        
         public Member build() {
