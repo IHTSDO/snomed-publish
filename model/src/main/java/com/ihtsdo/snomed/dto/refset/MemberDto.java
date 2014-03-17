@@ -8,19 +8,21 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
 import com.ihtsdo.snomed.model.refset.Member;
 
 @XmlRootElement(name="member")
 @JsonRootName("member")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MemberDto {
-
-    protected Long id;
     
-    protected String serialisedId;
-    protected Date effective;
+    protected String publicId;
     protected boolean active;
+    
+    @NotNull(message="You must specify an effective time")
+    protected Date effective;    
     
     @NotNull(message="You must specify a component")
     protected ConceptDto component;
@@ -39,8 +41,7 @@ public class MemberDto {
 	
     public static MemberDto parse(Member member){
     	MemberDto created = MemberDto.getBuilder(
-    			member.getId(),
-    			member.getSerialisedId(),
+    			member.getPublicId(),
     			member.getModule() == null ? null : ConceptDto.parse(member.getModule()), 
     			ConceptDto.parse(member.getComponent()),
     			member.getEffective(),
@@ -55,7 +56,7 @@ public class MemberDto {
         	 MemberDto r = (MemberDto) o;
              if (Objects.equal(r.getComponent(), getComponent()) &&
             		 Objects.equal(r.getModule(), getModule()) &&
-            		 Objects.equal(r.getSerialisedId(), getSerialisedId()) );// &&
+            		 Objects.equal(r.getPublicId(), getPublicId()) );// &&
             		 //Objects.equal(r.getEffective(), getEffective()) &&
             		 //Objects.equal(r.isActive(), isActive()))
              {
@@ -68,7 +69,6 @@ public class MemberDto {
      @Override
      public String toString(){
          return Objects.toStringHelper(this)
-                 .add("id", getId())
                  .add("effective", getEffective())
                  .add("isActive", isActive())
                  .add("component", getComponent())
@@ -79,27 +79,19 @@ public class MemberDto {
      @Override
      public int hashCode(){
     	 return java.util.Objects.hash(
-    			 getSerialisedId(),
+    			 getPublicId(),
     			 //getEffective(),
     			 //isActive(),
     			 getComponent(),
     			 getModule());
      }   
 
-	public Long getId() {
-		return id;
+	public String getPublicId() {
+		return publicId;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getSerialisedId() {
-		return serialisedId;
-	}
-
-	public void setSerialisedId(String serialisedId) {
-		this.serialisedId = serialisedId;
+	public void setPublicId(String publicId) {
+		this.publicId = publicId;
 	}
 
 	public Date getEffective() {
@@ -135,33 +127,23 @@ public class MemberDto {
 	}
 	
     public static Builder getBuilder(ConceptDto module, ConceptDto component) {
-        return new Builder(0L, "", module, component, new Date(), true);
+        return new Builder("", module, component, new Date(), true);
     }
 
     public static Builder getBuilder(String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
-        return new Builder(null, serialisedId, module, component, effective, active);
-    }    
-    
-    public static Builder getBuilder(Long id, String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
-        return new Builder(id, serialisedId, module, component, effective, active);
+        return new Builder(serialisedId, module, component, effective, active);
     }
     
     public static class Builder {
         private MemberDto built;
 
-        Builder(Long id, String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
+        Builder(String serialisedId, ConceptDto module, ConceptDto component, Date effective, boolean active) {
             built = new MemberDto();
             built.setComponent(component);
             built.setModule(module);
-            built.setId(id);
-            built.setSerialisedId(serialisedId);
+            built.setPublicId(serialisedId);
             built.setEffective(effective);
             built.setActive(active);
-        }
-        
-        public Builder id(Long id){
-            built.setId(id);
-            return this;
         }
         
         public Builder component(ConceptDto component){
@@ -174,7 +156,7 @@ public class MemberDto {
             return this;
         }
         public Builder serialisedId(String serialisedId){
-            built.setSerialisedId(serialisedId);
+            built.setPublicId(serialisedId);
             return this;
         }        
         public MemberDto build() {

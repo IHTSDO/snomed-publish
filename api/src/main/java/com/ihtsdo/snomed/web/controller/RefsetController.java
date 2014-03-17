@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
 import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
@@ -84,7 +87,21 @@ public class RefsetController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody RefsetDto getRefset(@PathVariable String refsetName){
         return getRefsetDto(refsetName);
-    }    
+    }
+    
+    @RequestMapping(value = "{refsetName}/members", 
+            method = RequestMethod.POST, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addMembers(@Valid @RequestBody Set<MemberDto> members, 
+            BindingResult bindingResult, @PathVariable String refsetName, HttpServletRequest request) 
+                    throws RefsetNotFoundException, ConceptIdNotFoundException
+    {
+        LOG.debug("Controller received request to ad new members to refset [{}]", refsetName);
+        refsetService.addMembers(members, refsetName);
+    }
+    
     
     @RequestMapping(value = "{refsetName}/concepts.json", 
             method = RequestMethod.GET, 

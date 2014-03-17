@@ -137,14 +137,14 @@ public class SnapshotTest {
         assertEquals(s1, s);
     }
     
-    @Test
-    public void shouldNotBeEqual(){
-        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
-                .setParameter("id", s1.getId())
-                .getSingleResult();
-        s.setId(45l);
-        assertNotEquals(s1, s);
-    }    
+//    @Test
+//    public void shouldNotBeEqual(){
+//        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
+//                .setParameter("id", s1.getId())
+//                .getSingleResult();
+//        s.setId(45l);
+//        assertNotEquals(s1, s);
+//    }    
     
     @Test
     public void shouldHaveSameHashcode(){
@@ -155,13 +155,13 @@ public class SnapshotTest {
         assertEquals(s.hashCode(), s1.hashCode());
     }    
     
-    @Test
-    public void shouldNotHaveSameHashcode(){
-        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
-                .setParameter("id", s1.getId())
-                .getSingleResult();
-        s.setId(45L);
-        assertNotEquals(s.hashCode(), s1.hashCode());
-    }       
+//    @Test
+//    public void shouldNotHaveSameHashcode(){
+//        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
+//                .setParameter("id", s1.getId())
+//                .getSingleResult();
+//        s.setId(45L);
+//        assertNotEquals(s.hashCode(), s1.hashCode());
+//    }       
     
 }

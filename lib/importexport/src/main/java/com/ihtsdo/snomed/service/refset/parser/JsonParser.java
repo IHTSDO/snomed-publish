@@ -17,13 +17,6 @@ public class JsonParser extends BaseRefsetParser {
 	
 	@Override
 	public Set<MemberDto> parse(Reader reader) throws IOException, InvalidInputException {
-		List<MemberDto> members = mapper.readValue(reader, new TypeReference<List<MemberDto>>() { } ); 
-
-		//reset any internal ids, just in case
-		for (MemberDto m : members){
-			m.setId(0L);
-		}
-		
-		return new HashSet<>(members);
+		return new HashSet<>(mapper.<List<MemberDto>>readValue(reader, new TypeReference<List<MemberDto>>() { } ));
 	}	
 }

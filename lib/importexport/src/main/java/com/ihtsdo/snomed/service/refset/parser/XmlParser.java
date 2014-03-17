@@ -17,17 +17,8 @@ public class XmlParser extends BaseRefsetParser {
 	
 	@Override
 	public Set<MemberDto> parse(Reader reader) throws IOException, InvalidInputException {
-		
 		try {
-			MembersDto members = (MembersDto) JAXBContext.newInstance(MembersDto.class).createUnmarshaller().unmarshal(reader);
-			
-			//reset any internal ids, just in case
-			for (MemberDto m : members.getMembers()){
-				m.setId(0L);
-			}
-			
-			return new HashSet<>(members.getMembers());			
-			
+			return new HashSet<>(((MembersDto) JAXBContext.newInstance(MembersDto.class).createUnmarshaller().unmarshal(reader)).getMembers());
 		} catch (JAXBException e) {
 			throw new InvalidInputException("Unable to parse xml using domain model jaxb mappings", e);
 		}

@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.sql.Date;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -24,7 +25,6 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Index;
 
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 
 @Entity
 @org.hibernate.annotations.Table(appliesTo = "Snapshot",
@@ -37,7 +37,7 @@ public class Snapshot {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Member> members;
     
     @NotNull
@@ -81,7 +81,9 @@ public class Snapshot {
     public boolean equals(Object o){
         if (o instanceof Snapshot){
             Snapshot r = (Snapshot) o;
-            if (r.getId() == getId()){
+            if ((r.getPublicId() == this.getPublicId()) &&
+                (r.getTitle() == this.getTitle()) &&
+                (r.getDescription() == this.getDescription())){
                 return true;
             }
         }
@@ -99,13 +101,10 @@ public class Snapshot {
     
     @Override
     public int hashCode(){
-        if (getId() != null){
-            return Longs.hashCode(getId());
-        }else if (getPublicId() != null){
-            return getPublicId().hashCode();
-        }else{
-            return -1; //delegate to equals method
-        }
+        return java.util.Objects.hash(
+                getPublicId(),
+                getTitle(),
+                getDescription());
     }
 
     @PreUpdate
@@ -120,7 +119,17 @@ public class Snapshot {
         modificationTime = now;
     }    
     
+    
+    public Snapshot addMembers(List<Member> members){
+        getMembers().addAll(members);
+        return this;
+    }
 
+    public Snapshot addMember(Member member){
+        getMembers().add(member);
+        return this;
+    }    
+    
     public Long getId() {
         return id;
     }

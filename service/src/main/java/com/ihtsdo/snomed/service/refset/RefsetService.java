@@ -1,7 +1,9 @@
 package com.ihtsdo.snomed.service.refset;
 
 import java.util.List;
+import java.util.Set;
 
+import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
@@ -18,6 +20,8 @@ import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.refset.Refset;
 
 public interface RefsetService {
+    
+    public abstract Refset addMembers(Set<MemberDto> members, String publicId) throws RefsetNotFoundException, ConceptIdNotFoundException;
 
     public abstract List<Refset> findAll(int pageIndex);
 

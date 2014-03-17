@@ -41,7 +41,7 @@ public class Rf2Serialiser extends BaseSerialiser{
     public void writeDto(List<MemberDto> members) throws IOException {
     	for (MemberDto m : members){
     		writer.write(
-    				Objects.toString(m.getSerialisedId()) + DELIMITER +
+    				Objects.toString(m.getPublicId()) + DELIMITER +
     				sdf.format(m.getEffective()) + DELIMITER +
     				(m.isActive() ? '1' : '0') + DELIMITER +
     				(m.getModule() == null ? DEFAULT_MODULE_ID : Objects.toString(m.getModule().getId())) + DELIMITER +
@@ -54,7 +54,7 @@ public class Rf2Serialiser extends BaseSerialiser{
     public void write(List<Member> members) throws IOException {
     	for (Member m : members){
     		writer.write(
-    				Objects.toString(m.getSerialisedId()) + DELIMITER +
+    				Objects.toString(m.getPublicId()) + DELIMITER +
     				sdf.format(m.getEffective()) + DELIMITER +
     				(m.isActive() ? '1' : '0') + DELIMITER +
     				(m.getModule() == null ? DEFAULT_MODULE_ID : Objects.toString(m.getModule().getSerialisedId())) + DELIMITER +

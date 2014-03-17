@@ -395,8 +395,20 @@ public class RepositoryRefsetService implements RefsetService {
             members.add(Member.getBuilder(module, component).build());
         }
         return members;
+    }
+
+    @Override
+    public Refset addMembers(Set<MemberDto> members, String publicId)
+            throws RefsetNotFoundException, ConceptIdNotFoundException {
+        
+        LOG.debug("Adding {} new members to refset {}", members.size(), publicId);
+        
+        Refset refset = findByPublicId(publicId);
+        refset.addMembers(fillMembers(members));
+        return refset;
     }      
 
+    
 
 
 //    private Pageable constructPageSpecification(int pageIndex) {

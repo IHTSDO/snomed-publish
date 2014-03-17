@@ -29,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.exception.ConceptsCacheNotBuiltException;
-import com.ihtsdo.snomed.exception.ProgrammingException;
 import com.ihtsdo.snomed.model.Concept;
 
 @Entity
@@ -124,17 +122,17 @@ public class Plan {
     
     @Override
     public int hashCode(){
-        if (getId() == null){
-            return 0;
-        }
-        return Longs.hashCode(getId());
+        return Objects.hashCode(
+                getTerminal());
+                
     }
     
     @Override
     public boolean equals(Object o){
         if (o instanceof Plan){
             Plan r = (Plan) o;
-            if ((r.getId() == this.getId()) && (r.getTerminal()).equals(this.getTerminal())){
+            if (Objects.equal(r.getTerminal(), this.getTerminal()) && 
+                    Objects.equal(r.refreshAndGetConcepts(), this.refreshAndGetConcepts())){
                 return true;
             }
         }
@@ -142,22 +140,13 @@ public class Plan {
     }
     
     @Override
-    public String toString(){
-        try {
-            return Objects.toStringHelper(this)
-                    .add("id", getId())
-                    .add("terminal", getTerminal())
-                    .add("concepts", hasConcepts() ? getConcepts().size() : "0")
-                    .toString();
-        } catch (ConceptsCacheNotBuiltException e) {
-            //will never happen, because of the hasConcepts guard above ;-)
-            throw new ProgrammingException(e);
-        }
+    public String toString(){        
+        return Objects.toStringHelper(this)
+                .add("id", getId())
+                .add("terminal", getTerminal())
+                .add("concepts", refreshAndGetConcepts().size())
+                .toString();
     }    
-    
-    public boolean hasConcepts(){
-        return concepts != null;
-    }
 
     public Rule getTerminal() {
         return terminal;

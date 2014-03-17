@@ -3,7 +3,9 @@ package com.ihtsdo.snomed.model.refset;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -25,6 +27,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Index;
 
+import com.google.common.base.Objects;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.OntologyVersion;
 
@@ -70,6 +73,9 @@ public class Refset {
     @NotNull
     @OneToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
     private Plan plan;
+    
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    private Set<Member> members = new HashSet<>();
     
     @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
@@ -131,11 +137,32 @@ public class Refset {
         getSnapshotsMap().put(snapshot.getPublicId(), snapshot);
     }
     
+    public Refset addMembers(Set<Member> members){
+        getMembers().addAll(members);
+        return this;
+    }
+
+    public Refset addMember(Member member){
+        getMembers().add(member);
+        return this;
+    }    
+    
+    
     @Override
     public boolean equals(Object o){
         if (o instanceof Refset){
             Refset r = (Refset) o;
-            if (r.getId() == getId()){
+            if (Objects.equal(r.getSource(), this.getSource()) &&
+                    Objects.equal(r.getType(), this.getType()) &&
+                    Objects.equal(r.getOntologyVersion(), this.getOntologyVersion()) && 
+                    Objects.equal(r.getRefsetConcept(), this.getRefsetConcept()) &&
+                    Objects.equal(r.getModuleConcept(), this.getModuleConcept()) &&
+                    Objects.equal(r.getTitle(), this.getTitle()) &&
+                    Objects.equal(r.getDescription(), this.getDescription()) && 
+                    Objects.equal(r.getPublicId(), this.getPublicId()) &&
+                    Objects.equal(r.getPlan(), this.getPlan()) &&
+                    Objects.equal(r.getMembers(), this.getMembers()))
+            {
                 return true;
             }
         }
@@ -155,13 +182,13 @@ public class Refset {
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
                 .add("plan", getPlan())
+                .add("members", getMembers().size())
                 .toString();
     }
     
     @Override
     public int hashCode(){
         return java.util.Objects.hash(
-                getId(),
                 getSource(),
                 getType(),
                 getOntologyVersion(),
@@ -170,7 +197,8 @@ public class Refset {
                 getTitle(),
                 getDescription(),
                 getPublicId(),
-                getPlan());
+                getPlan(),
+                getMembers());
     }
 
     @PreUpdate
@@ -296,6 +324,14 @@ public class Refset {
     public void setOntologyVersion(OntologyVersion ontologyVersion) {
         this.ontologyVersion = ontologyVersion;
     }
+    
+    public Set<Member> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<Member> members) {
+        this.members = members;
+    }    
 
     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
              Concept refsetConcept, Concept moduleConcept, String title, String description, 
@@ -311,8 +347,7 @@ public class Refset {
                  title, description, publicId, plan);
      }     
      
-     
-     public static class Builder {
+    public static class Builder {
          private Refset built;
 
          Builder(Long id, Source source, Type type, OntologyVersion ontologyVersion,

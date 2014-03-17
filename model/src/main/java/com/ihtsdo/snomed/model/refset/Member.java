@@ -28,7 +28,7 @@ public class Member {
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private Long id;
     
-    private String serialisedId;
+    private String publicId;
 	
 	@Temporal(TemporalType.TIMESTAMP) 
 	Date effective;
@@ -36,7 +36,7 @@ public class Member {
     @Column(columnDefinition = "BIT", length = 1) 
     private boolean active; 
     
-    @OneToOne 
+    @OneToOne
 	private Concept module;
 	
     @OneToOne 
@@ -65,7 +65,13 @@ public class Member {
     public boolean equals(Object o){
         if (o instanceof Member){
         	Member r = (Member) o;
-            if (r.getId() == getId()){
+            if (Objects.equal(r.getComponent(), this.getComponent()) &&
+                    //Hibernate converts util data to timestamp, so stright equals don't work
+                Objects.equal(r.getEffective().toString(), this.getEffective().toString()) &&
+                Objects.equal(r.getModule(), this.getModule()) &&
+                r.isActive() == this.isActive() &&
+                Objects.equal(r.getPublicId(), this.getPublicId()))
+            {
                 return true;
             }
         }
@@ -86,9 +92,9 @@ public class Member {
     @Override
     public int hashCode(){
    	 return java.util.Objects.hash(
-   			 getId(),
-   			 getSerialisedId(),
-   			 getEffective(),
+   			 getPublicId(),
+   			 //Hibernate converts util data to timestamp, so stright equals don't work
+   			 (getEffective() == null) ? getEffective().toString() : null,
    			 isActive(),
    			 getComponent(),
    			 getModule());
@@ -106,12 +112,12 @@ public class Member {
         modificationTime = now;
     }    
 	
-	public String getSerialisedId() {
-		return serialisedId;
+	public String getPublicId() {
+		return publicId;
 	}
 
-	public void setSerialisedId(String serialisedId) {
-		this.serialisedId = serialisedId;
+	public void setPublicId(String publicId) {
+		this.publicId = publicId;
 	}
 
 	public Long getId() {
@@ -182,7 +188,7 @@ public class Member {
             return this;
         }
         public Builder serialisedId(String serialisedId){
-            built.setSerialisedId(serialisedId);
+            built.setPublicId(serialisedId);
             return this;
         }        
         public Member build() {

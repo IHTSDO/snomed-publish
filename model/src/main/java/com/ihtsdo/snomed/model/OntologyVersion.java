@@ -109,7 +109,8 @@ public class OntologyVersion {
                 java.util.Objects.equals(version.getStatus(), getStatus()) &&
                 //java.util.Objects.equals(version.getStatements(), getStatements()) &&
                 //java.util.Objects.equals(version.getConcepts(), getConcepts()) &&
-                java.util.Objects.equals(version.getTaggedOn(), getTaggedOn()) )//&&
+                //Hibernate stores java.util.date as Timestamp, so the straight equals dont. work.
+                java.util.Objects.equals(version.getTaggedOn().toString(), getTaggedOn().toString()) )//&&
                 //java.util.Objects.equals(version.getDescriptions(), getDescriptions()))
                
             {
