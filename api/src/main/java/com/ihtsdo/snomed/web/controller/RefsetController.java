@@ -1,5 +1,9 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,11 +41,13 @@ import com.ihtsdo.snomed.dto.refset.MembersDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
+import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyVersionNotFoundException;
+import com.ihtsdo.snomed.exception.ProgrammingError;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
@@ -52,9 +59,16 @@ import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
 import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
+import com.ihtsdo.snomed.service.refset.parser.RefsetParser.Mode;
+import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory;
+import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory.Parser;
+import com.ihtsdo.snomed.web.dto.ImportFileDto;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto.Status;
+import com.ihtsdo.snomed.web.exception.FieldBindingException;
+import com.ihtsdo.snomed.web.exception.GlobalBindingException;
+import com.ihtsdo.snomed.web.exception.UnrecognisedFileExtensionException;
 
 @Controller
 @RequestMapping("/refsets")
@@ -95,18 +109,81 @@ public class RefsetController {
         return getRefsetDto(refsetName);
     }
     
-    @RequestMapping(value = "{refsetName}/members", 
+    @RequestMapping(value = "{refsetName}/members",
+            params = "type=list",
             method = RequestMethod.POST, 
             produces = {MediaType.APPLICATION_JSON_VALUE }, 
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addMembers(@Valid @RequestBody Set<MemberDto> members, 
-            BindingResult bindingResult, @PathVariable String refsetName) 
+    public void addMembersByList(@Valid @RequestBody Set<MemberDto> members, @PathVariable String refsetName) 
                     throws RefsetNotFoundException, ConceptIdNotFoundException
     {
-        LOG.debug("Controller received request to add new members to refset [{}]", refsetName);
+        LOG.debug("Controller received request to add new members from a list to refset [{}]", refsetName);
         refsetService.addMembers(members, refsetName);
     }
+    
+    @RequestMapping(value = "{refsetName}/members",
+            params = "type=file",
+            method = RequestMethod.POST, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addMembersByFile(@Valid @ModelAttribute ImportFileDto importDto, @PathVariable String refsetName) 
+                    throws RefsetNotFoundException, ConceptIdNotFoundException, ProgrammingError, 
+                    FieldBindingException, GlobalBindingException
+    {
+        LOG.debug("Controller received request to add new members to refset [{}] from a file: {}", refsetName, importDto);
+        
+        try (Reader reader = new InputStreamReader(new BufferedInputStream(importDto.getFile().getInputStream()))){
+            Set <MemberDto> membersToImport = RefsetParserFactory.getParser(getParser(importDto)).parseMode(Mode.FORGIVING).parse(reader);
+            refsetService.addMembers(membersToImport, refsetName);
+            LOG.debug("Imported {} members", membersToImport.size());
+        } catch (IOException e) {
+            throw new GlobalBindingException(
+                    "error.message.unable.to.read.file.io.exception",
+                    Arrays.asList(importDto.getFile().getOriginalFilename()),
+                    "Unable to read file - general IO exception: " + e.getMessage());
+        } catch (InvalidInputException e) {
+            throw new ProgrammingError(e);
+        } catch (UnrecognisedFileExtensionException e) {
+            throw new FieldBindingException(
+                    "fileType", 
+                    "error.message.file.extension.not.recognised",
+                    Arrays.asList(e.getExtension()), 
+                    "File extension " + e.getExtension() + "not recognised");
+        }
+    }   
+    
+    private Parser getParser(ImportFileDto importFileDto) throws UnrecognisedFileExtensionException{
+        LOG.info("Determining parser for file type [" + importFileDto.getFileType() + "]");
+        Parser parser = null;
+        if (importFileDto.isUseExtension()){
+            String name = importFileDto.getFile().getOriginalFilename();
+            String extension = name.substring(name.lastIndexOf('.') + 1, name.length()).toUpperCase();
+            LOG.info("Determining parser based on file extension [" + extension + "]");
+            if (extension.equals("JSON")){
+                parser = Parser.JSON;
+            }else if (extension.equals("XML")){
+                parser = Parser.XML;
+            }else if (extension.equals("TXT")){
+                parser = Parser.RF2;
+            }else if (extension.equals("RF2")){
+                parser = Parser.RF2;
+            }else{
+                throw new UnrecognisedFileExtensionException(extension);
+            }
+        }else if (importFileDto.isRf2()){
+            parser = Parser.RF2;
+        }else if (importFileDto.isJson()){
+            parser = Parser.JSON;
+        }else if (importFileDto.isXml()){
+            parser = Parser.XML;
+        }else{
+            throw new ProgrammingError("You forgot to handle file type enumeration of " + importFileDto.getFileType());
+        }
+        return parser;
+    }    
+    
     
     @RequestMapping(value = "{refsetName}/members", 
             method = RequestMethod.GET, 

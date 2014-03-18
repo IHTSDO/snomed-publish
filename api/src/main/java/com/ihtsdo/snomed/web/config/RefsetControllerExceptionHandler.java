@@ -1,10 +1,16 @@
 package com.ihtsdo.snomed.web.config;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,8 +24,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
+import com.ihtsdo.snomed.exception.ProgrammingError;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
-import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
+import com.ihtsdo.snomed.web.dto.ErrorDto;
+import com.ihtsdo.snomed.web.exception.FieldBindingException;
+import com.ihtsdo.snomed.web.exception.GlobalBindingException;
 
 @ControllerAdvice
 public class RefsetControllerExceptionHandler {
@@ -29,32 +38,78 @@ public class RefsetControllerExceptionHandler {
     @Resource
     private MessageSource messageSource;
     
+    // FIELD BINDING EXCEPTION
+    @ExceptionHandler(FieldBindingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleFieldBindingException(FieldBindingException e){
+        return new ErrorDto().addFieldError(
+                e.getField(),
+                resolveLocalizedErrorMessage(
+                        e.getMessageKey(), 
+                        e.getMessageArguments(),
+                        e.getDefaultMessage()));
+    }
+    
+    // GLOBAL BINDING EXCEPTION
+    @ExceptionHandler(GlobalBindingException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleUnrecognisedFileExtensionException(GlobalBindingException e){
+        return new ErrorDto().addGlobalError(
+                resolveLocalizedErrorMessage(
+                        e.getMessageKey(), 
+                        e.getMessageArguments(),
+                        e.getDefaultMessage()));
+    }    
+
+    // REFSET NOT FOUND EXCEPTION
     @ExceptionHandler(RefsetNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RefsetResponseDto handleRefsetNotFoundException(RefsetNotFoundException e){
-        RefsetResponseDto error = new RefsetResponseDto();
-        error.addGlobalError(e.getMessage());
-        return error;
+    public ErrorDto handleRefsetNotFoundException(RefsetNotFoundException e){
+        LOG.error("Unable to find refset with name {}", e.getId(), e);
+        return new ErrorDto().addGlobalError(
+                resolveLocalizedErrorMessage(
+                        "error.message.refset.publicid.not.found", 
+                        Arrays.asList(Long.toString(e.getId())),
+                        "Unable to find refset with name " + e.getId()));
     }
     
+    // CONCEPT NOT FOUND EXCEPTION
     @ExceptionHandler(ConceptIdNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RefsetResponseDto handleRefsetNotFoundException(ConceptIdNotFoundException e){
-        RefsetResponseDto error = new RefsetResponseDto();
-        error.addGlobalError(e.getMessage());
-        return error;
-    }    
+    public ErrorDto handleRefsetNotFoundException(ConceptIdNotFoundException e){
+        LOG.error("Unable to find concept with id {}", e.getId(), e);
+        return new ErrorDto().addGlobalError(
+                resolveLocalizedErrorMessage(
+                        "error.message.global.concept.not.found.exception", 
+                        Arrays.asList(Long.toString(e.getId())),
+                        "Unable to find concept with id " + e.getId()));
+    }
+    
+    // PROGRAMMING ERROR
+    @ExceptionHandler(ProgrammingError.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleProgrammingError(ProgrammingError e){
+        LOG.error(e.getMessage(), e);
+        return new ErrorDto().addGlobalError(
+                resolveLocalizedErrorMessage(
+                        "error.message.internal.error", 
+                        Arrays.asList(e.getMessage()),
+                        "Internal Server Error: " + e.getMessage()));
+    }        
     
     
+    //TODO: Refactor
     @ExceptionHandler(ServletRequestBindingException.class)
     public ResponseEntity<String> handleServletRequestBindingException(ServletRequestBindingException ex)   {
         return new ResponseEntity<String>(ex.getMessage(),HttpStatus.PRECONDITION_REQUIRED);
     }
-    
 
-    
+    //TODO: Refactor    
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex)   {
         if (ex.getCause() instanceof JsonParseException){
@@ -68,5 +123,13 @@ public class RefsetControllerExceptionHandler {
             return new ResponseEntity<String>(ex.getMessage(),HttpStatus.NOT_ACCEPTABLE);
         }
     }
-    
+
+    private String resolveLocalizedErrorMessage(String key, List<String> args, String defaultMessage) {
+        Locale currentLocale =  LocaleContextHolder.getLocale();
+        try {
+            return messageSource.getMessage(key, null, currentLocale);
+        } catch (NoSuchMessageException e) {
+            return defaultMessage;
+        }
+    }
 }
