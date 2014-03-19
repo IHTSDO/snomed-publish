@@ -141,12 +141,16 @@ public class Refset {
         getMembers().addAll(members);
         return this;
     }
+    
+    public Refset removeMember(Member member){
+        getMembers().remove(member);
+        return this;
+    }
 
     public Refset addMember(Member member){
         getMembers().add(member);
         return this;
     }    
-    
     
     @Override
     public boolean equals(Object o){

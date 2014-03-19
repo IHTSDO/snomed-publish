@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Refset.Source;
 import com.ihtsdo.snomed.model.refset.Refset.Type;
 
@@ -194,6 +195,19 @@ public class RefsetDto {
         this.snomedReleaseDate = snomedReleaseDate;
     }
    
+    public static RefsetDto parse(Refset refset){
+        return  getBuilder(
+                refset.getSource(), 
+                refset.getType(), 
+                refset.getOntologyVersion().getFlavour().getPublicId(),
+                refset.getOntologyVersion().getTaggedOn(),
+                ConceptDto.parse(refset.getRefsetConcept()),
+                ConceptDto.parse(refset.getModuleConcept()),
+                refset.getTitle(),
+                refset.getDescription(), 
+                refset.getPublicId(), 
+                PlanDto.parse(refset.getPlan())).build();
+    }
 
     public static Builder getBuilder(Source source, Type type, String snomedExtension,
             Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 

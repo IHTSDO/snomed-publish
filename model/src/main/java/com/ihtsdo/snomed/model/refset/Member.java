@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +29,7 @@ public class Member {
     @GeneratedValue(strategy=GenerationType.IDENTITY) 
     private Long id;
     
+    @NotNull
     private String publicId;
 	
 	@Temporal(TemporalType.TIMESTAMP) 
@@ -174,6 +176,7 @@ public class Member {
             built = new Member();
             built.setComponent(component);
             built.setModule(module);
+            built.setPublicId(generatePublicId());
         }
         
         public Builder id(Long id){
@@ -196,6 +199,10 @@ public class Member {
         }        
         public Member build() {
             return built;
+        }
+        
+        private String generatePublicId(){
+            return UUID.randomUUID().toString();
         }
     }
 }

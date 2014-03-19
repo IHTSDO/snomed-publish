@@ -8,6 +8,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
+import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
@@ -17,12 +18,15 @@ import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
+import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Refset;
 
 public interface RefsetService {
     
     public abstract Refset addMembers(Set<MemberDto> members, String publicId) throws RefsetNotFoundException, ConceptIdNotFoundException;
 
+    public abstract Member deleteMembership(String refsetId, String memberId) throws RefsetNotFoundException, MemberNotFoundException, NonUniquePublicIdException;
+    
     public abstract List<Refset> findAll(int pageIndex);
 
     public abstract List<Refset> findAll();

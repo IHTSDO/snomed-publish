@@ -24,6 +24,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
+import com.ihtsdo.snomed.exception.MemberNotFoundException;
+import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.ProgrammingError;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.web.dto.ErrorDto;
@@ -75,6 +77,41 @@ public class RefsetControllerExceptionHandler {
                         Arrays.asList(Long.toString(e.getId())),
                         "Unable to find refset with name " + e.getId()));
     }
+
+    // MEMBER NOT FOUND EXCEPTION
+    @ExceptionHandler(MemberNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleMemberNotFoundException(MemberNotFoundException e){
+        if (e.getId() != null){
+            LOG.error("Unable to find refset with internal id {}", e.getId(), e);
+            return new ErrorDto().addGlobalError(
+                    resolveLocalizedErrorMessage(
+                            "error.message.internal.error", 
+                            Arrays.asList(e.getMessage()),
+                            "Internal Server Error: " + e.getMessage()));            
+        }else{
+            LOG.error("Unable to find member {} for refset {}", e.getPublicId(), e.getRefsetName(), e);
+            return new ErrorDto().addGlobalError(
+                    resolveLocalizedErrorMessage(
+                            "error.message.member.publicid.not.found", 
+                            Arrays.asList(e.getPublicId(), e.getRefsetName()),
+                            "Unable to find member with id " + e.getPublicId() + " for refset with name " + e.getRefsetName()));            
+        }
+    }    
+    
+    // NON UNIQUE PUBLIC ID EXCEPTION
+    @ExceptionHandler(NonUniquePublicIdException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleNonUniquePublicIdException(NonUniquePublicIdException e){
+        LOG.error("Non Unique Public ID: {}", e.getMessage(), e);
+        return new ErrorDto().addGlobalError(
+                resolveLocalizedErrorMessage(
+                        "error.message.internal.error", 
+                        Arrays.asList(e.getMessage()),
+                        "Internal Server Error: " + e.getMessage()));
+    }        
     
     // CONCEPT NOT FOUND EXCEPTION
     @ExceptionHandler(ConceptIdNotFoundException.class)

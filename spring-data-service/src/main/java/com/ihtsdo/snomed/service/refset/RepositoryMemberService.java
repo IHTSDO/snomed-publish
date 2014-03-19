@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.repository.refset.MemberRepository;
@@ -41,6 +42,19 @@ public class RepositoryMemberService implements MemberService {
     }
     
     @Override
+    @Transactional(rollbackFor = MemberNotFoundException.class)
+    public Member delete(Long memberId) throws MemberNotFoundException {
+        LOG.debug("Deleting member with id: " + memberId);
+        Member deleted = memberRepository.findOne(memberId);
+        if (deleted == null) {
+            throw new MemberNotFoundException(memberId, "No member found with id: " + memberId);
+        }
+        memberRepository.delete(deleted);
+        return deleted;
+    }  
+    
+    
+    @Override
     @Transactional(readOnly = true)
     public Member findByPublicId(String publicId){
         LOG.debug("Getting member with publicId=" + publicId);
@@ -54,6 +68,18 @@ public class RepositoryMemberService implements MemberService {
         List<Member> found = memberRepository.findByRefsetPublicId(refsetPublicId);
         if (found == null){
             throw new RefsetNotFoundException(refsetPublicId);
+        }
+        return found;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Member> findByMemberPublicIdAndRefsetPublicId(String memberPublicId, String refsetPublicId)
+            throws MemberNotFoundException {
+        LOG.debug("Getting member with publicId {} for refset with publicId {}", memberPublicId, refsetPublicId);
+        List<Member> found = memberRepository.findByMemberPublicIdAndRefsetPublicId(refsetPublicId, memberPublicId);
+        if (found == null){
+            throw new MemberNotFoundException(memberPublicId, refsetPublicId);
         }
         return found;
     }    

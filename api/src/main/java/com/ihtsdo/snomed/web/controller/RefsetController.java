@@ -43,6 +43,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
+import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
@@ -121,6 +122,32 @@ public class RefsetController {
         LOG.debug("Controller received request to add new members from a list to refset [{}]", refsetName);
         refsetService.addMembers(members, refsetName);
     }
+    
+    @RequestMapping(value = "{refsetName}/members/{memberId}",
+            method = RequestMethod.DELETE, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MemberDto deleteMembership(@PathVariable String refsetName, @PathVariable String memberId) 
+                    throws RefsetNotFoundException, ConceptIdNotFoundException, MemberNotFoundException, NonUniquePublicIdException
+    {
+        LOG.debug("Controller received request to delete member {} from refset {}", memberId, refsetName);
+        return MemberDto.parse(refsetService.deleteMembership(refsetName, memberId));
+    }
+    
+    @RequestMapping(value = "{refsetName}",
+            method = RequestMethod.DELETE, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RefsetDto deleteRefset(@PathVariable String refsetName, @PathVariable String memberId) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to delete refset {}", refsetName);
+        return RefsetDto.parse(refsetService.delete(refsetName));
+    }     
+    
     
     @RequestMapping(value = "{refsetName}/members",
             params = "type=file",
@@ -216,44 +243,44 @@ public class RefsetController {
         return new XmlRefsetConcepts(getXmlConceptDtos(refsetName));
     }
     
-    @RequestMapping(value = "{refsetName}", 
-            method = RequestMethod.DELETE, 
-            consumes=MediaType.ALL_VALUE,
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RefsetResponseDto> deleteRefset(HttpServletRequest request, @PathVariable String refsetName){
-        LOG.debug("Received request to delete refset [{}]", refsetName);
-        RefsetResponseDto response = new RefsetResponseDto();
-        response.setPublicId(refsetName);
-        try {
-            Refset deleted = refsetService.delete(refsetName);
-            
-            response.setRefset(
-                RefsetDto.getBuilder(
-                        deleted.getSource(), 
-                        deleted.getType(), 
-                        deleted.getOntologyVersion().getFlavour().getPublicId(),
-                        deleted.getOntologyVersion().getTaggedOn(),
-                        ConceptDto.parse(deleted.getRefsetConcept()),
-                        ConceptDto.parse(deleted.getModuleConcept()),
-                        deleted.getTitle(),
-                        deleted.getDescription(), 
-                        deleted.getPublicId(), 
-                        PlanDto.parse(deleted.getPlan())).build()
-                    );
-
-            response.setCode(RefsetResponseDto.SUCCESS_DELETED);
-            response.setStatus(Status.DELETED);
-            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.OK);
-        } catch (RefsetNotFoundException e) {
-            response.setCode(RefsetResponseDto.FAIL_REFSET_NOT_FOUND);
-            response.setStatus(Status.FAIL);
-            response.setGlobalErrors(Arrays.asList(messageSource.getMessage(
-                    "global.error.refset.not.found", 
-                    Arrays.asList(refsetName).toArray(), 
-                    LocaleContextHolder.getLocale())));
-            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.PRECONDITION_FAILED);
-        }
-    }
+//    @RequestMapping(value = "{refsetName}", 
+//            method = RequestMethod.DELETE, 
+//            consumes=MediaType.ALL_VALUE,
+//            produces=MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<RefsetResponseDto> deleteRefset(HttpServletRequest request, @PathVariable String refsetName){
+//        LOG.debug("Received request to delete refset [{}]", refsetName);
+//        RefsetResponseDto response = new RefsetResponseDto();
+//        response.setPublicId(refsetName);
+//        try {
+//            Refset deleted = refsetService.delete(refsetName);
+//            
+//            response.setRefset(
+//                RefsetDto.getBuilder(
+//                        deleted.getSource(), 
+//                        deleted.getType(), 
+//                        deleted.getOntologyVersion().getFlavour().getPublicId(),
+//                        deleted.getOntologyVersion().getTaggedOn(),
+//                        ConceptDto.parse(deleted.getRefsetConcept()),
+//                        ConceptDto.parse(deleted.getModuleConcept()),
+//                        deleted.getTitle(),
+//                        deleted.getDescription(), 
+//                        deleted.getPublicId(), 
+//                        PlanDto.parse(deleted.getPlan())).build()
+//                    );
+//
+//            response.setCode(RefsetResponseDto.SUCCESS_DELETED);
+//            response.setStatus(Status.DELETED);
+//            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.OK);
+//        } catch (RefsetNotFoundException e) {
+//            response.setCode(RefsetResponseDto.FAIL_REFSET_NOT_FOUND);
+//            response.setStatus(Status.FAIL);
+//            response.setGlobalErrors(Arrays.asList(messageSource.getMessage(
+//                    "global.error.refset.not.found", 
+//                    Arrays.asList(refsetName).toArray(), 
+//                    LocaleContextHolder.getLocale())));
+//            return new ResponseEntity<RefsetResponseDto>(response, HttpStatus.PRECONDITION_FAILED);
+//        }
+//    }
 
     @RequestMapping(value = "", method = RequestMethod.POST, 
     produces = {MediaType.APPLICATION_JSON_VALUE }, 

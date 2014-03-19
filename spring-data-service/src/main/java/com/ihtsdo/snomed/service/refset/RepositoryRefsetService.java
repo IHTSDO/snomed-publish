@@ -25,6 +25,7 @@ import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
+import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.OntologyFlavourNotFoundException;
 import com.ihtsdo.snomed.exception.OntologyNotFoundException;
@@ -71,6 +72,9 @@ public class RepositoryRefsetService implements RefsetService {
     
     @Inject
     SnapshotService snapshotService;
+    
+    @Inject
+    MemberService memberService;
     
     @Inject
     protected ConceptService conceptService;   
@@ -365,7 +369,37 @@ public class RepositoryRefsetService implements RefsetService {
         Refset refset = findByPublicId(publicId);
         refset.addMembers(fillMembers(members, refset.getModuleConcept()));
         return refset;
-    }      
+    }
+    
+    @Override
+    public Member deleteMembership(String refsetId, String memberId) throws MemberNotFoundException, NonUniquePublicIdException, RefsetNotFoundException {
+        LOG.debug("Deleting membership with public id {} for refset with name {}", refsetId, memberId);
+
+        //Really need to replace the refset members set with a map instead
+        //this is really annoying...
+        //But I gave up after spending hours trying to get the JPQL query to work with a map.
+        //I really hate poking around with JPA stuff... Need to get a move on!
+        
+        Refset refset = findByPublicId(refsetId);
+        if (refset == null){
+            throw new RefsetNotFoundException(refsetId);
+        }
+        
+        List<Member> members = memberService.findByMemberPublicIdAndRefsetPublicId(memberId, refsetId);
+        if ((members == null) || members.isEmpty()){
+            throw new MemberNotFoundException(memberId, refsetId);
+        }
+        if (members.size() > 1){
+            throw new NonUniquePublicIdException("Internal Error: Found more than one member for refset " + refsetId + " with identifier " + memberId);
+        }
+        
+        refset.removeMember(members.get(0));
+        
+        refsetRepository.save(refset);
+        
+        Member returned = memberService.delete(members.get(0).getId());
+        return returned;
+    }    
     
 
     private Sort sortByAscendingTitle() {
@@ -416,6 +450,8 @@ public class RepositoryRefsetService implements RefsetService {
     private String generatePublicId(){
         return UUID.randomUUID().toString();
     }
+
+
     
     
 
