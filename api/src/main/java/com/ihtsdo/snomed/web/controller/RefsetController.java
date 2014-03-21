@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +15,12 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +64,8 @@ import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParser.Mode;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory.Parser;
+import com.ihtsdo.snomed.service.refset.serialiser.RefsetSerialiserFactory;
+import com.ihtsdo.snomed.service.refset.serialiser.RefsetSerialiserFactory.Form;
 import com.ihtsdo.snomed.web.dto.ImportFileDto;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 import com.ihtsdo.snomed.web.dto.RefsetResponseDto;
@@ -106,7 +109,7 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody RefsetDto getRefset(@PathVariable String refsetName){
+    public @ResponseBody RefsetDto getRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
         return getRefsetDto(refsetName);
     }
     
@@ -148,6 +151,28 @@ public class RefsetController {
         return RefsetDto.parse(refsetService.delete(refsetName));
     }     
     
+    @RequestMapping(value = "{refsetName}/members/{refsetName}.unversioned.rf2",
+            method = RequestMethod.GET, 
+            produces = {MediaType.TEXT_PLAIN_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    public void downloadUnversionedMembersInRf2(@PathVariable String refsetName,
+            Writer responseWriter, HttpServletResponse response) throws RefsetNotFoundException, GlobalBindingException
+    {
+        LOG.debug("Controller received request to download unversioned members of refset {}", refsetName);
+               
+        try {
+            RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(memberService.findByRefsetPublicId(refsetName));
+            response.setContentType(RF2_MIME_TYPE);
+        } catch (IOException e) {
+            LOG.error("Unable to write RF2 file: " + e.getMessage(), e);
+            throw new GlobalBindingException(
+                    "error.message.unable.to.write.file.io.exception",
+                    Arrays.asList(refsetName + "/members/" + refsetName + ".unversioned.rf2"),
+                    "Unable to write file - general IO exception: " + e.getMessage());
+        }
+    }     
+        
     
     @RequestMapping(value = "{refsetName}/members",
             params = "type=file",
@@ -239,7 +264,7 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody XmlRefsetConcepts getConcepts(@PathVariable String refsetName){
+    public @ResponseBody XmlRefsetConcepts getConcepts(@PathVariable String refsetName) throws RefsetNotFoundException{
         return new XmlRefsetConcepts(getXmlConceptDtos(refsetName));
     }
     
@@ -287,7 +312,7 @@ public class RefsetController {
     consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseBody
     public ResponseEntity<RefsetResponseDto> createRefset(@Valid @RequestBody RefsetDto refsetDto, 
-            BindingResult bindingResult, HttpServletRequest request)
+            BindingResult bindingResult, HttpServletRequest request) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to create new refset [{}]",
                 refsetDto.toString());
@@ -381,7 +406,7 @@ public class RefsetController {
         return response;
     }
 
-    private List<XmlRefsetConcept> getXmlConceptDtos(String pubId){
+    private List<XmlRefsetConcept> getXmlConceptDtos(String pubId) throws RefsetNotFoundException{
         Refset refset = refsetService.findByPublicId(pubId);
         System.out.println("Found refset " + refset);
         Set<Concept> concepts = refset.getPlan().refreshAndGetConcepts();
@@ -402,7 +427,7 @@ public class RefsetController {
         return xmlRefsetShorts;
     }    
  
-    private RefsetDto getRefsetDto(String pubId) {
+    private RefsetDto getRefsetDto(String pubId) throws RefsetNotFoundException {
         Refset found = refsetService.findByPublicId(pubId);
 
         return RefsetDto.getBuilder(

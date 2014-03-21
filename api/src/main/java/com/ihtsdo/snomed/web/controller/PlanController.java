@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.validation.ValidationResult;
+import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetPlanNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetTerminalRuleNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
@@ -51,7 +52,7 @@ public class PlanController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody PlanDto getRefsetPlan(@PathVariable String refsetName) {
+    public @ResponseBody PlanDto getRefsetPlan(@PathVariable String refsetName) throws RefsetNotFoundException {
         Refset refset = refsetService.findByPublicId(refsetName);
         System.out.println("Found refset " + refset);
         return PlanDto.parse(refset.getPlan());
@@ -65,7 +66,7 @@ public class PlanController {
     public ResponseEntity<RefsetPlanResponseDto> updateRefsetPlan(
             @Valid @RequestBody PlanDto planDto,
             BindingResult bindingResult, 
-            @PathVariable String refsetName)
+            @PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to update refset plan {} for refset {}", 
                 planDto.toString(), refsetName);

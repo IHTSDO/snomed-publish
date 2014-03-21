@@ -33,7 +33,7 @@ public interface RefsetService {
 
     public abstract Refset findById(Long id);
 
-    public abstract Refset findByPublicId(String publicId);
+    public abstract Refset findByPublicId(String publicId) throws RefsetNotFoundException;
 
     public abstract Refset update(RefsetDto updated) throws RefsetNotFoundException, RefsetConceptNotFoundException, ValidationException, RefsetPlanNotFoundException, RefsetTerminalRuleNotFoundException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException;
 

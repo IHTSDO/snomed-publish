@@ -30,15 +30,17 @@ public class JsonSerialiser extends BaseSerialiser{
 
     @Override
     public void writeDto(List<MemberDto> members) throws IOException {
-    	mapper.writeValue(writer, new TypeReference<List<MemberDto>>() { } );
+        throw new UnsupportedOperationException();
+    	//mapper.writeValue(writer, new TypeReference<List<MemberDto>>() { } );
     }
     
     @Override
     public void write(List<Member> members) throws IOException {
-    	List<MemberDto> memberDtos = new ArrayList<>(members.size());
-    	for (Member member : members){
-    		memberDtos.add(MemberDto.parse(member));
-    	}
-    	writeDto(memberDtos);
+        throw new UnsupportedOperationException();
+//    	List<MemberDto> memberDtos = new ArrayList<>(members.size());
+//    	for (Member member : members){
+//    		memberDtos.add(MemberDto.parse(member));
+//    	}
+//    	writeDto(memberDtos);
     }
 }

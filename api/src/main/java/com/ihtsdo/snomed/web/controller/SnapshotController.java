@@ -70,7 +70,7 @@ public class SnapshotController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<SnapshotDto>> getAllSnapshots(@PathVariable String refsetName){
+    public ResponseEntity<List<SnapshotDto>> getAllSnapshots(@PathVariable String refsetName) throws RefsetNotFoundException{
         LOG.debug("Received request for all snapshots for refset [{}]", refsetName);
         
         Refset refset = refsetService.findByPublicId(refsetName);
