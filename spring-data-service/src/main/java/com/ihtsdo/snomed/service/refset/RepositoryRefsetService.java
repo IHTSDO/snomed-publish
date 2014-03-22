@@ -42,15 +42,13 @@ import com.ihtsdo.snomed.model.SnomedFlavours.SnomedFlavour;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.model.refset.Refset.Status;
+import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.OntologyVersionService;
-
-import static com.ihtsdo.snomed.model.refset.RefsetSpecifications.findActiveByRefsetName;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 @Transactional (value = "transactionManager", readOnly = false)
