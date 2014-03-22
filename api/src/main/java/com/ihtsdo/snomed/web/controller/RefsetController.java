@@ -58,7 +58,7 @@ import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
-import com.ihtsdo.snomed.model.xml.XmlRefsetShort;
+import com.ihtsdo.snomed.model.xml.RefsetDtoShort;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParser.Mode;
@@ -101,8 +101,13 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<XmlRefsetShort> getAllRefsets(){
-        return getRefsetsDto();
+    public @ResponseBody List<RefsetDtoShort> getAllRefsets(){
+        List<Refset> refsets = refsetService.findAll();
+        List<RefsetDtoShort> refsetDtoShorts = new ArrayList<>();
+        for (Refset r : refsets){
+            refsetDtoShorts.add(new RefsetDtoShort(r));
+        }
+        return refsetDtoShorts;
     }    
         
     @RequestMapping(value = "{refsetName}", 
@@ -145,22 +150,33 @@ public class RefsetController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RefsetDto deleteRefset(@PathVariable String refsetName, @PathVariable String memberId) throws RefsetNotFoundException
+    public RefsetDto deleteRefset(@PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to delete refset {}", refsetName);
         return RefsetDto.parse(refsetService.delete(refsetName));
-    }     
+    }
+    
+    @RequestMapping(value = "{refsetName}",
+            params = {"action=resurect"},
+            method = RequestMethod.PUT, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RefsetDto resurectRefset(@PathVariable String refsetName) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to resurect deleted refset {}", refsetName);
+        return RefsetDto.parse(refsetService.resurect(refsetName));
+    }         
     
     @RequestMapping(value = "{refsetName}/members/{refsetName}.unversioned.rf2",
             method = RequestMethod.GET, 
-            produces = {MediaType.TEXT_PLAIN_VALUE }, 
             consumes = {MediaType.ALL_VALUE})
     @ResponseStatus(HttpStatus.OK)
     public void downloadUnversionedMembersInRf2(@PathVariable String refsetName,
             Writer responseWriter, HttpServletResponse response) throws RefsetNotFoundException, GlobalBindingException
     {
-        LOG.debug("Controller received request to download unversioned members of refset {}", refsetName);
-               
+        LOG.debug("Controller received request to download unversioned members of refset {} in RF2 format", refsetName);
         try {
             RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(memberService.findByRefsetPublicId(refsetName));
             response.setContentType(RF2_MIME_TYPE);
@@ -171,8 +187,41 @@ public class RefsetController {
                     Arrays.asList(refsetName + "/members/" + refsetName + ".unversioned.rf2"),
                     "Unable to write file - general IO exception: " + e.getMessage());
         }
+    }
+    
+    @RequestMapping(value = "{refsetName}/members/{refsetName}.unversioned.json",
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<MemberDto> downloadUnversionedMembersInJson(@PathVariable String refsetName) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to download unversioned members of refset {} in JSON format", refsetName);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName);
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for (Member m : members){
+            memberDtos.add(MemberDto.parse(m));
+        }
+        return memberDtos;
+    }        
+
+    @RequestMapping(value = "{refsetName}/members/{refsetName}.unversioned.xml",
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_XML_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MembersDto downloadUnversionedMembersInXml(@PathVariable String refsetName) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to download unversioned members of refset {} in XML format", refsetName);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName);
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for (Member m : members){
+            memberDtos.add(MemberDto.parse(m));
+        }
+        return new MembersDto(memberDtos);
     }     
-        
     
     @RequestMapping(value = "{refsetName}/members",
             params = "type=file",
@@ -320,7 +369,11 @@ public class RefsetController {
         int returnCode = RefsetResponseDto.FAIL;
         RefsetResponseDto response = new RefsetResponseDto();
         
-        Refset refset = refsetService.findByPublicId(refsetDto.getPublicId());
+        Refset refset = null;
+        try {
+            refset = refsetService.findByPublicId(refsetDto.getPublicId());
+        } catch (RefsetNotFoundException e1) {
+        }
         if (refset != null){
             bindingResult.addError(new FieldError(
                     bindingResult.getObjectName(), "publicId", refsetDto.getPublicId(),
@@ -418,14 +471,7 @@ public class RefsetController {
         return xmlConcepts;
     }    
 
-    private List<XmlRefsetShort> getRefsetsDto(){
-        List<Refset> refsets = refsetService.findAll();
-        List<XmlRefsetShort> xmlRefsetShorts = new ArrayList<>();
-        for (Refset r : refsets){
-            xmlRefsetShorts.add(new XmlRefsetShort(r));
-        }
-        return xmlRefsetShorts;
-    }    
+   
  
     private RefsetDto getRefsetDto(String pubId) throws RefsetNotFoundException {
         Refset found = refsetService.findByPublicId(pubId);

@@ -43,11 +43,14 @@ import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Snapshot;
+import com.ihtsdo.snomed.model.refset.Refset.Status;
 import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
 import com.ihtsdo.snomed.service.OntologyVersionService;
+
+import static com.ihtsdo.snomed.model.refset.RefsetSpecifications.findActiveByRefsetName;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 @Transactional (value = "transactionManager", readOnly = false)
@@ -88,36 +91,40 @@ public class RepositoryRefsetService implements RefsetService {
     @PostConstruct
     public void init(){}
     
-    @Override
-    @Transactional(readOnly = true)
-    public List<Refset> findAll(int pageIndex){
-        LOG.debug("Retrieving all refsets");
-//        System.out.println("\n\n\n\n\n\nFUCK!!!!!!!\n\n\n\n\n\n\n");
-//        Pageable pageSpecification = new PageRequest(pageIndex, NUMBER_OF_SNAPSHOTS_PER_PAGE, sortByAscendingTitle());
-//        Page requestedPage = snapshotRepository.findAll(constructPageSpecification(pageIndex));
-//        return requestedPage.getContent();
-        throw new UnsupportedOperationException();
-    }
-    
+//    @Override
+//    @Transactional(readOnly = true)
+//    public List<Refset> findAll(int pageIndex){
+//        LOG.debug("Retrieving all refsets");
+////        System.out.println("\n\n\n\n\n\nFUCK!!!!!!!\n\n\n\n\n\n\n");
+////        Pageable pageSpecification = new PageRequest(pageIndex, NUMBER_OF_SNAPSHOTS_PER_PAGE, sortByAscendingTitle());
+////        Page requestedPage = snapshotRepository.findAll(constructPageSpecification(pageIndex));
+////        return requestedPage.getContent();
+//        throw new UnsupportedOperationException();
+//    }
+//    
     @Override
     @Transactional(readOnly = true)
     public List<Refset> findAll(){
-        LOG.debug("Retrieving all refsets");
-        return refsetRepository.findAll(sortByAscendingTitle());
+        LOG.debug("Retrieving all active refsets, sorted by title");
+        return refsetRepository.findByStatus(Status.ACTIVE, new Sort(Sort.Direction.ASC, "title"));
     }    
     
-    @Override
-    @Transactional(readOnly = true)
-    public Refset findById(Long id) {
-        LOG.debug("Finding refset by id: " + id);
-        return refsetRepository.findOne(id);
-    }
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Refset findById(Long id) {
+//        LOG.debug("Finding refset by id: " + id);
+//        return refsetRepository.findOne(id);
+//    }
     
     @Override
-    @Transactional
-    public Refset findByPublicId(String publicId){
-        LOG.debug("Getting refset with publicId=" + publicId);
-        return refsetRepository.findByPublicId(publicId);
+    @Transactional(readOnly=true)
+    public Refset findByPublicId(String publicId) throws RefsetNotFoundException{
+        //Refset refset = refsetRepository.findOne(findActiveByRefsetName(publicId));
+        Refset refset = refsetRepository.findByPublicIdAndStatus(publicId, Status.ACTIVE);
+        if (refset == null){
+            throw new RefsetNotFoundException(publicId);
+        }
+        return refset;
     }    
 
     @Override
@@ -152,7 +159,7 @@ public class RepositoryRefsetService implements RefsetService {
             throw new OntologyFlavourNotFoundException(updated.getSnomedExtension());
         }
         
-        Refset refset = refsetRepository.findByPublicId(updated.getPublicId());
+        Refset refset = refsetRepository.findByPublicIdAndStatus(updated.getPublicId(), Status.ACTIVE);
         if (refset == null) {
             throw new RefsetNotFoundException("No refset found with public id: " + updated.getPublicId());
         }
@@ -275,29 +282,43 @@ public class RepositoryRefsetService implements RefsetService {
         }
     }
     
-    @Override
-    @Transactional(rollbackFor = RefsetNotFoundException.class)
-    public Refset delete(Long refsetId) throws RefsetNotFoundException {
-        LOG.debug("Deleting refset with id: " + refsetId);
-        Refset deleted = refsetRepository.findOne(refsetId);
-        if (deleted == null) {
-            throw new RefsetNotFoundException(refsetId, "No refset found with id: " + refsetId);
-        }
-        refsetRepository.delete(deleted);
-        return deleted;
-    }  
+//    @Override
+//    @Transactional(rollbackFor = RefsetNotFoundException.class)
+//    public Refset delete(Long refsetId) throws RefsetNotFoundException {
+//        LOG.debug("Deleting refset with id: " + refsetId);
+//        Refset deleted = refsetRepository.findOne(refsetId);
+//        if (deleted == null) {
+//            throw new RefsetNotFoundException(refsetId, "No refset found with id: " + refsetId);
+//        }
+//        refsetRepository.delete(deleted);
+//        return deleted;
+//    }  
 
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
     public Refset delete(String publicId) throws RefsetNotFoundException {
         LOG.debug("Deleting refset with public id: " + publicId);
-        Refset deleted = refsetRepository.findByPublicId(publicId);
-        if (deleted == null) {
+        Refset inactivated = refsetRepository.findByPublicIdAndStatus(publicId, Status.ACTIVE);
+        if (inactivated == null) {
             throw new RefsetNotFoundException(publicId, "No refset found with public id: " + publicId);
         }
-        refsetRepository.delete(deleted);
-        return deleted;
+        inactivated.setStatus(Status.INACTIVE);
+        refsetRepository.save(inactivated);
+        return inactivated;
     }    
+    
+    @Override
+    @Transactional(rollbackFor = RefsetNotFoundException.class)
+    public Refset resurect(String publicId) throws RefsetNotFoundException {
+        LOG.debug("Resurecting refset with public id: " + publicId);
+        Refset resurected = refsetRepository.findByPublicIdAndStatus(publicId, Status.INACTIVE);
+        if (resurected == null) {
+            throw new RefsetNotFoundException(publicId, "No inactive refset found with public id: " + publicId);
+        }
+        resurected.setStatus(Status.ACTIVE);
+        refsetRepository.save(resurected);
+        return resurected;
+    }        
     
     @Override
     @Transactional(rollbackFor = {
@@ -400,11 +421,6 @@ public class RepositoryRefsetService implements RefsetService {
         Member returned = memberService.delete(members.get(0).getId());
         return returned;
     }    
-    
-
-    private Sort sortByAscendingTitle() {
-        return new Sort(Sort.Direction.ASC, "title");
-    }
     
     private Set<Member> fillMembers(Set<MemberDto> memberDtos, Concept defaultModule) throws ConceptIdNotFoundException  {
         Set<Member> members = new HashSet<Member>();

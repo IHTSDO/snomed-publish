@@ -27,11 +27,11 @@ public interface RefsetService {
 
     public abstract Member deleteMembership(String refsetId, String memberId) throws RefsetNotFoundException, MemberNotFoundException, NonUniquePublicIdException;
     
-    public abstract List<Refset> findAll(int pageIndex);
+    //public abstract List<Refset> findAll(int pageIndex);
 
     public abstract List<Refset> findAll();
 
-    public abstract Refset findById(Long id);
+    //public abstract Refset findById(Long id);
 
     public abstract Refset findByPublicId(String publicId) throws RefsetNotFoundException;
 
@@ -40,14 +40,15 @@ public interface RefsetService {
     public abstract Refset create(RefsetDto created) throws RefsetConceptNotFoundException, ValidationException, NonUniquePublicIdException, OntologyNotFoundException, InvalidSnomedDateFormatException, OntologyVersionNotFoundException, OntologyFlavourNotFoundException;
 
     
-    public abstract Refset delete(Long refsetId) throws RefsetNotFoundException;
+    //public abstract Refset delete(Long refsetId) throws RefsetNotFoundException;
 
-    public abstract Refset delete(String publicId)
-            throws RefsetNotFoundException;
+    public abstract Refset delete(String publicId) throws RefsetNotFoundException;
 
     public Refset update(Refset refset);
 
     public SnapshotDto takeSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException;
 
     public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException;
+
+    Refset resurect(String publicId) throws RefsetNotFoundException;
 }

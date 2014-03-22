@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -46,17 +48,27 @@ public class Refset {
     
     public enum Type {
         CONCEPT, DESCRIPTION, STATEMENT;
-    }    
+    }
+    
+    public enum Status {
+        INACTIVE, ACTIVE
+    }
     
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Source source;
     
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Type type;
+    
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
     
     @NotNull
     @OneToOne
@@ -248,6 +260,14 @@ public class Refset {
     public void setType(Type type) {
         this.type = type;
     }
+    
+    public void setStatus(Status status){
+        this.status = status;
+    }
+    
+    public Status getStatus(){
+        return status;
+    }
 
     public Concept getRefsetConcept() {
         return refsetConcept;
@@ -288,7 +308,7 @@ public class Refset {
     public void setPlan(Plan plan) {
         this.plan = plan;
     }
-
+    
     public Date getCreationTime() {
         return creationTime;
     }
@@ -337,6 +357,8 @@ public class Refset {
         this.members = members;
     }    
 
+    
+    
     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
              Concept refsetConcept, Concept moduleConcept, String title, String description, 
              String publicId, Plan plan) {

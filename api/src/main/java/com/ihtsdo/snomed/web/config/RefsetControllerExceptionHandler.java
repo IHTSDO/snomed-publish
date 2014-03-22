@@ -70,11 +70,11 @@ public class RefsetControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ErrorDto handleRefsetNotFoundException(RefsetNotFoundException e){
-        LOG.error("Unable to find refset with name {}", e.getId(), e);
+        LOG.error("Unable to find refset with name {}", e.getPublicId(), e);
         return new ErrorDto().addGlobalError(
                 resolveLocalizedErrorMessage(
                         "error.message.refset.publicid.not.found", 
-                        Arrays.asList(Long.toString(e.getId())),
+                        Arrays.asList(e.getPublicId()),
                         "Unable to find refset with name " + e.getId()));
     }
 

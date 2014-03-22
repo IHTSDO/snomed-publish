@@ -9,7 +9,7 @@ import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.refset.Refset;
 
 @XmlRootElement(name="refset")
-public class XmlRefsetShort {
+public class RefsetDtoShort {
 
     private long id;
     private XmlRefsetConcept concept;
@@ -19,7 +19,7 @@ public class XmlRefsetShort {
     private Date created;
     private Date lastModified;
     
-    public XmlRefsetShort(Refset r){
+    public RefsetDtoShort(Refset r){
         setId(r.getId());
         setConcept(new XmlRefsetConcept(r.getRefsetConcept()));
         setPublicId(r.getPublicId());
@@ -29,7 +29,7 @@ public class XmlRefsetShort {
         setLastModified(r.getModificationTime());
     }
     
-    public XmlRefsetShort(){}
+    public RefsetDtoShort(){}
 
     @Override
     public String toString() {
@@ -51,8 +51,8 @@ public class XmlRefsetShort {
 
     @Override
     public boolean equals(Object o){
-        if (o instanceof XmlRefsetShort){
-            XmlRefsetShort r = (XmlRefsetShort) o;
+        if (o instanceof RefsetDtoShort){
+            RefsetDtoShort r = (RefsetDtoShort) o;
             if (r.getId() == this.getId()){
                 return true;
             }
