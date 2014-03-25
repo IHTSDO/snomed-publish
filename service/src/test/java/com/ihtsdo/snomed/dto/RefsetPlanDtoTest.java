@@ -54,6 +54,7 @@ public class RefsetPlanDtoTest {
         successDto = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
+                false,
                 of.getPublicId(), 
                 ov.getTaggedOn(),
                 new ConceptDto(1234l), 

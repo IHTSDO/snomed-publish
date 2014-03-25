@@ -60,11 +60,10 @@ public class RefsetTestUtil {
 //        return model;
 //    }
     
-    public static SnapshotDto createSnapshotDto(Long id, String publicId, String title, String description,
+    public static SnapshotDto createSnapshotDto(String publicId, String title, String description,
             Set<ConceptDto> concepts) {
         SnapshotDto dto = new SnapshotDto();
 
-        dto.setId(id);
         dto.setPublicId(publicId);
         dto.setTitle(title);
         dto.setDescription(description);

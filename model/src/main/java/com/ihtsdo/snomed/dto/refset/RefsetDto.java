@@ -28,6 +28,9 @@ public class RefsetDto {
     
     @NotNull(message="You must select a source")
     private Source source;
+    
+    @NotNull
+    private boolean pendingChanges;
         
     @Valid
     @NotNull(message="You must select a refset concept")
@@ -194,11 +197,20 @@ public class RefsetDto {
     public void setSnomedReleaseDate(String snomedReleaseDate) {
         this.snomedReleaseDate = snomedReleaseDate;
     }
-   
+    
+    public boolean isPendingChanges() {
+        return pendingChanges;
+    }
+
+    public void setPendingChanges(boolean pendingChanges) {
+        this.pendingChanges = pendingChanges;
+    }
+
     public static RefsetDto parse(Refset refset){
         return  getBuilder(
                 refset.getSource(), 
                 refset.getType(), 
+                refset.isPendingChanges(),
                 refset.getOntologyVersion().getFlavour().getPublicId(),
                 refset.getOntologyVersion().getTaggedOn(),
                 ConceptDto.parse(refset.getRefsetConcept()),
@@ -209,17 +221,17 @@ public class RefsetDto {
                 PlanDto.parse(refset.getPlan())).build();
     }
 
-    public static Builder getBuilder(Source source, Type type, String snomedExtension,
+    public static Builder getBuilder(Source source, Type type, boolean pendingChanges, String snomedExtension,
             Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
 			String publicId, PlanDto plan) {
-        return new Builder(source, type, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
+        return new Builder(source, type, pendingChanges, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
         		title, description, publicId, plan);
     }
     
     public static class Builder {
         private RefsetDto built;
         
-        public Builder(Source source, Type type,
+        public Builder(Source source, Type type, boolean pendingChanges,
                 String snomedExtension, Date snomedReleaseDate,
                 ConceptDto refsetConcept, ConceptDto moduleConcept,
                 String title, String description, String publicId, PlanDto plan) 
@@ -227,6 +239,7 @@ public class RefsetDto {
             built = new RefsetDto();
             built.setSource(source);
             built.setType(type);
+            built.setPendingChanges(pendingChanges);
             built.setRefsetConcept(refsetConcept);
             built.setModuleConcept(moduleConcept);
             built.setSnomedExtension(snomedExtension);

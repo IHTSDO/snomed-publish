@@ -101,7 +101,9 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody List<RefsetDtoShort> getAllRefsets(){
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<RefsetDtoShort> getAllRefsets(){
         List<Refset> refsets = refsetService.findAll();
         List<RefsetDtoShort> refsetDtoShorts = new ArrayList<>();
         for (Refset r : refsets){
@@ -114,7 +116,9 @@ public class RefsetController {
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody RefsetDto getRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RefsetDto getRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
         return getRefsetDto(refsetName);
     }
     
@@ -444,6 +448,7 @@ public class RefsetController {
                 RefsetDto.getBuilder(
                         updated.getSource(), 
                         updated.getType(), 
+                        updated.isPendingChanges(),
                         updated.getOntologyVersion().getFlavour().getPublicId(),
                         updated.getOntologyVersion().getTaggedOn(),
                         ConceptDto.parse(updated.getRefsetConcept()),
@@ -479,6 +484,7 @@ public class RefsetController {
         return RefsetDto.getBuilder(
                 found.getSource(), 
                 found.getType(), 
+                found.isPendingChanges(),
                 found.getOntologyVersion().getFlavour().getPublicId(),
                 found.getOntologyVersion().getTaggedOn(),
                 ConceptDto.parse(found.getRefsetConcept()),

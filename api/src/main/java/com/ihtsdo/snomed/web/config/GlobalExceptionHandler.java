@@ -9,6 +9,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,6 +39,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public RefsetResponseDto processValidationError(MethodArgumentNotValidException ex) {
+        LOG.debug("In Method Argument Not Valid Exception Handler");
         return error.build(ex.getBindingResult(), new RefsetResponseDto(), RefsetResponseDto.FAIL_VALIDATION);
     }    
     
@@ -44,13 +47,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.PRECONDITION_REQUIRED)
     @ResponseBody
     public String handleServletRequestBindingException(ServletRequestBindingException ex)   {
+        LOG.debug("In Servlet Request Binding Exception Handler");
         return ex.getMessage();
     }
-    
-
-    
+        
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex)   {
+        LOG.debug("In HTTP Method Not Readable Exception Handler");
         if (ex.getCause() instanceof JsonParseException){
             return new ResponseEntity<String>(((JsonParseException)ex.getCause()).getOriginalMessage(),HttpStatus.NOT_ACCEPTABLE);
         }else if (ex.getCause() instanceof UnrecognizedPropertyException){

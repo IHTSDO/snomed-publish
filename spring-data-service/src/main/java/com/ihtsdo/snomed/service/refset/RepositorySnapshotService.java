@@ -1,30 +1,32 @@
 package com.ihtsdo.snomed.service.refset;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
+import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
+import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
-import com.ihtsdo.snomed.model.Concept;
-import com.ihtsdo.snomed.model.refset.Member;
+import com.ihtsdo.snomed.model.refset.Plan;
+import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Rule;
 import com.ihtsdo.snomed.model.refset.Snapshot;
+import com.ihtsdo.snomed.model.refset.Status;
+import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
 
@@ -40,69 +42,107 @@ public class RepositorySnapshotService implements SnapshotService {
     protected SnapshotRepository snapshotRepository;
     
     @Inject
+    RefsetRepository refsetRepository;    
+    
+    @Inject
     protected PlanService planService;
     
     @Inject
+    protected RefsetService refsetService;    
+    
+    @Inject
     protected ConceptService conceptService;   
+    
+    @PersistenceContext(unitName="hibernatePersistenceUnit") 
+    private EntityManager em;    
     
     @PostConstruct
     public void init(){}
     
     @Override
-    @Transactional(readOnly = true)
-    public List<Snapshot> findAll(int pageIndex){
-        LOG.debug("Retrieving all snapshots");
-        throw new UnsupportedOperationException();
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<Snapshot> findAll(){
-        LOG.debug("Retrieving all snapshots");
-        return snapshotRepository.findAll(sortByAscendingTitle());
-    }    
-    
-    @Override
-    @Transactional(readOnly = true)
-    public Snapshot findById(Long id) {
-        LOG.debug("Finding snapshot by id: " + id);
-        return snapshotRepository.findOne(id);
-    }
-    
-    @Override
-    @Transactional
-    public Snapshot findByPublicId(String publicId){
-        LOG.debug("Getting snapshot with publicId=" + publicId);
-        return snapshotRepository.findByPublicId(publicId);
-    }    
+    @Transactional(readOnly=true)
+    public Snapshot findByPublicId(String refsetPublicId, String snapshotPublicId) throws SnapshotNotFoundException{
+        LOG.debug("Getting snapshot with publicId={} for refset {}", snapshotPublicId, refsetPublicId);
+        Snapshot snapshot = snapshotRepository.findOneBySnapshotPublicIdAndRefsetPublicIdAndStatus(
+                refsetPublicId, snapshotPublicId, Status.ACTIVE);
+        if (snapshot == null){
+            throw new SnapshotNotFoundException(refsetPublicId, snapshotPublicId);
+        }
+        return snapshot;
+    } 
+
+// SNAPSHOT MEMBERS ARE IMMUTABLE
+//    @Override
+//    @Transactional(rollbackFor = {SnapshotNotFoundException.class,
+//            ConceptIdNotFoundException.class, RefsetNotFoundException.class})
+//    public Snapshot addMembers(Set<MemberDto> members, String snapshotPublicId, String refsetPublicId)
+//            throws SnapshotNotFoundException, ConceptIdNotFoundException, RefsetNotFoundException {
+//        LOG.debug("Adding {} new members to refset {}", members.size(), snapshotPublicId);
+//        
+//        Refset refset = refsetService.findByPublicId(refsetPublicId);
+//        Snapshot snapshot = findByPublicId(refsetPublicId, snapshotPublicId);
+//        snapshot.addMembers(RepositoryRefsetService.fillMembers(members, refset.getModuleConcept(), conceptService));
+//        return snapshot;
+//    }    
 
     @Override
-    @Transactional(rollbackFor = {SnapshotNotFoundException.class})
-    public Snapshot update(SnapshotDto updated) throws NonUniquePublicIdException, SnapshotNotFoundException, RefsetConceptNotFoundException{
-        LOG.debug("Updating snapshot with information: " + updated);
+    @Transactional(rollbackFor = {SnapshotNotFoundException.class, NonUniquePublicIdException.class})
+    public Snapshot update(String refsetPublicId, String snapshotPublicId, SnapshotDto updated) 
+            throws NonUniquePublicIdException, SnapshotNotFoundException{
+        LOG.debug("Updating snapshot {} for refset {} with: {} ", snapshotPublicId, refsetPublicId, updated);
         
-        Snapshot snapshot = snapshotRepository.findOne(updated.getId());
-        if (snapshot == null) {
-            throw new SnapshotNotFoundException("No snapshot found with id: " + updated.getId());
-        }
+        Snapshot snapshot = findByPublicId(refsetPublicId, snapshotPublicId);
         
         snapshot.update(
                 updated.getPublicId(),
                 updated.getTitle(),
-                updated.getDescription(),
-                fillMembers(updated.getMemberDtos()));
+                updated.getDescription());
 
         try {
             return snapshotRepository.save(snapshot);
         } catch (DataIntegrityViolationException e) {
-            throw new NonUniquePublicIdException(e.getMessage(), e);
+            throw new NonUniquePublicIdException("Public id [" + updated.getPublicId() + "] already exist for snapshot for refset [" + refsetPublicId + "]");            
         }
     }   
+    
+    @Override
+    @Transactional(rollbackFor = {
+            RefsetNotFoundException.class, 
+            NonUniquePublicIdException.class})
+    public Snapshot createFromRefsetMembers(String refsetPublicId, SnapshotDto snapshotDto) 
+            throws RefsetNotFoundException, NonUniquePublicIdException {
+        
+        Refset refset = refsetService.findByPublicId(refsetPublicId);
+        
+        Snapshot snapshot = snapshotRepository.
+                findOneBySnapshotPublicIdAndRefsetPublicIdAndAnyStatus(refsetPublicId, snapshotDto.getPublicId());
+
+        if (snapshot != null){
+            throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
+        }
+        
+        Plan plan = refset.getPlan();
+        em.detach(plan);
+        
+        snapshot = Snapshot.getBuilder(
+                snapshotDto.getPublicId(), 
+                snapshotDto.getTitle(), 
+                snapshotDto.getDescription(), 
+                refset.getMembers(),
+                plan.getTerminal() != null ? plan.getTerminal().clone() : null).build();
+        
+        refset.addSnapshot(snapshot);
+        refset.setPendingChanges(false);
+        return snapshot;
+    }    
 
     @Override
-    @Transactional(rollbackFor={RefsetConceptNotFoundException.class})
-    public Snapshot create(SnapshotDto created) throws RefsetConceptNotFoundException, NonUniquePublicIdException, ValidationException{
-        LOG.debug("Creating new snapshot [{}]", created.toString());
+    @Transactional(rollbackFor={RefsetConceptNotFoundException.class,
+            NonUniquePublicIdException.class, ValidationException.class})
+    public Snapshot createFromDeclaredMembers(String refsetPublicId, SnapshotDto created) throws NonUniquePublicIdException, ValidationException, ConceptIdNotFoundException, RefsetNotFoundException{
+        LOG.debug("Creating new snapshot [{}] for refset {}", created.toString(), refsetPublicId);
+        
+        Refset refset = refsetService.findByPublicId(refsetPublicId);
         
         PlanDto planDto = new PlanDto();
         planDto.setRefsetRules(created.getRefsetRules());
@@ -114,7 +154,7 @@ public class RepositorySnapshotService implements SnapshotService {
                 created.getPublicId(), 
                 created.getTitle(), 
                 created.getDescription(),
-                fillMembers(created.getMemberDtos()),
+                RepositoryRefsetService.fillMembers(created.getMemberDtos(), refset.getModuleConcept(), conceptService),
                 rule
                 ).build();
         try {
@@ -125,49 +165,35 @@ public class RepositorySnapshotService implements SnapshotService {
     }
     
     @Override
-    @Transactional(rollbackFor = SnapshotNotFoundException.class)
-    public Snapshot delete(Long snapshotId) throws SnapshotNotFoundException {
-        LOG.debug("Deleting snapshot with id: " + snapshotId);
-        Snapshot deleted = snapshotRepository.findOne(snapshotId);
-        if (deleted == null) {
-            throw new SnapshotNotFoundException(snapshotId, "No snapshot found with id: " + snapshotId);
+    @Transactional
+    public Snapshot delete(String refsetPublicId, String snapshotPublicId) throws SnapshotNotFoundException {
+        LOG.debug("Inactivating (deleting) snapshot with public id {} for refset {} " + snapshotPublicId, refsetPublicId);
+        
+        Snapshot inactivated = snapshotRepository.findOneBySnapshotPublicIdAndRefsetPublicIdAndStatus(
+                refsetPublicId, snapshotPublicId, Status.ACTIVE);
+        if (inactivated == null) {
+            throw new SnapshotNotFoundException(refsetPublicId, snapshotPublicId);
         }
-        snapshotRepository.delete(deleted);
-        return deleted;
-    }  
+        inactivated.setStatus(Status.INACTIVE);
+        return inactivated;
+    }    
 
     @Override
-    @Transactional(rollbackFor = SnapshotNotFoundException.class)
-    public Snapshot delete(String publicId) throws SnapshotNotFoundException {
-        LOG.debug("Deleting snapshot with public id: " + publicId);
-        Snapshot deleted = snapshotRepository.findByPublicId(publicId);
-        if (deleted == null) {
-            throw new SnapshotNotFoundException(publicId, "No snapshot found with public id: " + publicId);
+    @Transactional
+    public Snapshot resurect(String refsetPublicId, String snapshotPublicId) throws SnapshotNotFoundException {
+        LOG.debug("Resurecting snapshot with public id {} for refset {}", snapshotPublicId, refsetPublicId);
+        Snapshot resurected = snapshotRepository.findOneBySnapshotPublicIdAndRefsetPublicIdAndStatus(
+                refsetPublicId, snapshotPublicId, Status.INACTIVE);
+        if (resurected == null) {
+            throw new SnapshotNotFoundException(refsetPublicId, snapshotPublicId);
         }
-        snapshotRepository.delete(deleted);
-        return deleted;
-    }    
-    
-    private Set<Member> fillMembers(Set<MemberDto> memberDtos) throws RefsetConceptNotFoundException {
-        Set<Member> members = new HashSet<>();
-        if ((memberDtos == null) || (memberDtos.isEmpty())){
-            return members;
-        }
-        for (MemberDto memberDto : memberDtos){
-            try {
-				Concept c = conceptService.findBySerialisedId(memberDto.getComponent().getIdAsLong());
-				if (c == null){
-				    throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
-				}
-				members.add(Member.getBuilder(null, c).build());
-			} catch (NumberFormatException e) {
-				throw new RefsetConceptNotFoundException(memberDto.getComponent(), "Did not find component concept with serialisedId " + memberDto.getComponent().getId());
-			}
-        }
-        return members;
-    }        
+        resurected.setStatus(Status.ACTIVE);
+        return resurected;
+    }
 
-    private Sort sortByAscendingTitle() {
-        return new Sort(Sort.Direction.ASC, "title");
+    @Override
+    @Transactional(readOnly=true)
+    public List<Snapshot> findAllSnapshots(String refsetPublicId) {
+        return snapshotRepository.findAllByRefsetPublicIdAndStatus(refsetPublicId, Status.ACTIVE);
     }
 }

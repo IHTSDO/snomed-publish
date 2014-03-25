@@ -5,7 +5,6 @@ import java.util.Set;
 
 import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.MemberNotFoundException;
@@ -44,11 +43,9 @@ public interface RefsetService {
 
     public abstract Refset delete(String publicId) throws RefsetNotFoundException;
 
-    public Refset update(Refset refset);
+    public abstract Refset update(Refset refset);
 
-    public SnapshotDto takeSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException;
+    //public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException;
 
-    public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException;
-
-    Refset resurect(String publicId) throws RefsetNotFoundException;
+    public abstract Refset resurect(String publicId) throws RefsetNotFoundException;
 }

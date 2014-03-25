@@ -22,7 +22,6 @@ import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
-import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
 import com.ihtsdo.snomed.exception.MemberNotFoundException;
@@ -42,8 +41,7 @@ import com.ihtsdo.snomed.model.SnomedFlavours.SnomedFlavour;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.Refset.Status;
-import com.ihtsdo.snomed.model.refset.Snapshot;
+import com.ihtsdo.snomed.model.refset.Status;
 import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
@@ -107,17 +105,10 @@ public class RepositoryRefsetService implements RefsetService {
         return refsetRepository.findByStatus(Status.ACTIVE, new Sort(Sort.Direction.ASC, "title"));
     }    
     
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Refset findById(Long id) {
-//        LOG.debug("Finding refset by id: " + id);
-//        return refsetRepository.findOne(id);
-//    }
-    
     @Override
     @Transactional(readOnly=true)
     public Refset findByPublicId(String publicId) throws RefsetNotFoundException{
-        //Refset refset = refsetRepository.findOne(findActiveByRefsetName(publicId));
+        LOG.debug("Getting active refset with publicId=" + publicId);
         Refset refset = refsetRepository.findByPublicIdAndStatus(publicId, Status.ACTIVE);
         if (refset == null){
             throw new RefsetNotFoundException(publicId);
@@ -191,17 +182,18 @@ public class RepositoryRefsetService implements RefsetService {
         } catch (ParseException e1) {
             throw new InvalidSnomedDateFormatException(updated.getSnomedReleaseDate(), e1);
         }
-
-        refset.update(
-                updated.getSource(), 
-                updated.getType(), 
-                ontologyVersion,
-                refsetConcept, 
-                moduleConcept, 
-                updated.getTitle(), 
-                updated.getDescription(), 
-                updated.getPublicId(), 
-                plan);
+//
+//        refset.update(
+//                updated.getSource(), 
+//                updated.getType(), 
+//                updated.gets
+//                ontologyVersion,
+//                refsetConcept, 
+//                moduleConcept, 
+//                updated.getTitle(), 
+//                updated.getDescription(), 
+//                updated.getPublicId(), 
+//                plan);
         
         try {
             return refsetRepository.save(refset);
@@ -279,23 +271,11 @@ public class RepositoryRefsetService implements RefsetService {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
     }
-    
-//    @Override
-//    @Transactional(rollbackFor = RefsetNotFoundException.class)
-//    public Refset delete(Long refsetId) throws RefsetNotFoundException {
-//        LOG.debug("Deleting refset with id: " + refsetId);
-//        Refset deleted = refsetRepository.findOne(refsetId);
-//        if (deleted == null) {
-//            throw new RefsetNotFoundException(refsetId, "No refset found with id: " + refsetId);
-//        }
-//        refsetRepository.delete(deleted);
-//        return deleted;
-//    }  
 
     @Override
     @Transactional(rollbackFor = RefsetNotFoundException.class)
     public Refset delete(String publicId) throws RefsetNotFoundException {
-        LOG.debug("Deleting refset with public id: " + publicId);
+        LOG.debug("Inactivating (deleting) refset with public id: " + publicId);
         Refset inactivated = refsetRepository.findByPublicIdAndStatus(publicId, Status.ACTIVE);
         if (inactivated == null) {
             throw new RefsetNotFoundException(publicId, "No refset found with public id: " + publicId);
@@ -316,111 +296,29 @@ public class RepositoryRefsetService implements RefsetService {
         resurected.setStatus(Status.ACTIVE);
         refsetRepository.save(resurected);
         return resurected;
-    }        
-    
-    @Override
-    @Transactional(rollbackFor = {
-            RefsetNotFoundException.class, 
-            NonUniquePublicIdException.class})
-    public SnapshotDto takeSnapshot(String refsetPublicId, SnapshotDto snapshotDto) 
-            throws RefsetNotFoundException, NonUniquePublicIdException {
-        Refset refset = findByPublicId(refsetPublicId);
-        if (refset == null){
-            throw new RefsetNotFoundException(refsetPublicId);
-        }
-        
-        Snapshot snapshot = refset.getSnapshot(snapshotDto.getPublicId());
-        
-        if (snapshot != null){
-            throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
-        }
-        
-        em.detach(refset.getPlan());
-        
-        snapshot = Snapshot.getBuilder(
-                snapshotDto.getPublicId(), 
-                snapshotDto.getTitle(), 
-                snapshotDto.getDescription(), 
-                Member.createFromConcepts(refset.getPlan().refreshAndGetConcepts()),
-                refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
-        
-        refset.addSnapshot(snapshot);
-        refset = refsetRepository.save(refset);
-        return SnapshotDto.parse(snapshot);
     }
-    
-    @Override
-    @Transactional(rollbackFor = {
-            RefsetNotFoundException.class, 
-            NonUniquePublicIdException.class,
-            ConceptIdNotFoundException.class})
-    public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) 
-            throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException {
-        Refset refset = findByPublicId(refsetPublicId);
-        if (refset == null){
-            throw new RefsetNotFoundException(refsetPublicId);
-        }
-        
-        Snapshot snapshot = refset.getSnapshot(snapshotDto.getPublicId());
-        
-        if (snapshot != null){
-            throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
-        }
-        
-        snapshot = Snapshot.getBuilder(
-                snapshotDto.getPublicId(), 
-                snapshotDto.getTitle(), 
-                snapshotDto.getDescription(), 
-                fillMembers(snapshotDto.getMemberDtos(), refset.getModuleConcept()),
-                refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
-        
-        refset.addSnapshot(snapshot);
-        refset = refsetRepository.save(refset);
-        return SnapshotDto.parse(snapshot);
-    }    
     
     @Override
     public Refset addMembers(Set<MemberDto> members, String publicId)
             throws RefsetNotFoundException, ConceptIdNotFoundException {
-        
         LOG.debug("Adding {} new members to refset {}", members.size(), publicId);
         
         Refset refset = findByPublicId(publicId);
-        refset.addMembers(fillMembers(members, refset.getModuleConcept()));
+        refset.addMembers(fillMembers(members, refset.getModuleConcept(), conceptService));
         return refset;
     }
     
     @Override
-    public Member deleteMembership(String refsetId, String memberId) throws MemberNotFoundException, NonUniquePublicIdException, RefsetNotFoundException {
+    public Member deleteMembership(String refsetId, String memberId) throws MemberNotFoundException, RefsetNotFoundException{
         LOG.debug("Deleting membership with public id {} for refset with name {}", refsetId, memberId);
-
-        //Really need to replace the refset members set with a map instead
-        //this is really annoying...
-        //But I gave up after spending hours trying to get the JPQL query to work with a map.
-        //I really hate poking around with JPA stuff... Need to get a move on!
-        
-        Refset refset = findByPublicId(refsetId);
-        if (refset == null){
-            throw new RefsetNotFoundException(refsetId);
-        }
-        
-        List<Member> members = memberService.findByMemberPublicIdAndRefsetPublicId(memberId, refsetId);
-        if ((members == null) || members.isEmpty()){
-            throw new MemberNotFoundException(memberId, refsetId);
-        }
-        if (members.size() > 1){
-            throw new NonUniquePublicIdException("Internal Error: Found more than one member for refset " + refsetId + " with identifier " + memberId);
-        }
-        
-        refset.removeMember(members.get(0));
-        
-        refsetRepository.save(refset);
-        
-        Member returned = memberService.delete(members.get(0).getId());
-        return returned;
+        Refset refset = findByPublicId(refsetId);        
+        Member member = memberService.findByMemberPublicIdAndRefsetPublicId(memberId, refsetId);
+        refset.removeMember(member);
+        return member;
     }    
     
-    private Set<Member> fillMembers(Set<MemberDto> memberDtos, Concept defaultModule) throws ConceptIdNotFoundException  {
+    /*package scope*/ static Set<Member> fillMembers(Set<MemberDto> memberDtos, 
+            Concept defaultModule, ConceptService conceptService) throws ConceptIdNotFoundException  {
         Set<Member> members = new HashSet<Member>();
         if ((memberDtos == null) || (memberDtos.isEmpty())){
             return members;
@@ -461,12 +359,40 @@ public class RepositoryRefsetService implements RefsetService {
         return members;
     }
 
-    private String generatePublicId(){
+    private static String generatePublicId(){
         return UUID.randomUUID().toString();
     }
 
 
-    
+//  @Override
+//  @Transactional(rollbackFor = {
+//          RefsetNotFoundException.class, 
+//          NonUniquePublicIdException.class,
+//          ConceptIdNotFoundException.class})
+//  public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) 
+//          throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException {
+//      Refset refset = findByPublicId(refsetPublicId);
+//      if (refset == null){
+//          throw new RefsetNotFoundException(refsetPublicId);
+//      }
+//      
+//      Snapshot snapshot = refset.getSnapshot(snapshotDto.getPublicId());
+//      
+//      if (snapshot != null){
+//          throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
+//      }
+//      
+//      snapshot = Snapshot.getBuilder(
+//              snapshotDto.getPublicId(), 
+//              snapshotDto.getTitle(), 
+//              snapshotDto.getDescription(), 
+//              fillMembers(snapshotDto.getMemberDtos(), refset.getModuleConcept()),
+//              refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
+//      
+//      refset.addSnapshot(snapshot);
+//      refset = refsetRepository.save(refset);
+//      return SnapshotDto.parse(snapshot);
+//  }        
     
 
 

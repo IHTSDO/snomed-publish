@@ -43,7 +43,7 @@ import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
-import com.ihtsdo.snomed.model.refset.Refset.Status;
+import com.ihtsdo.snomed.model.refset.Status;
 import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.service.refset.PlanService;
@@ -136,7 +136,8 @@ public class RepositoryRefsetServiceTest {
         
         RefsetDto created = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
-                Refset.Type.CONCEPT, 
+                Refset.Type.CONCEPT,
+                false,
                 of.getPublicId(),
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
@@ -268,6 +269,7 @@ public class RepositoryRefsetServiceTest {
         RefsetDto updatedDto = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
+                false,
                 of.getPublicId(), 
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),
@@ -342,6 +344,7 @@ public class RepositoryRefsetServiceTest {
         RefsetDto updated = RefsetDto.getBuilder(
                 Refset.Source.LIST, 
                 Refset.Type.CONCEPT, 
+                false,
                 of.getPublicId(),
                 ov.getTaggedOn(),
                 ConceptDto.parse(refsetConcept),

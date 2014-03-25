@@ -15,15 +15,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Snapshot;
 
 @XmlRootElement(name="snapshot")
 @JsonRootName("snapshot")
 public class SnapshotDto {
-    
-    protected Long id;
     
     @NotNull(message="Public ID can not be empty")
     @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
@@ -65,7 +62,7 @@ public class SnapshotDto {
     
 
     public static SnapshotDto parseSansMembers(Snapshot snapshot){
-        return SnapshotDto.getBuilder(snapshot.getId(), 
+        return SnapshotDto.getBuilder( 
                 snapshot.getTitle(),
                 snapshot.getDescription(),
                 snapshot.getPublicId(),
@@ -74,15 +71,14 @@ public class SnapshotDto {
     
     private static SnapshotDto fillMembers(Snapshot snap, SnapshotDto snapDto){
         Set<MemberDto> memberDtos = new HashSet<>();
-        for (Member m : snap.getMembers()){
+        for (Member m : snap.getImmutableMembers()){
             memberDtos.add(MemberDto.parse(m));
         }
         snapDto.setMemberDtos(memberDtos);
         return snapDto;
     }
     
-    public SnapshotDto(Long id, String publicId, String title, String description, Set<MemberDto> members){
-        this.id = id;
+    public SnapshotDto(String publicId, String title, String description, Set<MemberDto> members){
         this.publicId = publicId;
         this.title = title;
         this.description = description;
@@ -92,7 +88,6 @@ public class SnapshotDto {
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
-                .add("id", getId())
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
@@ -104,11 +99,10 @@ public class SnapshotDto {
     public boolean equals(Object o){
         if (o instanceof SnapshotDto){
             SnapshotDto dto = (SnapshotDto) o;
-            if (Objects.equal(dto.getId(), getId()) &&
-                    (Objects.equal(dto.getTitle(), getTitle())) &&
-                    (Objects.equal(dto.getDescription(), getDescription())) &&
-                    (Objects.equal(dto.getMemberDtos(), getMemberDtos())) &&
-                    (Objects.equal(dto.getPublicId(), getPublicId()))){
+            if ((Objects.equal(dto.getTitle(), getTitle())) &&
+                (Objects.equal(dto.getDescription(), getDescription())) &&
+                (Objects.equal(dto.getMemberDtos(), getMemberDtos())) &&
+                (Objects.equal(dto.getPublicId(), getPublicId()))){
                 return true;
             }
         }
@@ -117,13 +111,11 @@ public class SnapshotDto {
     
     @Override
     public int hashCode(){
-        if (getId() != null){
-            return Longs.hashCode(getId());
-        }else if (getPublicId() != null){
-            return getPublicId().hashCode();
-        }else{
-            return -1; //delegate to equals method
-        }
+        return java.util.Objects.hash(
+                getTitle(),
+                getDescription(),
+                //getMemberDtos(),
+                getPublicId());
     }
 
     public String getPublicId() {
@@ -150,16 +142,6 @@ public class SnapshotDto {
         this.description = description;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    
-    
     public Long getTerminal() {
         return terminal;
     }
@@ -184,17 +166,16 @@ public class SnapshotDto {
 		this.memberDtos = memberDtos;
 	}
 
-	public static Builder getBuilder(Long id, String title, String description, String publicId, Set<MemberDto> members) {
-        return new Builder(id, title, description, publicId, members);
+	public static Builder getBuilder(String title, String description, String publicId, Set<MemberDto> members) {
+        return new Builder(title, description, publicId, members);
     }
     
     public static class Builder {
         private SnapshotDto built;
 
-        Builder(Long id, String title, String description, String publicId, Set<MemberDto> members) {
+        Builder(String title, String description, String publicId, Set<MemberDto> members) {
             built = new SnapshotDto();
             built.setDescription(description);
-            built.setId(id);
             built.setPublicId(publicId);
             built.setTitle(title);
             built.setMemberDtos(members);

@@ -1,9 +1,6 @@
 package com.ihtsdo.snomed.model.refset;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +19,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ihtsdo.snomed.model.Concept;
+import com.ihtsdo.snomed.model.Ontology;
+import com.ihtsdo.snomed.model.OntologyFlavour;
+import com.ihtsdo.snomed.model.OntologyVersion;
+import com.ihtsdo.snomed.model.SnomedFlavours;
+import com.ihtsdo.snomed.model.SnomedOntology;
+import com.ihtsdo.snomed.model.refset.Refset.Source;
+import com.ihtsdo.snomed.model.refset.Refset.Type;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -34,18 +41,74 @@ public class SnapshotTest {
     @PersistenceContext(unitName="testdb")
     EntityManager em;
     
+    static Date DEFAULT_TAGGED_ON;
+    
+    static{
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        java.util.Date utilDate = cal.getTime();
+        DEFAULT_TAGGED_ON = new Date(utilDate.getTime());        
+    }       
+    
     @Before
     public void setUp() {
         Concept c = new Concept(1234);
         Member m = Member.getBuilder(null, c).build();
         em.persist(c);
         em.persist(m);
+
+        Concept refsetConcept = new Concept(1234l);
+        Concept moduleConcept = new Concept(2345l);
+        OntologyVersion ontologyVersion = new OntologyVersion();
         
+        refsetConcept.setOntologyVersion(ontologyVersion);
+        moduleConcept.setOntologyVersion(ontologyVersion);
+        
+        ontologyVersion.addConcept(refsetConcept);
+        ontologyVersion.addConcept(moduleConcept);
+        ontologyVersion.setTaggedOn(new Date(java.util.Calendar.getInstance().getTime().getTime()));
+        
+        em.persist(ontologyVersion);
+        em.persist(refsetConcept);
+        em.persist(moduleConcept);
+        
+        Refset r = Refset.getBuilder(
+                Refset.Source.LIST, 
+                Refset.Type.CONCEPT, 
+                ontologyVersion, 
+                refsetConcept, 
+                moduleConcept, 
+                "title1", 
+                "description1", 
+                "pubid_1", 
+                new Plan()).build();
+        
+        em.persist(r);
+
         s1 = Snapshot.getBuilder("pubid_1", "title1", "description1", new HashSet<Member>(Arrays.asList(m)), null).build();
+        
+        
+        s1.setRefset(r);
+        r.addSnapshot(s1);
+        
         em.persist(s1);
+        
         em.flush();
         em.clear();
     }
+    
+    public static Ontology createOntology() {
+        OntologyVersion ov = new OntologyVersion();
+        ov.setTaggedOn(DEFAULT_TAGGED_ON);
+        OntologyFlavour of = new OntologyFlavour();
+        of.setPublicId(SnomedFlavours.INTERNATIONAL.getPublicIdString());
+        of.setLabel(SnomedFlavours.INTERNATIONAL.getLabel());
+        Ontology o = new Ontology();
+        o.setLabel(SnomedOntology.LABEL);
+        o.setPublicId(SnomedOntology.PUBLIC_ID);
+        o.addFlavour(of);
+        of.addVersion(ov);
+        return o;
+    }  
     
     @Test
     public void shouldValidateRefset(){

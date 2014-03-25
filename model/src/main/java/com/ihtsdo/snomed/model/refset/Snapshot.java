@@ -2,15 +2,18 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -37,8 +40,16 @@ public class Snapshot {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+    
+    @NotNull
+    @ManyToOne
+    private Refset refset;
+    
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    private Set<Member> members;
+    private Set<Member> immutableMembers = new HashSet<>();
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -68,11 +79,10 @@ public class Snapshot {
     @OneToOne(targetEntity=BaseRule.class, cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     private Rule terminal;    
     
-    public void update(String publicId, String title, String description, Set<Member> members){
+    public void update(String publicId, String title, String description){
         setPublicId(publicId);
         setTitle(title);
         setDescription(description);
-        setMembers(members);
     }
     
     public Snapshot() {}
@@ -80,11 +90,13 @@ public class Snapshot {
     @Override
     public boolean equals(Object o){
         if (o instanceof Snapshot){
-            Snapshot r = (Snapshot) o;
-            if ((r.getPublicId() == this.getPublicId()) &&
-                (r.getTitle() == this.getTitle()) &&
-                (r.getDescription() == this.getDescription())){
-                return true;
+            Snapshot s = (Snapshot) o;
+            if ((Objects.equal(s.getTitle(), getTitle())) &&
+                (Objects.equal(s.getDescription(), getDescription())) &&
+                (Objects.equal(s.getImmutableMembers(), getImmutableMembers())) &&
+                (Objects.equal(s.getTerminal(), getTerminal())) &&
+                (Objects.equal(s.getPublicId(), getPublicId()))){
+                    return true;
             }
         }
         return false;
@@ -94,8 +106,11 @@ public class Snapshot {
     public String toString(){
         return Objects.toStringHelper(this)
                 .add("id", getId())
+                .add("publicId", getPublicId())
                 .add("title", getTitle())
                 .add("description", getDescription())
+                .add("immutableMembers", getImmutableMembers().size())
+                .add("terminal", getTerminal())
                 .toString();
     }
     
@@ -104,7 +119,8 @@ public class Snapshot {
         return java.util.Objects.hash(
                 getPublicId(),
                 getTitle(),
-                getDescription());
+                getDescription(),
+                getTerminal());
     }
 
     @PreUpdate
@@ -119,16 +135,16 @@ public class Snapshot {
         modificationTime = now;
     }    
     
-    
-    public Snapshot addMembers(List<Member> members){
-        getMembers().addAll(members);
-        return this;
-    }
-
-    public Snapshot addMember(Member member){
-        getMembers().add(member);
-        return this;
-    }    
+//    
+//    public Snapshot addMembers(Set<Member> immutableMembers){
+//        getMembers().addAll(immutableMembers);
+//        return this;
+//    }
+//
+//    public Snapshot addMember(Member member){
+//        getMembers().add(member);
+//        return this;
+//    }    
     
     public Long getId() {
         return id;
@@ -186,12 +202,12 @@ public class Snapshot {
         this.publicId = publicId;
     }
 
-    public Set<Member> getMembers() {
-		return members;
+    public Set<Member> getImmutableMembers() {
+		return immutableMembers;
 	}
 
-	public void setMembers(Set<Member> members) {
-		this.members = members;
+	public void setImmutableMembers(Set<Member> members) {
+		this.immutableMembers = members;
 	}
 
 	public Rule getTerminal() {
@@ -202,6 +218,22 @@ public class Snapshot {
         this.terminal = terminal;
     }
 
+    public void setStatus(Status status){
+        this.status = status;
+    }
+    
+    public Status getStatus(){
+        return status;
+    }   
+    
+    public void setRefset(Refset refset){
+        this.refset = refset;
+    }
+    
+    public Refset getRefset(){
+        return refset;
+    }
+    
     public static Builder getBuilder(String publicId, String title, String description, Set<Member> members, Rule terminal) {
         return new Builder(publicId, title, description, members, terminal);
     }
@@ -215,7 +247,7 @@ public class Snapshot {
             built.title = title;
             built.publicId = publicId;
             built.description = description;
-            built.members = members;
+            built.immutableMembers = members;
             built.terminal = terminal;
         }
 

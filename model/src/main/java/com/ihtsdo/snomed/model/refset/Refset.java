@@ -2,12 +2,11 @@ package com.ihtsdo.snomed.model.refset;
 
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,7 +14,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -50,9 +48,8 @@ public class Refset {
         CONCEPT, DESCRIPTION, STATEMENT;
     }
     
-    public enum Status {
-        INACTIVE, ACTIVE
-    }
+    @Column(columnDefinition = "BIT", length = 1) 
+    private boolean pendingChanges = false; 
     
     @Id 
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -89,9 +86,12 @@ public class Refset {
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
     private Set<Member> members = new HashSet<>();
     
-    @OneToMany(cascade=CascadeType.ALL)
-    @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
-    private Map<String, Snapshot> snapshotsMap;
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="refset")
+    private Set<Snapshot> snapshots = new HashSet<>();    
+    
+//    @OneToMany(cascade=CascadeType.ALL)
+//    @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
+//    private Map<String, Snapshot> snapshotsMap;
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -120,46 +120,61 @@ public class Refset {
     
     public Refset() {}
     
-    public Refset update(Source source, Type type, OntologyVersion ontologyVersion,
-            Concept refsetConcept, Concept moduleConcept, String title, String description, 
-            String publicId, Plan plan)
-    {
-        this.setSource(source);
-        this.setType(type);
-        this.setOntologyVersion(ontologyVersion);
-        this.setRefsetConcept(refsetConcept);
-        this.setModuleConcept(moduleConcept);
-        this.setTitle(title);
-        this.setDescription(description);
-        this.setPublicId(publicId);
-        this.setPlan(plan);
-        
+//    public Refset update(Source source, Type type, Status status, boolean pendingChanges, OntologyVersion ontologyVersion,
+//            Concept refsetConcept, Concept moduleConcept, String title, String description, 
+//            String publicId, Plan plan)
+//    {
+//        this.setSource(source);
+//        this.setStatus(status);
+//        this.setPendingChanges(pendingChanges);
+//        this.setType(type);
+//        this.setOntologyVersion(ontologyVersion);
+//        this.setRefsetConcept(refsetConcept);
+//        this.setModuleConcept(moduleConcept);
+//        this.setTitle(title);
+//        this.setDescription(description);
+//        this.setPublicId(publicId);
+//        this.setPlan(plan);
+//        
+//        return this;
+//    }
+//    
+    
+    public boolean isListSource(){
+        return getSource() == Source.LIST;
+    }
+    
+    public boolean isRuleSource(){
+        return getSource() == Source.RULES;
+    }
+    
+    public Refset addSnapshot(Snapshot snapshot){
+        getSnapshots().add(snapshot);
         return this;
     }
     
-    public Snapshot getSnapshot(String snapshotPublicId){
-        return getSnapshotsMap().get(snapshotPublicId);
+    public Set<Snapshot> getSnapshots(){
+        return snapshots;
     }
     
-    public Collection<Snapshot> getSnapshots(){
-        return getSnapshotsMap().values();
-    }
-    
-    public void addSnapshot(Snapshot snapshot){
-        getSnapshotsMap().put(snapshot.getPublicId(), snapshot);
+    public void setSnapshots(Set<Snapshot> snapshots){
+        this.snapshots = snapshots;
     }
     
     public Refset addMembers(Set<Member> members){
+        setPendingChanges(true);
         getMembers().addAll(members);
         return this;
     }
     
     public Refset removeMember(Member member){
+        setPendingChanges(true);
         getMembers().remove(member);
         return this;
     }
 
     public Refset addMember(Member member){
+        setPendingChanges(true);
         getMembers().add(member);
         return this;
     }    
@@ -333,14 +348,6 @@ public class Refset {
         this.version = version;
     }
 
-     Map<String, Snapshot> getSnapshotsMap() {
-        return snapshotsMap;
-    }
-
-     void setSnapshotsMap(Map<String, Snapshot> snapshotsMap) {
-        this.snapshotsMap = snapshotsMap;
-    }
-     
      public OntologyVersion getOntologyVersion() {
         return ontologyVersion;
     }
@@ -357,7 +364,13 @@ public class Refset {
         this.members = members;
     }    
 
+    public void setPendingChanges(boolean pendingChanges){
+        this.pendingChanges = pendingChanges;
+    }
     
+    public boolean isPendingChanges(){
+        return pendingChanges;
+    }
     
     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
              Concept refsetConcept, Concept moduleConcept, String title, String description, 

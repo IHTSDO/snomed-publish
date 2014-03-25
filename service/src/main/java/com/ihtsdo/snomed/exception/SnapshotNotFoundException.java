@@ -4,46 +4,31 @@ public class SnapshotNotFoundException extends Exception {
 
     private static final long serialVersionUID = 9145348616866771322L;
     private Long id;
-    private String publicId;
+    private String snapshotPublicId;
+    private String refsetPublicId;
 
     public SnapshotNotFoundException(Long id) {
         super();
         this.id = id;
     }
     
-    public SnapshotNotFoundException(String publicId){
-        super();
-        this.publicId = publicId;
-    }
-
     public SnapshotNotFoundException(Long id, String message) {
         super(message);
         this.id = id;
+    }    
+    
+    public SnapshotNotFoundException(String refsetPublicId, String snapshotPublicId){
+        super();
+        this.snapshotPublicId = snapshotPublicId;
+        this.refsetPublicId = refsetPublicId;
     }
     
-    public SnapshotNotFoundException(String publicId, String message) {
-        super(message);
-        this.publicId = publicId;
-    }
-    
-    public String getPublicId(){
-        return publicId;
+    public String getSnapshotPublicId(){
+        return snapshotPublicId;
     }
 
-
-    public SnapshotNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    public SnapshotNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-        // TODO Auto-generated constructor stub
-    }
-
-    public SnapshotNotFoundException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-        // TODO Auto-generated constructor stub
+    public String getRefsetPublicId(){
+        return refsetPublicId;
     }
 
     public Long getId() {
