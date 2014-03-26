@@ -13,8 +13,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -48,7 +49,11 @@ public class Snapshot {
     @ManyToOne
     private Refset refset;
     
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @NotNull
+    private int size;
+    
+    @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
+    @JoinTable
     private Set<Member> immutableMembers = new HashSet<>();
     
     @NotNull
@@ -234,21 +239,31 @@ public class Snapshot {
         return refset;
     }
     
-    public static Builder getBuilder(String publicId, String title, String description, Set<Member> members, Rule terminal) {
-        return new Builder(publicId, title, description, members, terminal);
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public static Builder getBuilder(String publicId, String title, String description, Refset refset, Set<Member> members, Rule terminal) {
+        return new Builder(publicId, title, description, refset, members, terminal);
     }
     
 
     public static class Builder {
         private Snapshot built;
 
-        Builder(String publicId, String title, String description, Set<Member> members, Rule terminal) {
+        Builder(String publicId, String title, String description, Refset refset, Set<Member> members, Rule terminal) {
             built = new Snapshot();
             built.title = title;
             built.publicId = publicId;
             built.description = description;
-            built.immutableMembers = members;
+            built.refset = refset;
+            built.immutableMembers.addAll(members);
             built.terminal = terminal;
+            built.size = members.size();
         }
 
         public Snapshot build() {

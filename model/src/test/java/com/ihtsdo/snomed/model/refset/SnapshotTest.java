@@ -24,8 +24,6 @@ import com.ihtsdo.snomed.model.OntologyFlavour;
 import com.ihtsdo.snomed.model.OntologyVersion;
 import com.ihtsdo.snomed.model.SnomedFlavours;
 import com.ihtsdo.snomed.model.SnomedOntology;
-import com.ihtsdo.snomed.model.refset.Refset.Source;
-import com.ihtsdo.snomed.model.refset.Refset.Type;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -84,7 +82,7 @@ public class SnapshotTest {
         
         em.persist(r);
 
-        s1 = Snapshot.getBuilder("pubid_1", "title1", "description1", new HashSet<Member>(Arrays.asList(m)), null).build();
+        s1 = Snapshot.getBuilder("pubid_1", "title1", "description1", r, new HashSet<Member>(Arrays.asList(m)), null).build();
         
         
         s1.setRefset(r);

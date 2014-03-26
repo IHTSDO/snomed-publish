@@ -1,5 +1,7 @@
 package com.ihtsdo.snomed.dto.refset;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -24,13 +26,19 @@ public class SnapshotDtoShort {
     @Size(min=4, message="Description must be longer than 4 characters")
     protected String description;
     
+    protected Date createdOn;
+    
+    protected int size;
+    
     public SnapshotDtoShort(){}
 
     public static SnapshotDtoShort parse(Snapshot snapshot){        
         return SnapshotDtoShort.getBuilder( 
                 snapshot.getTitle(),
                 snapshot.getDescription(),
-                snapshot.getPublicId()).build();        
+                snapshot.getPublicId(),
+                snapshot.getCreationTime(),
+                snapshot.getSize()).build();        
     }  
         
     public SnapshotDtoShort(String publicId, String title, String description){
@@ -92,19 +100,37 @@ public class SnapshotDtoShort {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+	public Date getCreatedOn() {
+        return createdOn;
+    }
 
-	public static Builder getBuilder(String title, String description, String publicId) {
-        return new Builder(title, description, publicId);
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+    
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public static Builder getBuilder(String title, String description, String publicId, Date createdOn, int size) {
+        return new Builder(title, description, publicId, createdOn, size);
     }
     
     public static class Builder {
         private SnapshotDtoShort built;
 
-        Builder(String title, String description, String publicId) {
+        Builder(String title, String description, String publicId, Date createdOn, int size) {
             built = new SnapshotDtoShort();
             built.setDescription(description);
             built.setPublicId(publicId);
             built.setTitle(title);
+            built.setCreatedOn(createdOn);
+            built.setSize(size);
         }
         
         public SnapshotDtoShort build(){

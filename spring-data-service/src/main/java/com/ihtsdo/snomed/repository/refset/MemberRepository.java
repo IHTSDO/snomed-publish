@@ -2,6 +2,7 @@ package com.ihtsdo.snomed.repository.refset;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -35,7 +36,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
                     "AND r.status=com.ihtsdo.snomed.model.refset.Status.ACTIVE";                                                                                                                                                                                                                                                                                                                                      
     
     @Query(FIND_BY_REFSET_PUBLIC_ID_AND_IS_ACTIVE)
-    public List<Member> findByRefsetPublicIdAndIsActive(@Param("refsetPublicId") String refsetPublicId);
+    public List<Member> findByRefsetPublicIdAndIsActive(
+            @Param("refsetPublicId") String refsetPublicId, Sort sort);
     
     @Query(FIND_BY_MEMBER_PUBLIC_ID_AND_REFSET_PUBLIC_ID_AND_IS_ACTIVE)
     public Member findByMemberPublicIdAndRefsetPublicIdAndIsActive(
@@ -45,6 +47,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
     @Query(FIND_BY_REFSET_PUBLIC_AND_SNAPSHOT_PUBLIC_ID_AND_IS_ACTIVE)
     public List<Member> findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(
             @Param("refsetPublicId") String refsetPublicId,
-            @Param("snapshotPublicId") String snapshotPublicId);
+            @Param("snapshotPublicId") String snapshotPublicId,
+            Sort sort);
     
 }

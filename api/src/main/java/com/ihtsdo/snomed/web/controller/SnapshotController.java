@@ -23,6 +23,7 @@ import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.MembersDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDto;
 import com.ihtsdo.snomed.dto.refset.SnapshotDtoShort;
+import com.ihtsdo.snomed.dto.refset.VersionsDto;
 import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
@@ -51,13 +52,13 @@ public class SnapshotController {
     @Inject
     RefsetErrorBuilder refsetErrorBuilder;
     
-    @RequestMapping(value = "{refsetName}/snapshots", 
+    @RequestMapping(value = "{refsetName}/versions", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public List<SnapshotDtoShort> getAllSnapshotsForRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
+    public VersionsDto getAllSnapshotsForRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
         LOG.debug("Received request for all snapshots for refset {}", refsetName);
         
         //make sure refset exists, or throw exception
@@ -67,10 +68,10 @@ public class SnapshotController {
         for (Snapshot s : snapshotService.findAllSnapshots(refsetName)){
             snapshotDtos.add(SnapshotDtoShort.parse(s));
         }
-        return snapshotDtos;
+        return new VersionsDto(snapshotDtos);
     }    
     
-    @RequestMapping(value = "{refsetName}/snapshots/{snapshotName}/members", 
+    @RequestMapping(value = "{refsetName}/version/{snapshotName}/members", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)
@@ -92,8 +93,20 @@ public class SnapshotController {
         return new MembersDto(memberDtos);
     }
     
+    @RequestMapping(value = "{refsetName}/version/{snapshotName}", 
+            method = RequestMethod.GET, 
+            consumes=MediaType.ALL_VALUE,
+            produces=MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)    
+    public SnapshotDtoShort getSnapshotMember(@PathVariable String refsetName, @PathVariable String snapshotName) throws SnapshotNotFoundException  
+    {
+        LOG.debug("Received request for snapshot [{}] for refset [{}]", snapshotName, refsetName);
+        return SnapshotDtoShort.parse(snapshotService.findByPublicId(refsetName, snapshotName));
+    }    
+    
     @Transactional
-    @RequestMapping(value = "{refsetName}/snapit", 
+    @RequestMapping(value = "{refsetName}/versions", 
             method = RequestMethod.POST, 
             consumes=MediaType.ALL_VALUE,
             produces=MediaType.APPLICATION_JSON_VALUE)

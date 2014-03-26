@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,21 +57,24 @@ public class RepositoryMemberService implements MemberService {
     @Transactional(readOnly = true)
     public List<Member> findByRefsetPublicId(String refsetPublicId){
         LOG.debug("Getting all members for refset with publicId=" + refsetPublicId);
-        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId);
+        return memberRepository.findByRefsetPublicIdAndIsActive(
+                refsetPublicId, new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId){
         LOG.debug("Getting all members for snapshot {} for refset {}", snapshotPublicId, refsetPublicId);
-        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId);
+        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(
+                refsetPublicId, snapshotPublicId, new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
     }    
 
     @Override
     @Transactional(readOnly = true)
     public Member findByMemberPublicIdAndRefsetPublicId(String memberPublicId, String refsetPublicId) throws MemberNotFoundException{
         LOG.debug("Getting member with publicId {} for refset with publicId {}", memberPublicId, refsetPublicId);
-        Member m = memberRepository.findByMemberPublicIdAndRefsetPublicIdAndIsActive(refsetPublicId, memberPublicId);
+        Member m = memberRepository.findByMemberPublicIdAndRefsetPublicIdAndIsActive(
+                refsetPublicId, memberPublicId);
         if (m == null){
             throw new MemberNotFoundException(memberPublicId, refsetPublicId);
         }

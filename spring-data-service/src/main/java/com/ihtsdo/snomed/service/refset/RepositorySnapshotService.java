@@ -21,7 +21,6 @@ import com.ihtsdo.snomed.exception.RefsetConceptNotFoundException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.exception.validation.ValidationException;
-import com.ihtsdo.snomed.model.refset.Plan;
 import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.refset.Rule;
 import com.ihtsdo.snomed.model.refset.Snapshot;
@@ -121,15 +120,13 @@ public class RepositorySnapshotService implements SnapshotService {
             throw new NonUniquePublicIdException("Snapshot with public id {} allready exists");
         }
         
-        Plan plan = refset.getPlan();
-        em.detach(plan);
-        
         snapshot = Snapshot.getBuilder(
                 snapshotDto.getPublicId(), 
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
+                refset,
                 refset.getMembers(),
-                plan.getTerminal() != null ? plan.getTerminal().clone() : null).build();
+                refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
         refset.addSnapshot(snapshot);
         refset.setPendingChanges(false);
@@ -154,14 +151,16 @@ public class RepositorySnapshotService implements SnapshotService {
                 created.getPublicId(), 
                 created.getTitle(), 
                 created.getDescription(),
+                refset,
                 RepositoryRefsetService.fillMembers(created.getMemberDtos(), refset.getModuleConcept(), conceptService),
                 rule
                 ).build();
         try {
-            return snapshotRepository.save(snapshot);
+            refsetRepository.save(refset);
         } catch (DataIntegrityViolationException e) {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
+        return snapshot;
     }
     
     @Override
