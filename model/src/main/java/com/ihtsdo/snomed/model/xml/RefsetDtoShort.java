@@ -6,6 +6,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.dto.refset.ConceptDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto;
+import com.ihtsdo.snomed.dto.refset.MemberDto.Builder;
 import com.ihtsdo.snomed.model.refset.Refset;
 
 @XmlRootElement(name="refset")
@@ -103,4 +106,35 @@ public class RefsetDtoShort {
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
+    
+    public static RefsetDtoShort parse(Refset r){
+        return getBuilder(new XmlRefsetConcept(r.getRefsetConcept()),
+                r.getPublicId(),
+                r.getTitle(),
+                r.getDescription(),
+                r.getCreationTime(),
+                r.getModificationTime()).build();
+    }
+    
+    public static Builder getBuilder(XmlRefsetConcept concept, String publicId, String title, String description, Date created, Date lastModified) {
+        return new Builder(concept, publicId, title, description, created, lastModified);
+    }
+    
+    public static class Builder {
+        private RefsetDtoShort built;
+
+        Builder(XmlRefsetConcept concept, String publicId, String title, String description, Date created, Date lastModified){
+            built = new RefsetDtoShort();
+            built.concept = concept;
+            built.publicId = publicId;
+            built.title = title;
+            built.description = description;
+            built.created = created;
+            built.lastModified = lastModified;
+        }
+        
+        public RefsetDtoShort build() {
+            return built;
+        }
+    }    
 }

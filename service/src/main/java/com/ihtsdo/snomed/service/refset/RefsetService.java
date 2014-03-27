@@ -22,13 +22,17 @@ import com.ihtsdo.snomed.model.refset.Refset;
 
 public interface RefsetService {
     
+    public enum SortOrder {
+        ASC, DESC;
+    }
+    
     public abstract Refset addMembers(Set<MemberDto> members, String publicId) throws RefsetNotFoundException, ConceptIdNotFoundException;
 
     public abstract Member deleteMembership(String refsetId, String memberId) throws RefsetNotFoundException, MemberNotFoundException, NonUniquePublicIdException;
     
     //public abstract List<Refset> findAll(int pageIndex);
 
-    public abstract List<Refset> findAll();
+    public abstract List<Refset> findAll(String sortBy, SortOrder sortOrder);
 
     //public abstract Refset findById(Long id);
 

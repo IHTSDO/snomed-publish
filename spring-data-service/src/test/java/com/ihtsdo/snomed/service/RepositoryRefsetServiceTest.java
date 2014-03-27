@@ -48,6 +48,7 @@ import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.service.refset.PlanService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
+import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 import com.ihtsdo.snomed.service.refset.RepositoryRefsetService;
 
 import static org.junit.Assert.assertEquals;
@@ -230,7 +231,7 @@ public class RepositoryRefsetServiceTest {
         List<Refset> refsets = new ArrayList<Refset>();
         when(refsetRepoMock.findAll()).thenReturn(refsets);
         
-        List<Refset> returned = refsetService.findAll();
+        List<Refset> returned = refsetService.findAll("title", SortOrder.ASC);
         
         verify(refsetRepoMock, times(1)).findByStatus(eq(Status.ACTIVE), any(Sort.class));
         verifyNoMoreInteractions(refsetRepoMock);

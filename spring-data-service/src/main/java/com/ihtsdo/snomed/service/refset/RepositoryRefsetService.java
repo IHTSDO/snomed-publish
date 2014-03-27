@@ -100,10 +100,14 @@ public class RepositoryRefsetService implements RefsetService {
 //    
     @Override
     @Transactional(readOnly = true)
-    public List<Refset> findAll(){
-        LOG.debug("Retrieving all active refsets, sorted by title");
-        return refsetRepository.findByStatus(Status.ACTIVE, new Sort(Sort.Direction.ASC, "title"));
+    public List<Refset> findAll(String sortBy, SortOrder sortOrder){
+        LOG.debug("Retrieving all active refsets, sorted by {} {}", sortBy, sortOrder); 
+        return refsetRepository.findByStatus(Status.ACTIVE, new Sort(sortDirection(sortOrder), sortBy));
     }    
+    
+    private Sort.Direction sortDirection(SortOrder sortOrder){
+        return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
+    }
     
     @Override
     @Transactional(readOnly=true)

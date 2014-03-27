@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.LocaleResolver;
@@ -41,6 +42,7 @@ import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.MembersDto;
 import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
+import com.ihtsdo.snomed.dto.refset.RefsetsDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
 import com.ihtsdo.snomed.exception.InvalidInputException;
 import com.ihtsdo.snomed.exception.InvalidSnomedDateFormatException;
@@ -56,11 +58,12 @@ import com.ihtsdo.snomed.exception.validation.ValidationException;
 import com.ihtsdo.snomed.model.Concept;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Refset;
+import com.ihtsdo.snomed.model.xml.RefsetDtoShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
-import com.ihtsdo.snomed.model.xml.RefsetDtoShort;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
+import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParser.Mode;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory;
 import com.ihtsdo.snomed.service.refset.parser.RefsetParserFactory.Parser;
@@ -96,6 +99,7 @@ public class RefsetController {
     @Resource
     private MessageSource messageSource;
     
+
     
     @RequestMapping(value = "", 
             method = RequestMethod.GET, 
@@ -103,13 +107,15 @@ public class RefsetController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<RefsetDtoShort> getAllRefsets(){
-        List<Refset> refsets = refsetService.findAll();
-        List<RefsetDtoShort> refsetDtoShorts = new ArrayList<>();
+    public RefsetsDto getAllRefsets(@RequestParam("sortBy") String sortBy,
+            @RequestParam("sortOrder") SortOrder sortOrder){
+        List<Refset> refsets = refsetService.findAll(sortBy, sortOrder);
+        List<RefsetDtoShort> refsetDtos = new ArrayList<>();
         for (Refset r : refsets){
-            refsetDtoShorts.add(new RefsetDtoShort(r));
+            refsetDtos.add(RefsetDtoShort.parse(r));
         }
-        return refsetDtoShorts;
+        return new RefsetsDto(refsetDtos);
+
     }    
         
     @RequestMapping(value = "{refsetName}", 
