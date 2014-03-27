@@ -184,13 +184,12 @@ public class RefsetController {
             consumes = {MediaType.ALL_VALUE})
     @ResponseStatus(HttpStatus.OK)
     public void downloadUnversionedMembersInRf2(@PathVariable String refsetName,
-            @RequestParam("sortBy") String sortBy, @RequestParam("sortOrder") SortOrder sortOrder,
             Writer responseWriter, HttpServletResponse response) throws RefsetNotFoundException, GlobalBindingException
     {
         LOG.debug("Controller received request to download unversioned members of refset {} in RF2 format", refsetName);
         try {
             RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(
-                    memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder));
+                    memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC));
             response.setContentType(RF2_MIME_TYPE);
         } catch (IOException e) {
             LOG.error("Unable to write RF2 file: " + e.getMessage(), e);
@@ -207,12 +206,10 @@ public class RefsetController {
             consumes = {MediaType.ALL_VALUE})
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<MemberDto> downloadUnversionedMembersInJson(@PathVariable String refsetName,
-            @RequestParam("sortBy") String sortBy, 
-            @RequestParam("sortOrder") SortOrder sortOrder) throws RefsetNotFoundException
+    public List<MemberDto> downloadUnversionedMembersInJson(@PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download unversioned members of refset {} in JSON format", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC);
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));
@@ -226,12 +223,10 @@ public class RefsetController {
             consumes = {MediaType.ALL_VALUE})
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public MembersDto downloadUnversionedMembersInXml(@PathVariable String refsetName,
-            @RequestParam("sortBy") String sortBy, 
-            @RequestParam("sortOrder") SortOrder sortOrder) throws RefsetNotFoundException
+    public MembersDto downloadUnversionedMembersInXml(@PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download unversioned members of refset {} in XML format", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC);
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));
