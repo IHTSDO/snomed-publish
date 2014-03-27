@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -32,6 +33,7 @@ import com.ihtsdo.snomed.model.refset.Snapshot;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.SnapshotService;
+import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 
 @Controller
@@ -77,14 +79,16 @@ public class SnapshotController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)    
-    public MembersDto  getSnapshotMembers(@PathVariable String refsetName, @PathVariable String snapshotName) throws SnapshotNotFoundException  
+    public MembersDto  getSnapshotMembers(@PathVariable String refsetName, @PathVariable String snapshotName,
+            @RequestParam("sortBy") String sortBy, 
+            @RequestParam("sortOrder") SortOrder sortOrder) throws SnapshotNotFoundException  
     {
         LOG.debug("Received request for members of snapshot [{}] for refset [{}]", snapshotName, refsetName);
 
         //make sure snapshot exists, or throw exception
         snapshotService.findByPublicId(refsetName, snapshotName);
         
-        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName);
+        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, sortBy, sortOrder);
         
         List<MemberDto> memberDtos = new ArrayList<MemberDto>();
         for (Member m : members){

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.repository.refset.MemberRepository;
+import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 @Transactional (value = "transactionManager", readOnly = false)
@@ -55,18 +56,21 @@ public class RepositoryMemberService implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Member> findByRefsetPublicId(String refsetPublicId){
-        LOG.debug("Getting all members for refset with publicId=" + refsetPublicId);
-        return memberRepository.findByRefsetPublicIdAndIsActive(
-                refsetPublicId, new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
+    public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder){
+        LOG.debug("Getting all members for refset with publicId={} sorted by {} {}", refsetPublicId, sortBy, sortOrder);
+        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId, 
+                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)); 
+                        //"component.fullySpecifiedName"));
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId){
-        LOG.debug("Getting all members for snapshot {} for refset {}", snapshotPublicId, refsetPublicId);
-        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(
-                refsetPublicId, snapshotPublicId, new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
+    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, String sortBy, SortOrder sortOrder){
+        LOG.debug("Getting all members for snapshot {} for refset {} sorted by {} {}", snapshotPublicId, refsetPublicId, sortBy, sortOrder);
+        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
+                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy));
+                
+                //new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
     }    
 
     @Override

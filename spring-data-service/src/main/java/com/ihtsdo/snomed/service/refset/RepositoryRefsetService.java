@@ -105,7 +105,7 @@ public class RepositoryRefsetService implements RefsetService {
         return refsetRepository.findByStatus(Status.ACTIVE, new Sort(sortDirection(sortOrder), sortBy));
     }    
     
-    private Sort.Direction sortDirection(SortOrder sortOrder){
+    public static Sort.Direction sortDirection(SortOrder sortOrder){
         return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
     }
     
