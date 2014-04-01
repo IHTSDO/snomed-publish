@@ -26,6 +26,7 @@ import com.ihtsdo.snomed.exception.MemberNotFoundException;
 import com.ihtsdo.snomed.exception.ProgrammingError;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
+import com.ihtsdo.snomed.exception.TagNotFoundException;
 import com.ihtsdo.snomed.web.dto.ErrorDto;
 import com.ihtsdo.snomed.web.exception.FieldBindingException;
 import com.ihtsdo.snomed.web.exception.GlobalBindingException;
@@ -145,6 +146,30 @@ public class RefsetControllerExceptionHandler {
                             "Unable to find member with id " + e.getSnapshotPublicId() + " for refset with name " + e.getRefsetPublicId()));            
         }
     }    
+    
+    // TAG NOT FOUND EXCEPTION
+    @ExceptionHandler(TagNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDto handleTagNotFoundException(TagNotFoundException e){
+        LOG.debug("In TagNotFoundExceptionHandler");
+        if (e.getId() != null){
+            LOG.error("Unable to find tag with internal id {}", e.getId(), e);
+            return new ErrorDto().addGlobalError(
+                    resolveLocalizedErrorMessage(
+                            "error.message.internal.error", 
+                            Arrays.asList(e.getMessage()),
+                            "Internal Server Error: " + e.getMessage()));            
+        }else{
+            LOG.error("Unable to find tag {} for refset {}", e.getTagPublicId(), e.getRefsetPublicId(), e);
+            return new ErrorDto().addGlobalError(
+                    resolveLocalizedErrorMessage(
+                            "error.message.member.publicid.not.found", 
+                            Arrays.asList(e.getTagPublicId(), e.getRefsetPublicId()),
+                            "Unable to find member with id " + e.getTagPublicId() + " for refset with name " + e.getRefsetPublicId()));            
+        }
+    }        
+    
     
     // CONCEPT NOT FOUND EXCEPTION
     @ExceptionHandler(ConceptIdNotFoundException.class)

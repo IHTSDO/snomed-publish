@@ -10,6 +10,7 @@
         <class>com.ihtsdo.snomed.model.Description</class>
         <class>com.ihtsdo.snomed.model.refset.Refset</class>
         <class>com.ihtsdo.snomed.model.refset.Plan</class>
+        <class>com.ihtsdo.snomed.model.refset.Tag</class>
         <class>com.ihtsdo.snomed.model.refset.Snapshot</class>
         <class>com.ihtsdo.snomed.model.refset.BaseRule</class>
         <class>com.ihtsdo.snomed.model.refset.rule.DifferenceRefsetRule</class>

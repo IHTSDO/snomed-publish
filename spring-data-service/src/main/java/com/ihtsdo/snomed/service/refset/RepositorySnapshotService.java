@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +30,7 @@ import com.ihtsdo.snomed.service.ConceptService;
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 
 @Service
+@Transactional(value = "transactionManager")
 public class RepositorySnapshotService implements SnapshotService {
     private static final Logger LOG = LoggerFactory.getLogger(RepositorySnapshotService.class);
 
@@ -51,9 +50,6 @@ public class RepositorySnapshotService implements SnapshotService {
     
     @Inject
     protected ConceptService conceptService;   
-    
-    @PersistenceContext(unitName="hibernatePersistenceUnit") 
-    private EntityManager em;    
     
     @PostConstruct
     public void init(){}

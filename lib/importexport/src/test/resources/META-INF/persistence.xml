@@ -12,6 +12,7 @@
         <class>com.ihtsdo.snomed.model.Ontology</class>
         <class>com.ihtsdo.snomed.model.refset.Refset</class>
         <class>com.ihtsdo.snomed.model.refset.Plan</class>
+        <class>com.ihtsdo.snomed.model.refset.Tag</class>
         <class>com.ihtsdo.snomed.model.refset.Snapshot</class>
         <class>com.ihtsdo.snomed.model.refset.Member</class>
         <class>com.ihtsdo.snomed.model.refset.BaseRule</class>

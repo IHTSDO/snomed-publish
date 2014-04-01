@@ -91,22 +91,7 @@ public class Snapshot {
     }
     
     public Snapshot() {}
-    
-    @Override
-    public boolean equals(Object o){
-        if (o instanceof Snapshot){
-            Snapshot s = (Snapshot) o;
-            if ((Objects.equal(s.getTitle(), getTitle())) &&
-                (Objects.equal(s.getDescription(), getDescription())) &&
-                (Objects.equal(s.getImmutableMembers(), getImmutableMembers())) &&
-                (Objects.equal(s.getTerminal(), getTerminal())) &&
-                (Objects.equal(s.getPublicId(), getPublicId()))){
-                    return true;
-            }
-        }
-        return false;
-    }
-    
+        
     @Override
     public String toString(){
         return Objects.toStringHelper(this)
@@ -120,12 +105,24 @@ public class Snapshot {
     }
     
     @Override
+    public boolean equals(Object o){
+        if (o instanceof Snapshot){
+            Snapshot s = (Snapshot) o;
+            if (Objects.equal(s.getPublicId(), getPublicId()) &&
+                Objects.equal(s.getRefset(), getRefset()) && 
+                Objects.equal(s.getImmutableMembers(), getImmutableMembers()) &&
+                Objects.equal(s.getTerminal(), getTerminal())){
+                return true;
+            }
+        }
+        return false;
+    }    
+    
+    @Override
     public int hashCode(){
         return java.util.Objects.hash(
-                getPublicId(),
-                getTitle(),
-                getDescription(),
-                getTerminal());
+                getRefset(),
+                getPublicId());
     }
 
     @PreUpdate

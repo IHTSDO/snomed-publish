@@ -32,7 +32,7 @@ public class ManifestCliParser {
         options.addOption("c", "concepts", true, "Concepts input file");
         options.addOption("d", "descriptions", true, "Descriptions input file");
         options.addOption("f", "format", true, "Input format");
-        options.addOption("r", "root", true, "Release folder"); 
+        options.addOption("r", "root", true, "Tag folder"); 
 //        options.addOption("o", "output", true, "Input format"); //optional
         options.addOption("db", "database", true, "Database location"); //optional    
 

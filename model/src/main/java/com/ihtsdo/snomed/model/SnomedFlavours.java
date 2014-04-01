@@ -8,7 +8,7 @@ public class SnomedFlavours {
     public enum PublicId {INTERNATIONAL}
     
     public static final Map<PublicId, SnomedFlavour> SnomedFlavourMap = new HashMap<>();
-    public static final SnomedFlavour INTERNATIONAL = new SnomedFlavour(PublicId.INTERNATIONAL, "Snomed International Release");
+    public static final SnomedFlavour INTERNATIONAL = new SnomedFlavour(PublicId.INTERNATIONAL, "Snomed International Tag");
     
     static{
       SnomedFlavourMap.put(PublicId.INTERNATIONAL, INTERNATIONAL);

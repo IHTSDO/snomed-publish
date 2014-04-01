@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +37,7 @@ import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
 
 @Controller
 @RequestMapping("/refsets")
-@Transactional(value = "transactionManager")
+//@Transactional(value = "transactionManager")
 public class SnapshotController {
     private static final Logger LOG = LoggerFactory.getLogger(SnapshotController.class);
     
@@ -109,7 +108,6 @@ public class SnapshotController {
         return SnapshotDtoShort.parse(snapshotService.findByPublicId(refsetName, snapshotName));
     }    
     
-    @Transactional
     @RequestMapping(value = "{refsetName}/versions", 
             method = RequestMethod.POST, 
             consumes=MediaType.ALL_VALUE,
@@ -134,7 +132,6 @@ public class SnapshotController {
         return SnapshotDtoShort.parse(snapshotService.createFromRefsetMembers(refsetName, snapshotDto));        
     }    
 
-//  @Transactional
 //  @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.rf2", 
 //          method = RequestMethod.GET, 
 //          consumes=MediaType.ALL_VALUE,
@@ -169,7 +166,6 @@ public class SnapshotController {
 //      //servletResponse.setContentType(RF2_MIME_TYPE);
 //  }        
     
-//  @Transactional
 //  @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.xml", 
 //          method = RequestMethod.GET, 
 //          consumes=MediaType.ALL_VALUE,
@@ -193,7 +189,6 @@ public class SnapshotController {
 //  }    
     
 
-//    @Transactional
 //    @RequestMapping(value = "{refsetName}/snapshots", 
 //            method = RequestMethod.POST, 
 //            consumes=MediaType.ALL_VALUE,
@@ -314,7 +309,6 @@ public class SnapshotController {
  
     
     /*
-    @Transactional
     @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}.txt", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,

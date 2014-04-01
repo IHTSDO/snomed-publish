@@ -87,11 +87,10 @@ public class Refset {
     private Set<Member> members = new HashSet<>();
     
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="refset")
-    private Set<Snapshot> snapshots = new HashSet<>();    
+    private Set<Snapshot> snapshots = new HashSet<>();
     
-//    @OneToMany(cascade=CascadeType.ALL)
-//    @JoinColumn(name="refset_id", referencedColumnName="id", nullable=true)
-//    private Map<String, Snapshot> snapshotsMap;
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="refset")
+    private Set<Tag> tags = new HashSet<>();    
     
     @NotNull
     @Size(min=2, max=20, message="Public ID must be between 2 and 20 characters")
@@ -220,16 +219,17 @@ public class Refset {
     @Override
     public int hashCode(){
         return java.util.Objects.hash(
-                getSource(),
-                getType(),
-                getOntologyVersion(),
-                getRefsetConcept(),
-                getModuleConcept(),
-                getTitle(),
-                getDescription(),
-                getPublicId(),
-                getPlan(),
-                getMembers());
+                //getSource(),
+                //getType(),
+                //getOntologyVersion(),
+                //getRefsetConcept(),
+                //getModuleConcept(),
+                //getTitle(),
+                //getDescription(),
+                getPublicId()//,
+                //getPlan(),
+                //getMembers()
+                );
     }
 
     @PreUpdate
@@ -372,6 +372,16 @@ public class Refset {
         return pendingChanges;
     }
     
+    
+    
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
     public static Builder getBuilder(Long id, Source source, Type type, OntologyVersion snomedRelease,
              Concept refsetConcept, Concept moduleConcept, String title, String description, 
              String publicId, Plan plan) {

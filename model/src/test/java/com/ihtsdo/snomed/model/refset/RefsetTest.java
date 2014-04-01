@@ -182,14 +182,14 @@ public class RefsetTest {
 //        
 //        assertEquals(r.hashCode(), r1.hashCode());
 //    }    
-    
-    @Test
-    public void shouldNotHaveSameHashcode(){
-        Refset r = em.createQuery("SELECT r FROM Refset r WHERE id=:id", Refset.class)
-                .setParameter("id", r1.getId())
-                .getSingleResult();
-        r.setId(45l);
-        assertNotEquals(r.hashCode(), r1.hashCode());
-    }       
+//    
+//    @Test
+//    public void shouldNotHaveSameHashcode(){
+//        Refset r = em.createQuery("SELECT r FROM Refset r WHERE id=:id", Refset.class)
+//                .setParameter("id", r1.getId())
+//                .getSingleResult();
+//        r.setId(45l);
+//        assertNotEquals(r.hashCode(), r1.hashCode());
+//    }       
     
 }

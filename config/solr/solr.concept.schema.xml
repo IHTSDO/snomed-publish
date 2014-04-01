@@ -111,8 +111,9 @@
    
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="title" type="text_general" indexed="true" stored="true"/>
-   <field name="version_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="version_title" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="exact_title" type="lowercase" indexed="true" stored="true"/>
+   <!--field name="version_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="version_title" type="text_general" indexed="true" stored="true" required="true" multiValued="false" /-->
    <field name="effectiveTime" type="long" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="active" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="status_concept_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
