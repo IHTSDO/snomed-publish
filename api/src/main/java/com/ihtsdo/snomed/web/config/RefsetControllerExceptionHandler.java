@@ -141,9 +141,9 @@ public class RefsetControllerExceptionHandler {
             LOG.error("Unable to find snapshot {} for refset {}", e.getSnapshotPublicId(), e.getRefsetPublicId(), e);
             return new ErrorDto().addGlobalError(
                     resolveLocalizedErrorMessage(
-                            "error.message.member.publicid.not.found", 
+                            "error.message.snapshot.not.found", 
                             Arrays.asList(e.getSnapshotPublicId(), e.getRefsetPublicId()),
-                            "Unable to find member with id " + e.getSnapshotPublicId() + " for refset with name " + e.getRefsetPublicId()));            
+                            "Unable to find snapshot with id " + e.getSnapshotPublicId() + " for refset with name " + e.getRefsetPublicId()));            
         }
     }    
     
@@ -230,7 +230,7 @@ public class RefsetControllerExceptionHandler {
     private String resolveLocalizedErrorMessage(String key, List<String> args, String defaultMessage) {
         Locale currentLocale =  LocaleContextHolder.getLocale();
         try {
-            return messageSource.getMessage(key, null, currentLocale);
+            return messageSource.getMessage(key, args.toArray(), currentLocale);
         } catch (NoSuchMessageException e) {
             return defaultMessage;
         }

@@ -58,6 +58,8 @@ public class RefsetDto {
     @Size(min=4, message="Description must be longer than 4 characters")
     private String description;
     
+    private int memberSize;
+    
     @NotNull(message="A plan must be associated with a refset")
     private PlanDto plan = new PlanDto();
         
@@ -73,6 +75,7 @@ public class RefsetDto {
                 .add("title", getTitle())
                 .add("description", getDescription())
                 .add("publicId", getPublicId())
+                .add("memberSize", getMemberSize())
                 .add("plan", getPlan())
                 .toString();
     }
@@ -205,6 +208,15 @@ public class RefsetDto {
     public void setPendingChanges(boolean pendingChanges) {
         this.pendingChanges = pendingChanges;
     }
+    
+
+    public int getMemberSize() {
+        return memberSize;
+    }
+
+    public void setMemberSize(int memberSize) {
+        this.memberSize = memberSize;
+    }
 
     public static RefsetDto parse(Refset refset){
         return  getBuilder(
@@ -218,14 +230,22 @@ public class RefsetDto {
                 refset.getTitle(),
                 refset.getDescription(), 
                 refset.getPublicId(), 
-                PlanDto.parse(refset.getPlan())).build();
+                PlanDto.parse(refset.getPlan()),
+                refset.getMemberSize()).build();
     }
 
     public static Builder getBuilder(Source source, Type type, boolean pendingChanges, String snomedExtension,
             Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
-			String publicId, PlanDto plan) {
+            String publicId, PlanDto plan) {
         return new Builder(source, type, pendingChanges, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
-        		title, description, publicId, plan);
+                title, description, publicId, plan, 0);
+    }    
+    
+    public static Builder getBuilder(Source source, Type type, boolean pendingChanges, String snomedExtension,
+            Date releaseDate, ConceptDto refsetConcept, ConceptDto moduleConcept, String title, String description, 
+			String publicId, PlanDto plan, int memberSize) {
+        return new Builder(source, type, pendingChanges, snomedExtension, releaseDate, refsetConcept, moduleConcept, 
+        		title, description, publicId, plan, memberSize);
     }
     
     public static class Builder {
@@ -234,7 +254,8 @@ public class RefsetDto {
         public Builder(Source source, Type type, boolean pendingChanges,
                 String snomedExtension, Date snomedReleaseDate,
                 ConceptDto refsetConcept, ConceptDto moduleConcept,
-                String title, String description, String publicId, PlanDto plan) 
+                String title, String description, String publicId, PlanDto plan,
+                int memberSize) 
         {
             built = new RefsetDto();
             built.setSource(source);
@@ -248,6 +269,7 @@ public class RefsetDto {
             built.setDescription(description);
             built.setPublicId(publicId);
             built.setPlan(plan);
+            built.setMemberSize(memberSize);
         }
 
         public RefsetDto build(){

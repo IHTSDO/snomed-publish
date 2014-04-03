@@ -55,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -174,6 +175,7 @@ public class RepositoryRefsetServiceTest {
 
         ArgumentCaptor<Refset> refsetArgument = ArgumentCaptor.forClass(Refset.class);
         verify(refsetRepoMock, times(1)).save(refsetArgument.capture());
+        verify(refsetRepoMock, times(1)).memberSize(anyString());
         //verify(refsetRepoMock, times(1)).findByPublicId(created.getPublicId());
         verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId());
         verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId());
@@ -323,6 +325,7 @@ public class RepositoryRefsetServiceTest {
         //verify(refsetRepoMock, times(1)).findOne(updatedDto.getId());
         verify(refsetRepoMock, times(1)).save(any(Refset.class));
         verify(refsetRepoMock, times(1)).findByPublicIdAndStatus(updatedDto.getPublicId(), Status.ACTIVE);
+        verify(refsetRepoMock, times(1)).memberSize(anyString());
         verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, refsetConcept.getSerialisedId());
         verify(conceptRepoMock, times(1)).findByOntologyVersionAndSerialisedId(ov, moduleConcept.getSerialisedId());
         verify(planServiceMock, times(1)).findById(any(Long.class));

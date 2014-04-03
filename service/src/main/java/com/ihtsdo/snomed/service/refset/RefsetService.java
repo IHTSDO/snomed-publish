@@ -52,4 +52,6 @@ public interface RefsetService {
     //public SnapshotDto importSnapshot(String refsetPublicId, SnapshotDto snapshotDto) throws RefsetNotFoundException, NonUniquePublicIdException, ConceptIdNotFoundException;
 
     public abstract Refset resurect(String publicId) throws RefsetNotFoundException;
+    
+    public abstract int getMemberSize(String publicId);
 }

@@ -114,6 +114,8 @@ public class Refset {
     @NotNull
     private Date modificationTime;
     
+    private int memberSize;
+    
     @Version
     private long version = 0;
     
@@ -176,8 +178,16 @@ public class Refset {
         setPendingChanges(true);
         getMembers().add(member);
         return this;
-    }    
+    }
     
+    public int getMemberSize() {
+        return memberSize;
+    }
+
+    public void setMemberSize(int memberSize) {
+        this.memberSize = memberSize;
+    }
+
     @Override
     public boolean equals(Object o){
         if (o instanceof Refset){

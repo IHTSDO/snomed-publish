@@ -37,10 +37,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.LocaleResolver;
 
-import com.ihtsdo.snomed.dto.refset.ConceptDto;
 import com.ihtsdo.snomed.dto.refset.MemberDto;
 import com.ihtsdo.snomed.dto.refset.MembersDto;
-import com.ihtsdo.snomed.dto.refset.PlanDto;
 import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.dto.refset.RefsetsDto;
 import com.ihtsdo.snomed.exception.ConceptIdNotFoundException;
@@ -317,9 +315,6 @@ public class RefsetController {
         
     }
     
-        
-    
-    
     @RequestMapping(value = "{refsetName}/concepts.json", 
             method = RequestMethod.GET, 
             consumes=MediaType.ALL_VALUE,
@@ -451,21 +446,7 @@ public class RefsetController {
       
     
     private RefsetResponseDto success(RefsetResponseDto response, Refset updated, Status status, int returnCode) {
-        response.setRefset(
-                RefsetDto.getBuilder(
-                        updated.getSource(), 
-                        updated.getType(), 
-                        updated.isPendingChanges(),
-                        updated.getOntologyVersion().getFlavour().getPublicId(),
-                        updated.getOntologyVersion().getTaggedOn(),
-                        ConceptDto.parse(updated.getRefsetConcept()),
-                        ConceptDto.parse(updated.getModuleConcept()),
-                        updated.getTitle(),
-                        updated.getDescription(), 
-                        updated.getPublicId(), 
-                        PlanDto.parse(updated.getPlan())).build()
-                    );
-        
+        response.setRefset(RefsetDto.parse(updated));        
         response.setStatus(status);
         response.setCode(returnCode);
         return response;
@@ -481,24 +462,10 @@ public class RefsetController {
         }
         System.out.println("returning xmlconcepts [" + xmlConcepts.size() + "]");
         return xmlConcepts;
-    }    
-
-   
+    }
  
     private RefsetDto getRefsetDto(String pubId) throws RefsetNotFoundException {
         Refset found = refsetService.findByPublicId(pubId);
-
-        return RefsetDto.getBuilder(
-                found.getSource(), 
-                found.getType(), 
-                found.isPendingChanges(),
-                found.getOntologyVersion().getFlavour().getPublicId(),
-                found.getOntologyVersion().getTaggedOn(),
-                ConceptDto.parse(found.getRefsetConcept()),
-                ConceptDto.parse(found.getModuleConcept()),
-                found.getTitle(),
-                found.getDescription(), 
-                found.getPublicId(), 
-                PlanDto.parse(found.getPlan())).build();
+        return RefsetDto.parse(found);
     }
 }

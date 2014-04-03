@@ -123,7 +123,9 @@ public class RepositoryRefsetService implements RefsetService {
     @Override
     @Transactional    
     public Refset update(Refset refset){
-        return refsetRepository.save(refset);
+        Refset newRefset = refsetRepository.save(refset);
+        newRefset.setMemberSize(getMemberSize(newRefset.getPublicId()));
+        return newRefset;
     }
     
     @Override
@@ -200,7 +202,9 @@ public class RepositoryRefsetService implements RefsetService {
 //                plan);
         
         try {
-            return refsetRepository.save(refset);
+            Refset updatedRefset = refsetRepository.save(refset);
+            updatedRefset.setMemberSize(getMemberSize(updatedRefset.getPublicId()));
+            return updatedRefset;
         } catch (DataIntegrityViolationException e) {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
@@ -270,7 +274,9 @@ public class RepositoryRefsetService implements RefsetService {
                 plan).build();
 
         try {
-            return refsetRepository.save(refset);
+            Refset newRefset = refsetRepository.save(refset);
+            newRefset.setMemberSize(getMemberSize(newRefset.getPublicId()));
+            return newRefset;
         } catch (DataIntegrityViolationException e) {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
@@ -309,6 +315,7 @@ public class RepositoryRefsetService implements RefsetService {
         
         Refset refset = findByPublicId(publicId);
         refset.addMembers(fillMembers(members, refset.getModuleConcept(), conceptService));
+        refset.setMemberSize(getMemberSize(publicId));
         return refset;
     }
     
@@ -318,6 +325,7 @@ public class RepositoryRefsetService implements RefsetService {
         Refset refset = findByPublicId(refsetId);        
         Member member = memberService.findByMemberPublicIdAndRefsetPublicId(memberId, refsetId);
         refset.removeMember(member);
+        refset.setMemberSize(refset.getMemberSize() - 1);
         return member;
     }    
     
@@ -363,9 +371,17 @@ public class RepositoryRefsetService implements RefsetService {
         return members;
     }
 
+    @Override
+    public int getMemberSize(String publicId) {
+        LOG.debug("Calculating number of members for refset " + publicId);
+        return refsetRepository.memberSize(publicId);
+    }
+    
+    
     private static String generatePublicId(){
         return UUID.randomUUID().toString();
     }
+
 
 
 //  @Override

@@ -1,9 +1,13 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -33,7 +37,10 @@ import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.SnapshotService;
 import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
+import com.ihtsdo.snomed.service.refset.serialiser.RefsetSerialiserFactory;
+import com.ihtsdo.snomed.service.refset.serialiser.RefsetSerialiserFactory.Form;
 import com.ihtsdo.snomed.web.dto.RefsetErrorBuilder;
+import com.ihtsdo.snomed.web.exception.GlobalBindingException;
 
 @Controller
 @RequestMapping("/refsets")
@@ -119,18 +126,71 @@ public class SnapshotController {
     {
         LOG.debug("Received request to create snapshot of refset [{}]", refsetName);
 
-        Snapshot snapshot = null;
         try {
-            snapshot = snapshotService.findByPublicId(refsetName, snapshotDto.getPublicId());
-        } catch (SnapshotNotFoundException e) {
-        }
-        
-        if (snapshot != null){
+            snapshotService.findByPublicId(refsetName, snapshotDto.getPublicId());
             throw new NonUniquePublicIdException("Public Id " + snapshotDto.getPublicId() + " for snapshot already exists");
-        }
-        
+        } catch (SnapshotNotFoundException e) {}
+                
         return SnapshotDtoShort.parse(snapshotService.createFromRefsetMembers(refsetName, snapshotDto));        
-    }    
+    }   
+    
+    @RequestMapping(value = "{refsetName}/version/{snapshotName}/{refsetName}.version.{snapshotName}.rf2",
+            method = RequestMethod.GET, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    public void downloadVersionedMembersInRf2(@PathVariable String refsetName, @PathVariable String snapshotName,
+            Writer responseWriter, HttpServletResponse response) throws RefsetNotFoundException, GlobalBindingException
+    {
+        LOG.debug("Controller received request to download version {} of refset {} in RF2 format", snapshotName, refsetName);
+        try {
+            RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(
+                    memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC));
+            response.setContentType(RefsetController.RF2_MIME_TYPE);
+        } catch (IOException e) {
+            LOG.error("Unable to write RF2 file: " + e.getMessage(), e);
+            throw new GlobalBindingException(
+                    "error.message.unable.to.write.file.io.exception",
+                    Arrays.asList(refsetName + "/version/" + snapshotName + "/"+ refsetName + ".version." + snapshotName + ".rf2"),
+                    "Unable to write file - general IO exception: " + e.getMessage());
+        }
+    }
+    
+    @RequestMapping(value = "{refsetName}/version/{snapshotName}/{refsetName}.version.{snapshotName}.json",
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<MemberDto> downloadVersionedMembersInJson(@PathVariable String refsetName,
+            @PathVariable String snapshotName) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to download version {} of refset {} in JSON format", snapshotName, refsetName);
+        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for (Member m : members){
+            memberDtos.add(MemberDto.parse(m));
+        }
+        return memberDtos;
+    }        
+
+    @RequestMapping(value = "{refsetName}/version/{snapshotName}/{refsetName}.version.{snapshotName}.xml",
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_XML_VALUE }, 
+            consumes = {MediaType.ALL_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MembersDto downloadVersionedMembersInXml(@PathVariable String refsetName,
+            @PathVariable String snapshotName) throws RefsetNotFoundException
+    {
+        LOG.debug("Controller received request to download version {} of refset {} in XML format", snapshotName, refsetName);
+        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for (Member m : members){
+            memberDtos.add(MemberDto.parse(m));
+        }
+        return new MembersDto(memberDtos);
+    }     
+    
 
 //  @RequestMapping(value = "{refsetName}/snapshot/{snapshotName}/members.rf2", 
 //          method = RequestMethod.GET, 
