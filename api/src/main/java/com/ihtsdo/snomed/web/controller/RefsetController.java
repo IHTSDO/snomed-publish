@@ -244,6 +244,10 @@ public class RefsetController {
     {
         LOG.debug("Controller received request to add new members to refset [{}] from a file: {}", refsetName, importDto);
         
+        if ((importDto.getFile().getOriginalFilename() == null) || (importDto.getFile().getOriginalFilename().isEmpty())){
+            throw new FieldBindingException("file", "error.message.no.file.sent", new ArrayList<String>(), "No file was sent");            
+        }
+        
         try (Reader reader = new InputStreamReader(new BufferedInputStream(importDto.getFile().getInputStream()))){
             Set <MemberDto> membersToImport = RefsetParserFactory.getParser(getParser(importDto)).parseMode(Mode.FORGIVING).parse(reader);
             refsetService.addMembers(membersToImport, refsetName);
