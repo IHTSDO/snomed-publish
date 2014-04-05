@@ -1,6 +1,7 @@
 package com.ihtsdo.snomed.service.refset;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -89,7 +90,6 @@ public class RepositorySnapshotService implements SnapshotService {
         Snapshot snapshot = findByPublicId(refsetPublicId, snapshotPublicId);
         
         snapshot.update(
-                updated.getPublicId(),
                 updated.getTitle(),
                 updated.getDescription());
 
@@ -117,15 +117,25 @@ public class RepositorySnapshotService implements SnapshotService {
         }
         
         snapshot = Snapshot.getBuilder(
-                snapshotDto.getPublicId(), 
+                //snapshotDto.getPublicId(),
+                UUID.randomUUID().toString(),
                 snapshotDto.getTitle(), 
                 snapshotDto.getDescription(), 
                 refset,
                 refset.getMembers(),
                 refset.getPlan().getTerminal() != null ? refset.getPlan().getTerminal().clone() : null).build();
         
+        //LOG.debug("Creating snapshot " + snapshot.toString());        
+        
         refset.addSnapshot(snapshot);
         refset.setPendingChanges(false);
+        try {
+            snapshotRepository.save(snapshot);
+            refsetRepository.save(refset);
+            setSnapshotPublicIdAfterSave(refset, snapshot);
+        } catch (DataIntegrityViolationException e) {
+            throw new NonUniquePublicIdException(e.getMessage(), e);
+        }
         return snapshot;
     }    
 
@@ -144,19 +154,31 @@ public class RepositorySnapshotService implements SnapshotService {
         Rule rule = planService.createRules(planDto);
         
         Snapshot snapshot = Snapshot.getBuilder(
-                created.getPublicId(), 
+                //created.getPublicId(),
+                UUID.randomUUID().toString(),
                 created.getTitle(), 
                 created.getDescription(),
                 refset,
                 RepositoryRefsetService.fillMembers(created.getMemberDtos(), refset.getModuleConcept(), conceptService),
                 rule
                 ).build();
+        
+        //LOG.debug("Creating snapshot " + snapshot.toString());
+        
         try {
+            snapshotRepository.save(snapshot);
             refsetRepository.save(refset);
+            setSnapshotPublicIdAfterSave(refset, snapshot);
         } catch (DataIntegrityViolationException e) {
             throw new NonUniquePublicIdException(e.getMessage(), e);
         }
         return snapshot;
+    }
+    
+    @Transactional
+    private void setSnapshotPublicIdAfterSave(Refset refset, Snapshot snapshot){
+        //LOG.debug("Generating Snapshot ID from refset {} and Snapshot {}", refset, snapshot);
+        snapshot.setPublicId(refset.getPublicId() + "-" + snapshot.getId().toString());
     }
     
     @Override

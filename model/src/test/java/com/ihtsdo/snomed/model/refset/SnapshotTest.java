@@ -189,14 +189,14 @@ public class SnapshotTest {
         assertEquals(s.getPublicId(), s1.getPublicId());
     }
     
-    @Test
-    public void shouldBeEqual(){
-        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
-                .setParameter("id", s1.getId())
-                .getSingleResult();
-        
-        assertEquals(s1, s);
-    }
+//    @Test
+//    public void shouldBeEqual(){
+//        Snapshot s = em.createQuery("SELECT s FROM Snapshot s WHERE id=:id", Snapshot.class)
+//                .setParameter("id", s1.getId())
+//                .getSingleResult();
+//        
+//        assertEquals(s1, s);
+//    }
     
 //    @Test
 //    public void shouldNotBeEqual(){

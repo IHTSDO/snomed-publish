@@ -13,9 +13,9 @@ import com.ihtsdo.snomed.model.refset.Snapshot;
 @JsonRootName("snapshot")
 public class SnapshotDtoShort {
     
-    @NotNull(message="Public ID can not be empty")
-    @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
+    //@NotNull(message="Public ID can not be empty")
+    //@Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
+    //@Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
     protected String publicId;
     
     @NotNull(message="validation.title.not.empty")

@@ -18,7 +18,8 @@ public class RefsetDtoShort {
     private String description;
     private Date created;
     private Date lastModified;
-
+    private int memberSize;
+    
     private boolean pendingChanges;    
     
     public RefsetDtoShort(Refset r){
@@ -30,6 +31,7 @@ public class RefsetDtoShort {
         setCreated(r.getCreationTime());
         setLastModified(r.getModificationTime());
         setPendingChanges(r.isPendingChanges());
+        setMemberSize(r.getMemberSize());
     }
     
     public RefsetDtoShort(){}
@@ -45,6 +47,7 @@ public class RefsetDtoShort {
                 .add("created", getCreated())
                 .add("lastModified", getLastModified())
                 .add("pendingChanges", isPendingChanges())
+                .add("memberSize", getMemberSize())
                 .toString();
     }
     
@@ -114,7 +117,13 @@ public class RefsetDtoShort {
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
-    
+    public int getMemberSize() {
+        return memberSize;
+    }
+    public void setMemberSize(int memberSize) {
+        this.memberSize = memberSize;
+    }
+
     public static RefsetDtoShort parse(Refset r){
         return getBuilder(new XmlRefsetConcept(r.getRefsetConcept()),
                 r.getPublicId(),
@@ -122,19 +131,20 @@ public class RefsetDtoShort {
                 r.getDescription(),
                 r.getCreationTime(),
                 r.getModificationTime(),
-                r.isPendingChanges()).build();
+                r.isPendingChanges(),
+                r.getMemberSize()).build();
     }
     
     public static Builder getBuilder(XmlRefsetConcept concept, String publicId, String title, 
-            String description, Date created, Date lastModified, boolean pendingChanges) {
-        return new Builder(concept, publicId, title, description, created, lastModified, pendingChanges);
+            String description, Date created, Date lastModified, boolean pendingChanges, int memberSize) {
+        return new Builder(concept, publicId, title, description, created, lastModified, pendingChanges, memberSize);
     }
     
     public static class Builder {
         private RefsetDtoShort built;
 
         Builder(XmlRefsetConcept concept, String publicId, String title, String description, 
-                Date created, Date lastModified, boolean pendingChanges){
+                Date created, Date lastModified, boolean pendingChanges, int memberSize){
             built = new RefsetDtoShort();
             built.concept = concept;
             built.publicId = publicId;
@@ -143,6 +153,7 @@ public class RefsetDtoShort {
             built.created = created;
             built.lastModified = lastModified;
             built.pendingChanges = pendingChanges;
+            built.memberSize = memberSize;
         }
         
         public RefsetDtoShort build() {

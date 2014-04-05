@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -22,9 +21,9 @@ import com.ihtsdo.snomed.model.refset.Snapshot;
 @JsonRootName("snapshot")
 public class SnapshotDto {
     
-    @NotNull(message="Public ID can not be empty")
-    @Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
+    //@NotNull(message="Public ID can not be empty")
+    //@Size(min=2, max=20, message="Public ID must be between 2 and 50 characters")
+    //@Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
     protected String publicId;
     
     @NotNull(message="validation.title.not.empty")

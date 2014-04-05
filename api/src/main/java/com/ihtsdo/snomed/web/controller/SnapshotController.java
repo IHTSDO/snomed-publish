@@ -126,10 +126,10 @@ public class SnapshotController {
     {
         LOG.debug("Received request to create snapshot of refset [{}]", refsetName);
 
-        try {
-            snapshotService.findByPublicId(refsetName, snapshotDto.getPublicId());
-            throw new NonUniquePublicIdException("Public Id " + snapshotDto.getPublicId() + " for snapshot already exists");
-        } catch (SnapshotNotFoundException e) {}
+//        try {
+//            snapshotService.findByPublicId(refsetName, snapshotDto.getPublicId());
+//            throw new NonUniquePublicIdException("Public Id " + snapshotDto.getPublicId() + " for snapshot already exists");
+//        } catch (SnapshotNotFoundException e) {}
                 
         return SnapshotDtoShort.parse(snapshotService.createFromRefsetMembers(refsetName, snapshotDto));        
     }   
