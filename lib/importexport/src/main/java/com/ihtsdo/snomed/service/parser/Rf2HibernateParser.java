@@ -500,6 +500,12 @@ public class Rf2HibernateParser extends HibernateParser{
                         } catch (InvalidInputException e){
                             LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
                             if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}
+                        } catch (java.util.NoSuchElementException e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}                            
+                        } catch (Exception e){
+                            LOG.error("Unable to parse line number " + currentLine + ". Line was [" + line + "]. Message is [" + e.getMessage() + "]", e);
+                            if (parseMode.equals(Mode.STRICT)){throw new InvalidInputException(e);}                            
                         }
                         line = br.readLine();
                         currentLine++;
