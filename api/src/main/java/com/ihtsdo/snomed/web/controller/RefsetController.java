@@ -305,11 +305,15 @@ public class RefsetController {
             consumes = {MediaType.ALL_VALUE})
     @ResponseBody   
     @ResponseStatus(HttpStatus.OK)
-    public MembersDto getMembers(@PathVariable String refsetName, @RequestParam("sortBy") String sortBy, 
-            @RequestParam("sortOrder") SortOrder sortOrder) throws RefsetNotFoundException, ConceptIdNotFoundException
+    public MembersDto getMembers(
+            @PathVariable String refsetName, 
+            @RequestParam("sortBy") String sortBy, 
+            @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam("pageIndex") int pageIndex,
+            @RequestParam("pageSize") int pageSize) throws RefsetNotFoundException, ConceptIdNotFoundException
     {
         LOG.debug("Controller received request to retrieve members for refset [{}]", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder, pageIndex, pageSize);
         
         List<MemberDto> memberDtos = new ArrayList<MemberDto>();
         for (Member m : members){

@@ -85,16 +85,21 @@ public class SnapshotController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)    
-    public MembersDto  getSnapshotMembers(@PathVariable String refsetName, @PathVariable String snapshotName,
+    public MembersDto  getSnapshotMembers(
+            @PathVariable String refsetName, 
+            @PathVariable String snapshotName,
             @RequestParam("sortBy") String sortBy, 
-            @RequestParam("sortOrder") SortOrder sortOrder) throws SnapshotNotFoundException  
+            @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam("pageIndex") int pageIndex,
+            @RequestParam("pageSize") int pageSize) throws SnapshotNotFoundException  
     {
         LOG.debug("Received request for members of snapshot [{}] for refset [{}]", snapshotName, refsetName);
 
         //make sure snapshot exists, or throw exception
         snapshotService.findByPublicId(refsetName, snapshotName);
         
-        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, sortBy, sortOrder);
+        List<Member> members = memberService.findBySnapshotPublicId(
+                refsetName, snapshotName, sortBy, sortOrder, pageIndex, pageSize);
         
         List<MemberDto> memberDtos = new ArrayList<MemberDto>();
         for (Member m : members){

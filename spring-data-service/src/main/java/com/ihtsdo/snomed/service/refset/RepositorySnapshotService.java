@@ -178,7 +178,7 @@ public class RepositorySnapshotService implements SnapshotService {
     @Transactional
     private void setSnapshotPublicIdAfterSave(Refset refset, Snapshot snapshot){
         //LOG.debug("Generating Snapshot ID from refset {} and Snapshot {}", refset, snapshot);
-        snapshot.setPublicId(refset.getPublicId() + "-" + snapshot.getId().toString());
+        snapshot.setPublicId(refset.getId() + "-" + snapshot.getId().toString());
     }
     
     @Override

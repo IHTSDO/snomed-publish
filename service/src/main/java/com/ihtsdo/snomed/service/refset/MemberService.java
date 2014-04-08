@@ -7,10 +7,9 @@ import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 
 public interface MemberService {
-
     public abstract Member findByMemberPublicIdAndRefsetPublicId(String memberPublicId, String refsetPublicId) throws MemberNotFoundException;
-    
+    public abstract List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder, int page, int pageSize);
+    public abstract List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, String sortBy, SortOrder sortOrder, int page, int pageSize);
     public abstract List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder);
-
     public abstract List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, String sortBy, SortOrder sortOrder);    
 }

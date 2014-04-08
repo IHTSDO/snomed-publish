@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,44 +36,41 @@ public class RepositoryMemberService implements MemberService {
     @PostConstruct
     public void init(){}
     
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Member findById(Long id){
-//        LOG.debug("Finding member by id: " + id);
-//        return memberRepository.findOne(id);
-//    }
-    
-//    @Override
-//    @Transactional(rollbackFor = MemberNotFoundException.class)
-//    public Member delete(Long memberId) throws MemberNotFoundException {
-//        LOG.debug("Deleting member with id: " + memberId);
-//        Member deleted = memberRepository.findOne(memberId);
-//        if (deleted == null) {
-//            throw new MemberNotFoundException(memberId, "No member found with id: " + memberId);
-//        }
-//        memberRepository.delete(deleted);
-//        return deleted;
-//    }
-
     @Override
     @Transactional(readOnly = true)
     public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder){
         LOG.debug("Getting all members for refset with publicId={} sorted by {} {}", refsetPublicId, sortBy, sortOrder);
-        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId, 
+        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId,
                 new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)); 
-                        //"component.fullySpecifiedName"));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder,
+            int page, int pageSize){
+        LOG.debug("Getting all members for refset with publicId={} sorted by {} {}, page {} of {}", refsetPublicId, sortBy, sortOrder, page, pageSize);
+        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId,
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy))); 
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, String sortBy, SortOrder sortOrder){
+    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, 
+            String sortBy, SortOrder sortOrder, int page, int pageSize){
+        LOG.debug("Getting all members for snapshot {} for refset {} sorted by {} {}", snapshotPublicId, refsetPublicId, sortBy, sortOrder);
+        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)));
+    }    
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, 
+            String sortBy, SortOrder sortOrder){
         LOG.debug("Getting all members for snapshot {} for refset {} sorted by {} {}", snapshotPublicId, refsetPublicId, sortBy, sortOrder);
         return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
                 new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy));
-                
-                //new Sort(Sort.Direction.ASC, "component.fullySpecifiedName"));
-    }    
-
+    }
+    
     @Override
     @Transactional(readOnly = true)
     public Member findByMemberPublicIdAndRefsetPublicId(String memberPublicId, String refsetPublicId) throws MemberNotFoundException{
@@ -83,7 +81,5 @@ public class RepositoryMemberService implements MemberService {
             throw new MemberNotFoundException(memberPublicId, refsetPublicId);
         }
         return m;
-    }    
-    
-        
+    }       
 }
