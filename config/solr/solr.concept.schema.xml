@@ -109,20 +109,21 @@
       trailing underscores (e.g. _version_) are reserved.
    -->
    
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="title" type="text_general" indexed="true" stored="true"/>
-   <field name="exact_title" type="lowercase" indexed="true" stored="true"/>
-   <field name="title_length" type="int" indexed="true" stored="true" />
-   <!--field name="inverse_title_length" type="float" indexed="true" stored="true" /-->
-   <!--field name="version_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="version_title" type="text_general" indexed="true" stored="true" required="true" multiValued="false" /-->
+   <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+
+   <!--field name="id"                 type="string"       indexed="true" stored="true" required="true" /-->
+   <field name="id"              type="string"       indexed="true" stored="true" required="true" />
+   <field name="version_flavour"    type="lowercase"    indexed="true" stored="true" />
+   <field name="version_date"       type="lowercase"    indexed="true" stored="true" />
+   
+   <field name="title"              type="text_general" indexed="true" stored="true"/>
+   <field name="exact_title"        type="lowercase"    indexed="true" stored="true"/>
+   <field name="title_length"       type="int"          indexed="true" stored="true" />
+
    <field name="effectiveTime" type="long" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="active" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="status_concept_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="module_concept_id" type="long" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="description_id" type="long" indexed="true" stored="true" required="true" multiValued="true"/>
-   <field name="description_term" type="text_general" indexed="true" stored="true" required="true" multiValued="true"/>   
-   
    
 <!--    <field name="sku" type="text_en_splitting_tight" indexed="true" stored="true" omitNorms="true"/> -->
 <!--    <field name="manu" type="text_general" indexed="true" stored="true" omitNorms="true"/> -->
@@ -248,7 +249,7 @@
  <!-- Field to use to determine and enforce document uniqueness. 
       Unless this field is marked with required="false", it will be a required field
    -->
- <uniqueKey>id</uniqueKey>
+ <uniqueKey>uuid</uniqueKey>
 
  <!-- DEPRECATED: The defaultSearchField is consulted by various query parsers when
   parsing a query string that isn't explicit about the field.  Machine (non-user)
@@ -303,6 +304,9 @@
    <!-- <copyField source="name" dest="alphaNameSort"/> -->
  
   <types>
+
+     <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
        attribute and any other attributes determine the real

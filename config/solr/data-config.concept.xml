@@ -1,40 +1,60 @@
 <dataConfig>
   <dataSource type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/snomed" user="root" password="3wQY2BzD6889bqu7" />
-  
-  <script><![CDATA[
-      function inverseTitleLength(row)    {
-        var title_length = row.get('title_length');
-        var inverse = 1 / title_length;
-        row.put('inverse_title_length', inverse);
-        return row;
-      }
-  ]]></script>
-
   <document>
-    <entity name="concept"
-      query="SELECT c.id as internal_id, c.serialisedId as id, c.fullySpecifiedName,
-                c.effectiveTime, c.active, c.status_id, c.module_id, 
-                LENGTH(c.fullySpecifiedName) as title_length,
-                status_concept.serialisedId as status_concept_id,
-                module_concept.serialisedId as module_concept_id
-            FROM Concept status_concept, Concept module_concept, Concept c, Ontology o
-            WHERE c.status_id=status_concept.id
-            AND c.module_id=module_concept.id">
+    <entity name="concept" query="
+      SELECT a.serialisedId as sctid,
+             a.effectiveTime,
+             a.active,
+             a.term,
+             Length(a.term) as term_length,
+             status_concept.serialisedId as status_concept_id,
+             module_concept.serialisedId as module_concept_id,
+             of.publicId as version_flavour,
+             ov.taggedOn as version_date
+      FROM
+      (
+        SELECT id, 
+               serialisedId, 
+               effectiveTime, 
+               active, 
+               status_id, 
+               module_id, 
+               ontologyVersion_id,       
+               fullySpecifiedName as term 
+        FROM Concept
+        UNION ALL
+        SELECT c.id, 
+               c.serialisedId, 
+               c.effectiveTime, 
+               c.active, 
+               c.status_id, 
+               c.module_id, 
+               c.ontologyVersion_id,
+               term 
+        FROM Description as d
+        INNER JOIN Concept as c ON c.id = d.about_id
+      )a,
+      Concept status_concept,
+      Concept module_concept,
+      OntologyFlavour of, 
+      OntologyVersion ov
+      WHERE  a.status_id=status_concept.id
+      AND    a.module_id=module_concept.id 
+      AND    ov.flavour_id=of.id
+      AND    a.ontologyVersion_id=ov.id">
 
-      <field column="id" name="id" />
-      <!--field column="version_id" name="version_id" />
-      <field column="version_title" name="version_title" /-->
-      <field column="fullySpecifiedName" name="title" />
-      <field column="title_length" name="title_length" />
-      <field column="fullySpecifiedName" name="exact_title" />
+      <field column="sctid" name="id" />
+      <field column="version_flavour" name="version_flavour" />
+      <field column="version_date" name="version_date" />
+
+      <field column="term" name="title" />
+      <field column="term" name="exact_title" />
+      <field column="term_length" name="title_length" />
+
       <field column="effectiveTime" name="effectiveTime" />
       <field column="active" name="active" />
-      <field column="status_concept_id" name="status_concept_id" />
-      <field column="module_concept_id" name="module_concept_id" />      
-      <entity name="description" query="select term, serialisedId from Description where about_id='${concept.internal_id}'">
-        <field column="serialisedId" name="description_id" />
-        <field column="term" name="description_term" />
-      </entity>
+      <field column="status_concept_id" name="status_concept_id" /> *
+      <field column="module_concept_id" name="module_concept_id" /> *
     </entity>
   </document>
 </dataConfig>

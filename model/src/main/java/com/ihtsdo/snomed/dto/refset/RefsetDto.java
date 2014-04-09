@@ -21,7 +21,7 @@ import com.ihtsdo.snomed.model.refset.Refset.Type;
 @JsonRootName("refset")
 public class RefsetDto {
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
     @NotNull(message="You must select a type")
     private Type type;
@@ -46,7 +46,7 @@ public class RefsetDto {
     private String snomedReleaseDate;
     
     @NotNull(message="Internet Address can not be empty")
-    @Size(min=2, max=20, message="Internet Address must be between 2 and 50 characters")
+    @Size(min=2, max=50, message="Internet Address must be between 2 and 50 characters")
     @Pattern(regexp="[a-zA-Z0-9_]+", message="Internet Address may contain characters, numbers, and underscores only")
     private String publicId;
     
