@@ -1,5 +1,8 @@
 package com.ihtsdo.snomed.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 
@@ -22,6 +25,8 @@ import com.ihtsdo.snomed.exception.NonUniquePublicIdException;
 import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.exception.TagNotFoundException;
+import com.ihtsdo.snomed.model.refset.Tag;
+import com.ihtsdo.snomed.service.Page;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 import com.ihtsdo.snomed.service.refset.TagService;
@@ -45,14 +50,23 @@ public class TagController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public TagsDto getAllTagsForRefset(@PathVariable String refsetName, 
-            @RequestParam("sortBy") String sortBy,
-            @RequestParam("sortOrder") SortOrder sortOrder) throws RefsetNotFoundException{
+            @RequestParam("sortBy") String sortBy, 
+            @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam(value="filter", defaultValue="", required=false) String filter,
+            @RequestParam("pageIndex") int pageIndex,
+            @RequestParam("pageSize") int pageSize) throws RefsetNotFoundException{
         LOG.debug("Received request for all tags for refset {}", refsetName);
         
         //make sure refset exists, or throw exception
         refsetService.findByPublicId(refsetName);
         
-        return TagsDto.parse(tagService.findAllTags(refsetName, sortBy, sortOrder));
+        Page<Tag> tagsPage = tagService.findAllTags(refsetName, sortBy, sortOrder, filter, pageIndex, pageSize);
+        
+        List<TagDto> tagDtos = new ArrayList<>();
+        for (Tag t : tagsPage.getContent()){
+            tagDtos.add(TagDto.parse(t));
+        }
+        return new TagsDto(tagDtos, tagsPage.getTotalElements());
     }    
 
     @RequestMapping(value = "{refsetName}/tags", 

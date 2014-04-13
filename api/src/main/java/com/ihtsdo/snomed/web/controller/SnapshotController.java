@@ -33,6 +33,7 @@ import com.ihtsdo.snomed.exception.RefsetNotFoundException;
 import com.ihtsdo.snomed.exception.SnapshotNotFoundException;
 import com.ihtsdo.snomed.model.refset.Member;
 import com.ihtsdo.snomed.model.refset.Snapshot;
+import com.ihtsdo.snomed.service.Page;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.SnapshotService;
@@ -66,17 +67,24 @@ public class SnapshotController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public VersionsDto getAllSnapshotsForRefset(@PathVariable String refsetName) throws RefsetNotFoundException{
+    public VersionsDto getAllSnapshotsForRefset(@PathVariable String refsetName,
+            @RequestParam("sortBy") String sortBy, 
+            @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam(value="filter", defaultValue="", required=false) String filter,
+            @RequestParam("pageIndex") int pageIndex,
+            @RequestParam("pageSize") int pageSize) throws RefsetNotFoundException{
         LOG.debug("Received request for all snapshots for refset {}", refsetName);
         
         //make sure refset exists, or throw exception
         refsetService.findByPublicId(refsetName);
         
+        Page<Snapshot> snapshotsPage = snapshotService.findAllSnapshots(refsetName, sortBy, sortOrder, filter, pageIndex, pageSize);
+        
         List<SnapshotDtoShort> snapshotDtos = new ArrayList<>();
-        for (Snapshot s : snapshotService.findAllSnapshots(refsetName)){
+        for (Snapshot s : snapshotsPage.getContent()){
             snapshotDtos.add(SnapshotDtoShort.parse(s));
         }
-        return new VersionsDto(snapshotDtos);
+        return new VersionsDto(snapshotDtos, snapshotsPage.getTotalElements());
     }    
     
     @RequestMapping(value = "{refsetName}/version/{snapshotName}/members", 
@@ -90,6 +98,7 @@ public class SnapshotController {
             @PathVariable String snapshotName,
             @RequestParam("sortBy") String sortBy, 
             @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam(value="filter", defaultValue="", required=false) String filter,
             @RequestParam("pageIndex") int pageIndex,
             @RequestParam("pageSize") int pageSize) throws SnapshotNotFoundException  
     {
@@ -98,14 +107,14 @@ public class SnapshotController {
         //make sure snapshot exists, or throw exception
         snapshotService.findByPublicId(refsetName, snapshotName);
         
-        List<Member> members = memberService.findBySnapshotPublicId(
-                refsetName, snapshotName, sortBy, sortOrder, pageIndex, pageSize);
+        Page<Member> membersPage = memberService.findBySnapshotPublicId(
+                refsetName, snapshotName, sortBy, sortOrder, filter, pageIndex, pageSize);
         
         List<MemberDto> memberDtos = new ArrayList<MemberDto>();
-        for (Member m : members){
+        for (Member m : membersPage.getContent()){
             memberDtos.add(MemberDto.parse(m));
         }
-        return new MembersDto(memberDtos);
+        return new MembersDto(memberDtos, membersPage.getTotalElements());
     }
     
     @RequestMapping(value = "{refsetName}/version/{snapshotName}", 
@@ -149,7 +158,7 @@ public class SnapshotController {
         LOG.debug("Controller received request to download version {} of refset {} in RF2 format", snapshotName, refsetName);
         try {
             RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(
-                    memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC));
+                    memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC, ""));
             response.setContentType(RefsetController.RF2_MIME_TYPE);
         } catch (IOException e) {
             LOG.error("Unable to write RF2 file: " + e.getMessage(), e);
@@ -170,7 +179,7 @@ public class SnapshotController {
             @PathVariable String snapshotName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download version {} of refset {} in JSON format", snapshotName, refsetName);
-        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC, "");
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));
@@ -188,7 +197,7 @@ public class SnapshotController {
             @PathVariable String snapshotName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download version {} of refset {} in XML format", snapshotName, refsetName);
-        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<Member> members = memberService.findBySnapshotPublicId(refsetName, snapshotName, "component.fullySpecifiedName", SortOrder.ASC, "");
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));

@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -38,37 +39,41 @@ public class RepositoryMemberService implements MemberService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder){
+    public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder, String searchTerm){
         LOG.debug("Getting all members for refset with publicId={} sorted by {} {}", refsetPublicId, sortBy, sortOrder);
         return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId,
-                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)); 
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder,
-            int page, int pageSize){
-        LOG.debug("Getting all members for refset with publicId={} sorted by {} {}, page {} of {}", refsetPublicId, sortBy, sortOrder, page, pageSize);
-        return memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId,
-                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy))); 
+                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy), searchTerm);
+        //return new com.ihtsdo.snomed.service.Page<Member>(page.getContent(), page.getTotalElements());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, 
-            String sortBy, SortOrder sortOrder, int page, int pageSize){
+    public com.ihtsdo.snomed.service.Page<Member> findByRefsetPublicId(String refsetPublicId, String sortBy, SortOrder sortOrder, String searchTerm, 
+            int page, int pageSize){
+        LOG.debug("Getting all members for refset with publicId={} sorted by {} {}, page {} of {}, with search term '{}'", refsetPublicId, sortBy, sortOrder, page, pageSize, searchTerm);
+        Page<Member> pageResult = memberRepository.findByRefsetPublicIdAndIsActive(refsetPublicId,
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)), searchTerm); 
+        return new com.ihtsdo.snomed.service.Page<Member>(pageResult.getContent(), pageResult.getTotalElements());
+    }    
+    
+    @Override
+    @Transactional(readOnly = true)
+    public com.ihtsdo.snomed.service.Page<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, 
+            String sortBy, SortOrder sortOrder, String searchTerm, int page, int pageSize){
         LOG.debug("Getting all members for snapshot {} for refset {} sorted by {} {}", snapshotPublicId, refsetPublicId, sortBy, sortOrder);
-        return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
-                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)));
+        Page<Member> pageResult = memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)),
+                searchTerm);
+        return new com.ihtsdo.snomed.service.Page<Member>(pageResult.getContent(), pageResult.getTotalElements());
     }    
 
     @Override
     @Transactional(readOnly = true)
     public List<Member> findBySnapshotPublicId(String refsetPublicId, String snapshotPublicId, 
-            String sortBy, SortOrder sortOrder){
+            String sortBy, SortOrder sortOrder, String searchTerm){
         LOG.debug("Getting all members for snapshot {} for refset {} sorted by {} {}", snapshotPublicId, refsetPublicId, sortBy, sortOrder);
         return memberRepository.findByRefsetPublicIdAndSnapshotPublicIdAndIsActive(refsetPublicId, snapshotPublicId, 
-                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy));
+                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy), searchTerm);
     }
     
     @Override

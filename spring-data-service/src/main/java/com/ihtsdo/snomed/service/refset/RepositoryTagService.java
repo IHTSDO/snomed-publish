@@ -1,11 +1,11 @@
 package com.ihtsdo.snomed.service.refset;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,10 +47,11 @@ public class RepositoryTagService implements TagService {
     
     @Override
     @Transactional(readOnly=true)
-    public List<Tag> findAllTags(String refsetPublicId, String sortBy, SortOrder sortOrder) throws RefsetNotFoundException {
-        LOG.debug("Getting all tags for refset {}", refsetPublicId);
-        return tagRepository.findAllByRefsetPublicId(refsetPublicId, 
-                new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy));
+    public com.ihtsdo.snomed.service.Page<Tag> findAllTags(String refsetPublicId, String sortBy, SortOrder sortOrder, String searchTerm, int page, int pageSize) throws RefsetNotFoundException {
+        LOG.debug("Getting all tags for refset with publicId={} sorted by {} {}, page {} of {}, with search term '{}'", refsetPublicId, sortBy, sortOrder, page, pageSize, searchTerm);
+        Page<Tag> pageResult = tagRepository.findAllByRefsetPublicId(refsetPublicId, searchTerm, 
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)));
+        return new com.ihtsdo.snomed.service.Page<Tag>(pageResult.getContent(), pageResult.getTotalElements());
     }
 
     @Override

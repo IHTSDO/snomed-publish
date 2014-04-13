@@ -59,6 +59,7 @@ import com.ihtsdo.snomed.model.refset.Refset;
 import com.ihtsdo.snomed.model.xml.RefsetDtoShort;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcept;
 import com.ihtsdo.snomed.model.xml.XmlRefsetConcepts;
+import com.ihtsdo.snomed.service.Page;
 import com.ihtsdo.snomed.service.refset.MemberService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
 import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
@@ -187,7 +188,7 @@ public class RefsetController {
         LOG.debug("Controller received request to download unversioned members of refset {} in RF2 format", refsetName);
         try {
             RefsetSerialiserFactory.getSerialiser(Form.RF2, responseWriter).write(
-                    memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC));
+                    memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC, ""));
             response.setContentType(RF2_MIME_TYPE);
         } catch (IOException e) {
             LOG.error("Unable to write RF2 file: " + e.getMessage(), e);
@@ -207,7 +208,7 @@ public class RefsetController {
     public List<MemberDto> downloadUnversionedMembersInJson(@PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download unversioned members of refset {} in JSON format", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC, "");
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));
@@ -224,7 +225,7 @@ public class RefsetController {
     public MembersDto downloadUnversionedMembersInXml(@PathVariable String refsetName) throws RefsetNotFoundException
     {
         LOG.debug("Controller received request to download unversioned members of refset {} in XML format", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC);
+        List<Member> members = memberService.findByRefsetPublicId(refsetName, "component.fullySpecifiedName", SortOrder.ASC, "");
         List<MemberDto> memberDtos = new ArrayList<>();
         for (Member m : members){
             memberDtos.add(MemberDto.parse(m));
@@ -309,17 +310,18 @@ public class RefsetController {
             @PathVariable String refsetName, 
             @RequestParam("sortBy") String sortBy, 
             @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam(value="filter", defaultValue="", required=false) String filter,
             @RequestParam("pageIndex") int pageIndex,
             @RequestParam("pageSize") int pageSize) throws RefsetNotFoundException, ConceptIdNotFoundException
     {
         LOG.debug("Controller received request to retrieve members for refset [{}]", refsetName);
-        List<Member> members = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder, pageIndex, pageSize);
+        Page<Member> membersPage = memberService.findByRefsetPublicId(refsetName, sortBy, sortOrder, filter, pageIndex, pageSize);
         
         List<MemberDto> memberDtos = new ArrayList<MemberDto>();
-        for (Member m : members){
+        for (Member m : membersPage.getContent()){
             memberDtos.add(MemberDto.parse(m));
         }
-        return new MembersDto(memberDtos);
+        return new MembersDto(memberDtos, membersPage.getTotalElements());
         
     }
     

@@ -1,6 +1,5 @@
 package com.ihtsdo.snomed.service.refset;
 
-import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -9,6 +8,9 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ import com.ihtsdo.snomed.model.refset.Status;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.repository.refset.SnapshotRepository;
 import com.ihtsdo.snomed.service.ConceptService;
+import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 
 //http://www.petrikainulainen.net/programming/spring-framework/spring-data-jpa-tutorial-three-custom-queries-with-query-methods/
 
@@ -210,7 +213,10 @@ public class RepositorySnapshotService implements SnapshotService {
 
     @Override
     @Transactional(readOnly=true)
-    public List<Snapshot> findAllSnapshots(String refsetPublicId) {
-        return snapshotRepository.findAllByRefsetPublicIdAndStatus(refsetPublicId, Status.ACTIVE);
+    public com.ihtsdo.snomed.service.Page<Snapshot> findAllSnapshots(String refsetPublicId, String sortBy, SortOrder sortOrder, String searchTerm, int page, int pageSize) {
+        LOG.debug("Getting all snapshots for refset with publicId={} sorted by {} {}, page {} of {}, with search term '{}'", refsetPublicId, sortBy, sortOrder, page, pageSize, searchTerm);
+        Page<Snapshot> pageResult =  snapshotRepository.findAllByRefsetPublicIdAndStatus(refsetPublicId, Status.ACTIVE, searchTerm, 
+                new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)));
+        return new com.ihtsdo.snomed.service.Page<Snapshot>(pageResult.getContent(), pageResult.getTotalElements());
     }
 }

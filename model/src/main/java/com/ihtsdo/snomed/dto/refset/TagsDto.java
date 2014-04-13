@@ -1,28 +1,19 @@
 package com.ihtsdo.snomed.dto.refset;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import com.ihtsdo.snomed.model.refset.Tag;
 
 public class TagsDto {
 
 	private List<TagDto> tags;
+	
+	private long totalSize;
 
     public TagsDto(){}
     
-    public TagsDto(List<TagDto> tags){
+    public TagsDto(List<TagDto> tags, long totalSize){
     	this.tags = tags;
+    	this.totalSize = totalSize;
     }
-    
-    public static TagsDto parse(List<Tag> tags){
-        List<TagDto> tagDtos = new ArrayList<>();
-        for (Tag t : tags){
-            tagDtos.add(TagDto.parse(t));
-        }
-        return new TagsDto(tagDtos);        
-    }
-    
     
 	public List<TagDto> getTags() {
 		return tags;
@@ -32,6 +23,8 @@ public class TagsDto {
 		this.tags = tags;
 	}
 	
-	
+    public long getTotalSize(){
+        return totalSize;
+    }   	
 
 }
