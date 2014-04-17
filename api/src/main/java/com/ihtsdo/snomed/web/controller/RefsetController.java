@@ -152,6 +152,20 @@ public class RefsetController {
         LOG.debug("Controller received request to delete member {} from refset {}", memberId, refsetName);
         return MemberDto.parse(refsetService.deleteMembership(refsetName, memberId));
     }
+
+    @RequestMapping(value = "{refsetName}/members/{memberId}",
+            method = RequestMethod.GET, 
+            produces = {MediaType.APPLICATION_JSON_VALUE }, 
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public MemberDto getMembership(@PathVariable String refsetName, @PathVariable String memberId) 
+                    throws RefsetNotFoundException, ConceptIdNotFoundException, MemberNotFoundException, NonUniquePublicIdException
+    {
+        LOG.debug("Controller received request to retrieve member {} from refset {}", memberId, refsetName);
+        return MemberDto.parse(memberService.findByMemberPublicIdAndRefsetPublicId(memberId, refsetName));
+    }
+        
     
     @RequestMapping(value = "{refsetName}",
             method = RequestMethod.DELETE, 

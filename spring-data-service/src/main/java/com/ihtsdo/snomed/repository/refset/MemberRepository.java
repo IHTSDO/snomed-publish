@@ -36,8 +36,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
     public static final String FIND_BY_MEMBER_PUBLIC_ID_AND_REFSET_PUBLIC_ID_AND_IS_ACTIVE = 
             "SELECT m FROM Member m, Refset r WHERE m MEMBER OF r.members " + 
                     "AND r.publicId=:refsetPublicId " + 
-                    "AND m.publicId=:memberPublicId " +
-                    "AND r.status=com.ihtsdo.snomed.model.refset.Status.ACTIVE";                                                                                                                                                                                                                                                                                                                                      
+                    "AND m.publicId=:memberPublicId";                                                                                                                                                                                                                                                                                                                                      
     
     @Query(FIND_BY_REFSET_PUBLIC_ID_AND_IS_ACTIVE_WITH_COMPONENT_TITLE_LIKE)
     public Page<Member> findByRefsetPublicIdAndIsActive(
