@@ -47,7 +47,7 @@ public class RefsetDto {
     
     @NotNull(message="Internet Address can not be empty")
     @Size(min=2, max=50, message="Internet Address must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="Internet Address may contain characters, numbers, and underscores only")
+    @Pattern(regexp="[a-zA-Z0-9_-]+", message="Internet Address may contain characters, numbers, and underscores only")
     private String publicId;
     
     @NotNull(message="validation.title.not.empty")

@@ -94,7 +94,7 @@ public class Refset {
     
     @NotNull
     @Size(min=2, max=50, message="Public ID must be between 2 and 50 characters")
-    @Pattern(regexp="[a-zA-Z0-9_]+", message="Public ID may contain characters, numbers, and underscores only")
+    @Pattern(regexp="[a-zA-Z0-9_-]+", message="Public ID may contain characters, numbers, and underscores only")
     //For some reason, declaring uniqueness on columns like this, does not seem t work,
     //at least not for hibernate implementation of JPA 2. Moved to @Table level instead.
     //@Column(name="publicId", unique = true, nullable=false, length=30)

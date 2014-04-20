@@ -1,8 +1,8 @@
 package com.ihtsdo.snomed.model.refset;
 
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.Collection;
-import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -15,8 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Objects;
@@ -70,8 +68,8 @@ public class Member {
     public boolean equals(Object o) {
         if (o instanceof Member) {
             Member r = (Member) o;
-            if (Objects.equal(r.getComponent(), this.getComponent()) &&
-                    Objects.equal(r.getEffective(), this.getEffective())){
+            if (Objects.equal(r.getComponent(), this.getComponent())){// &&
+                    //Objects.equal(r.getEffective(), this.getEffective())){
                 return true;
              }
         }
