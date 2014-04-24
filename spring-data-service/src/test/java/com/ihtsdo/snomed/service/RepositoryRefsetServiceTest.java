@@ -1,8 +1,6 @@
 package com.ihtsdo.snomed.service;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -12,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -48,7 +45,6 @@ import com.ihtsdo.snomed.repository.ConceptRepository;
 import com.ihtsdo.snomed.repository.refset.RefsetRepository;
 import com.ihtsdo.snomed.service.refset.PlanService;
 import com.ihtsdo.snomed.service.refset.RefsetService;
-import com.ihtsdo.snomed.service.refset.RefsetService.SortOrder;
 import com.ihtsdo.snomed.service.refset.RepositoryRefsetService;
 
 import static org.junit.Assert.assertEquals;
@@ -56,7 +52,6 @@ import static org.junit.Assert.assertNotNull;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -228,6 +223,7 @@ public class RepositoryRefsetServiceTest {
 //        verifyNoMoreInteractions(refsetRepoMock);
 //    }
     
+    /*
     @Test
     public void findAll() {
         List<Refset> refsets = new ArrayList<Refset>();
@@ -240,6 +236,7 @@ public class RepositoryRefsetServiceTest {
         
         assertEquals(refsets, returned);
     } 
+    */
     
 //    @Test
 //    public void findById() {

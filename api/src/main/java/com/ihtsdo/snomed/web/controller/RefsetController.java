@@ -106,15 +106,23 @@ public class RefsetController {
             produces=MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RefsetsDto getAllRefsets(@RequestParam("sortBy") String sortBy,
-            @RequestParam("sortOrder") SortOrder sortOrder){
-        List<Refset> refsets = refsetService.findAll(sortBy, sortOrder);
+    public RefsetsDto getAllRefsets(
+            @RequestParam("sortBy") String sortBy, 
+            @RequestParam("sortOrder") SortOrder sortOrder,
+            @RequestParam(value="filter", defaultValue="", required=false) String filter,
+            @RequestParam("pageIndex") int pageIndex,
+            @RequestParam("pageSize") int pageSize            
+            )
+    {
+        LOG.debug("Controller received request to retrieve all refsets on page {} with pageSize {} and title like {} sorted by {} {}", pageIndex, pageSize, filter, sortBy, sortOrder);
+        
+        Page<Refset> refsetsPage = refsetService.findAll(sortBy, sortOrder, filter, pageIndex, pageSize);
+        
         List<RefsetDtoShort> refsetDtos = new ArrayList<>();
-        for (Refset r : refsets){
+        for (Refset r : refsetsPage.getContent()){
             refsetDtos.add(RefsetDtoShort.parse(r));
         }
-        return new RefsetsDto(refsetDtos);
-
+        return new RefsetsDto(refsetDtos, refsetsPage.getTotalElements());
     }    
         
     @RequestMapping(value = "{refsetName}", 

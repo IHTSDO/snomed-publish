@@ -32,7 +32,7 @@ public interface RefsetService {
     
     //public abstract List<Refset> findAll(int pageIndex);
 
-    public abstract List<Refset> findAll(String sortBy, SortOrder sortOrder);
+    public abstract com.ihtsdo.snomed.service.Page<Refset> findAll(String sortBy, SortOrder sortOrder, String searchTerm, int page, int pageSize);
 
     //public abstract Refset findById(Long id);
 

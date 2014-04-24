@@ -76,7 +76,7 @@ public class SnapshotController {
         LOG.debug("Received request for all snapshots for refset {}", refsetName);
         
         //make sure refset exists, or throw exception
-        refsetService.findByPublicId(refsetName);
+        //refsetService.findByPublicId(refsetName);
         
         Page<Snapshot> snapshotsPage = snapshotService.findAllSnapshots(refsetName, sortBy, sortOrder, filter, pageIndex, pageSize);
         
@@ -105,7 +105,7 @@ public class SnapshotController {
         LOG.debug("Received request for members of snapshot [{}] for refset [{}]", snapshotName, refsetName);
 
         //make sure snapshot exists, or throw exception
-        snapshotService.findByPublicId(refsetName, snapshotName);
+        //snapshotService.findByPublicId(refsetName, snapshotName);
         
         Page<Member> membersPage = memberService.findBySnapshotPublicId(
                 refsetName, snapshotName, sortBy, sortOrder, filter, pageIndex, pageSize);

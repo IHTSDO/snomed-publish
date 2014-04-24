@@ -2,7 +2,6 @@ package com.ihtsdo.snomed.service.refset;
 
 import java.text.ParseException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +13,8 @@ import javax.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,10 +101,12 @@ public class RepositoryRefsetService implements RefsetService {
 //    
     @Override
     @Transactional(readOnly = true)
-    public List<Refset> findAll(String sortBy, SortOrder sortOrder){
-        LOG.debug("Retrieving all active refsets, sorted by {} {}", sortBy, sortOrder); 
-        return refsetRepository.findByStatus(Status.ACTIVE, new Sort(sortDirection(sortOrder), sortBy));
-    }    
+    public com.ihtsdo.snomed.service.Page<Refset> findAll(String sortBy, SortOrder sortOrder, String searchTerm, int page, int pageSize){
+        LOG.debug("Retrieving all active refsets, sorted by {} {} with title like {}", sortBy, sortOrder, searchTerm); 
+        Page<Refset> pageResult = refsetRepository.findAllActiveRefsetsWithTitleLike(
+                searchTerm, new PageRequest(page, pageSize, new Sort(RepositoryRefsetService.sortDirection(sortOrder), sortBy)));
+        return new com.ihtsdo.snomed.service.Page<Refset>(pageResult.getContent(), pageResult.getTotalElements());
+    }
     
     public static Sort.Direction sortDirection(SortOrder sortOrder){
         return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;

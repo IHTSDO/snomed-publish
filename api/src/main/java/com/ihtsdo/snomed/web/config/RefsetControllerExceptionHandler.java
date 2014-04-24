@@ -175,7 +175,7 @@ public class RefsetControllerExceptionHandler {
     @ExceptionHandler(ConceptIdNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ErrorDto handleRefsetNotFoundException(ConceptIdNotFoundException e){
+    public ErrorDto handleConceptIdNotFoundException(ConceptIdNotFoundException e){
         LOG.debug("In Concept Not Found Exception Handler");
         LOG.error("Unable to find concept with id {}", e.getId(), e);
         return new ErrorDto().addGlobalError(
