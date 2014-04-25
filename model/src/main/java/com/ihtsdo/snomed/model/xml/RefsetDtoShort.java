@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.base.Objects;
 import com.google.common.primitives.Longs;
+import com.ihtsdo.snomed.dto.refset.RefsetDto;
 import com.ihtsdo.snomed.model.refset.Refset;
 
 @XmlRootElement(name="refset")
@@ -19,6 +20,8 @@ public class RefsetDtoShort {
     private Date created;
     private Date lastModified;
     private int memberSize;
+    private String snomedExtension;
+    private String snomedReleaseDate;    
     
     private boolean pendingChanges;    
     
@@ -32,6 +35,8 @@ public class RefsetDtoShort {
         setLastModified(r.getModificationTime());
         setPendingChanges(r.isPendingChanges());
         setMemberSize(r.getMemberSize());
+        setSnomedExtension(r.getOntologyVersion().getFlavour().getPublicId());
+        setSnomedReleaseDate(RefsetDto.dateFormat.format(r.getOntologyVersion().getTaggedOn()));
     }
     
     public RefsetDtoShort(){}
@@ -48,6 +53,8 @@ public class RefsetDtoShort {
                 .add("lastModified", getLastModified())
                 .add("pendingChanges", isPendingChanges())
                 .add("memberSize", getMemberSize())
+                .add("snomedExtension", getSnomedExtension())
+                .add("snomedReleaseDate", getSnomedReleaseDate())
                 .toString();
     }
     
@@ -123,6 +130,24 @@ public class RefsetDtoShort {
     public void setMemberSize(int memberSize) {
         this.memberSize = memberSize;
     }
+    
+    
+
+    public String getSnomedExtension() {
+        return snomedExtension;
+    }
+
+    public void setSnomedExtension(String snomedExtension) {
+        this.snomedExtension = snomedExtension;
+    }
+
+    public String getSnomedReleaseDate() {
+        return snomedReleaseDate;
+    }
+
+    public void setSnomedReleaseDate(String snomedReleaseDate) {
+        this.snomedReleaseDate = snomedReleaseDate;
+    }
 
     public static RefsetDtoShort parse(Refset r){
         return getBuilder(new XmlRefsetConcept(r.getRefsetConcept()),
@@ -132,19 +157,24 @@ public class RefsetDtoShort {
                 r.getCreationTime(),
                 r.getModificationTime(),
                 r.isPendingChanges(),
-                r.getMemberSize()).build();
+                r.getMemberSize(),
+                r.getOntologyVersion().getFlavour().getPublicId(),
+                r.getOntologyVersion().getTaggedOn()).build();
     }
     
     public static Builder getBuilder(XmlRefsetConcept concept, String publicId, String title, 
-            String description, Date created, Date lastModified, boolean pendingChanges, int memberSize) {
-        return new Builder(concept, publicId, title, description, created, lastModified, pendingChanges, memberSize);
+            String description, Date created, Date lastModified, boolean pendingChanges, int memberSize, 
+            String snomedExtension, Date snomedReleaseDate) {
+        return new Builder(concept, publicId, title, description, created, lastModified, pendingChanges, 
+                memberSize, snomedExtension, snomedReleaseDate);
     }
     
     public static class Builder {
         private RefsetDtoShort built;
 
         Builder(XmlRefsetConcept concept, String publicId, String title, String description, 
-                Date created, Date lastModified, boolean pendingChanges, int memberSize){
+                Date created, Date lastModified, boolean pendingChanges, int memberSize,
+                String snomedExtension, Date snomedReleaseDate){
             built = new RefsetDtoShort();
             built.concept = concept;
             built.publicId = publicId;
@@ -154,6 +184,8 @@ public class RefsetDtoShort {
             built.lastModified = lastModified;
             built.pendingChanges = pendingChanges;
             built.memberSize = memberSize;
+            built.setSnomedExtension(snomedExtension);
+            built.setSnomedReleaseDate(RefsetDto.dateFormat.format(snomedReleaseDate));            
         }
         
         public RefsetDtoShort build() {

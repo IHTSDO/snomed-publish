@@ -21,7 +21,7 @@ import com.ihtsdo.snomed.model.refset.Refset.Type;
 @JsonRootName("refset")
 public class RefsetDto {
     
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     
     @NotNull(message="You must select a type")
     private Type type;
