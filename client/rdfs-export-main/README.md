@@ -13,7 +13,7 @@ The distribution jar file can be found at lib/rdfs-export-main/target/rdfs-expor
 
 For help on how to run the program, type:
 
-    java -jar manifest.jar -h
+    java -jar target/rdfs-export.jar -h
 
 which produces
 
