@@ -8,7 +8,8 @@ This is the syntax:
     -c, --concepts      File containing concepts
     -d, --descriptions  File containing descriptions
     -f, --format        File format of input files. One of 'RF1', 'RF2', 'CANONICAL', or 'CHILD_PARENT'
-    -n, --name          Ontology name
+    -v, --version		Version date, of the form 'yyyyMMdd'
+    -fl, --flavour		Snomed Flavour. One of {INTERNATIONAL}
     -p, --properties    Properties file with database configuration
     
 You will need to have the Java 7 JDK and Maven 3 to build the distribution jar file, and Java 7 JRE in order to run it.
@@ -27,7 +28,7 @@ Sample configuration
     
     java -Xmx6000m -jar target/import.jar --triples sct2_Relationship_Snapshot_INT_20130731.txt 
     --descriptions sct2_Description_Snapshot-en_INT_20130731.txt --concepts sct2_Concept_Snapshot_INT_20130731.txt 
-    --format RF2 --name testing --properties src/main/resources/database.properties
+    --format RF2 --fl INTERNATIONAL -v 20140131 --properties src/main/resources/database.properties
     
 with this database.properties configuration (a sample one can be [found here](/client/import-main/src/main/resources/database.properties):
 
