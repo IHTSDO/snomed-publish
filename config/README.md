@@ -63,12 +63,12 @@
         edit /etc/init.d/tomcat7 and add:
         > export CATALINA_OPTS="-Xmx6000m"
 
-- Tomcat Memory requirements
+- Tomcat JAVA Memory requirements
 
     Application  | Optimal Stack Size
     ------------ | -------------
     Solr | 1Gb
-    Jenkins | ???
+    Jenkins | 1.5Gb
     Refset API | ???
     Browser | ???
     Search | ???
