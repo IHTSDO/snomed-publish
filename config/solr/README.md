@@ -23,12 +23,12 @@ Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the ins
         
 - Create /var/lib/tomcat7/conf/Catalina/localhost/solr.xml
 
-      <Context docBase="/opt/solr/example/solr/solr.war" debug="0" crossContext="true">
-        <Environment name="solr/home" 
-                     type="java.lang.String" 
-                     value="/opt/solr/example/solr" 
-                     override="true" />
-      </Context>
+        <Context docBase="/opt/solr/example/solr/solr.war" debug="0" crossContext="true">
+          <Environment name="solr/home" 
+                       type="java.lang.String" 
+                       value="/opt/solr/example/solr" 
+                       override="true" />
+        </Context>
 
 - Configure logging
 
