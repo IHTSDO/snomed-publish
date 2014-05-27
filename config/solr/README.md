@@ -48,7 +48,6 @@ Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the ins
 - Give tomcat enough RAM, or you will get this weird error: "Unknown character set index for field received from server"
 
         edit /etc/init.d/tomcat7 and add this line:
-        
         > export CATALINA_OPTS="-Xmx1500m"
         
 
