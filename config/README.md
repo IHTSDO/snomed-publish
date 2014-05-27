@@ -65,10 +65,10 @@
 
 - Tomcat Memory requirements
 
-Application  | Optimal Stack Size
------------- | -------------
-Solr | 1Gb
-Jenkins | ???
-Refset API | ???
-Browser | ???
-Search | ???
+    Application  | Optimal Stack Size
+    ------------ | -------------
+    Solr | 1Gb
+    Jenkins | ???
+    Refset API | ???
+    Browser | ???
+    Search | ???
