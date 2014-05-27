@@ -69,6 +69,6 @@
     ------------ | -------------
     Solr | 1Gb
     Jenkins | 1.5Gb
-    Refset API | ???
+    Refset API | 500m and up (depend on cache size)
     Browser | ???
     Search | ???
