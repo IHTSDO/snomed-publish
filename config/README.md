@@ -72,3 +72,81 @@
     Refset API | 500m and up (depend on cache size)
     Browser | ???
     Search | ???
+
+###Install MySQL
+Install using apt
+
+    sudo apt-get install mysql-server mysql-client
+    
+###Install Git
+Install using apt
+
+    sudo apt-get install git
+
+###Install maven 3
+Install using apt
+
+    sudo apt-get install maven
+
+###Clone the snomed-publish repo, build, install and package
+Check out from Github using Git
+
+    git clone https://github.com/IHTSDO/snomed-publish
+    cd snomed-publish
+    mvn install
+    cd client
+    mvn package
+
+###Initialise MySQL with Snomed releases
+
+- Log into mysql and create a new empty database called 'snomed'
+- Import all your Snomed snapshot(!) releases into your database, following [these instructions](https://github.com/IHTSDO/snomed-publish/tree/master/client/import-main)
+
+###Install Solr
+Follow [these instructions](solr)
+
+###Index all Snomed releases in Solr
+  - copy /opt/solr/example/solr/collection1 to /opt/solr/example/solr/concept
+  - remove /opt/solr/example/solr/collection1
+  - edit /opt/solr/example/solr/concept/core.properties and set name=concept
+  - edit /opt/solr/example/solr/concept/conf/solrconfig.xml and add this:
+
+    <updateRequestProcessorChain>
+       <processor class="solr.UUIDUpdateProcessorFactory">
+        <str name="fieldName">uuid</str>
+       </processor>
+       <processor class="solr.LogUpdateProcessorFactory" />
+       <processor class="solr.RunUpdateProcessorFactory" />
+    </updateRequestProcessorChain>
+
+  - copy https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/data-config.xml 
+    to /opt/solr/example/solr/concept/conf/data-config.xml
+  - copy https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/schema.xml 
+    to /opt/solr/example/solr/concept/conf/schema.xml
+  - Ignore all the other files in github config/solr
+  - Edit /opt/solr/example/solr/concept/conf/data-config.xml and set the correct mysql database password
+  - make sure that all the Solr files are readable/writable by your tomcat7 user: chown -R tomcat7 /opt/solr
+  - restart tomcat: service tomcat7 restart
+  - remove title, id from schema.xml
+  - add to /opt/solr/example/solr/concept/conf/solrconfig.xml
+
+    <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+      <lst name="defaults">
+        <str name="config">data-config.xml</str>
+      </lst>
+    </requestHandler>
+
+  - add solr-dataimporthandler-*.jar: 
+      cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
+
+  - Add mysql driver to /opt/solr/example/solr/lib
+      http://dev.mysql.com/downloads/connector/j/
+
+  - add to /opt/solr/example/solr/concept/conf/solrconfig.xml
+     <lib dir="../lib" />
+
+  - 
+
+
+
+
