@@ -1,5 +1,5 @@
-Installing Solr
-===============
+Installing Solr in Tomcat 7
+===========================
 
 Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the installation instructions [found here](http://stackoverflow.com/questions/23503116/cant-get-solr-4-8-working-with-tomcat-7-and-ubuntu-12-04).
 
