@@ -25,18 +25,24 @@
 
 
 ###Install Java 7
-* Install Oracle Java 7 PPA: http://community.linuxmint.com/tutorial/view/1414
-  - > sudo add-apt-repository ppa:webupd8team/java
-  - > sudo apt-get update
-  - > sudo apt-get install oracle-java7-installer
-  - To later update your java version, run > sudo update-java-alternatives -s java-7-oracle
-  - Set up Java enironment variables:
-    - > sudo apt-get install oracle-java7-set-default
+- Install Oracle Java 7 using PPA, following [these instructions](http://community.linuxmint.com/tutorial/view/1414)
 
-* Fix Java Bug (Otherwise, Tomcat will never start): http://docs.oracle.com/cd/E13209_01/wlcp/wlss30/configwlss/jvmrand.html
-  - vi $JAVA_HOME/jre/lib/security/java.security and set
-  
-    securerandom.source=file:/dev/./urandom
+        sudo add-apt-repository ppa:webupd8team/java
+        sudo apt-get update
+        sudo apt-get install oracle-java7-installer
+        
+- To later update your java version, run
 
-  - note the special /./ notation, which is required [sic]
+        sudo update-java-alternatives -s java-7-oracle
+
+- Configure Java enironment variables:
+
+        sudo apt-get install oracle-java7-set-default
+
+* [Fix old Java Bug](http://docs.oracle.com/cd/E13209_01/wlcp/wlss30/configwlss/jvmrand.html), or Tomcat will never start: 
+
+        edit $JAVA_HOME/jre/lib/security/java.security and set
+        > securerandom.source=file:/dev/./urandom
+        
+        NB! Note the special '/./' notation, which is _required_ [sic]
 
