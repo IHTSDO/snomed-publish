@@ -16,13 +16,13 @@
 
 - We have the following apps:
 
-        - **Browser** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
-        - **Search** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
-        - **Jenkins Build Server** (Java), 
-        - **Refset Client** (NodeJS, Solr), 
-        - **Solr** (Tomcat, MySQL, Java), 
-        - **Refset API** (Tomcat, MySQL, Java 7), 
-        - **Sparql API** (Fuseki, Java)
+  - **Browser** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
+  - **Search** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
+  - **Jenkins Build Server** (Java), 
+  - **Refset Client** (NodeJS, Solr), 
+  - **Solr** (Tomcat, MySQL, Java), 
+  - **Refset API** (Tomcat, MySQL, Java 7), 
+  - **Sparql API** (Fuseki, Java)
 
 - You might want to deploy these on to different servers, as they are standalone apps
 
