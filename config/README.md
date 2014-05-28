@@ -123,15 +123,15 @@ Follow [these instructions](solr)
                <processor class="solr.RunUpdateProcessorFactory" />
             </updateRequestProcessorChain>
 
-  - Add data-config.xml
+- Add data-config.xml
         
                 wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/data-config.xml
 
-  - Add schema.xml
+- Add schema.xml
   
                 wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/schema.xml 
 
-  - Ignore all the other files in github [config/solr](https://github.com/IHTSDO/snomed-publish/tree/master/config/solr)
+- Ignore all the other files in github [config/solr](https://github.com/IHTSDO/snomed-publish/tree/master/config/solr)
   
 - Edit /opt/solr/example/solr/concept/conf/data-config.xml and set the correct mysql database password
 
