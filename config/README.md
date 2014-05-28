@@ -125,11 +125,11 @@ Follow [these instructions](solr)
 
   - Add data-config.xml
         
-        wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/data-config.xml
+                wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/data-config.xml
 
   - Add schema.xml
   
-        wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/schema.xml 
+                wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/schema.xml 
 
   - Ignore all the other files in github [config/solr](https://github.com/IHTSDO/snomed-publish/tree/master/config/solr)
   
@@ -137,54 +137,54 @@ Follow [these instructions](solr)
 
 - make sure that all the Solr files are readable/writable by your tomcat7 user
 
-        chown -R tomcat7 /opt/solr
+                chown -R tomcat7 /opt/solr
 
 
 - remove title, id from schema.xml
 
-        Edit /opt/solr/example/solr/concept/conf/schema.xml and comment out these lines:
-    
-          <fields>
-            ...
-            <!--field name="id" 
-                      type="string" 
-                      indexed="true" 
-                      stored="true" 
-                      required="true" /-->
-            ...
-            <!--field name="title" 
-                      type="text_general" 
-                      indexed="true"
-                      stored="true"
-                      multiValued="true"/-->
-            ...
-          </fields>
+                Edit /opt/solr/example/solr/concept/conf/schema.xml and comment out these lines:
+            
+                  <fields>
+                    ...
+                    <!--field name="id" 
+                              type="string" 
+                              indexed="true" 
+                              stored="true" 
+                              required="true" /-->
+                    ...
+                    <!--field name="title" 
+                              type="text_general" 
+                              indexed="true"
+                              stored="true"
+                              multiValued="true"/-->
+                    ...
+                  </fields>
 
   - Add data import extension libraries to Solr 
   
-        cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
+                cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
 
   - Add mysql driver to Solr
       
-        1. Download driver from http://dev.mysql.com/downloads/connector/j/
-        2. Copy driver jar to /opt/solr/example/solr/lib
+                1. Download driver from http://dev.mysql.com/downloads/connector/j/
+                2. Copy driver jar to /opt/solr/example/solr/lib
 
   - Modify /opt/solr/example/solr/concept/conf/solrconfig.xml
     
-        1. Add
+                1. Add
 
-            <requestHandler name="/dataimport" 
-                            class="org.apache.solr.handler.dataimport.DataImportHandler">
-                <lst name="defaults">
-                    <str name="config">data-config.xml</str>
-                </lst>
-            </requestHandler>
+                    <requestHandler name="/dataimport" 
+                                    class="org.apache.solr.handler.dataimport.DataImportHandler">
+                        <lst name="defaults">
+                            <str name="config">data-config.xml</str>
+                        </lst>
+                    </requestHandler>
             
-        2. Add
+                2. Add
         
-            <lib dir="../lib" />
+                <lib dir="../lib" />
             
 - restart tomcat
 
-        service tomcat7 restart
+                service tomcat7 restart
     
