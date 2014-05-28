@@ -15,6 +15,7 @@
 - You will need to change the filenames / server names / SSL certificate location and name to match the URL the app(s) will be deployed to
 
 - We have the following apps:
+
         - **Browser** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
         - **Search** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
         - **Jenkins Build Server** (Java), 
