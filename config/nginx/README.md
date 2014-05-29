@@ -14,7 +14,20 @@
 
 ###Install all the site configurations
 
-- We have the following apps. You might want to deploy these on different servers:
+- Edit /etc/nginx/nginx.conf and add the following
+
+    http {
+        ...
+        include /etc/nginx/sites-enabled/*;
+        ....
+    }
+    
+- Create folders for your site configs
+
+    mkdir /etc/nginx/sites-available
+    mkdir /etc/nginx/sites-enabled
+
+- We have the following apps:
 
   - **Browser** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
   - **Search** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
@@ -24,21 +37,18 @@
   - **Refset API** (Tomcat, MySQL, Java 7), 
   - **Sparql API** (Fuseki, Java)
 
-- Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
-    - Assume the domain you are trying to configure nginx for is called INSERT_SERVER_NAME_HERE
-    - Rename the above config file to INSERT_SERVER_NAME_HERE and put in /etc/nginx/sites-available/
+- Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx) and place in /etc/nginx/sites-available
+
+- Rename the files, and modify each config file, such that:
+
+    - Assume the domain for the app you are trying to configure nginx for is called INSERT_SERVER_NAME_HERE
+    - Rename each config file to INSERT_SERVER_NAME_HERE and put in /etc/nginx/sites-available/
     - Create a dynamic link to /etc/nginx/sites-enabled
 
-                ln -s /etc/nginx/sites-available/INSERT_SERVER_NAME_HERE /etc/nginx/sites-enabled/INSERT_SERVER_NAME_HERE
+        ln -s /etc/nginx/sites-available/INSERT_SERVER_NAME_HERE /etc/nginx/sites-enabled/INSERT_SERVER_NAME_HERE
 
-    - [build.ihtsdotools.org](build.ihtsdotools.org)
-        - Jenkins build server
-
-        - Replace these Strings in the above nginx config file
-        
-                INSERT_SERVER_NAME_HERE
-                INSERT_JENKINS_PORT_NUMBER_HERE
-
-        - Put your SSL certificate and key in /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/
+    - Edit each config file, and replace INSERT_SERVER_NAME_HERE with the actual server name
+    - Edit each config file, and replace INSERT_PORT_HERE with the actual port you are running the app under
+    - Put your SSL certificate and key for this domain in /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/
     
 
