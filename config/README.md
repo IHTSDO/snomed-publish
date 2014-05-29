@@ -44,7 +44,7 @@ Follow the instructions [found here](nginx)
 - Make sure Jenkins is running
 
         sudo service nginx start
-- Visit the Jenkins URL with your browser to complete install. Important: Please make sure you access Jenkins using port 80 and the server name you defined in your nginx site config, and NOT the internal Jenkins port
+- Visit the Jenkins URL with your browser to complete install. **Important:** Please make sure you access Jenkins using port 80 and the server name you defined in your nginx site config, and NOT the internal Jenkins port
 
 
 ###Install Apache Tomcat 7
