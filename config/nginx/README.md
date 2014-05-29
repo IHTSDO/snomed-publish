@@ -28,8 +28,11 @@
     - [build.ihtsdotools.org](build.ihtsdotools.org)
         - Jenkins build server
         - Match the port number of Jenkins
+        
                 proxy_pass http://127.0.0.1:9080/;
+                
         - Match the server name for the build server
+        
                 server_name build.ihtsdotools.org;
 
 - You will need to change the filenames / server names / SSL certificate location and name to match the URL the app(s) will be deployed to
