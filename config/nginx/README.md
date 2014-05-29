@@ -6,7 +6,8 @@
 
         curl http://nginx.org/keys/nginx_signing.key | apt-key add -
         echo -e "deb http://nginx.org/packages/mainline/ubuntu/ `lsb_release -cs` nginx\ndeb-src http://nginx.org/packages/mainline/ubuntu/ `lsb_release -cs` nginx" > /etc/apt/sources.list.d/nginx.list
-        sudo apt-get install spdy
+        sudo apt-get update
+        sudo apt-get install nginx
         
 ###Create and install SSL certificates
 - [copy/create your SSL certificates](https://www.startssl.com/?app=42), and put them in `/etc/nginx/ssl/{site url}/.` 
