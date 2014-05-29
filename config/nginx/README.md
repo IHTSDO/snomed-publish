@@ -12,7 +12,8 @@
 - [copy/create your SSL certificates](https://www.startssl.com/?app=42), and put them in `/etc/nginx/ssl/{site url}/.` 
 
 ###Install all the site configurations
-- We have the following apps:
+
+- We have the following apps. You might want to deploy these on different servers:
 
   - **Browser** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
   - **Search** (Deprecated: Tomcat, MySQL, Java 7, Solr), 
@@ -22,9 +23,7 @@
   - **Refset API** (Tomcat, MySQL, Java 7), 
   - **Sparql API** (Fuseki, Java)
 
-- You might want to deploy these on to different servers, as they are standalone apps
-
-- Download the site configs from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
+- Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
 
 - You will need to change the filenames / server names / SSL certificate location and name to match the URL the app(s) will be deployed to
 
