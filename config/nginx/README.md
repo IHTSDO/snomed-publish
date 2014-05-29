@@ -48,5 +48,10 @@
     - Edit each config file, and replace INSERT_SERVER_NAME_HERE with the actual server name
     - Edit each config file, and replace INSERT_PORT_HERE with the actual port you are running the app under
     - Put your SSL certificate and key for this domain in /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/
-    
+- Test your Nginx configuration by running
+
+            sudo nginx -t
+- Restart Nginx
+
+            sudo service nginx restart
 
