@@ -200,22 +200,23 @@ Follow [these instructions](solr)
         tar -zxvf jena-fuseki-1.0.1-distribution.tar.gz
         mv jena-fuseki-1.0.1 /opt
         ln -s /opt/jena-fuseki-1.0.1 /opt/fuseki
-- Get all relevant Snomed releases and unzip. You will need the Snapshot RF2 Release(s) files (x3)
-- Do these steps for every snapshot release you wish to import into Fuseki:
-- In your snomed-publish repo that you downloaded and built, find the RDFS Export tool and generate the RDF Schema file, following [these instructions](../client/rdfs-export-main)
 - Download and install [the rdf convert tool](https://bitbucket.org/jeenbroekstra/rdf-syntax-convert/downloads)
 
         wget https://bitbucket.org/jeenbroekstra/rdf-syntax-convert/downloads/rdfconvert-0.3.2-bin.zip
         unzip rdfconvert-0.3.2-bin.zip
         mv rdfconvert-0.3.2 /opt
         ln -s /opt/rdfconvert-0.3.2 rdfconvert
-- Use the rdfconvert tool to transform your RDF Schema file into an n-quads format
+- Get all relevant Snomed releases and unzip. You will need the Snapshot RF2 Release(s) files (x3)
+- Do these steps for every snapshot release you wish to import into Fuseki:
+        - In your snomed-publish repo that you downloaded and built, find the RDFS Export tool and generate the RDF Schema file, following [these instructions](../client/rdfs-export-main)
 
-        cd /opt/rdfconvert/bin
-        ./rdfconvert.sh -i RDF/XML -o N-Quads snomed.snapshot.release.rdf snomed.snapshot.release.nq
-- Use sed to give a name to the graph for this release, e.g. `http://snomedtools.info/snomed/20130731`
+        - Use the rdfconvert tool to transform your RDF Schema file into an n-quads format
 
-        sed 's/\ \./\ <http:\/\/snomedtools\.info\/snomed\/20130731>\ \./' snomed.20130731.nq > snomed.20130731.fixed.nq
+                cd /opt/rdfconvert/bin
+                ./rdfconvert.sh -i RDF/XML -o N-Quads snomed.snapshot.release.rdf snomed.snapshot.release.nq
+        - Use sed to give a name to the graph for this release, e.g. `http://snomedtools.info/snomed/20130731`
+
+                sed 's/\ \./\ <http:\/\/snomedtools\.info\/snomed\/20130731>\ \./' snomed.20130731.nq > snomed.20130731.fixed.nq
 - Transform all of these string-replaced n-quad files into the Jena database format `tdb` in one go
 
         /opt/jena/bin/tdbloader2.sh -loc snomed.tdb snomed.20130731.fixed.nq snomed.20140131.fixed.nq ... etc.
