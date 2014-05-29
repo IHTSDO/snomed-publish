@@ -200,7 +200,7 @@ Follow [these instructions](solr)
         tar -zxvf jena-fuseki-1.0.1-distribution.tar.gz
         mv jena-fuseki-1.0.1 /opt
         ln -s /opt/jena-fuseki-1.0.1 /opt/fuseki
-- Download and install [the rdf convert tool](https://bitbucket.org/jeenbroekstra/rdf-syntax-convert/downloads)
+- [Download the RDF Convert tool](https://bitbucket.org/jeenbroekstra/rdf-syntax-convert/downloads) and unzip the contents to /opt
 
         wget https://bitbucket.org/jeenbroekstra/rdf-syntax-convert/downloads/rdfconvert-0.3.2-bin.zip
         unzip rdfconvert-0.3.2-bin.zip
