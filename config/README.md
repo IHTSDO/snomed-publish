@@ -221,6 +221,6 @@ Follow [these instructions](solr)
 
         /opt/jena/bin/
         ./tdbloader2.sh -loc snomed.tdb snomed.20130731.fixed.nq snomed.20140131.fixed.nq ... etc.
-- Start fuseki and point it to the generated jena database file
+- Start fuseki and point it to the generated jena database file from the previous step
     
         /opt/fuseki/fuseki-server --loc=snomed.tdb
