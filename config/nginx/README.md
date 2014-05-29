@@ -25,26 +25,20 @@
   - **Sparql API** (Fuseki, Java)
 
 - Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
+    - Assume the domain you are trying to configure nginx for is called INSERT_SERVER_NAME_HERE
+    - Rename the above config file to INSERT_SERVER_NAME_HERE and put in /etc/nginx/sites-available/
+    - Create a dynamic link to /etc/nginx/sites-enabled
+
+                ln -s /etc/nginx/sites-available/INSERT_SERVER_NAME_HERE /etc/nginx/sites-enabled/INSERT_SERVER_NAME_HERE
 
     - [build.ihtsdotools.org](build.ihtsdotools.org)
         - Jenkins build server
-        - Match the port number of Jenkins
-        
-                proxy_pass http://127.0.0.1:9080/;
-                
-        - Match the server name for the build server
-        
-                server_name build.ihtsdotools.org;
-                ...
-                return 301   https://build.ihtsdotools.org;$request_uri;
-                ...
-                error_log    /var/log/nginx/build.ihtsdotools.org info;
-                ...
-                server_name build.ihtsdotools.org;
-                ...
-                root ******;
 
-    - 
+        - Replace these Strings in the above nginx config file
+        
+                INSERT_SERVER_NAME_HERE
+                INSERT_JENKINS_PORT_NUMBER_HERE
+
+        - Put your SSL certificate and key in /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/
     
-- You will need to change the filenames / server names / SSL certificate location and name to match the URL the app(s) will be deployed to
 
