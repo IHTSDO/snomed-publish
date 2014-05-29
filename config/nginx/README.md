@@ -24,8 +24,8 @@
     
 - Create folders for your site configs
 
-    mkdir /etc/nginx/sites-available
-    mkdir /etc/nginx/sites-enabled
+        mkdir /etc/nginx/sites-available
+        mkdir /etc/nginx/sites-enabled
 
 - We have the following apps:
 
