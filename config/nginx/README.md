@@ -16,11 +16,11 @@
 
 - Edit /etc/nginx/nginx.conf and add the following
 
-    http {
-        ...
-        include /etc/nginx/sites-enabled/*;
-        ....
-    }
+        http {
+          ...
+          include /etc/nginx/sites-enabled/*;
+          ....
+        }
     
 - Create folders for your site configs
 
