@@ -212,11 +212,11 @@ Follow [these instructions](solr)
   - In your snomed-publish repo that you downloaded and built, find the RDFS Export tool and generate the RDF Schema file, following [these instructions](../client/rdfs-export-main)
   - Use the rdfconvert tool to transform your RDF Schema file into an n-quads format
 
-                cd /opt/rdfconvert/bin
-                ./rdfconvert.sh -i RDF/XML -o N-Quads snomed.snapshot.release.rdf snomed.snapshot.release.nq
+          cd /opt/rdfconvert/bin
+          ./rdfconvert.sh -i RDF/XML -o N-Quads snomed.snapshot.release.rdf snomed.snapshot.release.nq
   - Use sed to give a name to the graph for this release, e.g. `http://snomedtools.info/snomed/20130731`
 
-                sed 's/\ \./\ <http:\/\/snomedtools\.info\/snomed\/20130731>\ \./' snomed.20130731.nq > snomed.20130731.fixed.nq
+          sed 's/\ \./\ <http:\/\/snomedtools\.info\/snomed\/20130731>\ \./' snomed.20130731.nq > snomed.20130731.fixed.nq
 - Transform all of these string-replaced n-quad files into the Jena database format `tdb` in one go
 
         /opt/jena/bin/tdbloader2.sh -loc snomed.tdb snomed.20130731.fixed.nq snomed.20140131.fixed.nq ... etc.
