@@ -42,10 +42,9 @@
 - Rename the files, and modify each config file, such that:
     - Assume the domain for the app you are trying to configure nginx for is called INSERT_SERVER_NAME_HERE
     - Rename each config file to INSERT_SERVER_NAME_HERE and put in /etc/nginx/sites-available/
-    - blah
-
+    - Create a dynamic link to /etc/nginx/sites-enabled for each site
+    
             ln -s /etc/nginx/sites-available/INSERT_SERVER_NAME_HERE /etc/nginx/sites-enabled/INSERT_SERVER_NAME_HERE
-
     - Edit each config file, and replace INSERT_SERVER_NAME_HERE with the actual server name
     - Edit each config file, and replace INSERT_PORT_HERE with the actual port you are running the app under
     - Put your SSL certificate and key for this domain in /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/
