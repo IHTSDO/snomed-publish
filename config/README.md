@@ -68,7 +68,6 @@ Follow the instructions [found here](nginx)
     Application  | Optimal Stack Size
     ------------ | -------------
     Solr | 1Gb
-    Jenkins | 1.5Gb
     Refset API | 500m and up (depend on cache size)
     Browser | ???
     Search | ???
