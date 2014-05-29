@@ -56,7 +56,6 @@ Follow the instructions [found here](nginx)
     - **Browser** (deprecated)
     - **Search** (deprecated)
     - **Refset Api**
-    - **Jenkins Build Server**
     - **Solr**
     
 - Make sure you give tomcat enough memory
