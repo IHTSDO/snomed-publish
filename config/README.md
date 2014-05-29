@@ -1,7 +1,7 @@
 # How to deploy Snomed-Publish apps
 
 
-### Install Nginx with SPDY 3 support
+### Install Nginx and all the site configs
 Follow the instructions [found here](nginx)
 
 ###Install Java 7
