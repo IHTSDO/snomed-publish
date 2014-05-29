@@ -26,6 +26,27 @@ Follow the instructions [found here](nginx)
         
         NB! Note the special '/./' notation, which is _required_ [sic]
 
+###Install Jenkins Build Server
+- Use apt-get to install, following [these instructions](https://wiki.jenkins-ci.org/display/JENKINS/Installing+Jenkins+on+Ubuntu)
+
+        wget -q -O - http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add -
+        sudo sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list'
+        sudo apt-get update
+        sudo apt-get install jenkins
+        
+- To later upgrade your Jenkins install, run
+
+        sudo apt-get update
+        sudo apt-get install jenkins
+
+- Set the Jenkins port number, make sure it does not clash with Tomcat
+
+        Edit /etc/default/jenkins
+        Set the port number to e.g. 9080
+
+- Visit the Jenkins URL with your browser to complete install
+
+
 ###Install Apache Tomcat 7
 - Use apt-get to install
       
