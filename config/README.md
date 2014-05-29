@@ -33,17 +33,17 @@ Follow the instructions [found here](nginx)
         sudo sh -c 'echo deb http://pkg.jenkins-ci.org/debian binary/ > /etc/apt/sources.list.d/jenkins.list'
         sudo apt-get update
         sudo apt-get install jenkins
-        
 - To later upgrade your Jenkins install, run
 
         sudo apt-get update
         sudo apt-get install jenkins
-
 - Set the Jenkins port number, make sure it does not clash with Tomcat
 
         Edit /etc/default/jenkins
         Set the port number to e.g. 9080
+- Make sure Jenkins is running
 
+        sudo service nginx start
 - Visit the Jenkins URL with your browser to complete install
 
 
