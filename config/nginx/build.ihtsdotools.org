@@ -1,0 +1,98 @@
+upstream build_server {
+    server 127.0.0.1:INSERT_JENKINS_PORT_NUMBER_HERE fail_timeout=0;
+}
+
+server {
+   listen       80;
+   server_name  INSERT_SERVER_NAME_HERE;
+   return 301   https://INSERT_SERVER_NAME_HERE$request_uri;
+}
+
+server {
+    listen 443 ssl spdy;
+    ssl on;
+    server_name INSERT_SERVER_NAME_HERE;
+    ssl_certificate /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/ssl-unified.crt;
+    ssl_certificate_key /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/ssl.key;
+
+    root /var/run/jenkins/war/;
+    keepalive_timeout 10;
+    access_log /var/log/nginx/INSERT_SERVER_NAME_HERE_access.log;
+    error_log /var/log/nginx/INSERT_SERVER_NAME_HERE_error.log;
+
+    location ~ "^/static/[0-9a-fA-F]{8}\/(.*)$" {
+        #rewrite all static files into requests to the root
+        #E.g /static/12345678/css/something.css will become /css/something.css
+        rewrite "^/static/[0-9a-fA-F]{8}\/(.*)" /$1 last;
+
+        add_header  Cache-Control  public;
+        expires  100d;
+    }
+
+    location /userContent {
+        #have nginx handle all the static requests to the userContent folder files
+        #note : This is the $JENKINS_HOME dir
+        root /var/lib/jenkins/;
+        if (!-f $request_filename){
+            #this file does not exist, might be a directory or a /**view** url
+            rewrite (.*) /$1 last;
+            break;
+        }
+        sendfile on;
+    }
+
+    index index.html index.htm;
+    
+    # ZIP
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";    
+
+    location @jenkins {
+        sendfile off;
+        proxy_pass         http://127.0.0.1:INSERT_JENKINS_PORT_NUMBER_HERE;
+        proxy_redirect     default;
+
+        if (!-f $request_filename) {
+            proxy_pass http://build_server;
+            break;
+        }
+
+        # Proxy headers.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_cache_bypass $http_upgrade;
+        proxy_http_version 1.1;
+        proxy_max_temp_file_size 0;
+
+        #this is the maximum upload size
+        client_max_body_size       10m;
+        client_body_buffer_size    128k;
+
+        proxy_connect_timeout      90;
+        proxy_send_timeout         90;
+        proxy_read_timeout         90;
+
+        proxy_buffer_size          4k;
+        proxy_buffers              4 32k;
+        proxy_busy_buffers_size    64k;
+        proxy_temp_file_write_size 64k;      
+    }
+
+    location / {
+        # Optional configuration to detect and redirect iPhones
+        if ($http_user_agent ~* '(iPhone|iPod)') {
+            rewrite ^/$ /view/iphone/ redirect;
+        }
+        try_files $uri @jenkins;
+    }
+}
