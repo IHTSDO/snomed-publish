@@ -25,8 +25,7 @@
 
 - Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
 
-    - [build.ihtsdotools.org](build.ihtsdotools.org)
-        - Jenkins build server
+    - [build.ihtsdotools.org](build.ihtsdotools.org): Jenkins build server
         - Match the port number of Jenkins
         
                 proxy_pass http://127.0.0.1:9080/;
