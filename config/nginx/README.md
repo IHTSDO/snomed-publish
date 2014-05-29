@@ -42,7 +42,7 @@
 - Rename the files, and modify each config file, such that:
     - Assume the domain for the app you are trying to configure nginx for is called INSERT_SERVER_NAME_HERE
     - Rename each config file to INSERT_SERVER_NAME_HERE and put in /etc/nginx/sites-available/
-    - Create a dynamic link to /etc/nginx/sites-enabled for each site
+    - blah
 
             ln -s /etc/nginx/sites-available/INSERT_SERVER_NAME_HERE /etc/nginx/sites-enabled/INSERT_SERVER_NAME_HERE
 
