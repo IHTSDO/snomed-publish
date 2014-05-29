@@ -25,7 +25,8 @@
 
 - Download the site configs for these apps from our [Github repository](https://github.com/IHTSDO/snomed-publish/tree/master/config/nginx)
 
-    - [build.ihtsdotools.org](build.ihtsdotools.org): Jenkins build server
+    - [build.ihtsdotools.org](build.ihtsdotools.org)
+        - Jenkins build server
         - Match the port number of Jenkins
         
                 proxy_pass http://127.0.0.1:9080/;
@@ -33,6 +34,16 @@
         - Match the server name for the build server
         
                 server_name build.ihtsdotools.org;
+                ...
+                return 301   https://build.ihtsdotools.org;$request_uri;
+                ...
+                error_log    /var/log/nginx/build.ihtsdotools.org info;
+                ...
+                server_name build.ihtsdotools.org;
+                ...
+                root ******;
 
+    - 
+    
 - You will need to change the filenames / server names / SSL certificate location and name to match the URL the app(s) will be deployed to
 
