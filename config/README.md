@@ -210,7 +210,7 @@ Follow [these instructions](solr)
 - Do these steps for every snapshot release you wish to import into Fuseki:
         
   - In your snomed-publish repo that you downloaded and built, find the RDFS Export tool and generate the RDF Schema file, following [these instructions](../client/rdfs-export-main)
-  - Use the rdfconvert tool to transform your RDF Schema file into an n-quads format
+  - Use the rdfconvert tool to transform your RDF Schema file into an n-quads format (modify the filename/locations in these examples to something more snensible)
 
           cd /opt/rdfconvert/bin
           ./rdfconvert.sh -i RDF/XML -o N-Quads snomed.snapshot.release.rdf snomed.snapshot.release.nq
@@ -219,7 +219,8 @@ Follow [these instructions](solr)
           sed 's/\ \./\ <http:\/\/snomedtools\.info\/snomed\/20130731>\ \./' snomed.20130731.nq > snomed.20130731.fixed.nq
 - Transform all of these string-replaced n-quad files into the Jena database format `tdb` in one go
 
-        /opt/jena/bin/tdbloader2.sh -loc snomed.tdb snomed.20130731.fixed.nq snomed.20140131.fixed.nq ... etc.
+        /opt/jena/bin/
+        ./tdbloader2.sh -loc snomed.tdb snomed.20130731.fixed.nq snomed.20140131.fixed.nq ... etc.
 - Start fuseki and point it to the generated jena database file
     
         /opt/fuseki/fuseki-server --loc=snomed.tdb
