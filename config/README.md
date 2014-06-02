@@ -18,6 +18,8 @@ Follow the instructions [found here](nginx)
 - Configure Java enironment variables:
 
         sudo apt-get install oracle-java7-set-default
+        
+- Log out of your shell and log back in again, to load your java environment variables        
 
 * [Fix old Java Bug](http://docs.oracle.com/cd/E13209_01/wlcp/wlss30/configwlss/jvmrand.html), or Tomcat will never start: 
 
