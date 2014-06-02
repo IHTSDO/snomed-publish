@@ -12,6 +12,18 @@
 ###Create and install SSL certificates
 - [copy/create your SSL certificates](https://www.startssl.com/?app=42), and put them in `/etc/nginx/ssl/{site url}/.` 
 
+###Allow for longer server names
+
+- Edit /etc/nginx/nginx.conf and add the following
+
+        http {
+          ...
+          server_names_hash_bucket_size 64;
+          ....
+        }
+
+
+
 ###Install all the site configurations
 
 - Edit /etc/nginx/nginx.conf and add the following
