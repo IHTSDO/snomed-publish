@@ -45,7 +45,7 @@ Follow the instructions [found here](nginx)
         Set the port number to e.g. 9080
 - Make sure Jenkins is running
 
-        sudo service nginx start
+        sudo service jenkins restart
 - Visit the Jenkins URL with your browser to complete install. **Important:** Please make sure you access Jenkins using port 80 and the server name you defined in your nginx site config, and NOT the internal Jenkins port
 
 
