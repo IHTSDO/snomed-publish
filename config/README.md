@@ -169,6 +169,12 @@ Follow [these instructions](solr)
 
         cd /opt/solr/example
         nohup java -jar -Xmx1000m start.jar &
+        
+- Go to the Solr web page to start indexing. If using Tomcat, this should be on port 8080. If using the bundled jar, this should be on port 8983. If you have set up your nginx proxy, it will of course be on port 80. 
+    - NOTE: Doing the indexing will take much more memory than running the Solr server, so make sure you start your server with a good amount of memory for this. You can scale this back again, after you have completed the indexing.
+    - On the left hand drop down, select 'concept'
+    - Then click on 'dataimport' option
+    - Select 'full-import' of 'concept' and click on 'execute'
 
     
 ###Setup Fuseki and initialise the Snomed SPARQL endpoint
