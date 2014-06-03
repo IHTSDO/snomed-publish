@@ -1,5 +1,19 @@
-Installing Solr in Tomcat 7
-===========================
+###Choosing how to install Solr
+You can choose to install Solr in Tomcat, Jetty, or use the Solr bundled jar file that acts as a web server. We suggest you install Solr using the bundled jar file, but you might want to consider using Tomcat or Jetty for a more safe environment.
+
+However, please note that there is NO WAY to host multiple apps in a single Tomcat install behind multilpe top level domains. For example, this is not possible: Have Solr installed at http://localhost:8080/solr, and have nginx proxy http://solr.sparklingideas.co.uk to http://localhost:8080/solr, while at the same time have, say, the refset api installed at http://localhost:8080/refset-api, with nginx proxxy for http://refset-api.sparklingideas.co.uk to http://localhost:8080/refset-api
+
+This annoying limitation with Tomcat has caught me out so many times now, it has stopped being funny a long time ago. Seriously. 
+
+The best thing would be, to install Solr on a server BY ITSELF, and deploy it in Tomcat as the ROOT app, and no have no other apps hosted by this server. 
+
+Failing this, just use the bundled jar that comes with the Solr distro.
+
+You will find details on how to install using both methods here.
+
+###Installing Solr 7 Standalone
+
+###Installing Solr in Tomcat 7
 
 Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the installation instructions [found here](http://stackoverflow.com/questions/23503116/cant-get-solr-4-8-working-with-tomcat-7-and-ubuntu-12-04).
 
