@@ -129,7 +129,8 @@ Follow [these instructions](solr)
         wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/data-config.xml
 
 - Add schema.xml
-  
+
+        rm /opt/solr/example/solr/concept/conf/schema.xml
         wget -P /opt/solr/example/solr/concept/conf/ https://github.com/IHTSDO/snomed-publish/tree/master/config/solr/schema.xml 
 
 - Ignore all the other files in github [config/solr](https://github.com/IHTSDO/snomed-publish/tree/master/config/solr)
