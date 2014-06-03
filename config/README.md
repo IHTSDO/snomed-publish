@@ -161,9 +161,15 @@ Follow [these instructions](solr)
 
         <lib dir="../lib" />
             
-- restart tomcat
+- IF using tomcat, start/restart tomcat
 
         service tomcat7 restart
+        
+- IF using the bundled jar, kill any current running instances, then
+
+        cd /opt/solr/example
+        nohup java -jar -Xmx1000m start.jar &
+
     
 ###Setup Fuseki and initialise the Snomed SPARQL endpoint
 - [Download Apache Jena](https://jena.apache.org/download/index.cgi) and unzip the contents to /opt
