@@ -20,7 +20,13 @@ Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the ins
 - Copy Solr logging libraries to Tomcat 7
 
         cp -r /opt/solr-4.8.1/example/lib/ext/* /usr/share/tomcat7/lib
-        cp -r /opt/solr/example/resources/log4j.properties /usr/share/tomcat7/lib        
+        cp -r /opt/solr/example/resources/log4j.properties /usr/share/tomcat7/lib
+        
+
+- Add data import extension libraries to Solr 
+  
+        mkdir /opt/solr/example/solr/lib
+        cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
         
 - Create /var/lib/tomcat7/conf/Catalina/localhost/solr.xml
 
