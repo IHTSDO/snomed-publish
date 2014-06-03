@@ -141,27 +141,6 @@ Follow [these instructions](solr)
 
         chown -R tomcat7 /opt/solr
 
-
-- remove title, id from schema.xml
-
-        Edit /opt/solr/example/solr/concept/conf/schema.xml and comment out these lines:
-            
-          <fields>
-            ...
-            <!--field name="id" 
-                      type="string" 
-                      indexed="true" 
-                      stored="true" 
-                      required="true" /-->
-            ...
-            <!--field name="title" 
-                      type="text_general" 
-                      indexed="true"
-                      stored="true"
-                      multiValued="true"/-->
-            ...
-          </fields>
-
 - Add data import extension libraries to Solr 
   
         cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
