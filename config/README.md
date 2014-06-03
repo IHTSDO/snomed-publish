@@ -137,7 +137,7 @@ Follow [these instructions](solr)
   
 - Edit /opt/solr/example/solr/concept/conf/data-config.xml and set the correct mysql database password
 
-- make sure that all the Solr files are readable/writable by your tomcat7 user
+- IF you have chosen to install Solr in Tomcat 7 or Jetty, make sure that all the Solr files are readable/writable by your tomcat7/jetty user
 
         chown -R tomcat7 /opt/solr
 
