@@ -13,6 +13,33 @@ You will find details on how to install using both methods here.
 
 ###Installing Solr 7 Standalone
 
+- Download Solr
+
+        wget http://mirror.nus.edu.sg/apache/lucene/solr/4.8.1/solr-4.8.1.tgz
+
+- Untar and copy solr to /opt
+
+        1. tar -zxvf solr-4.8.1.tgz
+        2. mv solr-4.8.1 /opt
+        3. ln -s /opt/solr-4.8.1 /opt/solr
+
+- Configure logging
+
+        1. mkdir /var/log/solr
+        2. edit /opt/solr/example/resources/log4j.properties and set "solr.log=/var/log/solr"
+
+
+- Add data import extension libraries to Solr 
+  
+        mkdir /opt/solr/example/solr/lib
+        cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
+
+- Run Solr
+
+        cd /opt/solr/example
+        nohup java -jar -Xmx1000m start.jar &
+
+
 ###Installing Solr in Tomcat 7
 
 Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the installation instructions [found here](http://stackoverflow.com/questions/23503116/cant-get-solr-4-8-working-with-tomcat-7-and-ubuntu-12-04).
