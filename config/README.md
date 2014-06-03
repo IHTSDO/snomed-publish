@@ -141,10 +141,6 @@ Follow [these instructions](solr)
 
         chown -R tomcat7 /opt/solr
 
-- Add data import extension libraries to Solr 
-  
-        cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
-
 - Add mysql driver to Solr
       
         1. Download driver from http://dev.mysql.com/downloads/connector/j/
