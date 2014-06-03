@@ -34,11 +34,6 @@ You will find details on how to install using both methods here.
         mkdir /opt/solr/example/solr/lib
         cp /opt/solr/dist/solr-dataimporthandler-4.8.1.jar /opt/solr/example/solr/lib
 
-- Run Solr
-
-        cd /opt/solr/example
-        nohup java -jar -Xmx1000m start.jar &
-
 
 ###Installing Solr in Tomcat 7
 
