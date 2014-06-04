@@ -100,6 +100,7 @@ Install using apt
 ###Initialise MySQL with Snomed releases
 
 - Log into mysql and create a new empty database called 'snomed'
+- Also create a new empty database called 'authentication' (this is just legacy, and not used, but still has to be there for the app to start properly)
 - Import all your Snomed snapshot(!) releases into your database, following [these instructions](../client/import-main)
 
 ###Install Solr
@@ -222,6 +223,7 @@ Follow [these instructions](solr)
 - Edit src/main/resources/spring.properties and set your database password
  
         > database.password=YOUR_PASSWORD
+        > authentication.database.password=YOUR_PASSWORD
 - Ignore all other settings, most of it is legacy
 
 - Build the application, and deploy to Tomcat
