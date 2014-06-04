@@ -226,6 +226,10 @@ Follow [these instructions](solr)
         > authentication.database.password=YOUR_PASSWORD
 - Ignore all other settings, most of it is legacy
 
+- Set the server name in the swagger api documentation configuration
+
+        Edit src/main/resources/swagger.properties and set
+        > documentation.services.basePath=https://YOUR_SERVER_NAME/api
 - Build the application, and deploy to Tomcat
  
         mvn package
