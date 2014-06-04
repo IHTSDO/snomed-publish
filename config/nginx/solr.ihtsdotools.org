@@ -1,0 +1,62 @@
+upstream solr_server {
+    server 127.0.0.1:INSERT_SOLR_PORT_NUMBER_HERE fail_timeout=0;
+}
+
+server {
+   listen       80;
+   server_name  INSERT_SERVER_NAME_HERE;
+   return 301   https://INSERT_SERVER_NAME_HERE$request_uri;
+}
+
+server {
+    listen 443 ssl spdy;
+    ssl on;
+    server_name INSERT_SERVER_NAME_HERE;
+    ssl_certificate /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/ssl-unified.crt;
+    ssl_certificate_key /etc/nginx/ssl/INSERT_SERVER_NAME_HERE/ssl.key;
+
+    root /opt/solr/example/solr-webapp/webapp;
+    rewrite ^/solr(.*)$ $1 last;
+
+    keepalive_timeout 10;
+    access_log /var/log/nginx/INSERT_SERVER_NAME_HERE_access.log;
+    error_log /var/log/nginx/INSERT_SERVER_NAME_HERE_error.log;
+
+    # ZIP
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)"; 
+
+    location / {
+        proxy_pass http://solr_server/solr/;
+        proxy_redirect http://solr_server/solr/ /;
+
+        # Proxy headers.
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_cache_bypass $http_upgrade;
+        proxy_http_version 1.1;
+
+        # Gateway timeout.
+        proxy_read_timeout 20s;
+        proxy_send_timeout 20s;
+        # Buffer settings.
+        proxy_buffers 8 32k;
+        proxy_buffer_size 64k;
+    }
+
+    location ~ (\.js$|\.css$|\.ico|\.jpg|\.png) {
+        add_header  Cache-Control  public;
+        expires  100d;
+    }
+    index index.html index.htm;
+}
