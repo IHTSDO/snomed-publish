@@ -92,24 +92,3 @@ Installation instructions for Solr 4.8.1 running in Tomcat 7. Taken from the ins
 
         edit /etc/init.d/tomcat7 and add this line:
         > export CATALINA_OPTS="-Xmx1500m"
-        
-###Install the refset API 
-
-- Go into the 'api' subfolder of your snomed-publish checkout
-
-- Edit src/main/resources/spring.properties and set your database password
- 
-    > database.password=YOUR_PASSWORD
-- Ignore all other settings, most of it is legacy
-
-- Build the application, and deploy to Tomcat
- 
-    mvn package
-    cp target/api.war /var/lib/tomcat7/webapps
-    chown tomcat7.tomcat7 /var/lib/tomcat7/webapps/api.war
-- Restart Tomcat
-
-    service tomcat7 restart
-- Make sure your nginx proxy configuration has been set up, otherwise Swagger will not work properly
-- Test that the api has been deployed by visiting http://SERVER_NAME - You should see the Swagger details page
-
