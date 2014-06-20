@@ -1,0 +1,38 @@
+server {
+   listen       80;
+   server_name  refset.sparklingideas.co.uk;
+   return 301   https://refset.sparklingideas.co.uk$request_uri;
+}
+
+server {
+    listen 443 ssl spdy;
+    ssl on;
+    server_name refset.sparklingideas.co.uk;
+    ssl_certificate /etc/nginx/ssl/refset.sparklingideas.co.uk/ssl-unified.crt;
+    ssl_certificate_key /etc/nginx/ssl/refset.sparklingideas.co.uk/ssl.key;
+
+    root /home/refset/source/snomed-refset/dist;
+    keepalive_timeout 10;
+    access_log /var/log/nginx/refset.sparklingideas.co.uk_access.log;
+    error_log /var/log/nginx/refset.sparklingideas.co.uk_error.log;
+
+    # ZIP
+    gzip on;
+    gzip_http_version 1.1;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_proxied any;
+    gzip_buffers 16 8k;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)"; 
+
+    index index.html index.htm;
+
+    location / {
+          try_files $uri $uri/ /index.html?/$request_uri;
+    }
+
+    location ~ (\.js$|\.css$|\.ico|\.jpg|\.png) {
+        add_header  Cache-Control  public;
+        expires  100d;
+    }
+}
