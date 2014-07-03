@@ -12,11 +12,12 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
 
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
+import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
 
 public class RdfsExportCliParser {
     
     public enum RdfFormat{
-        RDFXML("RDF/XML"), RDFXMLABBREV("RDF/XML-ABBREV"), NTRIPLE("N-TRIPLE"), N3("N3"), TURTLE("TURTLE");
+        RDFXML("RDF/XML"), RDFXMLABBREV("RDF/XML-ABBREV"), NTRIPLE("N-TRIPLE"), N3("N3"), TURTLE("TURTLE"), META("META");
         
         private String format;
         
@@ -79,12 +80,12 @@ public class RdfsExportCliParser {
         String concepts = commandLine.getOptionValue('c');//done
         String triples = commandLine.getOptionValue('t');//done
         String inputFormat = commandLine.getOptionValue("if");//done
-        String outputFormat = commandLine.getOptionValue("of");//done
+        String outputFormatString = commandLine.getOptionValue("of");//done
         String output = commandLine.getOptionValue("o");//done
         String db = commandLine.getOptionValue("db"); //done
         
         testInputs(helpString, commandLine, descriptions, concepts, triples, 
-                inputFormat, outputFormat, output, db);
+                inputFormat, outputFormatString, output, db);
                 
         File conceptsFile = null;
         File triplesFile = new File(triples);
@@ -101,9 +102,15 @@ public class RdfsExportCliParser {
             outputFile = new File(output);
         }
         
+        SnomedSerialiserFactory.Form outputFormat = null;
+        if (RdfFormat.getFormat(outputFormatString) == RdfFormat.META){
+            outputFormat = SnomedSerialiserFactory.Form.META; 
+        }else{
+            outputFormat = SnomedSerialiserFactory.Form.RDF_SCHEMA;
+        }
         
         callback.runProgram(conceptsFile, triplesFile, descriptionsFile, HibernateParserFactory.Parser.valueOf(inputFormat),
-                RdfFormat.getFormat(outputFormat), outputFile, db);
+                outputFormat, outputFile, db);
     }
     
     private static void testInputs(String helpString, CommandLine commandLine,
@@ -118,7 +125,7 @@ public class RdfsExportCliParser {
                     "-c,   --concepts\tOptional. File containing concepts\n" +
                     "-d,   --descriptions\tOptional. File containing descriptions\n" +
                     "-if,  --inputformat\tFile format of input files. One of 'RF1', 'RF2', 'CANONICAL', or 'CHILD_PARENT'\n" +
-                    "-of,  --outputformat\tFormat to serialise RDF Schema to. One of 'RDF/XML', 'RDF/XML-ABBREV', 'N-TRIPLE', 'N3' or 'TURTLE'\n" +
+                    "-of,  --outputformat\tFormat to serialise RDF Schema to. One of 'RDF/XML', or 'META'\n" +
                     "-o,   --output\t\tOptional. File to serialise RDF Schema to. Must be used together with '-of' option\n" +
                     "-db,  --database\tOptional. Specify location of database file. If not specified, \n\t\t\tdefaults to an in-memory database (minimum 3Gb of heap space required)\n");
                     
@@ -147,7 +154,7 @@ public class RdfsExportCliParser {
             try{
                 HibernateParserFactory.Parser.valueOf(inputFormat);            
             }catch (IllegalArgumentException e){
-                System.out.println("Output format specified '" + outputFormat + "' not supported. Use 'RDF/XML', 'RDF/XML-ABBREV', 'N-TRIPLE', 'N3' or 'TURTLE'. Usage is: " + helpString + "");
+                System.out.println("Output format specified '" + outputFormat + "' not supported. Use 'RDF/XML', or 'META'. Usage is: " + helpString + "");
                 System.exit(-1);            
             }            
         }

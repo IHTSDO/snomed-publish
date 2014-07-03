@@ -10,7 +10,7 @@ public class SnomedSerialiserFactory  {
     public static SnomedSerialiserFactory instance;
     
     public enum Form{
-        CANONICAL, CHILD_PARENT, RDF_SCHEMA, RF2;
+        CANONICAL, CHILD_PARENT, RDF_SCHEMA, RF2, META;
     }
     
     public static SnomedSerialiser getSerialiser(Form form, Writer writer) throws IOException{
@@ -21,6 +21,8 @@ public class SnomedSerialiserFactory  {
                 return new ChildParentSerialiser(writer);
             case RDF_SCHEMA:
                 return new RdfSchemaSerialiser(writer);
+            case META:
+                return new MetaSnomedSerialiser(writer);
             case RF2:
                 return new Rf2Serialiser(writer);
             default:

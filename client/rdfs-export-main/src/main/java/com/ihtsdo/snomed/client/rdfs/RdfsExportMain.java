@@ -74,7 +74,7 @@ public class RdfsExportMain {
     }    
 
     public void runProgram(File conceptsFile, File triplesFile, File descriptionsFile, Parser inputFormat, 
-            RdfsExportCliParser.RdfFormat outputFormat, File outputFile, String db) throws IOException, java.text.ParseException
+            SnomedSerialiserFactory.Form outputFormat, File outputFile, String db) throws IOException, java.text.ParseException
     {
         try{
             initDb(db);
@@ -105,8 +105,11 @@ public class RdfsExportMain {
             }
             
             if (outputFile != null){
+                
+                
+                
                 try (OutputStreamWriter ow = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outputFile)))){
-                	 SnomedSerialiserFactory.getSerialiser(Form.RDF_SCHEMA, ow).write(ontologyVersion);
+                	 SnomedSerialiserFactory.getSerialiser(outputFormat, ow).write(ontologyVersion);
                 }
             }
             
