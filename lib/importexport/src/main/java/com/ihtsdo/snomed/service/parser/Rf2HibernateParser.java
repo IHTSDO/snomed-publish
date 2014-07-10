@@ -111,7 +111,7 @@ public class Rf2HibernateParser extends HibernateParser{
     private void populateModuleAndDefinitionStatus(EntityManager em, final OntologyVersion ontologyVersion, 
             final Map<Long, Long> conceptIdToModuleIdMap, final Map<Long, Long> conceptIdToDefinitionStatusIdMap){
         final Map<Long, Long> map = createConceptSerialisedIdToDatabaseIdMap(ontologyVersion, em);
-        LOG.debug("{} concepts to update", map.keySet().size());
+        LOG.debug("Setting module and definition status for {} concepts", map.keySet().size());
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();

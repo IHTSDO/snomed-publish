@@ -371,19 +371,20 @@ public abstract class HibernateParser {
             final OntologyVersion o) {
         LOG.info("Populating display name cache");
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
-        Session session = ((Session) hem.getDelegate()).getSessionFactory()
-                .openSession();
+        
+        //Master Concepts
+        Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement psUpdate = connection
                         .prepareStatement("UPDATE Concept SET fullyspecifiedname=? WHERE id=?");
-                PreparedStatement psSelect = connection
-                        .prepareStatement("SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and d.ontologyVersion_id=? and d.active != 0;");
+                PreparedStatement psSelect = connection.prepareStatement(
+                        "SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN " + 
+                        "Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and " + 
+                        "d.ontologyVersion_id=? and d.active != 0;");
                 int counter = 1;
-                psSelect.setLong(
-                        1,
-                        CoreMetadataConcepts.DESCRIPTION_TYPE_FULLY_SPECIFIED_NAME);
+                psSelect.setLong(1,CoreMetadataConcepts.DESCRIPTION_TYPE_FULLY_SPECIFIED_NAME);
                 psSelect.setLong(2, o.getId());
                 ResultSet rs = psSelect.executeQuery();
                 while (rs.next()) {
@@ -396,6 +397,45 @@ public abstract class HibernateParser {
             }
         });
         tx.commit();
+        
+        //History Concepts
+        Session session2 = ((Session) hem.getDelegate()).getSessionFactory().openSession();
+        Transaction tx2 = session.beginTransaction();
+        session2.doWork(new Work() {
+            public void execute(Connection connection) throws SQLException {
+                PreparedStatement psUpdate = connection
+                        .prepareStatement("UPDATE Concept SET fullyspecifiedname=? WHERE serialisedId=? AND ontologyVersion_id=?");
+//                PreparedStatement psSelect = connection.prepareStatement(
+//                        "SELECT d.about_id, d.term FROM Description d LEFT OUTER JOIN " + 
+//                        "Concept c1 on d.type_id = c1.id WHERE c1.serialisedId=? and " + 
+//                        "d.ontologyVersion_id=? and d.active != 0;");
+                
+                PreparedStatement psSelect = connection.prepareStatement(
+                    "SELECT c2.serialisedId, d.term  " +
+                    "FROM Description d LEFT OUTER JOIN Concept c1 on d.type_id = c1.id, " +
+                        "Concept c2 " +
+                    "WHERE c1.serialisedId=? " +
+                        "AND d.ontologyVersion_id=? " +
+                        "AND d.active != 0 " +
+                        "AND c2.id=d.about_id ");
+                
+                
+                int counter = 1;
+                psSelect.setLong(1,CoreMetadataConcepts.DESCRIPTION_TYPE_FULLY_SPECIFIED_NAME);
+                psSelect.setLong(2, o.getId());
+                ResultSet rs = psSelect.executeQuery();
+                while (rs.next()) {
+                    psUpdate.setString(1, rs.getString(2)); //fsn, or d.term
+                    psUpdate.setLong(2, rs.getLong(1)); //serialisedId
+                    psUpdate.setLong(3, o.getId());
+                    psUpdate.addBatch();
+                    counter++;
+                }
+                psUpdate.executeBatch();
+                LOG.info("Updated " + counter + " display names");
+            }
+        });
+        tx2.commit();        
     }
 
     protected void createIsKindOfHierarchy(EntityManager em,
