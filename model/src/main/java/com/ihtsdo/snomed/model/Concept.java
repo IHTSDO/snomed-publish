@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,11 +19,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.Null;
 
 import org.apache.commons.lang.WordUtils;
 import org.hibernate.annotations.Index;
@@ -85,6 +88,13 @@ public class Concept {
     @OneToMany(mappedBy="about", fetch=FetchType.LAZY)  
     private Set<Description> description;
     private String fullySpecifiedName;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="masterConcept", fetch=FetchType.LAZY)
+    private Set<Concept> history = new HashSet<>();
+    
+    @ManyToOne
+    @JoinColumn(name="MasterConcept_id", nullable=true)
+    private Concept masterConcept = null;
     
     //RF1
     private String ctv3id;
@@ -160,7 +170,7 @@ public class Concept {
     public boolean equals(Object o){
         if (o instanceof Concept){
             Concept c = (Concept) o;
-            if (c.getSerialisedId() == this.getSerialisedId()){
+            if ((c.getSerialisedId() == this.getSerialisedId())){
                 return true;
             }
         }
@@ -464,6 +474,23 @@ public class Concept {
     public void setVersion(int version) {
         this.version = version;
     }
+
+    public Set<Concept> getHistory() {
+        return history;
+    }
+
+    public void setHistory(Set<Concept> history) {
+        this.history = history;
+    }
+
+    public Concept getMasterConcept() {
+        return masterConcept;
+    }
+
+    public void setMasterConcept(Concept masterConcept) {
+        this.masterConcept = masterConcept;
+    }
+
     
     
 }

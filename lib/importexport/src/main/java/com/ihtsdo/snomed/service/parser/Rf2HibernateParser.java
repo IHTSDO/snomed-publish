@@ -50,8 +50,10 @@ public class Rf2HibernateParser extends HibernateParser{
         HibernateEntityManager hem = em.unwrap(HibernateEntityManager.class);
         Session session = ((Session) hem.getDelegate()).getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
+        
         final Map<Long, Long> conceptIdToModuleIdMap = new HashMap<Long, Long>();
         final Map<Long, Long> conceptIdToDefinitionStatusIdMap = new HashMap<Long, Long>();
+        
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
                 PreparedStatement ps = connection.prepareStatement("INSERT INTO Concept (serialisedId, effectiveTime, active, primitive, statusId, version, ontologyVersion_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -98,6 +100,8 @@ public class Rf2HibernateParser extends HibernateParser{
             }
         });
         tx.commit();
+        
+        setMasterHistoryRelationships(em, ontologyVersion);
         setKindOfPredicate(em, ontologyVersion);
         populateModuleAndDefinitionStatus(em, ontologyVersion, conceptIdToModuleIdMap, conceptIdToDefinitionStatusIdMap);        
         stopwatch.stop();
@@ -113,7 +117,8 @@ public class Rf2HibernateParser extends HibernateParser{
         Transaction tx = session.beginTransaction();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                PreparedStatement ps = connection.prepareStatement("UPDATE Concept SET module_id=?, status_id=? WHERE id=? AND ontologyVersion_id=?");
+                PreparedStatement ps = connection.prepareStatement("UPDATE Concept SET module_id=?, status_id=? WHERE id=? AND ontologyVersion_id=? " + 
+                        "AND masterConcept_id IS NULL"); //sanity check: The map should never contain a Concept reference that is not a master
                 for (long serialisedId : map.keySet()){
                     try{
                         ps.setLong(1, map.get(conceptIdToModuleIdMap.get(serialisedId)));

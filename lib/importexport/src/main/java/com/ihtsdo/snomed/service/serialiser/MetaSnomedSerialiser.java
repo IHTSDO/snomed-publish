@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,11 +64,12 @@ public class MetaSnomedSerialiser extends BaseSnomedSerialiser{
     private final static String PROPERTY_SNOMED_MODULE = NS_SNOMED_TERM_IDENTIFIER + ":module";
     private final static String PROPERTY_SNOMED_MODIFIER = NS_SNOMED_TERM_IDENTIFIER + ":modifier";
     private final static String PROPERTY_SNOMED_CHARACTERISTIC_TYPE = NS_SNOMED_TERM_IDENTIFIER + ":characteristicType";
-    
     private final static String PROPERTY_SNOMED_DESCRIPTION = NS_SNOMED_DESCRIPTION_IDENTIFIER + ":description";
     private final static String PROPERTY_SNOMED_EFFECTIVE_TIME = NS_SNOMED_TERM_IDENTIFIER + ":effectiveTime";
     private final static String PROPERTY_SNOMED_CASE_SIGNIFICANCE = NS_SNOMED_TERM_IDENTIFIER + ":caseSignificance";
     private final static String PROPERTY_SNOMED_DESCRIPTION_TYPE = NS_SNOMED_TERM_IDENTIFIER + ":descriptionType";
+    private final static String PROPERTY_SNOMED_TRIPLE_HASH = NS_SNOMED_TERM_IDENTIFIER + ":tripleHash";
+    private final static String PROPERTY_SNOMED_HISTORY_ENTRY = NS_SNOMED_TERM_IDENTIFIER + ":historyEntry";
         
     private SimpleDateFormat longTimeParser = new SimpleDateFormat("yyyyMMdd");
     private SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -139,10 +139,47 @@ public class MetaSnomedSerialiser extends BaseSnomedSerialiser{
         return label.replace('\"', '\'');
     }
 
-	@Override
-	public void write(final Concept c) throws IOException, ParseException {
-	    final String id = NS_SNOMED_CONCEPT_IDENTIFIER + ':' + c.getSerialisedId();
-	    
+    private void writeTripleHash(final Statement s, final String id) throws IOException{
+        
+        writer.write(id + ' ' + PROPERTY_SNOMED_TRIPLE_HASH + " \"" + 
+                s.getSubject().getSerialisedId() + 
+                s.getPredicate().getSerialisedId() + 
+                s.getObject().getSerialisedId() + 
+                '\"' + LINE_ENDING);        
+    }
+
+    @Override
+    public void write(final Concept c) throws IOException, ParseException {    
+        final String id = NS_SNOMED_CONCEPT_IDENTIFIER + ':' + c.getSerialisedId();
+        
+        //Master
+        writeDatatypeProperties (c, id);
+        
+        //Description
+        if ((c.getDescription() != null) && !c.getDescription().isEmpty()){
+            for (Description d : c.getDescription()){
+                writer.write(id + ' ' + PROPERTY_SNOMED_DESCRIPTION + ' ' +
+                        NS_SNOMED_DESCRIPTION_IDENTIFIER + ':' + d.getSerialisedId() +
+                        LINE_ENDING);
+            }
+        }
+        
+        //History
+        if ((c.getHistory() != null) && !c.getHistory().isEmpty()){
+            int counter = 1;
+            for (Concept hc : c.getHistory()){
+                String hid = id + "_h" + counter++;
+                
+                writeDatatypeProperties (hc, hid);
+                
+                //History Entry
+                writer.write(id + ' ' + PROPERTY_SNOMED_HISTORY_ENTRY + ' ' + hid + LINE_ENDING);              
+            }
+        }
+    }
+    
+	
+	public void writeDatatypeProperties(final Concept c, String id) throws IOException, ParseException {
 	    //Label
 	    writer.write(id + ' ' + PROPERTY_RDFS_LABEL + 
 	            " \"" + safe(c.getFullySpecifiedName()) + '\"' + LANGUAGE + 
@@ -172,15 +209,6 @@ public class MetaSnomedSerialiser extends BaseSnomedSerialiser{
                 dateTimeFormatter.format(longTimeParser.parse(String.valueOf(c.getEffectiveTime()))) 
                 + '\"' + XML_SCHEMA_DATATYPE_DATE +
                 LINE_ENDING);
-        
-        //Description
-        if ((c.getDescription() != null) && !c.getDescription().isEmpty()){
-            for (Description d : c.getDescription()){
-                writer.write(id + ' ' + PROPERTY_SNOMED_DESCRIPTION + ' ' +
-                        NS_SNOMED_DESCRIPTION_IDENTIFIER + ':' + d.getSerialisedId() +
-                        LINE_ENDING);
-            }
-        }
 	}
 
 	@Override
@@ -284,6 +312,9 @@ public class MetaSnomedSerialiser extends BaseSnomedSerialiser{
             writer.write(id + ' ' + PROPERTY_SNOMED_CHARACTERISTIC_TYPE + ' ' + 
                     NS_SNOMED_CONCEPT_IDENTIFIER + ':' + s.getCharacteristicType().getSerialisedId() +
                     LINE_ENDING);
-        }        
+        }
+        
+        //Triple Hash
+        writeTripleHash(s, id);
     }	
 }
