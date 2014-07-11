@@ -26,7 +26,6 @@ import com.ihtsdo.snomed.service.parser.HibernateParser;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory;
 import com.ihtsdo.snomed.service.parser.HibernateParserFactory.Parser;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory;
-import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class RdfsExportMain {
     private static final Logger LOG = LoggerFactory.getLogger( RdfsExportMain.class );
