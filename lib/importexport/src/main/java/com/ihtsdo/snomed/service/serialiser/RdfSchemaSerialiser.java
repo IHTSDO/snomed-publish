@@ -23,9 +23,9 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     private final Logger LOG = LoggerFactory.getLogger(RdfSchemaSerialiser.class);
     
     private final String NS_ONTOLOGY_VARIABLE = "__ontologyVersion_id__";
-    private final String NS_CONCEPT = "http://snomed.info/sct/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
-    private final String NS_TRIPLE = "http://snomed.info/sct/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
-    private final String NS_DESCRIPTION = "http://snomed.info/sct/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
+    private final String NS_CONCEPT = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
+    private final String NS_TRIPLE = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
+    private final String NS_DESCRIPTION = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
     
     private SimpleDateFormat longTimeParser = new SimpleDateFormat("yyyyMMdd");
     private SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
