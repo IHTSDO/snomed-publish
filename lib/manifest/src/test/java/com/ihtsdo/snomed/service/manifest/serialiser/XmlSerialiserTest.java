@@ -55,8 +55,8 @@ public class XmlSerialiserTest {
                     "      <sn:file sn:mimetype=\"application/vnd.ihtsdo.snomed.refset.crossmap.simple+txt\" sn:name=\"der2_sRefset_SimpleMapDelta_INT_20120731.txt\" sn:size=\"0\" sn:type=\"refset\">\n" +
                     "         <sn:module sn:name=\"refsetModule2\" sn:sid=\"20\">\n" +
                     "            <sn:refset sn:name=\"refset21\" sn:sid=\"21\"/>\n" +
-                    "            <sn:refset sn:name=\"refset22\" sn:sid=\"22\"/>\n" +
                     "            <sn:refset sn:name=\"refset23\" sn:sid=\"23\"/>\n" +
+                    "            <sn:refset sn:name=\"refset22\" sn:sid=\"22\"/>\n" +
                     "            <sn:refset sn:name=\"refset24\" sn:sid=\"24\"/>\n" +
                     "         </sn:module>\n" +
                     "      </sn:file>\n" +
