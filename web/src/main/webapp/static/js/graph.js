@@ -43,10 +43,10 @@ MyApp.GraphSearchController = Ember.ObjectController.extend({
     var generated =
       "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
       "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-      "PREFIX c: <http://snomedtools.info/snomed/version/1/concept/rdfs/>\n" +
-      "PREFIX d: <http://snomedtools.info/snomed/version/1/description/rdfs/>\n" +
-      "PREFIX s: <http://snomedtools.info/snomed/version/1/statement/rdfs/>\n" +
-      "PREFIX sn: <http://snomedtools.info/snomed/term/>\n" +
+      "PREFIX c: <http://snomed.info/sct/version/1/concept/rdfs/>\n" +
+      "PREFIX d: <http://snomed.info/sct/version/1/description/rdfs/>\n" +
+      "PREFIX s: <http://snomed.info/sct/version/1/statement/rdfs/>\n" +
+      "PREFIX sn: <http://snomed.info/sct/term/>\n" +
       "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\n" +
       "SELECT * WHERE {\n";
     this.get('model').forEach(function(triple, tindex, enumerable){
