@@ -403,8 +403,6 @@ public class Rf2HibernateParserTest extends BaseTest{
                     c = concept;
 
                     assertNotNull(fsnDescription);
-                    assertEquals(c.getFullySpecifiedName(), fsnDescription.getTerm());
-
                     break;
                 }
             }
