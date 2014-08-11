@@ -23,9 +23,9 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     private final Logger LOG = LoggerFactory.getLogger(RdfSchemaSerialiser.class);
     
     private final String NS_ONTOLOGY_VARIABLE = "__ontologyVersion_id__";
-    private final String NS_CONCEPT = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
-    private final String NS_TRIPLE = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
-    private final String NS_DESCRIPTION = "http://snomedtools.info/snomed/version/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
+    private final String NS_CONCEPT = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/concept/rdfs/";
+    private final String NS_TRIPLE = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/statement/rdfs/";
+    private final String NS_DESCRIPTION = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/description/rdfs/";
     
     private SimpleDateFormat longTimeParser = new SimpleDateFormat("yyyyMMdd");
     private SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -69,7 +69,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
         writer.write(" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n");
         writer.write(" xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n");
         writer.write(" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n");
-        writer.write(" xmlns:sn=\"http://snomedtools.info/snomed/term/\"\n");
+        writer.write(" xmlns:sn=\"http://snomed.info/sct/term/\"\n");
         writer.write(" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n");
         writer.write(">\n");
         printStructural();
@@ -84,61 +84,61 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
 
     public void printStructural() throws IOException{
         //EffectiveTime
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/effectiveTime\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/effectiveTime\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">EffectiveTime</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Active
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/active\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/active\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Active</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Status
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/status\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/status\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Status</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Module
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/module\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/module\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Module</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Group
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/group\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/group\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Group</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //CharacteristicType
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/characteristictype\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/characteristictype\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">CharacteristicType</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Modifier
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/modifier\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/modifier\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Modifier</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Description
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/description\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/description\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Description</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //CaseSignificance
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/casesignificance\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/casesignificance\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">CaseSignificance</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");
         
         //Type
-        writer.write("<rdf:Description rdf:about=\"http://snomedtools.info/snomed/term/type\">\n");
+        writer.write("<rdf:Description rdf:about=\"http://snomed.info/sct/term/type\">\n");
         writer.write("<rdfs:label xml:lang=\"en-gb\">Type</rdfs:label>\n");
         writer.write("<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n");
         writer.write("</rdf:Description>\n");

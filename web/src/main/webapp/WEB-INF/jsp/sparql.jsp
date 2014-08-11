@@ -76,19 +76,19 @@
           </tr>
           <tr>
               <td>c</td>
-              <td>http://snomedtools.info/version/1/concept/rdfs/</td>
+              <td>http://snomed.info/version/1/concept/rdfs/</td>
           </tr>
           <tr>
               <td>d</td>
-              <td>http://snomedtools.info/version/1/description/rdfs/</td>
+              <td>http://snomed.info/version/1/description/rdfs/</td>
           </tr>
           <tr>
               <td>s</td>
-              <td>http://snomedtools.info/version/1/statement/rdfs/</td>
+              <td>http://snomed.info/version/1/statement/rdfs/</td>
           </tr>
           <tr>
             <td>sn</td>
-            <td>http://snomedtools.info/term/</td>
+            <td>http://snomed.info/term/</td>
           </tr>
           <tr>
             <td>xsd</td>

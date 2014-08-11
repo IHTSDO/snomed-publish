@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Set;
 
 import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -392,14 +393,24 @@ public class Rf2HibernateParserTest extends BaseTest{
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_STATEMENTS),
                 ClassLoader.getSystemResourceAsStream(TEST_RF2_DESCRIPTIONS), em);
         OntologyVersion o2 = em.merge(ontologyVersion);
-        Concept c = o2.getConcepts().iterator().next();
+        Set<Concept> cs = o2.getConcepts();
         Description fsnDescription = null;
-        for (Description d : c.getDescription()){
-            if (d.isFullySpecifiedName()){
-                fsnDescription = d;
-                break;
+        Concept c = null;
+        for (Concept concept : cs) {
+            for (Description d : concept.getDescription()){
+                if (d.isFullySpecifiedName()){
+                    fsnDescription = d;
+                    c = concept;
+
+                    assertNotNull(fsnDescription);
+                    assertEquals(c.getFullySpecifiedName(), fsnDescription.getTerm());
+
+                    break;
+                }
             }
-        }
+		}
+        
+        //to make sure these assertion has been performed for at least one concept
         assertNotNull(fsnDescription);
         assertEquals(c.getFullySpecifiedName(), fsnDescription.getTerm());
     }    
