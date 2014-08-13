@@ -64,7 +64,7 @@ public class SnapshotSnomedSerialiser extends BaseSnomedSerialiser{
     private final static String PROPERTY_SNOMED_MODULE = NS_SNOMED_TERM_IDENTIFIER + ":module";
     private final static String PROPERTY_SNOMED_MODIFIER = NS_SNOMED_TERM_IDENTIFIER + ":modifier";
     private final static String PROPERTY_SNOMED_CHARACTERISTIC_TYPE = NS_SNOMED_TERM_IDENTIFIER + ":characteristicType";
-    private final static String PROPERTY_SNOMED_DESCRIPTION = NS_SNOMED_DESCRIPTION_IDENTIFIER + ":description";
+    private final static String PROPERTY_SNOMED_DESCRIPTION = NS_SNOMED_TERM_IDENTIFIER + ":description";
     private final static String PROPERTY_SNOMED_EFFECTIVE_TIME = NS_SNOMED_TERM_IDENTIFIER + ":effectiveTime";
     private final static String PROPERTY_SNOMED_CASE_SIGNIFICANCE = NS_SNOMED_TERM_IDENTIFIER + ":caseSignificance";
     private final static String PROPERTY_SNOMED_DESCRIPTION_TYPE = NS_SNOMED_TERM_IDENTIFIER + ":descriptionType";
@@ -242,7 +242,7 @@ public class SnapshotSnomedSerialiser extends BaseSnomedSerialiser{
         //Description(s)
         if (d.getType() != null){
             writer.write(id + ' ' + PROPERTY_SNOMED_DESCRIPTION_TYPE + ' ' + 
-                    NS_SNOMED_DESCRIPTION_IDENTIFIER + ':' + d.getType().getSerialisedId() +
+            		NS_SNOMED_CONCEPT_IDENTIFIER + ':' + d.getType().getSerialisedId() +
                     LINE_ENDING);
         }        
         
