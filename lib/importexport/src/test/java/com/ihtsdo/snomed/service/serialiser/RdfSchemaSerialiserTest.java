@@ -19,98 +19,102 @@ import com.ihtsdo.snomed.model.Statement;
 import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class RdfSchemaSerialiserTest {
+	
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/#";
+    private final static String DEFAULT_SNOMED_BASE_URI = "http://sct.snomed.info/";
+
 
     private static final String EXPECTED_RESULT =
     		"<rdf:RDF\n" +
     		" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n" +
     		" xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n" +
     		" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n" +
-    		" xmlns:sn=\"http://snomed.info/sct/term/\"\n" +
+    		" xmlns:sn=\"" + NS_SNOMED_BASE + "\"\n" +
     		" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\"\n" +
     		">\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/effectiveTime\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "effectiveTime\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">EffectiveTime</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/active\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "active\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Active</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/status\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "status\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Status</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/module\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "module\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Module</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/group\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "group\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Group</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/characteristictype\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "characteristicType\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">CharacteristicType</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/modifier\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "modifier\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Modifier</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/description\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "description\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Description</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/casesignificance\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "caseSignificance\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">CaseSignificance</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/term/type\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "type\">\n" +
     		"<rdfs:label xml:lang=\"en-gb\">Type</rdfs:label>\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/100523006\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "100523006\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/100523007\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "100523007\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/116680003\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "116680003\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/statement/rdfs/0\">\n" +
+    		"<rdf:Description rdf:about=\""+ DEFAULT_SNOMED_BASE_URI + "0\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\"/>\n" +
-    		"<rdf:subject rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/100523006\"/>\n" +
-    		"<rdf:predicate rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/116680003\"/>\n" +
-    		"<rdf:object rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/100523007\"/>\n" +
+    		"<rdf:subject rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "100523006\"/>\n" +
+    		"<rdf:predicate rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "116680003\"/>\n" +
+    		"<rdf:object rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "100523007\"/>\n" +
     		"<sn:group rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">0</sn:group>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/100523008\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "100523008\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/100523009\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "100523009\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/2000/01/rdf-schema#Class\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/concept/rdfs/116680004\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "116680004\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/>\n" +
     		"<rdfs:label xml:lang=\"en-gb\">null</rdfs:label>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +
-    		"<rdf:Description rdf:about=\"http://snomed.info/sct/version/1/statement/rdfs/1\">\n" +
+    		"<rdf:Description rdf:about=\"" + DEFAULT_SNOMED_BASE_URI + "1\">\n" +
     		"<rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\"/>\n" +
-    		"<rdf:subject rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/100523008\"/>\n" +
-    		"<rdf:predicate rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/116680004\"/>\n" +
-    		"<rdf:object rdf:resource=\"http://snomed.info/sct/version/1/concept/rdfs/100523009\"/>\n" +
+    		"<rdf:subject rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "100523008\"/>\n" +
+    		"<rdf:predicate rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "116680004\"/>\n" +
+    		"<rdf:object rdf:resource=\"" + DEFAULT_SNOMED_BASE_URI + "100523009\"/>\n" +
     		"<sn:group rdf:datatype=\"http://www.w3.org/2001/XMLSchema#int\">1</sn:group>\n" +
     		"<sn:active rdf:datatype=\"http://www.w3.org/2001/XMLSchema#boolean\">false</sn:active>\n" +
     		"</rdf:Description>\n" +

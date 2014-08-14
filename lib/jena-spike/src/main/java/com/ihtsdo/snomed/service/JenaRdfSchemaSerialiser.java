@@ -29,11 +29,12 @@ import com.ihtsdo.snomed.model.Statement;
 
 public class JenaRdfSchemaSerialiser{
 
-    
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/";
+
     private static final String NS_ONTOLOGY_VARIABLE = "__ONTOLOGY_ID__";
-    private static final String NS_CONCEPT = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/concept/";
-    private static final String NS_TRIPLE = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/statement/";
-    private static final String NS_DESCRIPTION = "http://snomed.info/sct/version/" + NS_ONTOLOGY_VARIABLE + "/description/";
+    private static final String NS_CONCEPT = NS_SNOMED_BASE";
+    private static final String NS_TRIPLE = NS_SNOMED_BASE";
+    private static final String NS_DESCRIPTION = NS_SNOMED_BASE";
     private static final Logger LOG = LoggerFactory.getLogger(JenaRdfSchemaSerialiser.class);
 
 
@@ -78,34 +79,34 @@ public class JenaRdfSchemaSerialiser{
         List<Concept> concepts = conceptsQuery.getResultList();
         LOG.info("Loaded " + concepts.size() + " concepts in " + stopwatch.elapsed(TimeUnit.SECONDS) + " seconds");
 
-        OntProperty opEffectiveTime = ontModel.createOntProperty("http://snomed.info/sct/term/effectiveTime");
+        OntProperty opEffectiveTime = ontModel.createOntProperty(NS_SNOMED_BASE + "effectiveTime");
         opEffectiveTime.setLabel("Effective time", "en-uk");
         
-        OntProperty opActive = ontModel.createOntProperty("http://snomed.info/sct/term/active");
+        OntProperty opActive = ontModel.createOntProperty(NS_SNOMED_BASE + "active");
         opActive.setLabel("Active", "en-uk");
 
-        OntProperty opStatus = ontModel.createOntProperty("http://snomed.info/sct/term/status");
+        OntProperty opStatus = ontModel.createOntProperty(NS_SNOMED_BASE + "status");
         opStatus.setLabel("Status", "en-uk");
         
-        OntProperty opModule = ontModel.createOntProperty("http://snomed.info/sct/term/module");
+        OntProperty opModule = ontModel.createOntProperty(NS_SNOMED_BASE + "module");
         opModule.setLabel("Module", "en-uk");
         
-        OntProperty opGroup = ontModel.createOntProperty("http://snomed.info/sct/term/group");
+        OntProperty opGroup = ontModel.createOntProperty(NS_SNOMED_BASE + "group");
         opGroup.setLabel("Group", "en-uk");
         
-        OntProperty opCharacteristicType = ontModel.createOntProperty("http://snomed.info/sct/term/characteristictype");
+        OntProperty opCharacteristicType = ontModel.createOntProperty(NS_SNOMED_BASE + "characteristicType");
         opCharacteristicType.setLabel("CharacteristicType", "en-uk");
         
-        OntProperty opModifier = ontModel.createOntProperty("http://snomed.info/sct/term/modifier");
+        OntProperty opModifier = ontModel.createOntProperty(NS_SNOMED_BASE + "modifier");
         opModifier.setLabel("Modifier", "en-uk");
         
-        OntProperty opDescription = ontModel.createOntProperty("http://snomed.info/sct/term/description");
+        OntProperty opDescription = ontModel.createOntProperty(NS_SNOMED_BASE + "description");
         opModifier.setLabel("Decsription", "en-uk");
         
-        OntProperty opCaseSignificance = ontModel.createOntProperty("http://snomed.info/sct/term/casesignificance");
+        OntProperty opCaseSignificance = ontModel.createOntProperty(NS_SNOMED_BASE + "caseSignificance");
         opModifier.setLabel("CaseSignificance", "en-uk"); 
         
-        OntProperty opType = ontModel.createOntProperty("http://snomed.info/sct/term/type");
+        OntProperty opType = ontModel.createOntProperty(NS_SNOMED_BASE + "type");
         opModifier.setLabel("Type", "en-uk");
         
         int counter = 1;

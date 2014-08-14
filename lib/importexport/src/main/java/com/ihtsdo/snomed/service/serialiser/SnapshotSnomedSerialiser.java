@@ -23,7 +23,10 @@ public class SnapshotSnomedSerialiser extends BaseSnomedSerialiser{
     
     private static final String LANGUAGE = "@en-gb";
     
-    private final static String NS_SNOMED_BASE = "http://snomed.info/ns/sct";
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/#";
+    private final static String DEFAULT_SNOMED_BASE_URI = "http://sct.snomed.info/";
+
+
     private final static String GRAPH_NAME = NS_SNOMED_BASE + "graph#snomed";
     
     private static final String NS_XML_SCHEMA_DATATYPE = "http://www.w3.org/2001/XMLSchema#";
@@ -32,16 +35,16 @@ public class SnapshotSnomedSerialiser extends BaseSnomedSerialiser{
     private static final String XML_SCHEMA_DATATYPE_DATE = "^^" + NS_XML_SCHEMA_DATATYPE_IDENTIFIER + ":date";
     private static final String XML_SCHEMA_DATATYPE_INTEGER = "^^" + NS_XML_SCHEMA_DATATYPE_IDENTIFIER + ":int";
     
-    private final static String NS_SNOMED_TERM = NS_SNOMED_BASE + "term#";
+    private final static String NS_SNOMED_TERM = NS_SNOMED_BASE;
     private final static String NS_SNOMED_TERM_IDENTIFIER = "sn";
     
-    private final static String NS_SNOMED_CONCEPT = NS_SNOMED_BASE + "concept#";
+    private final static String NS_SNOMED_CONCEPT = NS_SNOMED_BASE;
     private final static String NS_SNOMED_CONCEPT_IDENTIFIER = "c";
     
-    private final static String NS_SNOMED_DESCRIPTION = NS_SNOMED_BASE + "description#";
+    private final static String NS_SNOMED_DESCRIPTION = NS_SNOMED_BASE;
     private final static String NS_SNOMED_DESCRIPTION_IDENTIFIER = "d";
     
-    private final static String NS_SNOMED_STATEMENT = NS_SNOMED_BASE + "statement#";
+    private final static String NS_SNOMED_STATEMENT = NS_SNOMED_BASE;
     private final static String NS_SNOMED_STATEMENT_IDENTIFIER = "s";    
     
     private final static String NS_RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
