@@ -29,7 +29,7 @@ import com.ihtsdo.snomed.model.Statement;
 
 public class JenaRdfSchemaSerialiser{
 
-    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/";
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info#";
 
     private static final String NS_ONTOLOGY_VARIABLE = "__ONTOLOGY_ID__";
     private static final String NS_CONCEPT = NS_SNOMED_BASE";
