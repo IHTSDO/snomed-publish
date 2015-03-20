@@ -21,7 +21,7 @@ public class UrlBuilder {
         
     
     public static URL createOntologyUrl(Concept c) throws MalformedURLException {
-        return new URL(ONTOLOGY_URL.replace(ontologyVersion_id_KEY, Long.toString(c.getOntology().getId())));
+        return new URL(ONTOLOGY_URL.replace(ontologyVersion_id_KEY, Long.toString(c.getOntologyVersion().getId())));
     }
     
     public static URL createOntologyUrl(Statement s) throws MalformedURLException {
@@ -29,18 +29,18 @@ public class UrlBuilder {
     }    
     
     public static URL createOntologyUrl(Description d) throws MalformedURLException {
-        return new URL(ONTOLOGY_URL.replace(ontologyVersion_id_KEY, Long.toString(d.getOntology().getId())));
+        return new URL(ONTOLOGY_URL.replace(ontologyVersion_id_KEY, Long.toString(d.getOntologyVersion().getId())));
     }    
 
     public static URL createDescriptionUrl(Description d) throws MalformedURLException {
         return new URL(DESCRIPTION_URL
-                .replace(ontologyVersion_id_KEY, Long.toString(d.getOntology().getId()))
+                .replace(ontologyVersion_id_KEY, Long.toString(d.getOntologyVersion().getId()))
                 .replace(DESCRIPTION_ID_KEY, Long.toString(d.getSerialisedId())));
     }
 
     public static URL createConceptUrl(Concept c) throws MalformedURLException {
         return new URL(CONCEPT_URL
-                .replace(ontologyVersion_id_KEY, Long.toString(c.getOntology().getId()))
+                .replace(ontologyVersion_id_KEY, Long.toString(c.getOntologyVersion().getId()))
                 .replace(CONCEPT_ID_KEY, Long.toString(c.getSerialisedId())));
     }
 

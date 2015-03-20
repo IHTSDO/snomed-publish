@@ -147,7 +147,7 @@ public class Concept {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("serialisedId", getSerialisedId())
-                .add("ontologyVersion", getOntology() == null ? null : getOntology().getId())
+                .add("ontologyVersion", getOntologyVersion() == null ? null : getOntologyVersion().getId())
                 .add("descriptions", getDescription() == null ? 0 : getDescription().size())
                 .add("statusId(rf1)", getStatusId())
                 .add("fullySpecifiedName(rf1)", getFullySpecifiedName())
@@ -402,7 +402,7 @@ public class Concept {
     public Set<Statement> getObjectOfStatements(){
         return objectOfStatements;
     }
-    public OntologyVersion getOntology() {
+    public OntologyVersion getOntologyVersion() {
         return ontologyVersion;
     }
     public void setOntologyVersion(OntologyVersion ontologyVersion) {

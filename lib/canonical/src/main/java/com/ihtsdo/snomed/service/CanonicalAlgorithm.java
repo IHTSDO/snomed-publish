@@ -61,7 +61,7 @@ public class CanonicalAlgorithm {
     protected Set<Statement> createProximalPrimitiveStatementsForConcept(Concept concept, boolean useCache, boolean showDetails, Set<Long> showDetailsConceptIds){
         Set<Statement> returnStatements = new HashSet<Statement>();
         for (Concept proximalPrimitiveConcept : getProximalPrimitiveConcepts(concept, useCache, showDetails, showDetailsConceptIds)){
-            returnStatements.add(new Statement(getNewId(), concept, concept.getOntology().getIsKindOfPredicate(), proximalPrimitiveConcept));
+            returnStatements.add(new Statement(getNewId(), concept, concept.getOntologyVersion().getIsKindOfPredicate(), proximalPrimitiveConcept));
         }
         return returnStatements;
     }    

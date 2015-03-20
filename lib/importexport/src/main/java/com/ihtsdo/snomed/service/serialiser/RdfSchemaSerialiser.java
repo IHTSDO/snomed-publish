@@ -325,13 +325,13 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
 
 	@Override
 	public void write(Concept c) throws IOException, ParseException {
-		writeConcept(c.getOntology(), c);
+		writeConcept(c.getOntologyVersion(), c);
 		
 	}
 
 	@Override
 	public void write(Description d) throws IOException, ParseException {
-		writeDescription(d.getOntology(), d);
+		writeDescription(d.getOntologyVersion(), d);
 		
 	}
 

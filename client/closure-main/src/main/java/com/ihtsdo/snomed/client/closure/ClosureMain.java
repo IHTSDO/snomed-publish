@@ -141,7 +141,7 @@ public class ClosureMain {
                 throw new InvalidInputException("Parsing failed");
             }
             
-            TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontology.id=:ontologyId", Concept.class);
+            TypedQuery<Concept> query = em.createQuery("SELECT c FROM Concept c WHERE c.ontologyVersion.id=:ontologyId", Concept.class);
             query.setParameter("ontologyId", ontologyVersion.getId());
             query.setHint("org.hibernate.cacheable", Boolean.TRUE);
             query.setHint("org.hibernate.readOnly", Boolean.TRUE);

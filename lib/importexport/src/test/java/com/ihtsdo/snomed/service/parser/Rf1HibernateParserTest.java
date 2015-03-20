@@ -176,7 +176,7 @@ public class Rf1HibernateParserTest extends BaseTest{
         assertEquals (HibernateParser.DEFAULT_CONCEPT_ACTIVE, c.isActive());
         assertEquals (HibernateParser.DEFAULT_CONCEPT_EFFECTIVE_TIME, c.getEffectiveTime());
         assertEquals (HibernateParser.DEFAULT_CONCEPT_PRIMITIVE, c.isPrimitive());
-        //assertEquals (new Long(1), c.getOntology().getId());
+        //assertEquals (new Long(1), c.getOntologyVersion().getId());
     }
     
     @Test

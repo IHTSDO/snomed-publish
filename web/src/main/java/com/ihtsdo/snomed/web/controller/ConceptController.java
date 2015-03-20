@@ -572,7 +572,7 @@ public class ConceptController {
 
 //    @RequestMapping(value="/ontology/{ontologyId}/export", method = RequestMethod.GET)
 //    public ModelAndView exportOntology(@PathVariable long ontologyId, ModelMap map, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, IOException, OntologyNotFoundException{
-//        Ontology ontology = ontologyService.getOntology(ontologyId);
+//        Ontology ontology = ontologyService.getOntologyVersion(ontologyId);
 //        response.setHeader("Content-Disposition", "attachment;filename=" + ontology.getName() + ".ontology.txt");
 //        response.setContentType("text/ontology");
 //        response.setHeader("Content-Encoding", "UTF-8");

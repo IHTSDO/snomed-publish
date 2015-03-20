@@ -71,7 +71,7 @@ public class Description {
     }
 
     public boolean isFullySpecifiedName(){
-        if (getOntology().isRf2()){
+        if (getOntologyVersion().isRf2()){
             return CoreMetadataConcepts.isFullySpecifiedName(getType());
         }else{
             return getDescriptionTypeId() == RF1_FULLY_SPECIFIED_NAME_ID;
@@ -79,7 +79,7 @@ public class Description {
     }
     
     public boolean isSynonym(){
-        if (getOntology().isRf2()){
+        if (getOntologyVersion().isRf2()){
             return CoreMetadataConcepts.isSynonym(getType());
         }else{
             return getDescriptionTypeId() == RF1_SYNONYM_ID;
@@ -103,7 +103,7 @@ public class Description {
         return Objects.toStringHelper(this)
                 .add("id", getId())
                 .add("internalId", getSerialisedId())
-                .add("ontologyVersion", getOntology() == null ? null : getOntology().getId())
+                .add("ontologyVersion", getOntologyVersion() == null ? null : getOntologyVersion().getId())
                 .add("term", getTerm())
                 .add("about", getAbout() == null ? null : getAbout().getSerialisedId())
                 .add("languageCode", getLanguageCode())
@@ -241,7 +241,7 @@ public class Description {
         this.serialisedId = serialisedId;
     }
 
-    public OntologyVersion getOntology() {
+    public OntologyVersion getOntologyVersion() {
         return ontologyVersion;
     }
 

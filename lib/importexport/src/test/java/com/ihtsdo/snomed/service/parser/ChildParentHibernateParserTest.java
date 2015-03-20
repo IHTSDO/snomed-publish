@@ -129,7 +129,7 @@ public class ChildParentHibernateParserTest extends BaseTest{
         assertNotNull(c);
         assertEquals (609555007, c.getSerialisedId());
         assertTrue(c.getKindOfs().contains(new Concept(161639008)));
-        //assertEquals (new Long(1), c.getOntology().getId());
+        //assertEquals (new Long(1), c.getOntologyVersion().getId());
     }
     
     @Test
