@@ -23,7 +23,7 @@ public class MetaSnomedSerialiser extends BaseSnomedSerialiser{
     
     private static final String LANGUAGE = "@en-gb";
     
-    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/";
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info";
     private final static String GRAPH_NAME = NS_SNOMED_BASE + "graph#metasnomed";
     
     private static final String NS_XML_SCHEMA_DATATYPE = "http://www.w3.org/2001/XMLSchema#";

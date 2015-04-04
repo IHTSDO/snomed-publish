@@ -24,7 +24,7 @@ public class RdfSchemaSerialiser extends BaseSnomedSerialiser{
     private final Logger LOG = LoggerFactory.getLogger(RdfSchemaSerialiser.class);
     
     private final String DEFAULT_SNOMED_BASE_URI = "http://sct.snomed.info/";
-    private final String DEFAULT_SNOMED_NS = "http://sct.snomed.info/#";
+    private final String DEFAULT_SNOMED_NS = "http://sct.snomed.info#";
 
     private final String NS_ONTOLOGY_VARIABLE = "__ontologyVersion_id__";
     private final String NS_CONCEPT = DEFAULT_SNOMED_BASE_URI;

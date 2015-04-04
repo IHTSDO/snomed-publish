@@ -23,7 +23,7 @@ public class SnapshotSnomedSerialiser extends BaseSnomedSerialiser{
     
     private static final String LANGUAGE = "@en-gb";
     
-    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/#";
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info#";
     private final static String DEFAULT_SNOMED_BASE_URI = "http://sct.snomed.info/";
 
 

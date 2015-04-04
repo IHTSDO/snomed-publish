@@ -20,7 +20,7 @@ import com.ihtsdo.snomed.service.serialiser.SnomedSerialiserFactory.Form;
 
 public class RdfSchemaSerialiserTest {
 	
-    private final static String NS_SNOMED_BASE = "http://sct.snomed.info/#";
+    private final static String NS_SNOMED_BASE = "http://sct.snomed.info#";
     private final static String DEFAULT_SNOMED_BASE_URI = "http://sct.snomed.info/";
 
 
